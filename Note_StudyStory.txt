@@ -1,0 +1,1503 @@
+
+/***************************************************************************/
+/***************************************************************************/
+茂啟餘圖 蒙簡天心 卿清溪浯 光前有奕 興宗樸派 以承道脈 超爾君子 克明俊德 世立其昌 公侯仲伯 孝義榮崇 古訓是式
+
+/***************************************************************************/
+mp3的編碼
+/***************************************************************************/
+mp3有所謂的kbps，(位元率，代表每秒鐘所傳輸的資料量，如，一首128kbps的mp3，表示每秒播放資料量為128kb) 
+包含從32、40、48、56、64、80、96、112、128、160、192、224、256、到320kbps的範圍，基本上越高音質相對越好， 而320再高上去當然還有，不過目前沒有播放器支援。
+
+而目前mp3有三種壓縮演算法：
+CBR (固定位元率) ： 鎖定一個固定位元率來編碼，檔案容量最大。(320kbps的CBR，為目前mp3最高音質，但檔案也是最大。)
+VBR (變動位元率) ： 在保持音質的前提下，會自動依聲音複雜程度來加強或減少資料流量。如：在檔案無聲的部份，減少流量；在大動態或大編製的場景，則增加流量。
+可在最小音質破 壞的限度內，達到節省空間的目的，流量上下限也可以設定。
+ABR (平均位元率)：由LAME發展，介於CBR與VBR之間的一種模式， 基本上就是以CBR的演算法去做VBR的工作。簡單的分別就是，VBR可設定流量的上下限，而ABR可再多加設定
+流量平均值(中間值)。
+不懂的話沒關係，反正普遍情況是這樣的：
+音質：CBR > VBR > ABR
+192 kbps以下的CBR，與後兩者無明顯差異，但檔案容量差很多，建議有心要壓CBR就直接衝高流量！
+檔 案大小：CBR > VBR & ABR
+後兩者隨參數設定而有差別，大致上差不了多少
+
+MP3是目前使用用戶最多、應用最為廣泛的有損壓縮數字音頻格式，而CBR、VBR、ABR， 則是LAME壓製MP3的三種方法。
+CBR（Constant Bit Rate，固定比特率） 
+　　CBR是最古老最簡單的MP3編碼（壓縮）方式。採用此法編碼時，整個文件的比特率都是一樣的，換言之，MP3文件每 秒使用的比特率都是一樣。儘管音樂文件有複雜程度
+不同的段落，編碼器始終把比特率保持一致，除非你用最高音質，否則，MP3文件中不同段落的音質會有變化。越是複雜的段落，其音質就越差。它的最大優點是文件的尺寸固
+定，便於計算存儲的空間。
+
+VBR（Variable Bit Rate，可變比特率） 
+　　VBR是一種可變編碼速率的MP3壓縮方式，其原理就是將一首歌的複雜部分用高比特率編碼，簡單部分用低比特率編碼，通過這種動態調整編碼速率的方式，進一步得到音
+質和文件體積之間的平衡。它的主要優點是可以讓整 首歌都能大致達到我們的音質要求，缺點是編碼時無法估計壓縮出來的文件體積大小。 
+現在推出的MP3隨身聽大部分都支援VBR了，不過有些機器雖然能夠播放VBR格式的歌曲，但是不能夠正確顯示播放時間，目前許多高品質的MP3 音樂都是採用VBR編碼的。
+
+ABR（Average Bit Rate，平均比特率） 
+　　ABR是VBR的一種插值參數，它是在VBR的基礎上發展出來的一種編碼方式，是針對CBR較大的文件體積和VBR生成文件體積大小 不定的特點創造了這種編碼模式。ABR在指定
+的文件大小內，以每50幀（30幀約1秒）為一段，低頻和不敏感頻率使用相對低的流量，高頻和大動態表現時使用高流量，可以作為VBR和CBR的一種折中選擇。
+
+大概的檔案大小 (僅為參考)：
+128Kbps CBR：3～4MB (常見於一般MP3，推薦)
+320Kbps CBR：9～12MB (追求音質極限的人適用)
+VBR 最佳音質(約220-270Kbps)：7～10MB (追求音質和檔案大小平衡的人適用)
+
+
+/***************************************************************************/
+HEX文件和BIN文件格式的區別
+/***************************************************************************/
+文件格式
+HEX文件和BIN文件是我們經常碰到的2種文件格式。下面簡單介紹一下這2種文件格式的區別：
+1 － HEX文件是包括地址資訊的，而BIN文件格式只包括了數據本身
+         在燒寫或下載HEX文件的時候，一般都不需要用戶指定地址，因為HEX文件內部的資訊已經包括了地址。而燒寫BIN文件的時候，用戶是一定需要指定地址資訊的。
+3 － BIN文件格式
+         對二進位文件而言，其實沒有」格式」。文件只是包括了純粹的二進位數據。         
+         
+4 － HEX文件格式
+         HEX文件都是由記錄（RECORD）組成的。在HEX文件裡面，每一行代表一個記錄。記錄的基本格式為：
+         +---------------------------------------------------------------+
+         |   RECORD  | RECLEN |  LOAD  | RECTYPE | INFO or DATA | CHKSUM |
+         |  MARK ':' |        | OFFSET |         |              |        |
+         +---------------------------------------------------------------+
+         |  1-byte   | 1-byte | 2-byte | 1-byte  |    n-byte    | 1-byte |
+         +---------------------------------------------------------------+
+         
+         記錄類型包括：
+         '00' Data Rrecord：用來記錄數據，HEX文件的大部分記錄都是數據記錄
+         '01' End of File Record: 用來標識文件結束，放在文件的最後，標識HEX文件的結尾
+         '04' Extended Linear Address Record: 用來標識擴展線性地址的記錄
+         '02' Extended Segment Address Record: 用來標識擴展段地址的記錄
+         
+         在上面的後2種記錄，都是用來提供地址資訊的。每次碰到這2個記錄的時候，都可以根據記錄計算出一個「基」地址。
+         對於後面的數據記錄，計算地址的時候，都是以這些「基」地址為基礎的。
+         
+         數據記錄的具體格式：
+         +---------------------------------------------------------------+
+         |   RECORD  | RECLEN |  LOAD  | RECTYPE | INFO or DATA | CHKSUM |
+         |  MARK ':' |        | OFFSET |  '00'   |              |        |
+         +---------------------------------------------------------------+
+         |  1-byte   | 1-byte | 2-byte | 1-byte  |    n-byte    | 1-byte |
+         +---------------------------------------------------------------+         
+         
+         看個例子：
+        :020000040000FA
+        :10000400FF00A0E314209FE5001092E5011092E5A3
+        :00000001FF         
+       
+        對上面的HEX文件進行分析：
+        第1條記錄的長度為02，LOAD OFFSET為0000，RECTYPE為04，說明該記錄為擴展段地址記錄。數據為0000，校驗和為FA。從這個記錄的長度和數據，我們可以計算出一個 基地址，這個地址為0X0000。後面的數據記錄都以這個地址為基地址。
+
+        第2條記錄的長度為10（16），LOAD OFFSET為0004，RECTYPE為00，說明該記錄為數據記錄。
+        數據為FF00A0E314209FE5001092E5011092E5，共16個BYTE。這個記錄的校驗和為A3。此時的基地址為0X0000，加上OFFSET，
+        這個記錄裡的16BYTE的數據的起始地址就是0x0000 + 0x0004 = 0x0004.
+        第3條記錄的長度為00，LOAD OFFSET為0000，TYPE ＝ 01，校驗和為FF。說明這個是一個END OF FILE RECORD，標識
+        文件的結尾。
+       
+        在上面這個例子裡，實際的數據只有16個BYTE：FF00A0E314209FE5001092E5011092E5，其起始地址為0x4
+
+4 － HEX文件和BIN文件大小有區別
+     HEX文件是用ASCII來表示二進位的數值。例如一般8-BIT的二進位數值0x3F，用ASCII來表示就需要分別表示字元'3'
+     和字元'F'，每個字元需要一個BYTE，所以HEX文件需要 > 2倍的空間。
+     對一個BIN文件而言，你查看文件的大小就可以知道文件包括的數據的實際大小。而對HEX文件而言，你看到的文件
+     大小並不是實際的數據的大小。一是因為HEX文件是用ASCII來表示數據，二是因為HEX文件本身還包括別的附加資訊。
+
+
+要想詳細瞭解HEX文件格式，請GOOGLE INTEL HEX，就能找到詳細的PDF文檔。
+
+
+/***************************************************************************/
+Android基於Cling開發DLNA應用    ref: http://www.it165.net/pro/html/201303/4968.html
+/***************************************************************************/
+DLNA，Digital Living Network Alliance的簡稱，即數字生活網路聯盟。
+其由消費性電子、移動電話以及電腦廠商組成。目標在於創建一套可以使得各廠商的產品互相連接，互相適應的工業標準，從而為消費者實現數位化生活。
+
+UPnP/DLNA library for Java and Android。
+GitHub最多關注，當前仍在維護，許可協定為LGPL或CDDL。
+
+以下為中文譯文：
+
+## 5. Android上的Cling
+Cling Core為Android應用提供了UPnP棧。由於如今大部分Android系統都是小型手持設備，所以通常你需要寫控制端應用。
+然而你也可以寫Android上的UPnP服務應用，其所有特性Cling Core都支援。
+ 
+```
+Android模擬器上的Cling
+在寫此時，Android模擬器還不支援接收UDP組播。不過，可以發送UDP組播。你能夠發送一個組播UPnP搜尋，並接收UDP單播回應，繼而發現正運行的設備。
+你發現不了在搜尋後新開啟的設備，並且在設備關閉時也收不到消息。另外，其他在你網路的控制端應用，則不能發現你本地的Android設備或服務。
+在你測試應用時，所有這些情況都會使你感到困惑，所以除非你真得理解哪些有作用、哪些沒有，不然你應當使用一個真正的設備。
+
+這章闡述了你如何整合Cling到你的Android應用，使其成為一個共享的部件。
+```
+ 
+### 5.1. 配置應用服務
+你可以在Android應用主activity中實例化Cling UpnpService。
+另一方面，如果你好些activities都要要求訪問UPnP棧，那麼最好採用後台服務，android.app.Service。
+之後，任何想要訪問UPnP棧的activity，都能夠在需要時綁定或解綁該服務。
+ 
+該服務元件的介面是org.teleal.cling.android.AndroidUpnpService：
+public interface AndroidUpnpService {
+    public UpnpService get();
+    public UpnpServiceConfiguration getConfiguration();
+    public Registry getRegistry();
+    public ControlPoint getControlPoint();
+}
+activity通常訪問已知UPnP設備的註冊表，或者通過ControlPoint查詢和控制UPnP設備。
+
+你必須在AndroidManifest.xml內配置內建的服務實現：
+<manifest ...>
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<application ...>
+ 
+<activity ...>
+...
+</activity>
+ 
+<service android:name="org.teleal.cling.android.AndroidUpnpServiceImpl"/>
+ 
+</application>
+</manifest>
+ 
+此Cling UPnP服務要求設備WiFi介面的訪問權限，事實上其也只將會綁定網路介面。
+此服務將會自動檢測WiFi介面的關閉，並優雅地處理這種情形：任何用戶端操作都會導致"no response from server"狀態，而你的代碼必須預料並處理該狀態。
+當服務元件創建或銷毀時，會相應開啟和關閉UPnP系統。這依賴於在你的activities裡是如何訪問此元件的。
+ 
+### 5.2 activity如何訪問服務
+service的生命週期在Android中很好的被定義了。如果service還沒啟動的話，第一個綁定服務的activity將會啟動它。
+當不再有activity綁定到service上時，作業系統將會銷毀此service。
+讓我們寫一個簡單的UPnP瀏覽activity。它用於將所有你網路內的設備顯示在一個列表內，並有一個功能表選項來觸發搜尋。
+activity連接UPnP服務之後，會一直監聽註冊表內設備的增加和刪除，所以顯示的設備列表會實時更新。
+ 
+以下是activity類的骨架：
+import android.app.ListActivity; 
+import android.content.ComponentName; 
+import android.content.Context; 
+import android.content.Intent; 
+import android.content.ServiceConnection; 
+import android.os.Bundle; 
+import android.os.IBinder; 
+import android.view.Menu; 
+import android.view.MenuItem; 
+import android.widget.ArrayAdapter; 
+import android.widget.Toast; 
+import org.teleal.cling.android.AndroidUpnpService; 
+import org.teleal.cling.android.AndroidUpnpServiceImpl; 
+import org.teleal.cling.model.meta.Device; 
+import org.teleal.cling.model.meta.LocalDevice; 
+import org.teleal.cling.model.meta.RemoteDevice; 
+import org.teleal.cling.registry.DefaultRegistryListener; 
+import org.teleal.cling.registry.Registry; 
+ 
+public class UpnpBrowser extends ListActivity { 
+ 
+    private ArrayAdapter<DeviceDisplay> listAdapter; 
+    private AndroidUpnpService upnpService; 
+    private ServiceConnection serviceConnection = ... 
+    private RegistryListener registryListener = new BrowseRegistryListener(); 
+ 
+    @Override 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+ 
+        listAdapter = 
+            new ArrayAdapter( 
+                this, 
+                android.R.layout.simple_list_item_1 
+            ); 
+        setListAdapter(listAdapter); 
+ 
+        getApplicationContext().bindService( 
+            new Intent(this, AndroidUpnpServiceImpl.class), 
+            serviceConnection, 
+            Context.BIND_AUTO_CREATE 
+        ); 
+    } 
+ 
+    @Override 
+    protected void onDestroy() { 
+        super.onDestroy(); 
+        if (upnpService != null) { 
+            upnpService.getRegistry().removeListener(registryListener); 
+        } 
+        getApplicationContext().unbindService(serviceConnection); 
+    } 
+ 
+    ... 
+ 
+} 
+``` 
+
+我們採用Android運行時默認提供的佈局和ListActivity父類。注意這個類可以是你應用的主activity，或者進一步上升進任務的堆棧。
+listAdapter黏合了Cling Registry上設備的增加移除事件與展示在用戶界面的列表項目。
+當沒有後台服務綁定到該activity時，upnpService變數為null。綁定和解綁發生在onCreate()和onDestroy()回調，所以activity綁定服務和它的生存週期一樣長。
+ 
+```
+暫停後台的UPnP服務
+當一個activity不再活動時（停止或暫停狀態），它仍會綁定著UPnP服務。UPnP服務將會持續運行，即使應用不再可見。
+由於UPnP服務的註冊表一定會定期維護發現的設備、刷新本地設備的通告、刪除過期的GENA事件訂閱等，將會消耗你設備的CPU和電量。
+當activity onPause()或onStop()方法被調用時，你可以調用Registry#pause()來通知UPnP服務不再維護註冊表。
+之後，你可以通過Registry#resume()來恢復後台服務，或同時用Registry#isPaused()檢查狀態。
+請閱讀這些方法的Javadoc瞭解詳細資訊，以及暫停註冊表維護對於設備、服務和GENA訂閱的意義。
+```
+ 
+以下是使用ServiceConnection處理綁定和解綁服務：
+private ServiceConnection serviceConnection = new ServiceConnection() { 
+ 
+    public void onServiceConnected(ComponentName className, IBinder service) { 
+        upnpService = (AndroidUpnpService) service; 
+ 
+        // Refresh the list with all known devices 
+        listAdapter.clear(); 
+        for (Device device : upnpService.getRegistry().getDevices()) { 
+            registryListener.deviceAdded(device); 
+        } 
+ 
+        // Getting ready for future device advertisements 
+        upnpService.getRegistry().addListener(registryListener); 
+ 
+        // Search asynchronously for all devices 
+        upnpService.getControlPoint().search(); 
+    } 
+ 
+    public void onServiceDisconnected(ComponentName className) { 
+        upnpService = null; 
+    } 
+}; 
+```
+
+首先，所有已知的UPnP設備能夠被查詢和顯示（如果UPnP服務剛開啟且到到目前還沒有設備通告它的存在）。
+然後，給UPnP服務的註冊表增加一個監聽者。該監聽者將會處理在你網路上發現的設備的增加和移除，並在更新在用戶界面列表內顯示的項目。
+當activity銷毀時，BrowseRegistryListener會被移除。
+最後，通過發送一個搜尋消息給所有UPnP設備，你會開啟異步搜索，此時這些設備將通告它們的存在。注意這個搜尋消息不是每次連接服務都需要的。
+這只需一次，在當主activity和應用啟動時，其會將已知設備寫入註冊表。
+
+以下是BrowseRegistryListener，他的任務就是更新列表項的顯示：
+class BrowseRegistryListener extends DefaultRegistryListener { 
+ 
+    @Override 
+    public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) { 
+        deviceAdded(device); 
+    } 
+ 
+    @Override 
+    public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) { 
+        runOnUiThread(new Runnable() { 
+            public void run() { 
+                Toast.makeText( 
+                        BrowseActivity.this, 
+                        "Discovery failed of '" + device.getDisplayString() + "': " + 
+                                (ex != null ? ex.toString() : "Couldn't retrieve device/service descriptors"), 
+                        Toast.LENGTH_LONG 
+                ).show(); 
+            } 
+        }); 
+        deviceRemoved(device); 
+    } 
+ 
+    @Override 
+    public void remoteDeviceAdded(Registry registry, RemoteDevice device) { 
+        deviceAdded(device); 
+    } 
+ 
+    @Override 
+    public void remoteDeviceRemoved(Registry registry, RemoteDevice device) { 
+        deviceRemoved(device); 
+    } 
+ 
+    @Override 
+    public void localDeviceAdded(Registry registry, LocalDevice device) { 
+        deviceAdded(device); 
+    } 
+ 
+    @Override 
+    public void localDeviceRemoved(Registry registry, LocalDevice device) { 
+        deviceRemoved(device); 
+    } 
+ 
+    public void deviceAdded(final Device device) { 
+        runOnUiThread(new Runnable() { 
+            public void run() { 
+                DeviceDisplay d = new DeviceDisplay(device); 
+                int position = listAdapter.getPosition(d); 
+                if (position >= 0) { 
+                    // Device already in the list, re-set new value at same position 
+                    listAdapter.remove(d); 
+                    listAdapter.insert(d, position); 
+                } else { 
+                    listAdapter.add(d); 
+                } 
+            } 
+        }); 
+    } 
+ 
+    public void deviceRemoved(final Device device) { 
+        runOnUiThread(new Runnable() { 
+            public void run() { 
+                listAdapter.remove(new DeviceDisplay(device)); 
+            } 
+        }); 
+    } 
+} 
+``` 
+ 
+鑒於性能的原因，當發現設備時，我們會直到一個完整的hydrated（所有設備被檢索和驗證）設備元數據模型可用時才執行等待。
+我們響應盡可能得快，同時只當remoteDeviceAdded()方法被調用時才去等待。甚至當搜索仍在運行時，我們仍舊顯示所有設備。
+在台式電腦上你通常不需要關心這個，不過，Android手持設備效率慢，並且UPnP使用好些臃腫的XML描述符來交換關於設備和服務的元數據。
+有時，在設備和它的服務完全可用前，這可能會花費數秒鐘。而remoteDeviceDiscoveryStarted()和remoteDeviceDiscoveryFailed()方法在搜索處理時會盡快被調用。順便說一句，如果設備有相同的UDN就表示相等的(a.equal(b))，但它們可能不會完全一致(a==b)。
+ 
+注意註冊表將會在分開的線程中調用監聽者方法。你必須在UI線程中更新顯示列表數據。
+ 
+activity中以下兩個方法增加了用來搜尋的功能表，如此用戶才能手動的刷新列表：
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    menu.add(0, 0, 0, R.string.search_lan)
+        .setIcon(android.R.drawable.ic_menu_search);
+    return true;
+}
+ 
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == 0 && upnpService != null) {
+        upnpService.getRegistry().removeAllRemoteDevices();
+        upnpService.getControlPoint().search();
+    }
+    return false;
+}
+```
+
+最後，DeviceDisplay類是一個非常簡單的JavaBean，只提供一個toString()方法來呈現列表資訊。通過修改此方法，你能夠顯示任何關於UPnP設備的資訊：
+class DeviceDisplay { 
+    Device device; 
+ 
+    public DeviceDisplay(Device device) { 
+        this.device = device; 
+    } 
+ 
+    public Device getDevice() { 
+        return device; 
+    } 
+ 
+    @Override 
+    public boolean equals(Object o) { 
+        if (this == o) return true; 
+        if (o == null || getClass() != o.getClass()) return false; 
+        DeviceDisplay that = (DeviceDisplay) o; 
+        return device.equals(that.device); 
+    } 
+ 
+    @Override 
+    public int hashCode() { 
+        return device.hashCode(); 
+    } 
+ 
+    @Override 
+    public String toString() { 
+        // Display a little star while the device is being loaded 
+        return device.isFullyHydrated() ? device.getDisplayString() : device.getDisplayString() + " *"; 
+    } 
+} 
+```
+
+還有我們必須覆蓋相等操作，這樣我們才可以用DeviceDisplay實例作為便捷的處理，從列表中手動地移除和增加設備。
+ 
+### 5.3. 優化服務行為
+UPnP服務運行時會消耗記憶體和CPU。儘管通常在一個正常的機器上沒有什麼問題，但在Android手持設備上就可能會有了。
+如果你禁用Cling UPnP服務的某些功能，或者設置暫停且在合適時恢復它，你可以留有更多的記憶體和電量。
+ 
+#### 5.3.1. 調整註冊表維護
+當服務運行時，後台有好些東西在執行。首先，有一個服務的註冊表和其維護線程。
+如果你寫一個控制端，後台註冊表維護者將會定期從遠端服務更新你對外的GENA訂閱。當沒有通知斷開網路時，它也會到期並移除任何遠端服務。
+如果你正提供服務，你的設備通告將被註冊表維護者刷新，並在GENA訂閱沒及時更新時移除它。
+註冊表維護者為了有效得防止UPnP網路上的過時狀態，所以所有參與者會實時更新其他參與者的視圖等等。
+ 
+默認情況下，註冊表維護者會每秒運行並檢查是否有事要做（當然，大多數情況下沒事做）。
+然而默認的Android配置有5秒的間隔休眠，所以這已經花費了更少的後台CPU佔用時間 — 不過你的應用可能會暴露稍微過時的資訊。
+在UpnpServiceConfiguration你可以通過覆蓋getRegistryMaintenanceIntervalMillis()進一步的調整設置。在Android上，你必須子類化服務實現來提供一個新的配置。
+
+``` 
+public class MyUpnpService extends AndroidUpnpServiceImpl { 
+ 
+    @Override 
+    protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) { 
+        return new AndroidUpnpServiceConfiguration(wifiManager) { 
+ 
+            @Override 
+            public int getRegistryMaintenanceIntervalMillis() { 
+                return 7000; 
+            } 
+ 
+        }; 
+    } 
+} 
+``` 
+此時不要忘了在AndroidManifest.xml內配置MyUpnpService，而不是原先的實現。當在你的activities裡綁定服務時，也必須使用該類型。
+ 
+#### 5.3.2. 暫停和恢復註冊表維護
+另外一個更有效同時也不是很複雜的優化是，每當你的activites不再需要UPnP服務時，暫停和恢復註冊表。
+這通常發生在當activity不在前台（暫停），甚至不再顯示（停止）時。
+默認情況下，activity狀態改變對UPnP服務沒有影響，除非你在activities生命週期的回調內綁定和解綁服務。
+ 
+除了綁定和解綁服務，你也可以在activity onPause()或onStop()方法被調用時，通過調用Registry#pause()來暫停註冊表。
+之後，你可以通過Registry#resume()來恢復後台服務，或同時用Registry#isPaused()檢查狀態。
+ 
+請閱讀這些方法的Javadoc瞭解詳細資訊，以及暫停註冊表維護對於設備、服務和GENA訂閱的意義。
+根據你的應用要做什麼，否則這種小的優化可能不值得處理這些效果。另一方面，你的應用應當能夠處理失敗的GENA訂閱續期，或者消失的遠端設備。 
+ 
+#### 5.3.3. 配置搜索
+最有效的優化是UPnP設備有選擇性的搜索。儘管UPnP服務的網路傳輸層在後台會保持運行（線程正等待且socket被綁定），這個特性允許你有選擇且快速的丟棄搜索資訊。
+舉例來說，如果你正在寫一個控制端，且不通告你想要控制的服務（對其他設備沒興趣），那麼你可以丟棄所有接收的搜索資訊。
+另一方面，如果你只提供設備和服務，所有搜索資訊（除了你自身服務的搜索資訊）可能都可以被丟棄，你對其他遠端設備和其服務一點都不會有興趣。
+ 
+一旦UDP數據包內容可用，該搜索資訊就會被Cling選擇並偷偷的丟棄，所以不需要進一步得解析和處理，同時CPU時間和記憶體消耗顯著得減少，
+即使當你在Android手持設備上後台持續運行UPnP服務。
+
+為了配置你的控制端應用支援哪些服務，需要覆蓋前面章節展示的服務介面並提供一組ServiceType實例：
+``` 
+public class MyUpnpService extends AndroidUpnpServiceImpl { 
+ 
+    @Override 
+    protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) { 
+        return new AndroidUpnpServiceConfiguration(wifiManager) { 
+ 
+            @Override 
+            public ServiceType[] getExclusiveServiceTypes() { 
+                return new ServiceType[] { 
+                        new UDAServiceType("SwitchPower") 
+                }; 
+            } 
+ 
+        }; 
+    } 
+} 
+``` 
+
+這個配置將會忽略所有不通告chemas-upnp-org:SwitchPower:1的任何通告。
+這是我們控制端要處理的，不需要其他任何東西了。如果你返回一個空的數組（默認行為），所有服務和設備將會發現以及沒有通告會被丟棄。
+如果你正在寫一個控制端應用而不是服務應用，你可以讓getExclusiveServiceTypes()方法返回null。
+這將會完全禁用搜索，此時所有設備和服務的通告一接收就會被丟棄。
+ 
+
+/***************************************************************************/
+使用Cling API開發UPnP
+/***************************************************************************/
+使用Cling API開發UPnP(一)：開始
+一直以來都是用Cyberlink來當成開發UPnP的API，後來看到一篇論文是用Cling完成UPnP在Android平台的開發，想說來試試這套，或許也可以在自已的論文中比較這兩套
+的差異性。
+話不多說，先去官網下載cling-distribution-1.0.5.zip，解壓縮後會有cling-core-1.0.5.jar及teleal-common-1.0.13.jar，將這兩個jar丟到java目錄的/lib/ext下。
+接著我們就可以先玩玩cling的workbench這支程式，其實就是一支UPnP ControlPoint，和Cyberlink比較起來，我還是比較喜歡Cyberlink的，畫面設計的比較面善，
+log吐出來的資訊較完整。至於功能面目前看來還差不多(還在研究中...)
+
+依官網頁面Getting Strated先來試試看程式的結構性，恩！感覺好像要先啟一個UPnPService，這個Service可以是ControlPoint 或 Device？繼續看下去囉！
+
+1.UpnpService upnpService = new UpnpServiceImp();
+-實作一個UPnP Stack，有了這個stack，可以拿來做controlpoint(cling指client)及device(cling指server)
+-不要了，就upnpService.shutdown()來切斷所有upnp network連線並通知大家byebye
+
+2.兩個建構子
+UpnpService upnpService = new UpnpServiceImp(RegisterListener...)
+-馬上實作一個instance
+UpnpService upnpService = new UpnpServiceImp(new DefaultUpnpServiceConfiguration(8081))
+-DefaultUpnpServiceConfiguration也是一個介面
+
+3.實作controlpoint
+upnpService.getControlPoint()
+若要search device
+-upnpService.getControlPoint.search(new STAllHeader())  ->找所有device
+(效果和upnpService.getControlPoint.search()一樣)
+-upnpService.getControlPoint.search(new UDNHeader(udn)) ->針對某個udn
+
+4.UDA vs. namespace
+UDA是followUPnP Device Architecture下的命名規則
+namespace則是依照vendor自行定義的
+
+UPnP Service下有兩個重要元件
+-state variable
+-action
+
+使用Cling API開發UPnP(二)：列出Device/Service/Action
+Device
+利用RegistryListener()裡的RemoteDeviceAdd可以得到Device
+
+public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
+    // TODO Auto-generated method stub
+    
+    System.out.println(device);
+    RemoteService[] service = device.getServices();  //得到device的所有services
+    for(int n=0;n<service.length;n++){
+     System.out.println(service[n]);     
+     Action[] getAction = service[n].getActions();  //得到其中servide的所有actions
+     for(int m=0;m<getAction.length;m++){
+      System.out.println(getAction[m]);
+     }
+    }
+    
+}
+
+
+/******************************************************************************/
+常見音訊檔案格式釋疑
+/******************************************************************************/
+　 　 　作者：賴建宇 (版權所有，請尊重著作權) 
+　 　備註：本教材中所提及之軟、硬體名稱、商標、圖片其所有權均歸屬其原公司所有
+在現今的電腦應用領域中，隨著時代的變遷，如今市面上通行著各種不同的音訊的檔案格式，對從事多媒體應用以及後製成音的使用者而言，如何充分認知各格式的優劣點以
+及應用範圍，以及不同格式間的轉換，是很重要的！
+以下針對目前網路常見的各類型音訊檔案格式做一說明：
+01. WAV格式
+此類檔案其副檔名為WAV，這是由微軟(Microsoft)公司所主導開發的一種音訊檔案格式，從最早期Windows 初代即開始使用，目前可說是現今Windows平台下最通行的格式WAV
+格式支援多種壓縮格式及演算法，也支援各種不同的取樣頻率、取樣容量以及聲道數，廣泛為從事多媒體及成音後製所採用，一般音樂CD的規格便是採用44.1KHz的取樣率、
+16bit取樣容量及立體音雙聲道格式的WAV檔案製成。其缺點是檔案容量較大，若在不降低取樣率或取樣容量及聲道數情況下，不易在網際網路上進行傳遞。
+
+02. CDA格式 (CD-Audio)
+此類檔案其副檔名為CDA，一般音樂CD在光碟機中以檔案總管開啟後，便可直接看見此類型檔案，儘管音樂CD在壓製/燒錄成CD前，大多以WAV格式儲存，但是在壓製/燒錄成CD
+時，則必鬚根據光碟紅皮書的規格轉換為副檔名為CDA的資料串流格式，並以音軌的方式逐軌進行儲存。因此如果要將音樂CD還原回原始WAV格式，必須另外利用軟體工具以擷
+取轉換的方式來進行還原，此作業一般俗稱"抓音軌"或"擷取音軌"。
+
+03. MP3格式
+此類檔案其副檔名為MP3，其實是MPEG-1 Audio Layer3的縮寫，簡單來說，它是採用了MPEG-1壓縮法中第三層規範中有關音訊檔案的壓縮技術，此種演算法係採破壞性壓縮法
+來對數位音訊檔案進行壓縮。簡單來說便是在固定的取樣率及取樣容量下，利用限制流量的方式來提供程度不等的壓縮，關於流量設定部分，可分固定流量(CBR)與
+變動流量(VBR)兩種，現今大部分採用CBR，音質較差；但通行度較佳，若採用VBR則可有較佳的音質表現，但是容易受限於一般MP3播放器的播放能力限制。
+一般來說；壓縮檔案與原始檔案比對後，會發現在高頻部份的響應表現較差，尤其是在古典音樂類別的音樂更是明顯，但是在一般類型的音樂則較不明顯。若以128K流量的壓
+縮流量來計算，壓縮後容量與未壓縮前的WAV格式相比，其容量可以縮小達10倍之多，因此而廣泛的使用在網際網路的應用上，因此MP3可說是目前全球最通行的音訊壓縮格式。
+
+03. MP3Pro格式
+此類檔案其副檔名與MP3相同，是由瑞典Coding公司所研發的技術，透過其專利解碼技術，可以在不改變原先MP3格式檔案大小的情況下，有效提升音質，也就是說64K的MP3Pro
+即可達到128K的MP3音質水準。但是由於推出時機以及專利權問題，如今仍然並不普及。
+
+04. WMA格式
+此類檔案其副檔名為WMA，為Windows Media Audio的縮寫，顧名思義為微軟公司針對網路需求所開發的音訊壓縮格式，其壓縮比最大可達1:18，因採用較新的演算法，因此以
+相同大小檔案而言，其音質會較MP3表現為佳。WMA同時也支援DRM(Digital Right Management)數位版權機制，可限制檔案播放的時間、次數以及限制拷貝，因而可有效抑制盜
+版的猖獗?目前廣泛地為線上音樂販售業者(如KK-Box、EZ-Peer+所採用)。
+
+04. RA/RM/RMX格式
+此類檔案其副檔名為RA/RM/RMX，為Real Netwrok所開發的檔案格式，採用該公司的專利演算法，在較低的網路頻寬環境下，仍然能保有相當程度的播放品質，因此也廣為線上
+串流媒體業者所採用。其格式主要可分為三類，分別是RA(Real Audio)、RM(RealMedia)、RMX(RealAudio Secure)，其中RMX。普遍來說；在高壓縮比條件下表現不錯，但若在
+中、低壓縮比條件下時，表現卻反而不及其他同類型檔案格式了。
+
+05. AU格式
+此類檔案其副檔名為AU，為UNIX作業系統中廣泛使用的音訊格式，在早期以UNIX作業系統為主的WEB網路伺服器時代，AU在當時來說，可說是唯一的標準，當然目前已經逐漸式
+微了。
+
+06. VOC格式
+此類檔案其副檔名為VOC，為早期DOS作業系統中廣泛使用的音訊格式，可說是"骨灰級"的音訊規格，在早期聲霸卡(Sound Blaster，備註)當道的音效時代，可以說是廣為遊戲
+界所採用的標準，其結構與目前的WAV格式類似，如今當然已經式微了。
+備註：該公司目前已改名為創巨/創新未來(Creative)
+
+07. AIF/AIFF格式
+此類檔案其副檔名為AIF/AIFF，為Audio Exchange File Format的縮寫，為Apple公司所開發的音訊格式，目前仍廣泛地使用在Macintosh平台作業系統中，與WAV相同，同樣具
+備音質佳但檔案體積大的缺點。AIF之於Mac OS就如同WAV之於Windows一般。
+
+08. SND格式
+此類檔案其副檔名為SND，也是Apple公司所開發的音訊格式，支援某些特定的壓縮演算法，目前僅常見於Macintosh平台上。
+
+09. AAC格式
+此類檔案其副檔名為AAC，為Advanced Audio Coding的縮寫，採用了MPEG2 Layer-7的演算法，AAC可提供了48個聲道及16個低頻輔助聲道，有16個資料串，壓縮效率要比
+MPEG-1 Layer-3高30%，因為採取了最新的演算技術，因此無論在壓縮率以及音質均明顯優於MP3及WMA等同類型檔案，可說是新一代最具人氣的音訊壓縮格式，
+
+09. ATRAC格式
+此為SONY所開發的專屬音訊壓縮格式，廣泛地應用在該公司旗下的MD(Mini DIsc)系列產品，具有獨特的ATRAC演算法，可以在1:5的壓縮比下而無明顯的音質損失，與MP3相較
+之下之下具有音質較佳的特性。然而隨著新一代演算法的問世，再加上MD已退出主流市場，因此本規格也以逐漸式微中。
+
+10. DVD-Audio格式
+為新一代的數位音訊格式，以DVD為儲存媒體。與CD-Audio相比，其取樣頻率可為48K/96K/192K或者是44.1K/88.2K/176.4K的組合選擇，取樣容量可為16bit/24bit/32bit等多
+種格式，聲道數最多可達6聲道，動態範圍更可達到144dB。若採用192K/24bit/雙聲道規格，以單面單層的DVD來說，可記錄長達74分鐘的音樂，整體音質表現可說是十分駭人
+，可惜目前採用此規格發行的音樂專輯屈指可數，另外檔案過於龐大，同樣不適用於網路傳遞。
+
+11. SACD格式
+為SONY所針對高傳真Hi-Fi音響玩家所開發的新一代音樂規格，為Super Audio CD的縮寫。其取樣率為傳統音樂CD的64倍，也就是2822.4 KHz資料，並採用24bit的取樣容量，
+在播'放時最高頻率響應可達100kHz，為傳統音樂CD的5倍，音質表現遠勝於現在任何規格，可說是夢幻級的規格，可惜此格式無法在一般電腦光碟機或CD Player進行播放，必
+須使用專屬的播放機，而且目前採用此規格發行的音樂專輯也仍在少數，因此說是少數有錢人的玩意也不為過。
+
+11. VQF格式
+為YAMAHA和NTT所共同開發的音訊壓縮技術，壓縮比最高可達1:18。與MP3相較下，在相同音質下可節省檔案體積達30%~50%，音質也頗具水準，但由於VQF為一未公開的封閉式
+規格，因此至今仍無法普及。
+
+12. S48格式
+為Stereo/48Khz的縮寫，採用MPEG-1 Layer 1和Layer 2的壓縮技術，俗稱MP1及MP2，其壓縮比較Mp3為差，音質則與MP3相當?表面看來規格並不突出，然而其因具備有易編輯
+、剪接的特性，因此廣泛使用在廣播電台的應用領域。
+
+12. SVX格式
+為早期Commodore公司所開發的音訊檔案格式，為早期的Amiga電腦所採用，不支援壓縮格式?如今看來，可以說是"化石級"的檔案格式
+
+13. OGG格式
+此類檔案其副檔名為OGG。OGG 是一個完全開放、免權利金，多用途的音訊壓縮格式，可處理中至高品質的音樂（8kHz-48.0 kHz、16 位元、多聲道），其 bitrates 範圍每
+頻道可自 16 到 128 kbps。因此 Vorbis 是屬於 MPEG-4（AAC）的同級競爭音樂格式，擁有高於 MPEG-1/2 audio layer 3、MPEG-4 audio（TwinVQ）、WMA 和 PAC 的效能表
+現。
+總而言之，OGG可算是相當優秀的演算法，可惜普及性仍然不足，以及播放軟體的支援度仍有待加強，加上後起之秀AAC的夾殺，未來的發展可能有限。
+
+14. FLAC格式
+FLAC即是Free Lossless Audio Codec的縮寫，中譯為"無損音頻壓縮編碼"。FLAC是一套著名的自由音頻壓縮編碼，其特點是無損壓縮(與APE相同)。不同於其他有損壓縮編碼
+如MP3 及 AAC，它不會破任何原有的音頻資訊，所以可以還原音樂光碟音質。現在它已被很多軟體及硬體音頻產品所支援。
+
+15. APE格式
+APE格式是由Monkey's Audio公司所開發，與FLAC相同，也是一種音頻的無損壓縮格式，大小只有wav文件的一半，但是音質沒有絲毫降低。壓縮比約為1:3 。APE給網友交流CD
+帶來了更多的方便，解決了許多古典音樂愛好者傳送高音質CD的需求。一張80分鐘的音樂CD大小大約700M在壓縮後大約僅剩200~300MB，以便於網路傳遞，可惜壓縮/解壓縮時
+間過長，為其最大缺點。
+
+
+/******************************************************************************/
+Loyalty 音檔權利金
+/******************************************************************************/
+MP3
+直至目前，約有近一百萬種可播放數位音樂的裝置，採用了 MP3 編碼格式。MP3 為 MPEG-1/MPEG-2 Layer 3 的簡稱，此一標準是由國際標準組織
+（International Organization for Standardization）所發展。MP3 除了普遍應用於現有音樂硬體，根據 MP3 的專利管理公司 Thomson 表示，
+每個月從網際網路上下載的 MP3 檔案超過十億個。
+MP3 的優點在於其易用性，普遍可見於音樂播放軟硬體中，使用者得以使用統一的音樂檔案格式彼此交換檔案。MP3 的缺點則在於高額的權利金。
+Thomson 收取的權利金費用使得不少獨立開發人員與廣播人員對 MP3 望之卻步。
+目前的 MP3 授權方案，在應用軟體上，MP3 解碼器須支付每單元 0.75 美元，或選擇一次支付五萬至六萬美金，編碼器每單元的權利金為 2.5 至 5 美元。
+在硬體產品的部份，MP3 解碼器須支付每單元 0.75 美元，編碼器每單元為 2.5 至 5 美元。以上授權方案屬於傳統的 MP3 技術，如果選用新一代的 MP3PRO，
+將須支付更高的授權金額。
+此外，如果在電子音樂播放、廣播、串流上使用 MP3，則必須支付 Thomson 相關營收的百分之二至百分之三。
+儘管 MP3 是目前各平台間普及率與流動率最高的音樂檔案格式，高額的權利金對於獨立開發人員和小型企業，卻成為其致命缺點。
+
+Ogg Vorbis 與 Xiph.Org
+Ogg Vorbis 是一個完全開放、免權利金，多用途的音訊壓縮格式，可處理中至高品質的音樂（8kHz-48.0 kHz、16 位元、多聲道），其 bitrates 範圍每頻道可自 16 到 128 kbps。因此 Vorbis 是屬於 MPEG-4（AAC）的同級競爭音樂格式，擁有高於 MPEG-1/2 audio layer 3、MPEG-4 audio（TwinVQ）、WMA 和 PAC 的效能表現。
+Vorbis 是非營利組織 Xiph.Org 旗下 Ogg 多媒體編碼格式家族中的首項技術。Xiph.Org 以 BSD 授權釋出 Vorbis，已經吸引不少開發人員以及不願支付 MP3 授權金的製造廠商。
+Xiph.Org 是一個確保網路多媒體基礎免受私人利益危害的非營利組織，其目標為支援並發展自由、開放的協定與軟體，提供公眾、開發人員與商業市場所需。 Xiph.Org 旗下囊括一系列的開放源碼多媒體發展專案。這些專案包括與 On2 Technologies 聯手發展的 Ogg Theora 影像編碼技術、Free Lossless Audio Codec（FLAC）和作為語音壓縮之用的低 bitrate codec，Speex。
+包括 Ogg bitstream 格式規格和 Vorbis RTP 封包規格在內的 Xiph 技術，已經進入 Internet Engineering Task Force 的標準審查作業。更為重要的是，遊戲公司、硬體製造廠商、Web 出版商、串流音訊開發人員和關注數位音樂的其他個人，正在試圖將 Vorbis 整合到他們的產品之中。儘管對於 MP3 仍為構成威脅，然而 Vorbis 的確在數位音樂領域中掀起新的波瀾。
+Xiph.Org 執行經理，同時也是開放源碼串流媒體系統 Icecast 開發者的 Jack Moffitt 表示，他們或許無法超越過 MP3，然而他們的目標並不在於此，而是希望解放多媒體技術，就未來發展建立穩定的絕佳平台。
+Digital Innovations LLC 主席兼技術長 Joe Born 認為，採用 Ogg Vorbis 是理所當然的決定。該公司日前取得授權將 Ogg Vorbis 應用至該公司旗下的 Neuros 音樂設備中。這是第一家與開放源碼社群建立合作關係的數位音樂設備製造商。該公司同時也發表了一套開放源碼同步應用軟體 Positron，透過這套軟體，Neuros 的用戶可以從 Linux 工作站，將數位音樂檔案傳輸至 Neuros 上。
+IDC 的資深分析師 Susan Kevorkian 表示，在 MP3 播放器上增加 Linux、Ogg Vorbis，乃至於其他作業系統與檔案格式的支援，可以在 MP3 播放器市場趨於成熟後，延伸該市場的生命週期。
+
+FLAC 
+應該算是其中表現最佳的選擇，既是 Open Source，使用上也不用付權利金。
+
+
+/******************************************************************************/
+影音編碼概說
+/******************************************************************************/
+相信會在網路上下載影片，或是自己嘗試過剪輯、輸出影音資料的各位，一定聽過編碼這玩意吧？曾經遭遇過拿到手的影片，播放起來卻是有影無聲、有聲無影，甚或完全無
+法播放的困境？通常最大的原因，就是電腦中缺乏了該檔案所需的編碼(英文稱為codec，別再偷懶打成code了)。所謂的編碼，一般來說有兩種解釋：compressor與
+decompressor，或是coder與decoder。我比較傾向採用coder與decoder做解釋，因為codec不一定會將資料壓縮(compress)，雖然壓縮也是編碼的任務之一。
+編碼之所以被發展，主要有以下原因，第一：將資料的表示方法標準化。這很容易理解，就如同摩斯電碼將A至Z每一個字母以獨特的訊號表示，正因為它被標準化，哪怕它已
+經是古老且被停用的編碼了，摩斯電碼走到世界各國仍是通用的。在這個例子中，摩斯電碼並沒有將所要傳遞的資料「壓縮」，反而將資料量膨脹了，但卻能確保從發送端傳
+遞出去的(coder)，與接收端收到的(decoder)，是一模一樣的資訊。
+第二個原因，同時也是影音編碼的主要目的，則是將資料量壓縮。舉一個同樣很古老的例子，黑膠唱片在當年碰到很大的問題：由於聲音資訊在黑膠唱片上是以刻痕方式表示
+，聲音的頻率越低，則刻痕越寬，反之則越窄。這對唱片業造成很大的障礙，因為一張黑膠唱片的面積大不到哪去，若音訊刻痕不做處理，一張黑膠唱片的可錄音時間可能會
+因低頻太多而大大縮短，或因高頻部分使得刻痕太細，產生製造上的困難。為解決此問題，早期各大唱片公司各有各的編碼方式，將音訊編碼、壓縮之後，再行刻片，大大縮
+小了刻痕的尺寸，並延長唱片的播放時間。而美國唱片工業協會(Recording Industry Association of America，簡稱RIAA)在1958年則將編碼方式統一化：刻片時將低頻減弱
+、高頻增益，使得唱片上的刻痕寬度不至於有過大的變化，減輕唱針的負擔。播放唱片時，再經由解碼器還原出原本的音訊。這就如同DVD中的5.1聲道音軌多為Dolby Digital
+的AC3壓縮，或是其競爭對手DTS公司的編碼，因為5.1聲道相較於雙聲道來說，資料膨脹了不少，故有必要編碼壓縮。
+同樣的應用亦出現在更多的場合：用手機拍短片？那應該免不了用上H.263與AMR。絕大多數會把CD唱片備份在電腦中的人都會選擇MP3，Open Source軟體死硬派可能會選擇
+Vorbis或Musepack，而追求音質的人必定會使用封存音樂專用的APE、FLAC或True Audio編碼。要播放超高畫質的藍光光碟？鐵定要搞定H.264編碼。用DV拍攝的片子想燒成
+DVD？先拿到MPEG-2編碼器再說。喜歡透過某些管道(?)在網路上看免費的日劇或電影？明白Divx、Xivd與Realvideo對你絕對有幫助。不論是單純的媒體播放，或是更複雜的影
+音製作、剪輯，皆與編碼脫離不了關係。
+這麼廣泛的應用看似很複雜，其實並不然。選對工具、用對方法，自然可以事半功倍，這正是你現在正看本AV站的原因(喂)。相信本文讓你大致瞭解編碼的用途，往後我們將
+探討並說明編碼的實際運用。
+
+
+/******************************************************************************/
+影音封裝格式: (上)概說          ref: http://cation-av-station.blogspot.tw/2008/04/blog-post_16.html
+/******************************************************************************/
+上次概略介紹了影音編碼(請參照影音編碼概說)，這次則針對影音封裝格式做簡介。
+所謂的封裝格式，簡單的說，就是影音資料的載體，或稱「容器」(container)。與編碼不同的是，編碼負責表示資料，容器則將資料打包，方便傳遞、播放。
+例如：Windows平台上常見的未壓縮WAV音訊檔案，其實僅是一種封裝格式，其內部包含的資料，是採用PCM(Pulse-Code Modulation)型式表示的音訊。
+同樣的，在蘋果電腦的Mac OS中，PCM資料則是用AIFF檔案封裝，在昇陽電腦的系統上則是採用AU/SND檔案格式。所以WAV、AIFF與AU/SND檔案雖是因應不同作業系統而產生的
+格式，骨子裡它們根本是一樣的東西。Windows平台只要有適當的軟體，一樣可以認得AIFF與AU/SND檔案，進而播放裡頭的PCM音訊。
+封裝格式不見得只能存放一種類型的資料，通常可以允許多種不同的型式的資料同時存於其中，這正是它的方便之處。例如：電影DVD上的VOB檔案是一個載體，裡頭包含了用
+MPEG-2標準壓縮的影像，用Dolby Digital或DTS格式壓縮的5.1聲道音軌，以及多國語言的字幕。所以一個單獨的VOB檔案，就可以同時傳遞多種資料，省去檔案太分散的麻煩
+，方便DVD播放器與電腦讀取。
+在此再次強調：container與codec是截然不同的東西：被編碼資料的是包在container中的。因為封裝格式是藉於播放軟體(或硬體)與影音資料之間的中介層，要讓電腦撥放一
+個檔案，首先電腦需藉由適當的中介軟體辨識出該檔案的封裝格式為何，並讀取出其中的影音資料，送交個別的解碼器還原後，再行呈現。這當中的中介軟體，或稱「分離器
+」，通常有parser、splittter或demuxer等多個名字。因此，影音檔案之畫質、音質好壞，不是由封裝格式決定的，而是由其內部封裝的編碼壓製品質而定：AVI影片跟MKV影
+片的畫質無從比較，只有它們內部包裝的DivX或Xvid等編碼才能決定。
+那麼，影音檔案一定得包在封裝格式中，才能播放嗎？答案是否定的。以MP3為例，單獨的MP3檔案本身就包含了可以播放的資訊，MP3檔案就是MP3檔案，裡頭不會再放其他的
+東西了；FLAC音訊不論是放在MKV(Matroska)或Ogg中，抑或抽出來成為獨立的FLAC檔案，也是可播放的。但MKV可以搭配章節檔案將一首曲子做分段，方便使用者直接選曲，而
+Ogg則可在網路上藉由串流(streaming)方式播放，十分適用於網路電台。因此，選用容器與否，要看用途而定。
+目前可見的封裝格式不下十來種，在下篇中將針對較常見的格式做簡介。
+
+
+/******************************************************************************/
+影音封裝格式: (下)常見格式簡介
+/******************************************************************************/
+基本上針對各個封裝格式都可以長篇大論一番，在此僅對電腦平台上常見的格式做簡單說明：
+1. AVI(Audio Video Interleave)：
+拜微軟之賜，這絕對是目前流通率最高的格式。為了對抗蘋果電腦的Quicktime影音架構，微軟於1992年提出了Videos for Windows架構(VfW)，以外掛的方式替自家的Windows 3.1增加影音功能，並於Windows 95後完全整合成作業系統的一部分，AVI便是VfW中制定的封裝格式。
+基本上AVI格式沒有強制限定包在其中的編碼為何，所以AVI可以包含早期的Cinepak、Intel Indeo等影片，乃至於微軟自家的Windows Media Video與正紅的DivX、Xvid影像編碼，音訊方面從未壓縮的PCM到MP3、Dolby Digial 5.1音軌(AC3)與Windows Media Audio皆可。但這不代表AVI什麼都能吃，在壓縮上會用到b-frame的H.264/AVC視訊編碼就受限於AVI先天不支援b-frame而無法完整發揮能力，雖然你依舊可以藉由小小的hack將b-frame塞到AVI裡頭，但就是比不上放在原生支援b-frame的MP4中來得漂亮。而AVI對於由Xiph.org基金會力抗MP3而發展的Vorbis音訊的支援度，更是問題多多。
+雖然AVI很老了，但正因歷史悠久，所以在各平台上都有良好的支援，幾乎沒有哪台電腦是不能播放、剪輯AVI。而在2000年左右崛起的DivX、Xvid等符合MPEG-4 Part 2的影像編碼，更讓AVI再度活絡起來，許多家電公司為了提高DVD播放器的銷售量，也發展了可以支援DivX格式之AVI檔案的DVD播放器，省去了得將影片轉碼成標準DVD用MPEG-2編碼的麻煩。相信AVI的壽命還是很長的。
+
+2. MP4：
+MP4是MPEG-4 Part 14標準制定的封裝格式，主要用來包裝各種遵循MPEG-4標準的影音編碼，包括DivX、Xvid、3ivx與H.264/AVC等視訊，音訊則以MPEG-4 Part 3規範的AAC(Advanced Audio Coding)為主。話雖如此，MP4依舊可以封裝MPEG-1、MPEG-2等較早的格式，不論視訊或音訊皆然，因此理論上你可以把MP3音樂包到MP4容器裡頭。
+所以在這產生一個很多人常常搞混的重點：MP4不是MP3的後繼者，AAC才是。MP3檔案僅是單純的音樂資訊，本身沒有封裝的功能，MP4則單純是封裝格式，它可以包著AAC音訊，更可以包著MP3，雖然這麼做很無聊，不過我們還是展示一下這件無聊事：
+Media Player Classic正在播放一個用MP4包起來的MP3音樂。畫面下方可看到正在解析MP4格式的Haali Media Splitter，平時播放單純的MP3時這玩意絕對不會跑出來；在它左方的則是解碼MP4中音訊的ffdshow audio decoder。由ffdshow提供的資訊頁可看出它處理的是MP3音樂。這可不是單純將MP3檔名改成MP4就好，而是把MP3音樂扔到YAMB程式中包裝而成的。
+還是不相信嗎？就下載回去看看吧。
+說到MP4就不得不提一下蘋果電腦的Quicktime架構。Quicktime制定了MOV封裝格式，在Quicktime 6以前，蘋果電腦一直走著自己的路線，但MPEG-4標準在1998年左右制定時，蘋果電腦漸漸朝MPEG-4靠攏，並將MOV格式文件公開，使MOV成為MPEG-4認可的封裝格式，並演化成MP4，成為業界中通用的標準。所以現在相當多的手機與可攜式多媒體播放器，都可以認得並播放MP4檔案，這也是為何蘋果電腦的iTunes播放軟體與iPod隨身聽大力支援MP4。
+
+3. Ogg(好暴力)：
+MP3音樂雖然用途廣泛，但實際上任何一家生產與MP3相關軟硬體的公司，都需要支付MP3權利金，特別是付費給MP3的主要發展者：德國的Fraunhofer Gesellschaft機構。為了力抗MP3近乎壟斷數位音樂市場的局面，完全走開放原始碼的Xiph.org基金會於1998年開始發展Vorbis壓縮格式，並同時設計了Ogg格式以封裝Vorbis。此外，Vorbis亦可封裝Xiph.org自行發展的Theora視訊，以及針對壓縮人聲做最佳化的Speex編碼，而在2003年被Xiph.org納入體系的無損音訊壓縮FLAC，也可以包裝在Ogg裡頭。但在網路上最常見的，仍屬包裝Vorbis音訊的Ogg，所以Ogg跟Vorbis時常被互換著稱呼，但這實際上是不正確的，至少也該稱它為Ogg Vorbis，這是Xiph.org的官方稱法。
+由於Ogg Vorbis格式具有完全的開放性，使用上不需支付任何權利金，所以被很多電腦遊戲採用，也有少數的數位隨身聽產品支援。些許Linux作業系統在預設上更是「不支援」MP3播放、壓製，反而對Ogg Vorbis的支援極好。而由於Ogg格式可在網路上採用串流方式播放，使用foobar2000+oddcast+Icecast組合的網路電台是不計其數。
+Ogg在Windows平台上也有很好的支援，第一個預設直接支援Ogg格式的播放器就是Winamp，由Winamp前核心成員Peter Pawlowski編寫的foobar2000也對Ogg支援良好。雖然網路上也可以找到走DirectShow路線的Ogg filter，讓Windows Media Player播放Ogg，但在此還是建議使用專門播放音樂的foobar2000。
+
+4. OGM(Ogg Media)：
+目前OGM的發展停頓了，但它依舊在外國的影音社群中少量的流通著。OGM基本上是Tobias Waldvogel這位老兄將Ogg做了些許破解後的產物，所以OGM除了能夠包含Xiph.org發展的所有編碼以外，更可同時包含多軌的視訊(DivX、Xvid等)、多軌音訊(MP3、AC3、AAC等)，多軌字幕檔(srt、ssa等)，並且支援章節段落選擇，使得OGM一時之間成為使用上極具彈性的封裝格式。
+上圖展示正在播放的OGM卡通檔案。由右下方工具列的圖示，依序是：解碼Xvid視訊的ffdshow video decoder，解碼Vorbis音訊的ffdshow audio decoder，顯示srt英文字幕檔的VobSub(現已改名為VSFilter)，以及解析OGM檔案的Haali Media Splitter。由Splitter的功能清單可看出，本OGM檔案實際上包裝著兩個Vorbis音軌，分別是日語發音以及英語發音，隨時可以切換(誰會想看英語發音的美少X戰士啦)，字幕檔也可依需求關掉或打開，所以理論上要再包進一個日文字幕檔也不是難事。此外，Chapter選項顯示本卡通有15個段落，直接選取就可快速跳躍，不需要自行拉影片時間軸。基本上這已經類似於DVD的結構了，單獨一個OGM檔案，直接到位。
+但OGM雖以開放式的Ogg為基底，卻沒有開放自身原始碼，也不是自由軟體，更走出了Ogg的規格之外。關於這一點，Xiph.org的人可是很火：http://xiph.org/container/ogm.html。「OGM不是Ogg，但很多人以為它是Ogg，並寫信來要我們提供支援」上面的網頁如是說。雖然Tobias稍後將OGM的程式捐贈給Xiph.org，並成為了Xiph.org的一份子，但當更強大的Matroska格式崛起後，OGM便逐漸被淡忘了，連Xiph.org都不太想理它。OGM R.I.P。
+
+5. MKV/MKV(Matroska)：
+Matroska於2002年開始發展，屬於開放軟體，所有的程式碼都是公開的，並有完善的文件說明。簡單來說，MKV運作起來與OGM極為相似，可謂有過之而無不及，並能封裝比OGM更多的編碼種類，多到在這裡的篇幅塞都塞不下，有興趣請參考Matroska的官方說明。不過目前最常見的，仍屬MPEG-4影像與Vorbis、AAC與AC3音訊為主，此外MKV亦可封裝非影音編碼類的檔案，常見的應用之一，就是把SSA、ASS字幕檔所用到的字體檔案一併打包進去。沒錯，就是華康XX體那一類的東西，如此一來就算使用者的電腦裡沒有安裝該字型，影片播放時字幕也可以漂漂亮亮的。
+Matroska檔案依舊可用Haali Media Splitter解析，這是Matroska官方推薦的分離器。上圖的影片是從DVD中rip出來的，雖是以標準NTSC解析度720*480壓製的H.264影片，與DVD中的原始解析度一樣，但播放起來卻是16:9的853*480。這是因為MKV檔案在打包時可以任意指定播放比例，這與採用DVD播放器接電視放片子有異曲同工之妙。搭配由VobSub從DVD裡頭抓出來的字幕檔，讓使用者自行備份的影片與DVD上的近乎一模一樣。
+某些Matroska檔案中僅包含音樂而沒有影片，通常會被改稱為MKA檔案，實際上它與MKV的結構完全相同，使用上無異。以MKA檔案打包無損壓縮的True Audio音樂，搭配章節分段的CUE檔，在日本是非常風行的。
+MKA_Demo
+利用單一個Matroska備份一整張CD唱片。上圖顯示CoreWavPack decoder正在解碼由無損格式WavPack壓縮的音樂，由於紀錄音樂曲目章節資訊的CUE檔也被包裝進來了，亦可在Haali Media Splitter的選單上看到可以直接選取的曲目。在此播放的是日裔指揮家小澤征爾指揮Boston交響樂團，演奏法國近代印象派音樂家Maurice Ravel的作品。
+Matroska在使用上極具彈性與便利性，在國外的字幕組社群中相當受歡迎，但由於它是網路上Open Source社群開發的產物，商業軟體對它的支援奇差無比，再加上可以包裝非影音檔案的天性，幾乎沒有剪接軟體可以直接對Matroska做剪輯。Matroska比較像是：作為最終端，專門在電腦上播放的「成品」。
+
+6. RM/RMVB(RealMedia)
+RealMedia是RealNetworks公司為自家RealVideo與RealAudio制定的封裝格式。RealNetworks公司於1990年代中期崛起，當時寬頻網路尚未普及，故RealNetworks致力於串流媒體的發展：讓一份檔案可以邊傳遞邊播放，不需要完全下載後才能開啟，因此促成了RealMedia的誕生。雖然要把RealMedia檔案完整下載也不成問題。早期的RealMedia僅能為固定流率，故副檔名為RM。RMVB則是後來加入了變動流率(variable bitrate)技術後的名字。
+由於RealMedia是商業公司的封閉格式，以往僅有ReakNetworks公司自家的RealPlayer可以播放。但RealPlayer曾有設計不周詳，造成使用者的電腦在網路上被開漏洞的不良紀錄，以及軟體本身撰寫不佳，效能低落，甚至搞爛作業系統的慘劇，使得RealPlayer聲名狼藉好一陣子。因此某K-Lite編碼包的作者群開發了Real Alternative解碼器，讓使用者不需要安裝RealPlayer，就可用Windows Media Player或Media Player Classic播放大部分的RealMedia檔案。雖然RealNetworks公司對此提出了多次警告，但大家還是用得不亦樂乎。
+Real_Demo
+正在搭配Real Alternative運作的Media Player Classic，雖然表面上不太容易看出來。
+在國外的影音社群中，RealMedia的可見度非常低，因為它搭配的RealVideo與ReakAudio實在是無法跟其他編碼相提並論，反倒是在對岸的社群中相當受歡迎，有著為數極多的日劇、卡通流通著，少數大陸製的可攜式多媒體播放器更可直接播放RealMedia。
+本文僅簡介了電腦上較常見的六種封裝格式，欲瞭解更多相關資訊請參照本Wiki文件。
+
+
+/***************************************************************************/
+批次檔教學
+/***************************************************************************/
+甚麼是批次檔： 
+在DOS系統下，有三類檔案是可以使DOS執行而進行某些工作，這三類檔案分別有以下三個不同的副檔名 
+1. .com (指令檔，命令檔) 例如 Command.com, Edit.com 等。 
+2. .exe (執行檔) 例如 Copy.exe, Mem.exe 等。 
+3. .bat (批次檔) 例如 Autoexec.bat 等。 
+ 　其中 .com 及 .exe 的檔案是用編譯或組合語言寫出，需要較多工夫來學習編寫，一般終端用者 (end-user) 不會花時間來學習編寫這些程式，但 .bat 的批次檔
+   是一連串的 DOS 內部或外部指令 (批次檔的意思是 指令集) ，或是執行程式的主檔名，因此只要懂得這些指令，加上一些簡單的語法，就可寫出批次檔。
+   終端用者利用自己編寫的批次檔，就可使 DOS 執行自己編定的程式。 
+　 批次檔是由 DOS 指令組成，因此批次檔有錯誤時，就等於我們在提示號 (C)鍵入錯的指令一樣，螢幕會有 Bad command or file name 的回應。 
+　 批次檔必定要是純文字檔案，可使用 DOS 的編輯器(DOS Editor)或用windows內的 記事本 寫出來，這兩個都是簡單的文書處理器，文稿內不含任何控制碼 
+   (如字款和字的大小，文章闊度等等)，這就最適合用來編來批次檔。
+
+批次檔的規格： 
+1. 批次檔要以純文字寫出，每一項指令要在一行中完成，不能分兩行，每行最多是 127 個字。每一行只能容納一個指令，兩個指令就要分兩行 (或用連結符號)。 
+2. 批次檔的檔案要用 .bat 為副檔名，除了 Autoexec.bat，主檔名由用者自定，但最好避免和 DOS 指令同名，例如不要用 Copy.bat、Del.bat、Dir.bat、Exit.bat 等等。 
+3. 批次檔需用 DOS 指令加上特定語次寫成，這些指令包括 DOS 內部及外部指令，語法有以下各項： 
+   call choice echo 
+   for...in...do goto if(if exit)(if not exist) 
+   pause rem shift 
+ 　指令錯誤會有 "Bad command or file name" 回應，語法錯誤會有 " Syntax error" 的回應。
+4. 要 DOS 執行批次檔的指令，只需鍵入主檔名，例如 Menu.bat 或 menu。不過若批次檔的主檔名和 .com 或 .exe 的主檔名相同時，就要鍵入全名，例如
+   批次檔的名稱是 copy.bat 或 edit.bat時，就要鍵入copy.bat 或 edit.bat 才能使電腦執行批次檔的指令，否則電腦會執行 copy.exe 或 edit.com 這些 DOS 指令。 
+5. 在批次檔執行途中，一起按下 [Ctrl]+[C] 或 [Ctrl]+[Break] 可終止程式。按下這兩個鍵後，螢幕會顯示：Terminate batch job (y/N)? 
+　　按 [Y] 會終止這批次檔和回到 DOS 的提示號，按 [N] 則取消[Ctrl]+[C] 指令，批次檔會繼續執行程式。
+
+早期在DOS系統工作下，都可能需要使用批次檔來執行電腦工作，當文字介面的系統逐漸被Windows、Unix系統（圖形介面）所取代時，現今一般使用電腦的人，可能也不是很
+清楚什麼是批次檔，我們今天就來介紹何謂批次檔。
+批次檔是一種文字檔案（ASCII檔案），由一連串的MS-DOS命令所組成的。
+批次檔的命名規則與一般檔案相同，但其副檔名固定為".BAT"，即"將 一連串的命令"儲存在檔案中，該批次檔的指令可無限制的重覆使用，永遠得到相同的執行結果。
+究竟批次檔又該如何使用呢？以下介紹批次檔的常用指令。
+
+批次檔的常用指令如下：
+*------------------------------------------
+一、 ECHO
+*------------------------------------------
+在正常的情況下，批次檔中的每道命令執行前都會先出現螢幕上。有了ECHO命令，就可以任意控制是否列印出命令列。
+用法：在批次檔中鍵入echo on/off ，on：表示要印出命令列，off：則不印出命令列，若要禁止批次檔的命令顯示在螢幕上，則使用隱藏echo off（＠ECHO OFF），
+用法在命令列的開頭上加上＠符號
+Ex：
+@echo off　表示資料隱藏
+echo .... 測試ECHO指令
+echo .... 請稍後
+echo .... 完成.....
+
+結果：
+Test Enter
+.... 測試ECHO指令
+.... 請稍後
+.... 完成.....
+
+*------------------------------------------
+*   二、 代換參數
+*------------------------------------------
+代換參數的標記是一個百分號（%）再跟著一個阿拉伯數字，最多可使用10個代換參數，這些變數的值，則由呼叫批次檔的命令所指定。
+Ex：
+@echo off
+echo .... 測試代換參數指令
+echo .... 請稍後
+echo .... 完成.....
+echo %1 %2 %3 %4
+
+結果：
+Test TCP EDU NETWORK CENTER Enter
+.... 測試ECHO指令
+.... 請稍後
+.... 完成.....
+TCP EDU NETWORK CENTER
+
+*------------------------------------------
+*  三、 PAUSE：是暫停批次檔的執行。
+*------------------------------------------
+當MS-DOS執行到PAUSE時就暫時中止目前的工作，並印出下列訊息：
+press any key to contunue …… 
+Ex：
+@echo off
+echo .... 測試代換參數指令
+echo .... 請稍後
+echo .... 完成.....
+echo %1 %2 %3 %4
+pause
+echo %5 %6
+
+結果：
+Test TCP EDU NETWORK CENTER Enter E-Mail chan@ms64.hinet.net
+.... 測試ECHO指令
+.... 請稍後
+.... 完成.....
+TCP EDU NETWORK CENTER
+Press any key to continue ....
+
+E-Mail chan@ms64.hinet.net
+
+*------------------------------------------
+*  四、 REM（REMark）用來在批次檔執行中顯示某些訊息
+*------------------------------------------
+用法是在批次檔中鍵入rem，後面跟著所要顯示的字串
+
+Ex：
+@echo off
+echo .... 測試代換參數指令
+echo .... 請稍後
+echo .... 完成.....
+rem 下面指令，開始做代換參數
+echo %1 %2 %3 %4
+pause
+echo %5 %6
+
+*------------------------------------------
+*  五、 IF
+*------------------------------------------
+IF命令在批次檔中用來測試特定的條件，以決定是否執行某些命令。絛件的型態分為四種：
+////////////////////////////////////////////////////////////////////
+(1) IF EXIST
+此條件是用來檢查某一檔案是否存在，若存在則條件成立，便執行指定的命令
+Ex：
+@echo off
+if exist test1.bat type test1.bat
+
+////////////////////////////////////////////////////////////////////
+(2) IF String1 = = String2（= = 表相等性的比較）
+Ex：
+@echo off
+echo .... 測試IF指令
+echo %1
+if '%OS%'=='Windosws_NT' goto good
+if %1 == a goto first
+if %1 == b goto second
+if %1 == c goto three
+:good
+echo 作業系統%OS%
+:first
+echo 執行first (a)
+goto finish
+:second
+echo 執行second (b)
+goto finish
+:three
+echo 執行three (c)
+goto finish
+:finish
+
+結果：
+Test1 a Enter
+a
+執行First(a)
+執行程式結束
+
+////////////////////////////////////////////////////////////////////
+(3) IF ERRORLEVEL
+ERRORLEVEL是由MS-DOS所管理的一個系統變數，目的是監視所有錯誤發生的情況。（類似ErrorMessage）
+
+////////////////////////////////////////////////////////////////////
+(4) IF NOT
+IF NOT是當測試條件不成立時才執行後面命令
+
+Ex：
+@echo off
+if not exist test1.bat type test1.bat
+echo 執行程式結束
+
+*------------------------------------------
+*  六、 GOTO
+*------------------------------------------
+GOTO命令在批次檔中用來轉移控制權，可以指示批次檔跳至某一標記（line label）由一個冒號（：）跟著字元符號所組成的；label也可使用代換變數
+Ex：
+goto first 或 goto %1
+
+*------------------------------------------
+*  七、 FOR
+*------------------------------------------
+FOR命令允許批次檔中的其他命令，可以重覆地執行
+for %%a IN (file1 file2 file3) DO del %%a
+虛擬變數必須以兩個百分號（%%）起頭，in後面著參數列，do後面跟著要執行的命令
+
+Ex1：
+@echo off
+echo .... 測試FOR指令
+echo .... 請稍後
+echo .... 完成.....
+echo ....
+for %%a IN (test_a.bat test_b.bat test_c.bat) do copy %%a prn
+結果：
+test Enter
+.... 測試FOR指令
+.... 請稍後
+.... 完成.....
+....
+    1 File(s) Copied
+    1 File(s) Copied
+    1 File(s) Copied
+
+Ex2：
+REM 取得日期
+FOR /F "tokens=1-4 delims=/ " %%a IN ("%date%") DO (SET _MyDate=%%a%%b%%c%%d)
+REM 顯示去掉分隔符號號後的結果
+echo %_MyDate%
+說明：
+/F 是指定將後面 %date% 的環境變數當成檔案來處理，而處理的依據就是在「"tokens=1-4 delims=/ "」這邊。
+tokens如果按照字面翻譯的話，是權杖的意思，這樣翻不太直覺，在這邊翻成順序可能比較好一些。
+以這個例子來說，就是要取得順序 1 ~ 4 的字串，那程式怎麼知道這個順序的分法呢？透過 delims 這個引述的設定，程式就知道要怎麼去分析 %date% 環境變數的順序。
+在 delims 等號右邊的字元就是用來指定分割順序的依據。以這個例子來說，我們用「/」與「 」(空白，White Space)這兩個分隔符號號來分割 %date% 的順序。
+因此原本 %date% 的內容是 2006/03/07 星期二，在程式來看就變成了：
+順序　內　　容
+﹉﹉　﹉﹉﹉﹉
+1 　　　2006
+2 　 　 　03
+3 　　 　07
+4　　　星期二
+%%a 是說把順序 1 的結果指派給名稱為 %%a 的變數，因此順序 2 的變數名稱就會是 %%b，以此類推，最多可以有 52 個變數，
+原因如下：變數名稱有大小寫之分，所以 %%a 跟 %%A 不同，且僅能以一個英文字母來命名，所以 26（個字母）× 2（大寫跟小寫 2 種）＝52（個）。
+DO 後面的括號內容是用來指定所要執行的命令內容，以這個例子來說，就是指定一個名稱為 _MyDate 的變數，它的內容是由 %%a%%b%%c%%d 所構成的。
+再來我們看看使用 FOR 指令去掉時間變數之分隔符號號的結果：
+
+MyTime.bat 的檔案內容如下所示:
+----程式開始----
+REM 取得時間
+FOR /F "tokens=1-4 delims=:." %%a IN ("%time%") DO (SET _MyTime=%%a%%b%%c%%d)
+REM 顯示去掉分隔符號號後的結果
+echo %_MyTime%
+
+----程式結束----
+看看執行的結果：
+C:\>MyTime
+螢幕輸出：
+14243241
+講了這麼多，您知道該怎麼運用 %date% 與 %time% 環境變數了嗎？
+
+*------------------------------------------
+*  八、 SHIFT
+*------------------------------------------
+SHIFT命令允許在批次檔的起動命令中，使用超過10以上的實際參數
+（%0～%9）
+
+*------------------------------------------
+*  九、 CALL
+*------------------------------------------
+模組化的程式設計，是將一個完整的程式分割成一個個獨立的模組（module），每個模組負責一項功能
+Ex：
+@echo off
+echo .... 測試CALL指令
+echo .... 請稍後
+echo %1 %2
+call test_b
+echo %3 %4
+echo 程式模組已執行完畢 （test_a.bat）
+
+@echo off
+echo 執行test_b程式
+echo 即將執行test_c .....
+call test_c
+echo 執行test_b程式完畢~~~ （test_b.bat）
+
+@echo off
+echo 執行test_c程式
+if exist test2.bat type test2.bat
+echo 執行test_c程式完畢~~~ （test_b.bat）
+
+*------------------------------------------
+*  十、 set
+*------------------------------------------
+宣告變數；設定變數
+set gbs=%OS%    取得作業系統
+set xdate=%date%   取得目前日期20080610
+set xmonth=%date:~5,2%   取得目前月份06
+set select=
+set /P select=請選擇：   等待取得使用者所輸入字元
+在DOS環境下輸入Set，可列出windows環境變數
+
+
+/***************************************************************************/
+批次處理程式的字串功能 (Function of String in Batch)
+/***************************************************************************/
+Windows 擁有優良的界面控制，但如果涉及大量重覆性的運作
+使用界面並不合適，因此便需要使用批次處理程式
+Windows provides a good quality of GUI, but, if you would like to do a large number of repetitive operations,
+GUI is not appropriate, so we need to use the batch process
+
+Windows 的 Batch File 與 Unix/Linux 的 Shell Script 很相似
+但在功能上 Batch File 比 Shell Script 弱
+而且使用限制亦相當大，說明文件亦比較難理解
+Batch File in Windows and Shell Script in Unix/Linux is similar.
+However, the syntax of Batch File is weaker than Shell Script
+and restrictions are quite large, the documentation is also more difficult to understand.
+
+在 Batch File 經常使用的形態是字串
+String is the most usable type in Batch File
+1       set string=mystring
+這是一個簡單的語法將字串「mystring」指派至變數「string」
+This is a simple statement to assign "mystring" to variable "string"
+
+1       echo %string%
+echo 是將資料輸出至命令提示字元的指令
+被 % 前後包著的文字便是變數名稱
+echo is a command to show the message on console
+A text wrapped by % is a variable name
+
+截取字串
+Get a substring
+1       set string=mystring
+2       echo %string:~0,2%
+0 表示開始位置，第一個字元位置為 0
+2 表示截取字串長度
+開始位置必須為整數，截取字串長度必須為正整數
+當開始位置為負數時，會倒向截取如 %string:~-3,2% 傳回「in」
+不使用截取字串長度或截取長度大於字串長度時，便從開始位置截取至最後如 %string:~4% 傳回「ring」
+0 is the start index, the index of first letter is 0
+2 is the length of substring
+start index must be integer, length of substring must be positive integer
+If the start index is negative integer, it will intercept the substring reversely, for example %string:~-4,2% returns "in"
+If you don't use length of substring or length of substring is larger than length of original string, it will intercept the substring from start index to end of original string, for example %string:~4% returns "ring"
+
+字串取代
+String replacement
+1       set string=herro
+2       echo %string:r=l%
+r 為搜尋的字串，不能是空字串
+l 為取代的字串
+如例子會傳回「hello」
+r is the search string, it cannot be empty string
+l is the replace string
+The example returns "hello"
+
+字串長度
+Length of string
+Batch File 並沒有計算字串長度的方法，所以必須由使用者自行編製計算器
+由於沒有正式的計算字串長度的方法，因此動用了： if defined ， labal ， goto 來模擬
+Batch File does not have a method to calculate the length of string, so user must write a sub-routine to count the length of string
+There is not regular method to calculate the length of string, so we use: if defined, label, goto to simulate
+1        set string=mystring
+2        set /a length=0
+3        :loop
+4        if defined string (
+5            set string=%string:~1%
+6            set /a length+=1
+7            goto loop
+8        )
+9        echo %length%
+
+
+/******************************************************************************/
+[網路設備; 待機; ErP; 電視機; 咖啡機; 能效; 歐盟]
+/******************************************************************************/
+ref : 技術壁壘資源網 
+
+2013年8月23日，歐盟在官方公報（OJ）上正式公佈了ErP網路待機的實施條例(EU) No 801/2013，
+對待關機實施條例(EC) No 1275/2008和電視機實施條例(EC) No 642/2009進行修訂
+（實施條例草案詳見G/TBT/N/EU/86）。
+
+1. 出台背景
+    在2006-2007年歐盟進行的關於家用和辦公用電子電氣設備待機和關機耗能的技術、環境
+    和經濟研究中，網路待機能耗問題已被提出。該研究報告得出結論：網路連接成為家用和
+    辦公設備的一個共有特性。2008年6月21日，由於當時缺乏相應的數據，用能產品生態設
+    計法規委員會建議以單獨的立法過程來解決網路待機問題。
+    2009-2011年生態設計工作計劃確定網路待機為其工作重點之一。為此，歐盟法規委員會
+    在2010/2011年開展了網路待機的預備性研究，對網路待機的技術、環境和經濟影響進行
+    了分析。該研究與來自歐盟和第三國家的利益相關方和團體共同開發研究，並將結果公之
+    於眾。該研究估計：在歐盟境內銷售的家用和辦公用電子電氣設備關於網路待機的能耗，
+    在2010年達到54太瓦時，相當於2300萬噸的二氧化碳排放量。如果不採取措施，網路待機
+    能耗到2020年將增至90太瓦時。並且網路待機能耗是可以顯著減少的。本條例將增加技術
+    的市場滲透，提高網路待機的能效，預計2020年將為歐盟節約能源36太瓦時，2025年達到
+    49太瓦時。
+    鑒於待機和網路待機條件下的功能是相通的，並且涵蓋產品範圍相當，2011年9月14日召
+    開的生態設計咨詢論壇支援網路待機生態設計要求應通過修訂現有待關機實施條例
+    (EC) No 1275/2008來規定的觀點。對待機和關機模式生態設計要求的審查與網路待機應
+    同步進行。鑒於待關機條例(EC) No 1275/2008規定的審查日期在網路待機要求第一階段
+    之前，1275/2008的審查日期將推遲一年，不遲於2016年1月7日。
+    由於電視機屬於特定產品生態設計實施措施管制，排除在待關機實施條例
+    (EC) No 1275/2008之外，關於電視機網路待機的生態設計要求包含在電視機實施條例
+    (EC) No 642/2009的生態設計要求之中。網路待機的技術、環境和經濟研究估計：到
+    2020年，電視機網路待機的生態設計要求估計可節約10太瓦時的電量。
+    對於咖啡機，2011年12月16日及2012年4月18日的生態設計咨詢論壇支援這樣的觀點：
+    咖啡機將不制定特定產品的實施措施，但待關機實施條例(EC) No 1275/2008的待機要求
+    對於咖啡機應更明確。本條例引入了咖啡機電源管理要求的應用規範，關於設備自動切換
+    到待機/關機模式到的默認延遲時間。從ErP家用咖啡機的技術、環境和經濟研究可以得出
+    結論：咖啡機自動切換到待機/關機模式後的延遲時間限制，到2020年將為歐盟每年節約
+    超過2太瓦時的電能。這些節約的能源並沒有在(EC) No. 1275/2008的節能假設中考慮。
+
+2. 對待關機實施條例(EC) No 1275/2008的修訂
+    (1) 名稱和定義
+    (EC) No 1275/2008的名稱變為「家用及辦公用設備待機和關機模式及網路待機功耗的生
+    態設計要求」，增加了網路設備的網路待機的生態設計要求。
+    其中網路指帶有拓撲鏈接的通信基礎設施，包括物理元件、組織原則、溝通程式和格式
+    （協定）的架構。網路待機指設備能夠以遠端啟動觸發（remotely initiated trigger）
+    通過網路連接恢復一項功能的狀態。遠端啟動觸發指經由網路、來自設備外部的一個信號
+    。網路設備指設備連接到網路的能力，並且有一個或多個網路連接埠。網路連接埠指位於
+    設備網路連接的有線或無線介面，設備能夠通過該介面被遠端激活。
+    網路設備的網路待機要求因網路可用性而有所區別，具有高網路可用性的網路設備以及具
+    有高網路可用性功能的網路設備與其他網路設備的網路待機要求是不同的。其中網路可用
+    性指設備通過網路連接埠檢測到遠端啟動觸發後恢復功能的能力。具有高網路可用性的網
+    路設備（HiNA設備）指有以下一個或多個功能但沒有其他功能作為主功能的設備，包括路
+    由器、網路交換機、無線網路接入點、集線器、調製解調器、VoIP電話、視頻電話。具有
+    高網路可用性功能的網路設備（具有HiNA功能的設備）指具有路由器、網路交換機、無線
+    網路介面或其組合功能的設備，但非HiNA設備。路由器指確定網路流量傳送的最佳路徑作
+    為其主要功能的網路設備。路由器根據網路層資訊（L3），從一個網路向另一個網路轉發
+    數據包。網路交換機指根據每幀的目的地址來過濾、轉發和分發幀作為其主要功能的網路
+    設備。所有的交換機操作至少在數據鏈路層（L2）。無線網路接入點指提供IEEE 802.11
+    （Wi-Fi）連接到多個用戶端作為其主要功能的一種設備。集線器指包含多個連接埠、用
+    於連接局域網段的網路設備。調製解調器指發送和接收有線網路上數字調製的模擬信號作
+    為其主要功能的一種設備。
+    此外，大幅面列印設備和遠端呈現系統屬於網路待機的排除範圍。其中列印設備指從電子
+    輸入產生紙質輸出的設備。列印設備可能有附加的功能，並且可以作為多功能設備或多功
+    能產品在市場上銷售。大幅面列印設備指設計於A2及更大紙張列印的列印設備，包括設計
+    於容納大於等於406公釐寬的連續紙張的列印設備。遠端呈現系統指高清視頻會議和合作
+    系統，其中包括用戶界面、高清相機、顯示器、音響系統以及視頻和音頻的編碼和解碼處
+    理能力。
+
+    相對於草案，實施條例增加了關於電腦的台式瘦客戶機、工作站、移動工作站、小型伺服
+    器、電腦伺服器的定義。
+
+    (2) 網路待機的生態設計要求
+    1）從2015年1月1日起：
+    a. 關閉無線網路連接的可能性
+    任何能夠連接到無線網路的網路設備，應向用戶提供關閉無線網路連接的可能性。本要求
+    並不適用於依賴單一無線網路連接達到預期用途且無有線網路連接的產品。
+    b. 網路設備的電源管理
+    除非不適合預期用途，網路設備應提供電源管理或類似功能。當網路設備沒有提供主功能
+    並且其他用能產品不依賴於其功能，電源管理功能應在適合設備預期用途的盡可能短的時
+    間內，將設備自動切換至網路待機的狀態，除非該功能不適合預期用途。
+    在提供網路待機的狀態下，電源管理功能可以自動將設備切換至網路待機狀態（待機模式
+    或關機模式或其他不超過適用待機和/或關機模式功耗要求的狀態）。
+    網路設備的所有網路連接埠應提供電源管理或類似功能。電源管理或類似功能應被激活，
+    除非所有網路連接埠被關閉。在這種情況下，如果任何網路連接埠被激活，電源管理或類
+    似功能也應被激活。電源管理或類似功能，將設備自動切換至網路待機狀態的缺省時間不
+    得超過20分鐘。
+    c. 當所有網路連接埠被關閉時，有一個或多個待機模式的網路設備應符合這些待機模式的
+    要求。
+    d. 當所有網路連接埠被關閉時，HiNA設備以外的網路設備應符合普通設備的電源管理要求。
+    e. 網路待機狀態功耗
+    HiNA設備或帶有HiNA功能的設備，其網路待機狀態的功耗不得超過12.0W。其他網路設備的
+    網路待機功耗不得超過6.0 W。設備通過電源管理或類似功能切換至網路待機狀態。此網路
+    待機功耗限值規定不適用於：電源額定功率大於750W的列印設備；大幅面列印設備；遠端
+    呈現系統；台式瘦客戶機；工作站；移動工作站；小型伺服器；電腦伺服器。
+    2）從2017年1月1日起：
+    a. 當所有的有線網路連接埠斷開連接且所有無線網路連接埠被關閉，有一個或多個待機模
+    式的網路設備應符合這些待機模式的要求。
+    b. 當所有的有線網路連接埠斷開連接且所有網路連接埠被關閉，HiNA設備以外的網路設備
+    應符合普通設備的電源管理規定。
+    c. 網路待機狀態的功耗
+    HiNA設備或帶有HiNA功能的設備，其網路待機狀態的功耗不得超過8.0W。其他網路設備的網
+    路待機功耗不得超過3.0 W。設備通過電源管理或類似功能切換至網路待機狀態。此網路待
+    機功耗限值規定不適用於大幅面列印設備、台式瘦客戶機、工作站、移動工作站、小型伺服
+    器、電腦伺服器。
+    3）從2019年1月1日起：
+    對於HiNA設備和具有HiNA功能設備以外的網路設備，其網路待機功耗不得超過2.0W。
+    (3) 咖啡機的生態設計要求
+    從2015年1月1日起：
+    對於咖啡機，產品自動切換到待機/關機/低功耗模式和狀態的延遲時間應：
+    對於將咖啡儲存在一個保溫壺的家用滴式過濾咖啡機，完成最後一次煮咖啡週期後的時間不
+    超過5分鐘，或者完成除垢或自清洗過程後的時間不超過30分鐘；
+    對於將咖啡儲存在一個非保溫壺的家用滴式過濾咖啡機，完成最後一次煮咖啡週期後的時間
+    不超過40分鐘，或者完成除垢或自清洗過程後的時間不超過30分鐘；
+    對於非滴式過濾咖啡機的家用咖啡機，完成最後一次煮咖啡週期後的時間不超過30分鐘，或
+    激活加熱元件的時間不超過30分鐘，或激活茶杯預熱功能的時間不超過60分鐘，或者完成除
+    垢或自清洗過程後的時間不超過30分鐘，除非需要用戶干預以防止可能的損壞或事故的警報
+    已被觸發。
+    此日期不適用於電源管理要求。
+    (4) 產品資訊要求
+    從2015年1月1日起，網路設備的製造商應在免費訪問網站上清晰顯示以下資訊：
+    a. 每個待機和/或關機模式以及網路待機狀態（設備通過電源管理或類似功能切換）的功耗
+    數（W）以及電源管理或類似的功能將設備自動切換至待機和/或關機模式和/或網路待機狀
+    態的時間；
+    b. 如果所有有線網路連接埠連接並且所有無線網路連接埠被激活，產品在網路待機狀態下
+    的功耗；
+    c. 如何激活和關閉無線網路連接埠的指南。
+    (5) 製造商提供的資訊
+    對於待機和/或關機模式，增加了任何有關設備操作的說明，如用戶將設備切換至網路待機
+    狀態的資訊。
+    對於網路設備：
+    位於設備上的網路連接埠的數目和類型（除了無線網路連接埠）；如果在相同的物理網路連
+    接埠可容納多種類型的網路連接埠，應當特別指出；
+    所有網路連接埠在交付前是否被關閉；
+    設備是否屬於HiNA設備或帶有HiNA功能的設備；如果沒有資訊提供，設備被認為不是HiNA設
+    備或不帶有HiNA功能的設備。
+    對於每種類型的網路連接埠：
+
+    電源管理或類似的能將設備切換至網路待機狀態的缺省時間；
+    用於重新激活設備的觸發器；
+   （最大）性能規格；
+    設備網路待機的（最大）功耗，如果僅此連接埠用於遠端激活；
+    設備所使用的通信協定。
+    如果沒有提供相關資訊，該設備被認為不是網路設備，除非該設備提供的路由器、網路交換
+    機、無線網路接入點（非終端）、集線器、調製解調器、VoIP電話、視頻電話的功能。
+    最後增加了「在製造商沒有定義網路設備的情況下，維護一個或多個網路連接或等待一個遠
+    端啟動觸發的需要，不被認為是豁免條例2(d)規定的電源管理功能要求的技術理由。」的規
+    定。
+    (6) 驗證程式和標桿
+    修訂條例還對條例附錄III的驗證程式和附錄IV的標桿進行了修訂。
+
+3. 對電視機實施條例(EC) No 642/2009的修訂
+    (1) 概念
+    網路電視指連接到網路、有一個或多個網路連接埠的電視機。帶有高網路可用性功能的網路
+    電視（帶HiNA功能的電視機）指帶有路由器、網路交換機、無線網路介面（非終端）或其組
+    合的電視機。
+    (2) 網路待機的生態設計要求
+    在附錄I「生態設計要求」增加了第3點「網路待機的功耗要求」。
+    a. 從2015年1月1日起 
+    可關閉無線網路連接：如果一台網路電視有能力連接到無線網路，它應為用戶提供關閉無線
+    網路連接的功能。這一要求並不適用於為了預期用途依賴於單一無線網路連接並且沒有有線
+    網路連接的產品。
+    網路電視的電源管理：在用戶最後一次在開機模式交互和/或改變頻道不超過4小時後，網路
+    電視機應從開機模式自動切換至網路待機狀態或不超過網路待機狀態功耗要求的適用的任何
+    其他狀態。在自動從開機模式切換至適用狀態/模式前，網路電視機應顯示警告資訊，並且
+    這種功能應設為缺省。在網路待機狀態，電源管理功能將設備自動切換至待機模式、關機模
+    式或其他不超過關機和/或待機模式功耗要求的狀態。電源管理或類似功能，應適用於網路
+    電視的所有網路連接埠。電源管理或類似功能應被激活，除非所有無線網路連接埠被關閉。
+    在這種情況下，如果任何一個網路連接埠被激活，電源管理或類似功能應被激活。
+    有一個或多個待機模式的網路電視，當所有網路連接埠被關閉時，應符合這些待機模式的要
+    求。
+    網路待機的功耗：帶有HiNA功能的電視機，其網路待機功耗不得超過12.00 W；不帶有HiNA
+    功能的電視機，其網路待機功耗不得超過6.00 W。
+    b. 從2017年1月1日起
+    有一個或多個待機模式的網路電視，當所有有線網路連接埠被斷開並且所有無線網路連接埠
+    被關閉時，應符合這些待機模式的要求。
+    當所有有線網路連接埠被斷開並且所有網路連接埠被關閉時，網路電視應符合2.2 (d)款的
+    規定。
+    網路待機功耗：帶有HiNA功能的電視機，其網路待機功耗不得超過8.00 W；不帶有HiNA功能
+    的電視機，其網路待機功耗不得超過3.00 W。
+    c. 從2019年1月1日起
+    不帶HiNA功能的電視機，在設備通過電源管理或類似功能切換至網路待機狀態的功耗，不得
+    超過2.00 W。
+    在製造商所提供資訊中有關技術文件，增加以下內容：
+
+對於網路待機：
+位於電視機的網路連接埠的數量和類型，除了無線網路連接埠；如果在相同的物理網路連接埠可
+容納多種類型的網路連接埠，特別應當指出；
+交付前所有網路連接埠是否被關閉；
+設備是否屬於帶有HiNA功能的設備；如果沒有提供資訊，該設備被認為不是HiNA設備或者帶有
+HiNA功能的設備。
+    對於每種類型的網路連接埠：
+電源管理或類似功能將電視機切換至網路待機狀態的缺省切換時間；
+用於重新激活設備的觸發器；
+（最大）性能規格；
+如果僅該連接埠用於遠端激活，（電源管理或類似功能將設備切換到）網路待機狀態的（最大）功
+耗。
+如果沒有提供資訊，該設備被認為不是網路設備。
+(3) 驗證程式
+    修訂條例還對電視機實施條例附錄III的驗證程式進行了修訂。
+Guidelines accompanying Commission Regulation (EU) No 801_2013 of 22 August 2013 
+
+
+/******************************************************************************/
+技術壁壘資源網 [EuP指令; 待機; 關機; 能效; 1275/2008; 音視頻; 視聽電子]
+http://www.tbtmap.cn/portal/Contents/Channel_2125/2009/0427/72378/content_72378.jsf
+/******************************************************************************/
+    2008年12月18日，歐委會在其官方公報（OJ L 339, 18.12.2008, p. 45-52）上公佈了第1275/2008號條例，要求家用和辦公用電子電氣設備滿足有關待機和關機能耗的生態設計要求。EuP指令的第一個實施措施也正式出台，並2009年1月7日開始生效。
+1. 適用範圍
+    該實施措施適用於１在市場銷售並供最終用戶使用；２屬於條例附件I所列的耗能產品；３需要從總電源取電才可操作；和４電壓在250 V或以下的插即用的家用和辦公用電子電氣設備。其中音視頻產品包括收音機、電視機、攝像機、錄影機、高保真錄音機、音頻放大器、家庭影院、樂器、其他音視頻設備。電器的零部件不在該條例的管理範疇。
+2. 概念
+    「待機模式」包括「重新激活」和「資訊或狀態顯示」兩種情況。其中「重新激活」是指一種通過遙控開關，包括遙控器、內部感測器以及定時器激活工作模式，使設備進入一種提供其他功能（包括主功能）的運行狀態的功能，如電視機、CD/DVD播放器通過遙控器或定時器重新進入工作狀態；「資訊或狀態顯示」是指一種在顯示器上提供資訊或指示設備的某種狀態的連續功能，如微波爐帶有LCD顯示時間和程式狀態。機頂盒產品所涉及的「網路待機模式」暫不在此實施措施的「待機」範疇。「關機模式」是指設備連接到主電源但不提供任何功能的運行狀態，包括僅提供關機模式指示，或僅提供用以確保歐盟電磁相容指令要求所必須的功能的狀態，如電視機插入插座但通過「硬關機開關」與電源斷開（不消耗電能）。
+3. 生態設計要求
+    上述音視頻產品應分兩個階段實施其耗能限值（附件II）：
+第一階段：在條例生效一年後（即2010年1月7日），關機或重新激活的待機模式下功耗不得超過1 W，具有資訊或狀態顯示的待機模式功耗不得超過2 W；
+第二階段：在條例生效四年後（即2013年1月7日），關機或重新激活動的待機模式下功耗不得超過0.5 W，而具有資訊或狀態顯示的待機模式功耗不得超過1 W。
+    此外，除非產品預定不適合有待機/關機功能，否則在插電狀態下，所有產品都應具有關機和/或待機模式或達到功耗要求的其它模式。並且，當產品未使用其主要功能或不影響其他耗能產品運行時，產品應提供電源管理或類似功能，使得在合理的最短時間內自動將產品切換至待機、關機或能耗不超過實施措施規定的要求的其他模式。所應用的合格評定程式為「內部設計控制」和「符合性評價管理體系」，並通過CE符合性標誌和符合性聲明來確保並聲明符合這些要求。
+
+4. 資訊要求
+    在資訊要求方面，製造商應針對每種待機/關機模式提供：
+電力消耗的數據（精確到小數點後第2位）；
+使用的測量方法；
+設備模式的選擇或程式的描述；
+設備自動切換模式的過程說明；
+設備的操作說明；
+測試時的各項參數；
+有關待機/關機模式符合性評估的設備特性說明。
+5. 指引文件
+    2009年10月，歐盟發佈有關此項實施措施的指引文件，以解釋和澄清業界對於家庭環境中使用的資訊技術設備（ITE）產品與待關機的定義、生態設計要求等。該指引文件的鏈接如下：
+
+EC 1275/2008待關機實施條例指引文件（2009-10）
+    對於待關機實施措施中有疑義的部分，該指引解釋說明如下：
+    (1) 產品範圍
+    一般來說，判斷產品是否屬於本條例範疇，可通過判別產品是否同時滿足以下四個條件來實現：單獨功能單元且預定為最終用戶使用；屬於附錄I列出的用能產品；依賴於市電供電；標稱電壓在250 V以下。
+    對於家用電器，條例包含電子控制的燃氣用具（灶台、烤爐）、真空吸塵器、洗衣干衣一體機、製冰機、淨水設備等。
+    對於ITE設備，條例涵蓋的是在家庭環境中使用的設備，如EMC指令中的B類ITE設備。有關「ITE設備」和「家庭環境」與EMC指令（2004/108/EC）基本要求涵蓋的EN 55022定義相同。EMC分類可以作為決定某ITE產品是否在本條例範圍內的一項指標，A類ITE設備就不在本條例範疇內。
+    對於消費類電子設備，除了條例附錄I(3)列出的設備，還包括（但不限於）娛樂電子產品，如HiFi音響和家庭影院、CD和DVD播放器、視頻遊戲機和電話答錄機。
+    對於依賴於市電供電的便攜式產品，許多便攜式充電產品在充電座上充電，該產品無需拆卸電池。對於這種產品，本條例適用於由便攜式產品及其外部電源組成的功能單元（以及與能耗相關的其他潛在配件）。
+    對於低壓外部電源（EPS），外部電源實施條例EC 278/2009對本條例進行了修訂，排除了帶有低壓外部電源投入市場的家用和辦公用設備。「低壓外部電源」的定義與能源之星計劃對於外部電源的定義一致。
+    (2) 電源輸入方式的排除項目
+    條例涵蓋從市電取電（標稱230 V/50 Hz）的產品，例如從電網直接取電的產品，這些產品可以從電網上斷開。使用其他電源輸入的產品將不適用於本條例，例如：
+
+以太網供電（Power over Ethernet）；
+電話線供電（Power over a telephone land-line）；
+DC電源產品並通過USB供電（DC-powered products, and power over USB）；
+非充電電池供電（Non-rechargeable batteries）。
+    (3) 提供有效的待關機功能
+    在第一階段（2010年1月7日起），製造商應提供有效的待機和/或關機功能，若兩者都無法提供，需提供低能源消耗模式（Low Energy Mode），且不得超過規定限值；若廠商同時提供待機與關機模式，則兩者皆需要符合規定；若產品本身不適用關機項目，則可不必提供本功能，但製造商需提交技術文件以說明為何不需提供待關機功能。
+    (4) 關機模式
+    條例中「關機」的定義與能源之星電腦、顯示器、影像設備規範中的定義相當，也與歐盟數字電視服務系統或寬帶設備的行為準則一致。
+    對於關機模式，可能存在以下功能：
+
+簡單的模式指示（如LED指示燈）不視為功能，因此在本條例定義的「關機」模式，LED指示燈可以亮著；
+為了符合EMC指令（2004/108/EC）而配備的EMC濾波器。
+    除了產品提供的軟硬關機功能（Switching on via a hard or soft switch）、LED關機指示燈與EMC濾波器（EMC filter）等功能，其它附加功能則不視為關機模式，例如：
+
+待機模式；
+揮發性記憶體保護功能，能夠即時重新激活而無需啟動（例如對於電腦的ACPI S3）；
+睡眠模式（如能源之星影像設備或電視機規範中的定義）；
+電視信號記錄中的等待RF信號模式；
+網路待機模式。
+    (5) 待機模式
+    待機模式指產品必須通過遙控、內部感應器或定時器來啟動其他功能的模式；包括時鐘的資訊或狀態顯示。例子有：
+
+音視頻產品中的紅外感測器，使得產品可響應遙控信號；
+辦公室的時鐘計時器，使得週末可自動打開或關閉；
+帶有遙控的音頻-視頻-PC機，這種PC通過遙控打開和關閉。
+待機包括資訊狀態顯示，上面提及的LED指示燈僅指示關機模式狀態，不視為資訊狀態顯示。
+    如果提供任何「待機」功能之外的功能，則其對應的工作狀態不視為「待機」狀態。具體例子有：
+通過網路介面（如LAN、USB、RS-232C、Wi-Fi、HDMI和遙控外的紅外通訊）的網路通訊功能；
+網路重新激活功能，如（譬如電腦有Wake on LAN可激活ACPI S4和S5模式）。
+揮發性記憶體保護功能，能夠即時重新激活而無需啟動（例如對於電腦的ACPI S3）；
+能源之星定義的睡眠模式，對於保持網路連接或提供加強重新激活功能的那些狀態；
+帶有OS激活狀態的快速重新啟動功能，如存在於帶有硬碟的設備（如DVD刻錄機、迷你高清組合機）；
+安全警報系統；
+支援其他設備的供電功能（如電視機為天線供電，視頻/DVD刻錄機為從天線到電視機的RF信號供電）；
+電池完成充電後的電池存在指示位和功率電平檢測儀；
+激活的網路下載模式，如在預編程時間及時接收電子節目指南（EPG）更新的DVD刻錄機。
+    便攜式設備（如便攜式真空吸塵器）中電池負載的維護模式（maintenance mode）是該系統（充電電池和便攜設備）的主要功能之一，以補償電池自然放電。該功能不是重新激活功能和資訊顯示功能，因此不視為待機模式。暫時關閉能耗模式，也不屬於待機模式，例如烤箱暫時關閉能耗模式，進行降溫動作。
+    企業/機構可仔細研讀本指引，看您在執行本條例的過程中是否遇到了同樣的問題。歡迎企業/機構就有關問題和本編輯進行探討。 
+
+6. 就網路待機對待關機實施條例的修訂提案[注1]
+    2013年8月23日，歐盟在官方公報（OJ）上正式公佈了ErP網路待機的實施條例(EU) No 801/2013，對待關機實施條例(EC) No 1275/2008和電視機實施條例(EC) No 642/2009進行修訂（實施條例草案詳見G/TBT/N/EU/86）。 
+
+    (1) 出台背景
+    在2006-2007年歐盟進行的關於家用和辦公用電子電氣設備待機和關機耗能的技術、環境和經濟研究中，網路待機能耗問題已被提出。該研究報告得出結論：網路連接成為家用和辦公設備的一個共有特性。2008年6月21日，由於當時缺乏相應的數據，用能產品生態設計法規委員會建議以單獨的立法過程來解決網路待機問題。
+    2009-2011年生態設計工作計劃確定網路待機為其工作重點之一。為此，歐盟法規委員會在2010/2011年開展了網路待機的預備性研究，對網路待機的技術、環境和經濟影響進行了分析。該研究與來自歐盟和第三國家的利益相關方和團體共同開發研究，並將結果公之於眾。該研究估計：在歐盟境內銷售的家用和辦公用電子電氣設備關於網路待機的能耗，在2010年達到54太瓦時，相當於2300萬噸的二氧化碳排放量。如果不採取措施，網路待機能耗到2020年將增至90太瓦時。並且網路待機能耗是可以顯著減少的。本條例將增加技術的市場滲透，提高網路待機的能效，預計2020年將為歐盟節約能源36太瓦時，2025年達到49太瓦時。
+    鑒於待機和網路待機條件下的功能是相通的，並且涵蓋產品範圍相當，2011年9月14日召開的生態設計咨詢論壇支援網路待機生態設計要求應通過修訂現有待關機實施條例(EC) No 1275/2008來規定的觀點。對待機和關機模式生態設計要求的審查與網路待機應同步進行。鑒於待關機條例(EC) No 1275/2008規定的審查日期在網路待機要求第一階段之前，1275/2008的審查日期將推遲一年，不遲於2016年1月7日。
+    由於電視機屬於特定產品生態設計實施措施管制，排除在待關機實施條例(EC) No 1275/2008之外，關於電視機網路待機的生態設計要求包含在電視機實施條例(EC) No 642/2009的生態設計要求之中。網路待機的技術、環境和經濟研究估計：到2020年，電視機網路待機的生態設計要求估計可節約10太瓦時的電量。
+    (2) 名稱和定義
+    (EC) No 1275/2008的名稱變為「家用及辦公用設備待機和關機模式及網路待機功耗的生態設計要求」，增加了網路設備的網路待機的生態設計要求。
+    其中網路指帶有拓撲鏈接的通信基礎設施，包括物理元件、組織原則、溝通程式和格式（協定）的架構。網路待機指設備能夠以遠端啟動觸發（remotely initiated trigger）通過網路連接恢復一項功能的狀態。遠端啟動觸發指經由網路、來自設備外部的一個信號。網路設備指設備連接到網路的能力，並且有一個或多個網路連接埠。網路連接埠指位於設備網路連接的有線或無線介面，設備能夠通過該介面被遠端激活。
+    網路設備的網路待機要求因網路可用性而有所區別，具有高網路可用性的網路設備以及具有高網路可用性功能的網路設備與其他網路設備的網路待機要求是不同的。其中網路可用性指設備通過網路連接埠檢測到遠端啟動觸發後恢復功能的能力。具有高網路可用性的網路設備（HiNA設備）指有以下一個或多個功能但沒有其他功能作為主功能的設備，包括路由器、網路交換機、無線網路接入點、集線器、調製解調器、VoIP電話、視頻電話。具有高網路可用性功能的網路設備（具有HiNA功能的設備）指具有路由器、網路交換機、無線網路介面或其組合功能的設備，但非HiNA設備。路由器指確定網路流量傳送的最佳路徑作為其主要功能的網路設備。路由器根據網路層資訊（L3），從一個網路向另一個網路轉發數據包。網路交換機指根據每幀的目的地址來過濾、轉發和分發幀作為其主要功能的網路設備。所有的交換機操作至少在數據鏈路層（L2）。無線網路接入點指提供IEEE 802.11（Wi-Fi）連接到多個用戶端作為其主要功能的一種設備。集線器指包含多個連接埠、用於連接局域網段的網路設備。調製解調器指發送和接收有線網路上數字調製的模擬信號作為其主要功能的一種設備。
+    (3) 網路待機的生態設計要求
+    1）從2015年1月1日起：
+    a. 關閉無線網路連接的可能性
+    任何能夠連接到無線網路的網路設備，應向用戶提供關閉無線網路連接的可能性。本要求並不適用於依賴單一無線網路連接達到預期用途且無有線網路連接的產品。
+    b. 網路設備的電源管理
+    除非不適合預期用途，網路設備應提供電源管理或類似功能。當網路設備沒有提供主功能並且其他用能產品不依賴於其功能，電源管理功能應在適合設備預期用途的盡可能短的時間內，將設備自動切換至網路待機的狀態，除非該功能不適合預期用途。在提供網路待機的狀態下，電源管理功能可以自動將設備切換至網路待機狀態（待機模式或關機模式或其他不超過適用待機和/或關機模式功耗要求的狀態）。
+    網路設備的所有網路連接埠應提供電源管理或類似功能。電源管理或類似功能應被激活，除非所有網路連接埠被關閉。在這種情況下，如果任何網路連接埠被激活，電源管理或類似功能也應被激活。電源管理或類似功能，將設備自動切換至網路待機狀態的缺省時間不得超過20分鐘。
+    c. 當所有網路連接埠被關閉時，有一個或多個待機模式的網路設備應符合這些待機模式的要求。
+    d. 當所有網路連接埠被關閉時，HiNA設備以外的網路設備應符合普通設備的電源管理要求。
+    e. 網路待機狀態功耗
+    HiNA設備或帶有HiNA功能的設備，其網路待機狀態的功耗不得超過12.0W。其他網路設備的網路待機功耗不得超過6.0 W。設備通過電源管理或類似功能切換至網路待機狀態。此網路待機功耗限值規定不適用於：電源額定功率大於750W的列印設備；大幅面列印設備；遠端呈現系統；台式瘦客戶機；工作站；移動工作站；小型伺服器；電腦伺服器。
+    2）從2017年1月1日起：
+    a. 當所有的有線網路連接埠斷開連接且所有無線網路連接埠被關閉，有一個或多個待機模式的網路設備應符合這些待機模式的要求。
+    b. 當所有的有線網路連接埠斷開連接且所有網路連接埠被關閉，HiNA設備以外的網路設備應符合普通設備的電源管理規定。
+    c. 網路待機狀態的功耗
+    HiNA設備或帶有HiNA功能的設備，其網路待機狀態的功耗不得超過8.0W。其他網路設備的網路待機功耗不得超過3.0 W。設備通過電源管理或類似功能切換至網路待機狀態。此網路待機功耗限值規定不適用於大幅面列印設備、台式瘦客戶機、工作站、移動工作站、小型伺服器、電腦伺服器。
+
+    3）從2019年1月1日起：
+    對於HiNA設備和具有HiNA功能設備以外的網路設備，其網路待機功耗不得超過2.0W。
+    (4) 產品資訊要求
+    從2015年1月1日起，網路設備的製造商應在免費訪問網站上清晰顯示以下資訊：
+
+    a. 每個待機和/或關機模式以及網路待機狀態（設備通過電源管理或類似功能切換）的功耗數（W）以及電源管理或類似的功能將設備自動切換至待機和/或關機模式和/或網路待機狀態的時間；
+    b. 如果所有有線網路連接埠連接並且所有無線網路連接埠被激活，產品在網路待機狀態下的功耗；
+    c. 如何激活和關閉無線網路連接埠的指南。
+
+    (5) 製造商提供的資訊
+    對於待機和/或關機模式，增加了任何有關設備操作的說明，如用戶將設備切換至網路待機狀態的資訊。
+    對於網路設備：
+
+位於設備上的網路連接埠的數目和類型（除了無線網路連接埠）；如果在相同的物理網路連接埠可容納多種類型的網路連接埠，應當特別指出；
+所有網路連接埠在交付前是否被關閉；
+設備是否屬於HiNA設備或帶有HiNA功能的設備；如果沒有資訊提供，設備被認為不是HiNA設備或不帶有HiNA功能的設備。
+    對於每種類型的網路連接埠：
+
+ 電源管理或類似的能將設備切換至網路待機狀態的缺省時間；
+用於重新激活設備的觸發器；
+（最大）性能規格；
+設備網路待機的（最大）功耗，如果僅此連接埠用於遠端激活；
+設備所使用的通信協定。
+    如果沒有提供相關資訊，該設備被認為不是網路設備，除非該設備提供的路由器、網路交換機、無線網路接入點（非終端）、集線器、調製解調器、VoIP電話、視頻電話的功能。
+    最後增加了「在製造商沒有定義網路設備的情況下，維護一個或多個網路連接或等待一個遠端啟動觸發的需要，不被認為是豁免條例2(d)規定的電源管理功能要求的技術理由。」的規定。
+    (6) 驗證程式和標桿
+
+    修訂條例還對條例附錄III的驗證程式和附錄IV的標桿進行了修訂。
+
+/******************************************************************************/
+/******************************************************************************/
+物聯網的基本架構
+感測層          用來識別、感測與控制末端物體的各種狀態，透過感測網路將資訊蒐集並傳遞至網路層。
+網路層          為了將感測資訊傳遞至應用層的應用系統。
+應用層          結合各種資料分析技術，以及子系統重新整合，來滿足企業不同的業務需求。
+
+感知層：物品對於周邊環境的感測、溝通能力（全面感知）
+網路層：轉換不同網路間溝通的技術並負責傳送感知層與應用層之間的資訊（可靠傳遞）
+應用層：針對感知層傳送的資訊，依不同的需求目的進行處理及應用（智慧處理）
+
+物聯網規格陣營
+Qualcomm       Allseen Alliance
+Apple          Homekit
+Google/Nest    Thread Group
+Intel          OIC(Open Interconnect Consortium)
+
+
+下面介紹一下四個目前檯面上聲勢最大的物聯網標準：
+Allseen聯盟     http://www.etcentric.org/wp-content/uploads/2014/07/AllSeen_Alliance_Logo.png
+　目前勢力最大的應該是AllSeen Alliance（稱為AllSeen），該聯盟在2013年12月由Linux基金會成立，
+  成員包含了來自半導體、白色家電、消費電子、下游零售商的巨頭們，例如高通、微軟以及中國的海爾、韓國LG、日本松下、Sharp等等共有五十多家公司，
+  擁立的技術稱為「AllJoyn」，這個技術是由高通所開發並免費轉移給ASA聯盟。
+　AllJoyn是一套開放開源的軟體SDK，可支援不同的作業系統，如Android、iOS、Windows等，
+  也相容於各式的網路系統，例如Wi-Fi、藍芽、Zigbee等等，它強調任何開發者皆可免費下載進行開發，由於只需要將其SDK嵌入軟體中即可，因此可以在不同的製造商、作業系統之間跨平台運作；
+  AllJoyn強調開放與相容，我們只要連上AllSeen Alliance的網站，便可在下載頁面上找到支援不同平台的AllJoyn版本來進行開發。
+　由於AllJoyn需經過硬體來解譯執行，因此它可能需要較強大的處理器而無法直接應用在強調低秏能、體積細小且低成本的晶片上，它在物聯網的架構中比較偏向網路層的應用。
+
+OIC聯盟         http://openinterconnect.org/wp-content/uploads/2014/01/OIC_colour_logo_medium.png
+　原本大家以為Intel會跟隨並加入AllSeen的陣營，但出人意料的，
+  Intel在今年(2014年) 7月聯合了AT&T、 Cisco、奇異、三星、Broadcom、IBM 和等等公司成立Open Interconnect Consortium（簡稱OIC）希望主導制定物聯網通訊的標準；
+  目前OIC 聯盟並沒有透露其技術細節，在OIC的網站上也還沒有相關的技術說明及文件，只是聲稱可以相容於iOS、Android、Linux 和其他作業系統，且同時可以封裝多種不同的無線聯網標準，
+  未來也將與AllJoyn相同也採開放原碼方式發展，並會額外加入認證測試制度。
+  雖然OIC廠商數量目前僅約AllSeen Alliance的二成左右，但也都是屬於一線的世界級公司，因此聲勢不小，大有分庭抗禮的趨勢。
+　此外，依據最近10/3的新聞，宏碁、聯發科等台系大廠也宣佈加入了OIC陣營，陣容開始壯大。
+
+Thread聯盟      http://cnet4.cbsistatic.com/hub/i/r/2014/07/14/45425a38-5a67-4951-9488-167fca4ba5a8/resize/270xauto/08151588a9a2312491d151680c8b1c76/thread-group-vert.jpg
+　其實早在2011年的Google I/O大會上，Google便曾經提出Android@Home 的計畫，希望把Android可以控制的裝置，從原先的智慧型手機、平板，再擴張到家電裝置，不過後來整個計劃沉寂不了了之。
+　這次Google透過旗下的Nest捲土重來，在今年(2014年) 7月成立Thread聯盟（大約晚了OIC聯盟一個星期），其所定義的新物聯網標準名稱亦稱為Thread，
+  目前參與成員有三星、安謀、飛思卡爾（Freescale Semiconductor）、芯科（Silicon Labs）、風扇商Big Ass Fans、門鎖商 Yale Security 等等，雖然成員還不多，
+  但以Google在Android的能力以及結合Nest深耕物聯網的實力，外界普遍認為Thread大有與其它聯盟一搏的實力，此外我們注意到三星電子除加入Allseen之外也加入了Thread陣營，不希望押錯寶的心態相當濃厚。
+　Thread標準是基於既有的ZigBee技術並加以改造的一種衍生協定，但是它卻不相容於原有的ZigBee設備，因此它需要業者更新設備韌體之後才能使用，
+  與其它聯盟的標準比較起來，Thread更接近於底層作為取代類似ZigBee的另一種網路協定，但是也代表其它聯盟也可以將Thread標準納入而與其相容。
+  很明顯的，Thread在物聯網的架構中是屬於較底層的感知層應用，似乎Google希望能直接透過Thread從底層來統一所有協定。
+
+Apple Homekit   https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT9EpRVy2C4P9TU2rkwZsRZ_3kqdIOjztLs1TVcfpW--4qNTMLL8Q
+  在6月3日蘋果的2014年全球開發者大會(WWDC)上，蘋果推出了智慧家居平臺HomeKit。
+  HomeKit對於硬體有特殊的要求，硬體商必需將特殊的無線晶片和軟體整合在硬體設備裡面，經過MadeforiPhone(MFi)認證後才能由開發人員透過HomeKit API去開發相關的應用，
+  最終的使用者將透過iOS平台，利用Siri的語音控制去進行操控，因此，我們可以看得出來，
+  蘋果的物聯網方案是「聯網物品 + iOS + Apps + Siri」的一個組合，然而這也限制了它的發展，因為你無法使用非iOS的設備來操控Homekit平台。
+　但是為了擴大Homekit支援的範圍，雖然蘋果當初要求相關設備需要經過MFi的認證才能加入HomeKit，最近也開放了讓其它非MFi認證設備也可透過介面轉換方式相容於HomeKit，
+  不過可能在安全性支援與其它設備資訊的分享上無法與MFi認證設備相同而有所限制。
+  因此我們可以看出，Homekit是架構在物聯網中最上方應用層的一種應用，只要是經過Homekit認證的設備，便能接受Homekit的監控、指揮及調度。
+
+四大標準在物聯網架構所處的位置：
+以上這四大相互競爭的物聯網標準，我們可以看出其實它們彼此都具有差異：
+OIC     目前我們還不清楚他們的架構與作法，因此暫且不論；
+AllSeen 繼承了Linux的開源精神選擇走最開放的路線，包容所有的協定與系統平台，應用在物聯網架構中的網路層
+Thread Group:它衍生自Zigbee並應用在物聯網架構的感知層，預期它未來也會與AllSeen一樣採開放的方式，它們兩者關心的重點都是在如何整合物與物之間的如何相連，
+        其中Thread自己本身就屬於底層的物聯網協定，且忽略其它協定僅針對Thread協定本身進行處理，而AllSeen則是包容並解譯所有的網路協定，這是兩者之間最大的差異所在。
+HomeKit 它屬於蘋果自家的軟體平臺，定位在物聯網架構的應用層，它所選擇的角色完全不同於AllJoyn與Thread，HomeKit不去理會物與物之間是如何相連的，而只是站在所有物物必經的樞紐位置（應用層）要求所有物件聽它指揮。
+
+由於AllSeen、Thread與HomeKit這三種標準在物聯網中所佔據的高度並不相同（從低至高Thread→ AllSeen→HomeKit），
+因此理論上，在實際應用時它們是可以彼此相容而不會相互干擾，因此目前的物聯網標準之爭，預期將會持續下去，只是並不致於像以往的Beta v.s. VHS或Blu Ray v.s. HD DVD之爭一樣，最終只能有一種標準能夠勝出。
+有一句話說的好，「物聯網（The Internet of Things；IOT）真正的大餅不在那數百億顆感測器、也不在單純的連結服務！
+真正的獲利泉源是來自於分析解讀、使用感測器而創造出的龐大數據。」，目前各大聯盟競逐物並押寶各種聯網的標準，其最終目的並不在於標準技術的規範，而是在於更能方便利用自己的標準來掌控使用者數據的流向與最終的數據。
+/***************************************************************************/
+/***************************************************************************/
+/***************************************************************************/
+/***************************************************************************/
+/***************************************************************************/
+

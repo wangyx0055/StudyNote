@@ -1,0 +1,5081 @@
+
+/***************************************************************************/
+[C/C++] 將字串轉成 16 進位      ref: http://blog.wu-boy.com/2010/09/cc-%E5%B0%87%E5%AD%97%E4%B8%B2%E8%BD%89%E6%88%90-16-%E9%80%B2%E4%BD%8D/                
+/***************************************************************************/
+最近在碰嵌入式系統遇到一個還蠻常見的問題，我要將16進位的字串(例如 AAC2) test 轉成16進位的 unsigned int，
+讓我可以進行 & | not 一些二進位運算，底下是轉換程式，大家參考看看
+int power(int x,int n)
+{
+    int i;
+    int num = 1;
+    for(i=1;i<=n;i++)
+        num*=x;
+    return num;
+}
+
+int transfer_string_to_hex(unsigned char *str_name)
+{
+    char string[]="0123456789ABCDEF";
+    int number[]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int i = 0;
+    int j = 0;
+    int str_number = 0;
+    for(i=0; i<sizeof(str_name); i++)
+    {
+        for(j=0; j<sizeof(string); j++)
+        {
+            if(toupper(str_name[i]) == string[j])
+            {
+                str_number += power(16, (sizeof(str_name)-1-i))* number[j];
+                break;
+            }
+        }
+    }
+    return str_number;
+}
+
+由於嵌入式並沒有 pow 這個函式可以使用，所以自己寫了 power 來取代，我用在偵測網路線是否有插上：
+int detect_wan_wire()
+{
+
+    FILE *fp = NULL;
+    unsigned char *pch;
+    unsigned char buf[128] = {0};
+    unsigned int mask = 0x0004;
+    int retry = 3;
+    int res = 0;
+    int i = 0;
+    unsigned int a;
+    unsigned int b;
+    sprintf(buf, "mii_mgr -g -p 7 -r 1 > %s", WAN_FILE);
+    system(buf);
+    char * pEnd;
+    long int li1, li2, li3, li4;
+    for (i=0; i<retry; i++)
+    {
+        if( NULL != (fp = fopen(WAN_FILE , "r")))
+        {
+            memset (buf , '\0' , sizeof(buf));
+            fgets(buf , sizeof ( buf ) , fp);
+            pch = strstr(buf, "=") + 2;
+            b = transfer_string_to_hex(pch);
+            a = b & mask;
+            res = (a == 4) ? 1 : 0;
+            fclose ( fp );
+            fp = NULL;
+            memset ( buf , '\0' , sizeof (buf));
+        }
+    }
+    return res;
+}
+
+
+/***************************************************************************/
+// [C/C++] 判斷檔案是否存在 file_exists
+/***************************************************************************/
+在 C 裡面該如何實做？有兩種方式如下:
+1. 直接開檔
+bool file_exists(const char * filename)
+{
+    if (FILE * file = fopen(filename, "r"))
+    {
+        fclose(file);
+        return true;
+    }
+    return false;
+}
+
+C++ 寫法
+std::fstream foo;
+foo.open("bar");
+
+if(foo.is_open() == true)
+     std::cout << "Exist";
+else 
+     std::cout << "Doesn't Exist";
+
+2. 讀取檔案狀態
+#include<sys/stat.h>
+int file_exists (char * fileName)
+{
+   struct stat buf;
+   int i = stat ( fileName, &buf );
+     /* File found */
+     if ( i == 0 )
+     {
+       return 1;
+     }
+     return 0;
+      
+}
+
+
+/***************************************************************************/
+[技術] 在C中列出目錄與檔案
+/***************************************************************************/
+一般在C中，我們可以使用opendir()與readdir()來列出目錄下所有的檔案。
+以下是範例程式：
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+main() {
+    DIR * dir;
+    struct dirent * ptr;
+    int i;
+    dir =opendir("/etc/rc.d");
+    while((ptr = readdir(dir))!=NULL) {
+        printf("d_name: %s\n", ptr->d_name);
+    }
+    closedir(dir);
+}
+
+配合struct dirent，定義如下：
+struct dirent {
+    ino_t d_ino;
+    off_t d_off;
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];
+};
+
+d_ino 此目錄進入點的inode
+d_off 目錄文件開頭至此目錄進入點的位移
+d_reclen d_name的長度，不包含NULL字元
+d_type d_name所指的檔案類型
+d_name 檔名
+其中unsigned cahr d_type;可以來判斷是子目錄或是一般的檔案。
+但不知是我使用的uClibC的問題，沒實作到還怎樣，使用上一直有問題。
+
+後來還是找到解決方法，方法有2種，分別如下：
+1. 再使用一次readdir()來判斷回傳值，若回傳為NULL，即為檔案。
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+
+main() {
+    DIR * dir;
+    DIR * dir2;
+    struct dirent * ptr;
+    int i;
+    dir =opendir("/etc/rc.d");
+    while((ptr = readdir(dir))!=NULL) {
+        char pathname[100];
+        sprintf(pathname,"/etc/rc.d/%s", ptr->d_name);
+        if((dir2 = opendir(pathname))==NULL) {
+            printf("%s: file\n", ptr->d_name);
+        } else {
+            printf("%s: directory\n", ptr->d_name);
+            closedir(dir2);
+        }
+    }
+    closedir(dir);
+}
+
+2. 使用int stat(const char *file_name, struct stat *buf)，
+在struct stat其中的 st_mode 可以用來判斷是哪種檔案(也就是上面 d_type的 功用)。
+為了方便，POSIX另外有定義幾個MACRO：
+S_ISLNK(st_mode) : 是symbolic link
+S_ISREG(st_mode) 一般檔案(regular file)
+S_ISDIR(st_mode) 目錄(directory)
+S_ISCHR(st_mode) 字元設備檔(char device)
+S_ISBLK(st_mode) 區塊設備檔(block device)
+S_ISSOCK(st_mode) local-domain socket
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <unistd.h>
+main() {
+    DIR * dir;
+    struct dirent * ptr;
+    int i;
+    dir =opendir("/etc/rc.d");
+    while((ptr = readdir(dir))!=NULL) {
+        char pathname[100];
+        struct stat buf;
+        sprintf(pathname,"/etc/rc.d/%s", ptr->d_name);
+        stat(pathname, &buf);
+        if(S_ISREG(buf.st_mode))
+            printf("%s: file\n", ptr->d_name);
+        else
+            printf("%s: directory\n", ptr->d_name);
+    }
+    closedir(dir);
+}
+
+/***************************************************************************/
+[技術] Linux攔截Signal程式
+/***************************************************************************/
+From: http://blog.csdn.net/lcrystal623/archive/2007/03/05/1521159.aspx
+
+攔截鍵盤Ctrl + C，程式執行後，進入while(1)迴圈，當按下Ctrl + C後，執行signal函數指定的函式fun，輸出字串。
+代碼如下：
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+
+void fun(int signal)
+{
+ printf("Hello World！\n");
+ exit(0);
+}
+
+int main()
+{
+ signal(SIGINT,fun);
+ 
+ while(1){;}
+}
+
+
+/***************************************************************************/
+[技術] Linux Shared Memory程式
+/***************************************************************************/
+From: http://blog.csdn.net/lcrystal623/archive/2007/03/05/1521158.aspx
+要運行程式，需要在當前目錄下建立一個share檔案，share是一個空檔案，沒有任何意義，只是函數ftok需要一個檔案名作參數，ftok另一個參數可以為任何數字。
+程式執行後，分為父子程式，子程式申請Shared Memory，然後等待父程式繼續執行，父程式首先等待子程式申請到Shared Memory區段(segment)，然後輸出Shared Memory中
+的內容，為了演示Shared Memory可以隨時更新，程式中在子程式裡產生隨機數寫入Shared Memory供父程式讀取。
+代碼如下：
+
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <signal.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+
+int shmID;
+char * buf;
+
+void finalize(int signo)
+{
+ shmctl(shmID,IPC_RMID,NULL);
+ exit(0);
+}
+
+int main()
+{
+ int i = 1;  
+ key_t shmKey;
+ 
+ signal(SIGINT,finalize);
+ signal(SIGTERM,finalize);
+ 
+ if(fork() == 0) //子程式
+ {  
+  shmKey = ftok("share",16);  //可以使用任何大於0的數字，如果名字和數相同，則產生的key相同。
+  if(shmKey == -1)
+  {
+   printf("建立key出錯\n");
+   exit(-1);
+  }
+  
+  shmID = shmget(shmKey,20,IPC_CREAT | IPC_EXCL | 0666);
+  if(shmID == -1)
+  {
+   printf("建立Shared Memory Segment出錯\n");
+   exit(-1);
+  }
+  
+  sleep(2); //等待父程式執行，好顯示第一行為空。
+  while(1)
+  {
+   buf = (char *)shmat(shmID,NULL,0);
+   srandom(time(NULL));
+   sprintf(buf,"%d",random()); 
+   shmdt(buf);  
+  }
+ }
+ else  //父程式
+ {
+  sleep(1); //讓子程式先執行，以建立Shared Memory Segment。
+  
+  shmKey = ftok("share",16);  //可以使用任何大於0的數字，如果名字和數相同，則產生的key相同。
+  if(shmKey == -1)
+  {
+   printf("建立key出錯\n");
+   exit(-1);
+  }
+  
+  shmID = shmget(shmKey,20,0); //0表示如果shmKey映射的不存在則報錯。
+  if(shmID == -1)
+  {
+   printf("引用Segment id出錯\n");
+   exit(-1);
+  }
+  
+  while(1)
+  { 
+   buf = (char *)shmat(shmID,NULL,0);
+   printf("%d. 現在Shared Memory中的內容為：%s\n",i++,buf);
+   shmdt(buf);
+   sleep(1);
+  }
+ } 
+
+ return 0;
+}
+
+
+/***************************************************************************/
+[技術] Linux多執行緒程式
+/***************************************************************************/
+整個程式並沒有體現出對共享資源鎖的保護使用，只是個簡單的例子，原理完全正確，
+但由於簡單，CPU運行一定會順利的執行，因此不加鎖結果也相同。主要目的是演示如
+何建立執行緒，如何建立mutex實現共享鎖。代碼如下：
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<pthread.h>
+
+int resource = 0;
+pthread_mutex_t mutex;
+
+void handle()
+{
+ int i;
+ 
+ for(i = 0; i < 10; i++)
+  {  
+   pthread_mutex_lock(&mutex);   
+   
+   resource++;
+   
+   pthread_mutex_unlock(&mutex);
+   sleep(1);
+  }
+}
+
+int main()
+{
+ pthread_t id;
+  int i ;
+  int ret;
+   
+  ret = pthread_mutex_init(&mutex,NULL);
+  if(ret != 0)
+  {
+   printf("創建共享鎖失敗！\n");
+   exit(1);
+  }
+  
+  ret = pthread_create(&id,NULL,(void *)handle,NULL); 
+  if(ret != 0)
+  {
+   printf("創建線程出錯!\n");
+   exit(1);
+  } 
+ 
+  for(i = 0; i < 10; i++)
+  {
+   pthread_mutex_lock(&mutex);   
+   
+   printf("%d\n",resource);
+   
+   pthread_mutex_unlock(&mutex);
+   sleep(2);
+  }
+ 
+  pthread_join(id,NULL);
+  pthread_mutex_destroy(&mutex);
+    
+  return (0);
+}
+
+
+/***************************************************************************/
+[語言] __FILE__, __LINE__
+/***************************************************************************/
+看過 __FILE__, __LINE__ 沒?
+C語言常常有那種知道的不要問，不知道的不要說的詭異(取自某討論區的黑暗氣氛...這根本是死結嘛)
+其實這是GCC complier 預先就定義好的變數，不只這兩個，只要符合C99的標準有以下七個
+__LlNE__
+__FILE__
+__FUNCTION__
+__TIME__
+__DATE__
+__STDC__           (是否遵守ISO C )
+__STDC_HOSTED__  (是不是HOST，非寄居)
+__STDC_VERSION__ (版本)
+
+用GCC的話並不完全符合上面的定義
+__STDC_VERSION__ 就變成 __VERSION__
+__func__ 等同於__FUNCTION__ 不過聽說GCC建議使用前者。
+
+另外complier，我用GCC試過存在
+__TIMESTAMP__
+
+寫個程式印一下就知道了
+printf("line: %d \n", __LINE__);
+printf("file: %s \n", __FILE__);
+printf("function: %s \n", __FUNCTION__);
+printf("function: %s \n", __func__);
+printf("time: %s \n", __TIME__);
+printf("date: %s \n", __DATE__);
+printf("STDC: %d \n", __STDC__);
+printf("STDC_HOSTED: %d \n", __STDC_HOSTED__);
+printf("VERSION: %s \n", __VERSION__);
+printf("TIMESTAMP: %s \n", __TIMESTAMP__);
+輸出:
+line: 150 
+file: test.c 
+function: main 
+function: main
+time: 15:13:28 
+date: Jan 21 2010 
+STDC: 1
+STDC_HOSTED: 1
+VERSION: 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
+TIMESTAMP: Thu Jan 21 15:13:26 2010
+
+這東西就可以視情況取用，很方便。
+多方便?
+
+例如我們要重新定義一個DBG()函數來幫忙debug好了
+#define DBG(msg, arg...) printf("%s:%s(%d): " msg, __FILE__, __FUNCTION__, __LINE__, ##arg)
+這樣我們就可以把DBG()當作printf()使用還多增加function name 行數等等可以查詢。
+
+如: DBG("index:%d str = %s\n", index, str);
+輸出: test.c:main(146): index:2147483647 str = bejo
+--
+那define 看起來十分詭異對吧 XD
+其實那也只是置換的意思，把置換ㄧ下就很清楚了
+DBG("index:%d str = %s\n", index, str);
+被置換成
+printf("%s%s(%d): " "index:%d str = %s\n", __FILE__, __FUNCTION__, __LINE__,  index, str);
+
+DBG --> printf
+msg --> "index:%d str = %s\n"
+arg --> index, str
+就ㄧ點都不奇怪了...
+補充一下假指令#line 的用法
+這用法可以在openl2tp這包open source看到，用在bison paswer相關
+例如當
+testA.c 是由bejo.c 自動產生時，run testA.c包好的檔案去debug會產生一些困擾，這時候我們可以這樣做
+#line 888 "bejo.c"
+        printf("%s line: %d\n", __FILE__, __LINE__);
+        printf("line: %d\n", __LINE__);
+輸出
+bejo.c line:888
+line:889
+就會知道該去看該死的bejo.c 第888行
+---
+自動產生的code聽起好夢幻XD
+
+
+/***************************************************************************/
+[技術] Linux下的Timer
+/***************************************************************************/
+其實之前就有用到Timer，只是最近又再一次用到，所以把相關的部份整理一下。
+在Linux下實做定時器有兩種方法，分別是alarm()和setitimer()，以下分別介紹：
+1. alarm()
+alarm()可以用來設定信號SIGALRM在指定的秒數後傳到目前的process。
+使用起來比起setitimer較為簡單，但由於使用的單位是秒數，所以如果不要求很精確的話，用alarm()配合signal()就夠了。
+unsigned int alarm(unsigned int seconds)
+alarm()用來設置信號SIGALRM在經過參數seconds指定的秒數後傳送給目前的process。
+如果參數seconds為0，則之前設置的鬧鐘會被取消，並將剩下的時間返回，如果之前未設鬧鐘則返回0。
+void sigalrm_fn(int sig) 
+{
+  printf("alarm!\n");
+  alarm(2);
+
+  return;
+}
+
+int main(void) 
+{
+  signal(SIGALRM, sigalrm_fn);
+  alarm(1);
+  while(1) pause();
+}
+
+2. setitimer()
+setitimer()比alarm功能強大，支援3種類型的Timer：
+ITIMER_REAL : 以系統真實的時間來計算，它送出SIGALRM信號。
+ITIMER_VIRTUAL : 以Process在User-Mode下花費的時間來計算，它送出SIGVTALRM信號。
+ITIMER_PROF : 以Process在User-Mode下和Kernel-Mode下所費的時間來計算，它送出SIGPROF信號。
+int setitimer(int which, const struct itimerval *value, struct itimerval *ovalue));
+setitimer()第一個參數which指定定時器類型（上面三種之一）；
+第二個參數是struct itimerval的一個instance；第三個參數可不做處理。
+setitimer()調用成功返回0，否則返回-1。
+struct itimerval 
+{
+    struct timeval it_interval; /* timer interval */
+    struct timeval it_value; /* current value */
+};
+itimerval結構中的it_value是減少的時間，當這個值為0的時候就發出相應的信號。
+然後再將it_value設置為it_interval值。也就是說如果itimerval.it_interval不為0，則該定時器將持續有效(每隔一段時間就會發送一個信號)。
+下面是關於setitimer的一個簡單示範，在該例子中，每隔一秒發出一個SIGALRM，每隔0.5秒發出一個SIGVTALRM信號:
+int sec;
+void sigroutine(int signo) {
+  switch (signo){
+    case SIGALRM:
+      printf("Catch a signal -- SIGALRM \n");
+      signal(SIGALRM, sigroutine);
+      break;
+    case SIGVTALRM:
+      printf("Catch a signal -- SIGVTALRM \n");
+      signal(SIGVTALRM, sigroutine);
+      break;
+  }
+  return;
+}
+
+int main() {
+  struct itimerval value, ovalue, value2;
+  sec = 5;
+
+  printf("process id is %d\n", getpid());
+  signal(SIGALRM, sigroutine);
+  signal(SIGVTALRM, sigroutine);
+
+  value.it_value.tv_sec = 1;
+  value.it_value.tv_usec = 0;
+  value.it_interval.tv_sec = 1;
+  value.it_interval.tv_usec = 0;
+  setitimer(ITIMER_REAL, &value, &ovalue);
+
+  value2.it_value.tv_sec = 0;
+  value2.it_value.tv_usec = 500000;
+  value2.it_interval.tv_sec = 0;
+  value2.it_interval.tv_usec = 500000;
+  setitimer(ITIMER_VIRTUAL, &value2, &ovalue);
+
+  for(;;) ;
+
+}
+
+PS：
+Linux信號機制基本上是從Unix系統中繼承過來的。
+早期Unix系統中的信號機制比較簡單和原始，後來在實踐中暴露出一些問題，
+因此，把那些建立在早期機制上的信號叫做"不可靠信號"，
+信號值小於SIGRTMIN(SIGRTMIN=32，SIGRTMAX=63)的信號都是不可靠信號。
+這就是"不可靠信號"的來源。它的主要問題是：Process每次處理信號後，
+就將對信號的響應設置為Default動作。在某些情況下，將導致對信號的錯誤處理；
+因此，User如果不希望這樣的操作，那麼就要在信號處理函數結尾再一次使用signal()，重新安裝該信號。
+
+
+/***************************************************************************/
+HowTo build simple C programs on Linux
+/***************************************************************************/
+1. Introduction
+This document will step you though compiling and running simple C programs under the Linux operating system. 
+It is meant as a guide for beginners who may know how to program in C but don't know how to build a C program on Linux. 
+This document uses simple C programs to illustrate how to build the programs under Linux. 
+It covers writing a basic C program but it is not meant as a guide to teach the language. 
+We will also step through the basics of writing a Makefile for your project.
+This document also assumes that you know how to create/edit files on Linux and that you have the GNU C compiler installed. An easy way to tell if you have a C compiler installed is by issuing the command 'which gcc'. We are also assuming that the compile is executed from the command line. There are far too many GUI/IDE type environments to cover otherwise.
+
+2. A Simple program
+2.1 Writing the source
+The source of our first program is below:
+Code:
+#include <stdio.h>
+main()
+{
+  printf("Linuxquestions.org\n");
+}
+Save the program above and call it simplelq.c
+
+Here is the breakdown of the program above.
+The first line #include <stdio.h> is a preprocessor directive. 
+This basically tells the compiler that we are using the functions that are in the stdio library. 
+The stdio library contains all the basic functions needed for basic input and output for our program.
+
+The second line main() is a required function for every C program. 
+main() is the starting point for the program. Like all functions the body begins with a { (open curly brace) and ends with a } (close curly brace).
+
+The body of our main function printf ("Linuxquestions.org\n"); is a function call to the printf function. 
+printf stands for print formatted and has complex rules for printing text, numbers to specific formats. 
+Here we are just displaying the test "Linuxquestions.org" to the screen. 
+The \n at the end of string is a newline. 
+It tells printf to end the line and start any additional text on the next line. All function calls in C must end in a ;
+
+2.2 Compiling the Source
+The compile is done from the command line.
+Code:
+$  gcc -o simplelq simplelq.c
+$
+gcc is the GNU C compiler. The -o option tells it what to name the output file and the simplelq.c is the source file.
+The output from the compiler will be a binary file called simplelq
+
+2.3 Running the executable
+In order to run our sample executable we will need to apply the execute permission to the file. The we will execute it after.
+Code:
+$  chmod 744 simplelq
+$  ./simplelq 
+Linuxquestions.org
+The output of our sample program produced the text "Linuxquestions.org" to the console (or screen). 
+Try to add some more text to the sample program, recompile and watch the output.
+
+3. Dealing with multiple sources
+In most projects that are more that a couple functions you will most likely want to split out the source into multiple files. 
+Splitting the code allows the source to be more manageable by avoiding huge source files and to group like functions together. 
+Here is an example that has multiple sources:
+
+3.1 The source files
+Code:
+/* File: appendall.h */
+/* below is a forward deceleration of a function.  It differs from a 
+function header by the semicolon at the end.  Any source that wants to 
+use the appendall function needs to include this header file. */
+
+void appendall( int iArgCount,
+                char * iArgs[],
+                char * szReturnBuffer,
+                int iSize );
+Code:
+/* File: appendall.c */
+#include <stdio.h>
+void appendall( int iArgCount,
+               char * iArgs[],
+               char * szReturnBuffer,
+               int iSize )
+{
+  int i = 0;
+  
+  for ( i = 0; i < iArgCount; i++ ) /* Loop through all the arguments */
+  {
+      /* Test to see if the added length of the new arg will exceed */
+      /* the length of our buffer */
+
+     if (( strlen( szReturnBuffer ) + strlen( iArgs[i] )) < iSize )
+     {
+        strcat( szReturnBuffer, iArgs[i] ); /* concatenate */
+        strcat( szReturnBuffer, " " );      /* add a string */
+     }
+     else
+     {
+        printf( "Error:  exceeded buffer size\n");
+        break;
+     }
+  }
+}
+
+Code:
+/* File appendallmain.cpp */
+*/ This include will pull in the function declaration for appendall.h 
+*/
+#include "appendall.h"
+#define SIZE 500
+
+main( int argc, char * argv[])
+{
+  char szNewString[SIZE]; /* declare a character array of size 500 */
+
+  appendall( argc, argv, szNewString, SIZE );  /* Call the function */
+  printf("%s", szNewString );
+}
+
+3.2 Compiling the Source
+The compile is done from the command line.
+There are a couple ways to do this. One is to compile and link in one step and the other is to build the objects separately and then link.
+Compile and link multiple sources in one step.
+Code:
+$  gcc -o appendall appendall.c appendallmain.c
+$
+Compile and link in multiple steps:
+Code:
+$ gcc -c appendall.c 
+$ gcc -c appendallmain.c
+$ gcc -o appendall appendall.o appendallmain.o
+$
+The -c flag tells the compiler to compiler only and not call the linker.
+It is easier to build and link in one step, but if you are using Makefiles to manage your project the separate compile and link makes building much quicker.
+
+Here is a simple Makefile for building the above sources:
+Code:
+all:     appendall
+appendall.o:     appendall.c appendall.h
+    gcc -c appendall.c
+appendallmain.o:     appendallmain.c appendall.h
+    gcc -c appendallmain.c
+appendall:     appendall.o appendallmain.o
+    gcc -o appendall appendall.o appendallmain.o
+clean: 
+    rm *.o appendall
+
+Run make to build the sources:
+Code:
+$ make
+gcc -c appendall.c
+gcc -c appendallmain.c
+gcc -o appendall appendall.o appendallmain.o
+$
+Here is the basic breakup of a Makefile rule:
+target ... : prerequisites ...
+command
+...
+...
+
+There must be a <tab> character before all the commands after a rule. Spaces instead of tabs will result in errors.
+
+4. Suggest Links
+http://www.gnu.org/software/gcc/gcc.html
+http://www.gnu.org/software/make/manual/make.html
+http://www.linuxquestions.org/questions/search.php
+
+
+/******************************************************************************/
+Linux命令行程式設計
+/******************************************************************************/
+Linux下很多程式甚至那些具有圖形用戶界面（graphical user interface，GUI）的程式，都能接受和處理命令行選項。
+對於某些程式，這是與其他程式或用戶進行交互的主要手段。具有可靠的複雜命令行參數處理機制，會使得您的應用程式更好、更有用。
+不過很多開發人員都將其寶貴的時間花在了編寫自己的命令行解析器，卻不使用 getopt()，而後者是一個專門設計來減輕命令行處理負擔的庫函數。
+1、命令行參數
+命令行程式設計的首要任務是解析命令行參數，GUI派的程式員很少關心這個。這裡，我們對參數（argument）採用了一種比較通俗的定義：命令行上除命令名之外的字串。參
+數由多項構成，項與項之間用空白符彼此隔開。
+參數進一步分為選項和操作數。選項用於修改程式的默認行為或為程式提供資訊，比較老的約定是以短劃線開頭。選項後可以跟隨一些參數，稱為選項參數。剩下的就是操作
+數了。
+2、POSIX約定
+POSIX表示可移植作業系統介面：Portable Operating System Interface，電氣和電子工程師協會（Institute of Electrical and Electronics Engineers，IEEE）最初開發
+POSIX 標準，是為了提高 UNIX 環境下應用程式的可移植性。然而，POSIX 並不局限於 UNIX。許多其它的作業系統，例如 DEC OpenVMS 和 Microsoft Windows NT，都支援 
+POSIX 標準。
+下面是POSIX標準中關於程式名、參數的約定：
+程式名不宜少於2個字元且不多於9個字元； 當然許多標準從恆許未遵守以上約定，主要是歷史相容問題，因為標準出現之前，就已經存在N多程式了。
+3、GNU長選項
+GNU鼓勵程式員使用--help、--verbose等形式的長選項。這些選項不僅不與POSIX約定衝突，而且容易記憶，另外也提供了在所有GNU工具之間保持一致性的機會
+。GNU長選項有自己的約定：
+對於已經遵循POSIX約定的GNU程式，每個短選項都有一個對應的長選項。 
+4、基本的命令行處理技術
+C程式通過argc和argv參數訪問它的命令行參數。argc是整型數，表示參數的個數（包括命令名）。main()函數的定義方式有兩種，區別僅在於argv如何定義：
+int main(int argc, char *argv[])
+{
+   ……
+}       
+int main(int argc, char **argv)
+{
+   ……
+}
+當 C 運行時庫的程式啟動代碼調用您的 main() 時，已經對命令行進行了處理。argc 參數包含參數的計數值，而 argv 包含指向這些參數的指針數組。argv[0]是程式名。
+一個很簡單的命令行處理技術的例子是echo程式，它可以將參數輸出到標準設備上，用空格符隔開，最後換行。若命令行第一個參數為-n，那麼就不會換行。
+
+清單1：
+#include <stdio.h>
+int main(int argc, char **argv)
+{
+    int i, nflg;
+    nflg = 0;
+    if(argc > 1 && argv[1][0] == '-' && argv[1][1] == 'n'){
+        nflg++;
+        argc--;
+        argv++;
+    }
+    for(i=1; i<argc; i++){
+        fputs(argv[i], stdout);
+        if(i < argc-1)
+            putchar(' ');
+    }
+    if(nflg == 0)
+        putchar('\n');
+
+    return 0;
+}
+echo程式中，對於命令行參數的解析是手動實現的。很久以前，Unix支援小組為了簡化對於命令行參數的解析，開發了getopt()函數，同時提供了幾個外部變數，使得編寫遵
+守POSIX的代碼變得更加容易了。
+
+5、命令行參數解析函數 —— getopt()
+getopt()函數聲明如下：
+#include <unistd.h>
+int getopt(int argc, char * const argv[], const char *optstring);
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+該函數的argc和argv參數通常直接從main()的參數直接傳遞而來。optstring是選項字母組成的字串。如果該字串裡的任一字元後面有冒號，那麼這個選項就要求有選項參數。
+當給定getopt()命令參數的數量 (argc)、指向這些參數的數組 (argv) 和選項字串 (optstring) 後，getopt() 將返回第一個選項，並設置一些全局變數。使用相同的參數再
+次調用該函數時，它將返回下一個選項，並設置相應的全局變數。如果不再有可識別的選項，將返回 -1，此任務就完成了。
+getopt() 所設置的全局變數包括：
+char *optarg
+下面就用getopt()來寫個小程式，體驗一下命令行解析的快樂。
+程式描述：
+程式名：opt_parse_demo
+選項：
+-n —— 顯示我的名字。 
+
+清單2：
+#include <stdio.h>
+#include <unistd.h>
+int main (int argc, char **argv)
+{
+    int oc;                     /*選項字元 */
+    char *b_opt_arg;            /*選項參數字串 */
+
+    while((oc = getopt(argc, argv, "ngl:")) != -1)
+    {
+        switch(oc)
+        {
+            case 'n':
+                printf("My name is Lyong.\n");
+                break;
+            case 'g':
+                printf("Her name is Xxiong.\n");
+                break;
+            case 'l':
+                b_opt_arg = optarg;
+                printf("Our love is %s\n", optarg);
+                break;
+        }
+    }
+   return 0;
+}
+運行結果：
+$ ./opt_parse_demo -n
+My name is Lyong.
+$ ./opt_parse_demo -g
+Her name is Xxiong.
+$ ./opt_parse_demo -l forever
+Our love is forever
+$ ./opt_parse_demo -ngl forever
+My name is Lyong.
+Her name is Xxiong.
+Our love is forever
+6、改變getopt()對錯誤命令行參數資訊的輸出行為
+不正確的調用程式在所難免，這種錯誤要麼是命令行選項無效，要麼是缺少選項參數。正常情況下，getopt()會為這兩種情況輸出自己的出錯資訊，並且返回'?'。為了驗證此
+事，可以修改一下上面的清單2中的代碼。
+清單3：
+#include <stdio.h>
+#include <unistd.h>
+int main (int argc, char **argv)
+{
+    int oc;                     /*選項字元 */
+    char *b_opt_arg;            /*選項參數字串 */
+
+    while((oc = getopt(argc, argv, "ngl:")) != -1)
+    {
+        switch(oc)
+        {
+            case 'n':
+                printf("My name is Lyong.\n");
+                break;
+             case 'g':
+                printf("Her name is Xxiong.\n");
+                break;
+            case 'l':
+                b_opt_arg = optarg;
+                printf("Our love is %s\n", optarg);
+                break;
+            case '?':
+                printf("arguments error!\n");
+                break;
+        }
+    }
+    return 0;
+}
+輸入一個錯誤的命令行，結果如下：
+$ ./opt_parse_demo -l
+./opt_parse_demo: option requires an argument -- l
+arguments error!
+很多時候，我們不希望輸出任何錯誤資訊，或更希望輸出自己定義的錯誤資訊。可以採用以下兩種方法來更改getopt()函數的出錯資訊輸出行為：
+在調用getopt()之前，將opterr設置為0，這樣就可以在getopt()函數發現錯誤的時候強制它不輸出任何消息。 多說無益，動手測試一下。
+清單4：
+#include <stdio.h>
+#include <unistd.h>
+int main (int argc, char **argv)
+{
+   int oc;                     /*選項字元 */
+   char ec;                           /*無效的選項字元*/
+   char *b_opt_arg;            /*選項參數字串 */
+
+   while((oc = getopt(argc, argv, ":ngl:")) != -1)
+   {
+       switch(oc)
+       {
+           case 'n':
+               printf("My name is Lyong.\n");
+               break;
+            case 'g':
+               printf("Her name is Xxiong.\n");
+               break;
+           case 'l':
+               b_opt_arg = optarg;
+               printf("Our love is %s\n", optarg);
+               break;
+           case '?':
+               ec = (char)optopt;
+               printf("無效的選項字元 \' %c \'!\n", ec);
+               break;
+           case ':':
+               printf("缺少選項參數！\n");
+               break;
+       }
+   }
+   return 0;
+}
+測試結果：
+$ ./opt_parse_demo -a
+無效的選項字元 ' a '!
+$ ./opt_parse_demo -l
+缺少選項參數！
+7、GNU提供的getopt()函數的特點
+上面所設計的getopt()函數是UNIX支援小組提供的，其執行時一碰到不以'-'開始的命令行參數就停止尋找選項。而GNU提供的getopt()函數與之不同，它會掃瞄整個命令行來
+尋找選項。當調用GNU getopt()函數並處理命令行參數的時候，它重新排列argv中的元素，這樣當重排結束時，所有選項都被移動到前面並且那些繼續檢查argv[optind]至
+argv[argc-1]中剩餘參數的代碼仍正常工作，但在任何情況下，碰到特殊參數'--'就結束對選項的掃瞄。
+可以輸入一個亂序的命令行，查看opt_parse_demo的輸出：
+$ ./opt_parse_demo -l forever a b c d -g -n
+Our love is forever
+Her name is Xxiong.
+My name is Lyong.
+GNU getopt()第二個特點是可以在optstring中使用特殊的首字元改變getopt()的默認行為：
+optstring[0] = '+'，這樣就與UNIX支援小組提供的getopt()很相近了。 GNU getopt()第三個特點是optstring中的選項字元後面接兩個冒號，就允許該選項有可選的選項參
+數。在選項參數不存在的情況下，GNU getopt()返回選項字元並將optarg設置為NULL。
+8、GNU長選項命令行解析
+20 世紀 90 年代，UNIX 應用程式開始支援長選項，即一對短橫線、一個描述性選項名稱，還可以包含一個使用等號連接到選項的參數。
+GNU提供了getopt-long()和getopt-long-only()函數支援長選項的命令行解析，其中，後者的長選項字串是以一個短橫線開始的，而非一對短橫線。
+getopt_long() 是同時支援長選項和短選項的 getopt() 版本。下面是它們的聲明：
+#include <getopt.h>
+int getopt_long(int argc, char * const argv[], const char *optstring, const struct option *longopts, int *longindex);
+int getopt_long_only(int argc, char * const argv[],const char *optstring,const struct option *longopts, int *longindex);
+getopt_long()的前三個參數與上面的getopt()相同，第4個參數是指向option結構的數組，option結構被稱為「長選項表」。longindex參數如果沒有設置為NULL，那麼它就指向一個變數，這個變數會被賦值為尋找到的長選項在longopts中的索引值，這可以用於錯誤診斷。
+option結構在getopt.h中的聲明如下：
+struct option{
+    const char *name;
+    int has_arg;
+    int *flag;
+    int val;
+};
+對結構中的各元素解釋如下：
+const char *name
+這是選項名，前面沒有短橫線。譬如"help"、"verbose"之類。
+int has_arg
+描述了選項是否有選項參數。如果有，是哪種類型的參數，此時，它的值一定是下表中的一個。
+符號常量                數值    含義
+no_argument             0       選項沒有參數
+required_argument       1       選項需要參數 
+optional_argument       2       選項參數可選
+int *flag
+如果這個指針為NULL，那麼getopt_long()返回該結構val字段中的數值。如果該指針不為NULL，getopt_long()會使得它所指向的變數中填入val字段中的數值，並且
+getopt_long()返回0。如果flag不是NULL，但未發現長選項，那麼它所指向的變數的數值不變。
+int val
+這個值是發現了長選項時的返回值，或者flag不是NULL時載入*flag中的值。典型情況下，若flag不是NULL，那麼val是個真／假值，譬如1或0；另一方面，如果flag是NULL，
+那麼val通常是字元常量，若長選項與短選項一致，那麼該字元常量應該與optstring中出現的這個選項的參數相同。
+每個長選項在長選項表中都有一個單獨條目，該條目裡需要填入正確的數值。數組中最後的元素的值應該全是0。數組不需要排序，getopt_long()會進行線性搜索。但是，根
+據長名字來排序會使程式員讀起來更容易。
+以上所說的flag和val的用法看上去有點混亂，但它們很有實用價值，因此有必要搞透徹了。
+大部分時候，程式員會根據getopt_long()發現的選項，在選項處理過程中要設置一些標記變數，譬如在使用getopt()時，經常做出如下的程式格式：
+int do_name, do_gf_name, do_love; /*標記變數*/
+char *b_opt_arg;
+while((c = getopt(argc, argv, ":ngl:")) != -1)
+{
+    switch (c){
+    case 'n':
+        do_name = 1;
+    case 'g':
+        do_gf_name = 1;
+        break;
+        break;
+    case 'l':
+        b_opt_arg = optarg;
+    ……
+    }
+}
+當flag不為NULL時，getopt_long*()會為你設置標記變數。也就是說上面的代碼中，關於選項'n'、'l'的處理，只是設置一些標記，如果flag不為NULL,時，getopt_long()可
+以自動為各選項所對應的標記變數設置標記，這樣就能夠將上面的switch語句中的兩種種情況減少到了一種。下面給出一個長選項表以及相應處理代碼的例子。
+清單5：
+#include <stdio.h>
+#include <getopt.h>
+int do_name, do_gf_name;
+char *l_opt_arg;
+struct option longopts[] = {
+    { "name",           no_argument,    &do_name,       1},
+    { "gf_name",        no_argument,    &do_gf_name,    1},
+    { "love",        required_argument, NULL,           'l'},
+    {     0,    0,    0,    0},
+};
+
+int main(int argc, char *argv[])
+{
+    int c;
+    
+    while((c = getopt_long(argc, argv, ":l:", longopts, NULL)) != -1){
+        switch (c){
+        case 'l':
+            l_opt_arg = optarg;
+            printf("Our love is %s!\n", l_opt_arg);
+            break;
+        case 0:
+            printf("getopt_long()設置變數 : do_name = %d\n", do_name);
+            printf("getopt_long()設置變數 : do_gf_name = %d\n", do_gf_name);
+            break;
+        }
+    }
+    return 0;
+}
+在進行測試之前，再來回顧一下有關option結構中的指針flag的說明吧。
+如果這個指針為NULL，那麼getopt_long()返回該結構val字段中的數值。如果該指針不為NULL，getopt_long()會使得它所指向的變數中填入val字段中的數值，並且getopt_long()返回0。如果flag不是NULL，但未發現長選項，那麼它所指向的變數的數值不變。
+下面測試一下：
+
+$ ./long_opt_demo --name
+getopt_long()設置變數 : do_name = 1
+getopt_long()設置變數 : do_gf_name = 0
+$ ./long_opt_demo --gf_name
+getopt_long()設置變數 : do_name = 0
+getopt_long()設置變數 : do_gf_name = 1
+$ ./long_opt_demo --love forever
+Our love is forever!
+$ ./long_opt_demo -l forever
+Our love is forever!
+測試過後，應該有所感觸了。關於flag和val的討論到此為止。下面總結一下get_long()的各種返回值的含義：
+返回值    
+含 義
+0      
+getopt_long()設置一個標誌，它的值與option結構中的val字段的值一樣
+1
+每碰到一個命令行參數，optarg都會記錄它
+'?'
+無效選項
+':'
+缺少選項參數
+'x'
+選項字元'x'
+-1
+選項解析結束
+從實用的角度來說，我們更期望每個長選項都對應一個短選項，這種情況下，在option結構中，只要將flag設置為NULL，並將val設置為長選項所對應的短選項字元即可。譬如
+上面清單5中的程式，我們修改如下。
+清單6：
+#include <stdio.h>
+#include <getopt.h>
+int do_name, do_gf_name;
+char *l_opt_arg;
+struct option longopts[] = {
+   { "name",       no_argument,         NULL,           'n'},
+   { "gf_name",    no_argument,         NULL,           'g'},
+   { "love",       required_argument,   NULL,           'l'},
+   {    0,   0,   0,   0},
+};
+
+int main(int argc, char *argv[])
+{
+   int c;
+   
+   while((c = getopt_long(argc, argv, ":l:", longopts, NULL)) != -1){
+       switch (c){
+       case 'n':
+           printf("My name is LYR.\n");
+           break;
+       case 'g':
+           printf("Her name is BX.\n");
+           break;
+       case 'l':
+           l_opt_arg = optarg;
+           printf("Our love is %s!\n", l_opt_arg);
+           break;
+       }
+   }
+   return 0;
+}
+測試結果如下：
+
+$ ./long_opt_demo --name --gf_name --love forever
+My name is LYR.
+Her name is BX.
+Our love is forever!
+$ ./long_opt_demo -ng -l forever
+My name is LYR.
+Her name is BX.
+Our love is forever!
+9、在LINUX之外的系統平台上使用GNU getopt()或getopt_long()
+只要從GNU程式或GNU C Library(GLIBC)的CVS檔案文件中copy源文件即可（http://sourceware.org/glibc/）。所需源文件是getopt.h、getopt.c和getoptl.c，將這些文件包
+含在你的項目中。另外，你的項目中最好也將COPYING.LIB文件包含進去，因為GNU LGPL（GNU 程式庫公共許可證）的內容全部包括在命名為
+注意，在包含所需文件之後，在調用getopt_long()系列函數的源代碼中，應該使用#include "getopt.h"，而不是#include <getopt.h>，前者會首先在當前目錄中尋找
+getopt.h。
+使用Windows平台的兄弟可以試用一下，很希望能在這裡反饋一下你的使用情況，謝謝。
+10、結論
+程式需要能夠快速處理各個選項和參數，且要求不會浪費開發人員的太多時間。在這一點上，無論是GUI(圖形用戶交互）程式還是CUI（命令行交互）程式，都是其首要任務，
+其區別僅在於實現方式的不同。GUI通過功能表、對話方塊之類的圖形控件來完成交互，而CUI使用了純文本的交互方式。各有利弊吧。在程式開發中，許多測試程式用CUI來完
+成是首選方案。
+getopt() 函數是一個標準庫調用，可允許您使用直接的 while/switch 語句方便地逐個處理命令行參數和檢測選項（帶或不帶附加的參數）。與其類似的 getopt_long() 允
+許在幾乎不進行額外工作的情況下處理更具描述性的長選項，這非常受開發人員的歡迎。
+既然已經知道了如何方便地處理命令行選項，現在就可以集中精力改進您的程式的命令行，可以添加長選項支援，或添加之前由於不想向程式添加額外的命令行選項處理而擱
+置的任何其他選項。但不要忘記在某處記錄您所有的選項和參數，並提供某種類型的內置幫助函數來為健忘的用戶提供幫助。
+
+
+/***************************************************************************/
+// [Linux] 用gcc 自製 Library      from: http://www.wretch.cc/blog/awaysu/25074587
+/***************************************************************************/
+Library可分成三種，static、shared與dynamically loaded。
+1. Static libraries
+Static 程式庫用於靜態連結，簡單講是把一堆object檔用ar(archiver)包裝集合起來，檔名以 `.a' 結尾。優點是執行效能通常會比後兩者快，而且因為是靜態連結，所以不
+易發生執行時找不到library或版本錯置而無法執行的問題。缺點則是檔案較大，維護度較低；例如library如果發現bug需要更新，那麼就必須重新連結執行檔。
+1.1 編譯
+編譯方式很簡單，先例用 `-c' 編出 object 檔，再用 ar 包起來即可。
+____ hello.c ____
+#include <stdio.h>
+void hello()
+{ 
+    printf("Hello "); 
+}
+____ world.c ____
+#include <stdio.h>
+void world()
+{ 
+    printf("world."); 
+}
+____ mylib.h ____
+void hello();
+void world();
+
+$ gcc -c hello.c world.c             /* 編出 hello.o 與 world.o */
+$ ar rcs libmylib.a hello.o world.o  /* 包成 limylib.a */
+這樣就可以建出一個檔名為 libmylib.a 的檔。
+輸出的檔名其實沒有硬性規定，但如果想要配合 gcc 的 '-l' 參數來連結，一定要以 `lib' 開頭，中間是你要的library名稱，然後緊接著 `.a' 結尾。
+
+1.2 使用
+____ main.c ____
+#include "mylib.h"
+int main()
+{
+    hello();
+    world();
+}
+使用上就像與一般的 object 檔連結沒有差別。
+$ gcc main.c libmylib.a
+也可以配合 gcc 的 `-l' 參數使用
+$ gcc main.c -L. -lmylib
+`-Ldir' 參數用來指定要搜尋程式庫的目錄，`.' 表示搜尋現在所在的目錄。
+通常預設會搜 /usr/lib 或 /lib 等目錄。 
+`-llibrary' 參數用來指定要連結的程式庫 ，'mylib' 表示要與mylib進行連結，他會搜尋library名稱前加`lib'後接`.a'的檔案來連結。
+$ ./a.out
+Hello world.
+
+2. Shared libraries
+Shared library 會在程式執行起始時才被自動載入。因為程式庫與執行檔是分離的，所以維護彈性較好。
+有兩點要注意，shared library是在程式起始時就要被載入，而不是執行中用到才載入，而且在連結階段需要有該程式庫才能進行連結。
+首先有一些名詞要弄懂，soname、real name與linker name。
+soname 
+用來表示是一個特定 library 的名稱，像是 libmylib.so.1。前面以 `lib' 開頭，接著是該 library 的名稱，
+然後是 `.so' ，接著是版號，用來表名他的介面；如果介面改變時，就會增加版號來維護相容度。
+real name
+是實際放有library程式的檔案名稱，後面會再加上 minor 版號與release 版號，像是 libmylib.so.1.0.0 。
+一般來說，版號的改變規則是(印象中在 APress-Difinitive Guide to GCC中有提到，但目前手邊沒這本書)，
+最尾碼的release版號用於程式內容的修正，介面完全沒有改變。
+中間的minor用於有新增加介面，但相舊介面沒改變，所以與舊版本相容。
+最前面的version版號用於原介面有移除或改變，與舊版不相容時。
+linker name
+是用於連結時的名稱，是不含版號的 soname ，如: libmylib.so。
+通常 linker name與 real name是用 ln 指到對應的 real name ，用來提供彈性與維護性。
+2.1 編譯
+shared library的製作過程較複雜。
+$ gcc -c -fPIC hello.c world.c
+編譯時要加上 -fPIC 用來產生 position-independent code。也可以用 -fpic 參數。 
+(不太清楚差異，只知道 -fPIC 較通用於不同平台，但產生的code較大，而且編譯速度較慢)。
+$ gcc -shared -Wl,-soname,libmylib.so.1 -o libmylib.so.1.0.0 \
+         hello.o world.o
+-shared 表示要編譯成 shared library
+-Wl 用於參遞參數給linker，因此-soname與libmylib.so.1會被傳給linker處理。
+-soname用來指名 soname 為 limylib.so.1
+library會被輸出成libmylib.so.1.0.0 (也就是real name)
+若不指定 soname 的話，在編譯結連後的執行檔會以連時的library檔名為soname，並載入他。否則是載入soname指定的library檔案。
+可以利用 objdump 來看 library 的 soname。
+$ objdump -p libmylib.so  | grep SONAME
+  SONAME      libmylib.so.1
+若不指名-soname參數的話，則library不會有這個欄位資料。
+在編譯後再用 ln 來建立 soname 與 linker name 兩個檔案。
+$ ln -s libmylib.so.1.0.0 libmylib.so
+$ ln -s libmylib.so.1.0.0 libmylib.so.1
+2.2 使用
+與使用 static library 同。
+$ gcc main.c libmylib.so
+以上直接指定與 libmylib.so 連結。
+或用
+$ gcc main.c -L. -lmylib
+linker會搜尋 libmylib.so 來進行連結。
+如果目錄下同時有static與shared library的話，會以shared為主。
+使用 -static 參數可以避免使用shared連結。
+$ gcc main.c -static -L. -lmylib
+此時可以用 ldd 看編譯出的執行檔與shared程式庫的相依性
+$ldd a.out
+ linux-gate.so.1 =>  (0xffffe000)
+ libmylib.so.1 => not found
+ libc.so.6 => /lib/libc.so.6 (0xb7dd6000)
+ /lib/ld-linux.so.2 (0xb7f07000)
+輸出結果顯示出該執行檔需要 libmylib.so.1 這個shared library。
+會顯示 not found 因為沒指定該library所在的目錄，所找不到該library。
+因為編譯時有指定-soname參數為 libmylib.so.1 的關係，所以該執行檔會載入libmylib.so.1。
+否則以libmylib.so連結，執行檔則會變成要求載入libmylib.so
+$ ./a.out
+./a.out: error while loading shared libraries: libmylib.so.1:
+cannot open shared object file: No such file or directory
+因為找不到 libmylib.so.1 所以無法執行程式。
+有幾個方式可以處理。
+a. 把 libmylib.so.1 安裝到系統的library目錄，如/usr/lib下
+b. 設定 /etc/ld.so.conf ，加入一個新的library搜尋目錄，並執行ldconfig
+   更新快取
+c. 設定 LD_LIBRARY_PATH 環境變數來搜尋library
+   這個例子是加入目前的目錄來搜尋要載作的library
+   $ LD_LIBRARY_PATH=. ./a.out
+   Hello world.
+
+3. Dynamically loaded libraries
+Dynamicaaly loaded libraries 才是像 windows 所用的 DLL ，在使用到時才載入，編譯連結時不需要相關的library。
+動態載入庫常被用於像plug-ins的應用。
+3.1 使用方式
+動態載入是透過一套 dl function來處理。
+#include <dlfcn.h>
+void *dlopen(const char *filename, int flag);
+    開啟載入 filename 指定的 library。
+void *dlsym(void *handle, const char *symbol);
+    取得 symbol 指定的symbol name在library被載入的記憶體位址。
+int dlclose(void *handle);
+    關閉dlopen開啟的handle。
+char *dlerror(void);
+    傳回最近所發生的錯誤訊息。
+
+____ dltest.c ____
+#include <stdio.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+int main()  
+{
+        void *handle;
+        void (*f)();
+        char *error;
+
+        /* 開啟之前所撰寫的 libmylib.so 程式庫 */
+        handle = dlopen("./libmylib.so", RTLD_LAZY);
+        if( !handle ) {
+                fputs( dlerror(), stderr);
+                exit(1);
+        }
+
+        /* 取得 hello function 的 address */
+        f = dlsym(handle, "hello");
+        if(( error=dlerror())!=NULL) {
+                fputs(error, stderr);
+                exit(1);
+        }
+        /* 呼叫該 function */
+        f();
+        dlclose(handle);
+}
+
+編譯時要加上 -ldl 參數來與 dl library 連結
+$ gcc dltest.c -ldl
+結果會印出 Hello 字串
+$ ./a.out
+Hello
+關於dl的詳細內容請參閱 man dlopen
+--
+參考資料:
+Creating a shared and static library with the gnu compiler [gcc]
+   http://www.adp-gmbh.ch/cpp/gcc/create_lib.html
+Program Library HOWTO
+   http://tldp.org/HOWTO/Program-Library-HOWTO/index.html
+
+
+/******************************************************************************/
+調節madplay等音量大小
+/******************************************************************************/
+主要是通過Linux的混音設備/dev/mixer 來操作音量的輸出大小：
+代碼為：
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/soundcard.h>
+
+int main(int argc, char *argv[])
+{
+    int MIX_FD;
+    int iLeft = 0;
+    int iRight = 0;
+    int iLevel0 ,iLevel;
+
+    if (argc < 2) {
+        printf("Please add a file name and the volume level such as: ./volume 80\n");
+        exit(0);
+    }
+
+    iLeft = iRight = atoi(argv[1]);
+
+    iLevel = (iRight << 8) + iLeft;
+
+    MIX_FD= open("/dev/mixer", O_WRONLY);
+    if (MIX_FD == -1) {
+        perror("Error:open /dev/mixer error");
+        exit(1);
+    }
+
+    ioctl(MIX_FD, MIXER_WRITE(SOUND_MIXER_VOLUME), &iLevel);     /* 調整大小 */
+
+    close(MIX_FD);
+
+    return 0;
+}
+
+
+/******************************************************************************/
+kill 使用的幾種情況
+/******************************************************************************/
+此處用了一個播放madplay的應用程式作為記錄。裡面有幾個地方用到了kill，分別來進行播放音樂進程的開始、暫停、停止等操作：
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/soundcard.h>
+#include <stdlib.h>
+
+int main()
+{
+    char ch;
+    int MIX_FD;
+    int iLeft = 60;
+    int iRight = 20;
+    int iLevel;
+
+    MIX_FD= open("/dev/mixer", O_WRONLY);
+    if (MIX_FD == -1)
+       {
+        perror("Error:open /dev/mixer error");
+        exit(1);
+    }
+
+    printf ("[a] Play \n");
+    printf ("[b] Pause \n");
+    printf ("[c] Resume\n");
+    printf ("[d] stop \n");
+    printf ("[+] Up Vol\n");
+    printf ("[-] Down Vol\n");
+    printf ("[e] Exit \n");
+
+    while(1)
+    {
+       printf("Please enter your choice: ");
+       scanf("%c",&ch);
+       printf("\n");
+
+        switch (ch)
+        {
+            case '+':
+                if(iLeft<100)
+                    iLeft += 5;
+                iLevel = (iRight << 8) + iLeft;
+                ioctl(MIX_FD, MIXER_WRITE(SOUND_MIXER_VOLUME), &iLevel);
+            break;
+
+            case '-':
+                if(iLeft>20)
+                    iLeft -= 5;
+                iLevel = (iRight << 8) + iLeft;
+                ioctl(MIX_FD, MIXER_WRITE(SOUND_MIXER_VOLUME), &iLevel);
+            break;
+
+            case 'a':
+                iLevel = (iRight << 8) + iLeft;
+                ioctl(MIX_FD, MIXER_WRITE(SOUND_MIXER_VOLUME), &iLevel);
+                system("./madplay /tmp/p.mp3 &");          //利用system函數調用madplay播放器播放*.mp3音樂
+            break;
+
+            case 'b':
+             system("killall -STOP madplay &");         //利用system函數調用killall命令將madplay暫停
+            break;
+
+            case 'c':
+             system("killall -CONT madplay &");         //利用system函數調用killall命令恢復madplay的播放
+            break;
+
+            case 'd':
+            system("killall -9 madplay");           //利用system函數調用killall命令將madplay終止掉
+            break;
+
+            case 'e':
+               goto exit;
+        }
+    }
+
+exit: 
+    return 0;
+}
+
+
+/******************************************************************************/
+讀管道和寫管道  ref: http://hi.baidu.com/zhxust/blog/item/bde3661e92d17e1541341711.html
+/******************************************************************************/
+下面實現讀管道和寫管道，並且對讀取的資訊進行處理
+fifo_read.c
+------------
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define FIFO "/tmp/myfifo"
+
+#define PLAYING 0
+#define PAUSED 1
+
+static int state=PLAYING;
+
+int main(int argc,char** argv)
+{
+    char buf_r[100];
+    int fd;
+    int nread;
+
+    if((mkfifo(FIFO,O_CREAT|O_EXCL)<0)&&(errno!=EEXIST))
+       printf("cannot create fifoserver\n");
+    printf("Preparing for reading...\n");
+
+    memset(buf_r,0,sizeof(buf_r));
+    fd=open(FIFO,O_RDONLY|O_NONBLOCK,0);
+    if(fd==-1)
+    {
+       perror("open");
+       exit(1);
+    }
+    for(;;)
+    {
+       memset(buf_r,0,sizeof(buf_r));
+
+       if((nread=read(fd,buf_r,100))==-1){
+        if(errno==EAGAIN)
+         printf("no data yet\n");
+       }
+
+       if(buf_r[0]=='q'){
+        printf("exit\n");
+        break;
+       }
+
+       switch(buf_r[0]){
+        case 'p':{
+         int s;
+         s=state;
+         if(s==PLAYING){
+          printf("Paused\n");
+          s=PAUSED;
+         }
+         else{
+          printf("Playing\n");
+          s=PLAYING;
+         }
+         state=s;
+        }
+       }
+       sleep(1);
+    }
+    unlink(FIFO);
+
+    return 0;
+}
+
+------------
+fifo_write.c
+-----------
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define FIFO_SERVER "/tmp/myfifo"
+
+main(int argc,char** argv)
+{
+    int fd;
+    char w_buf[100];
+    int nwrite;
+
+    if(fd==-1)
+       if(errno==ENXIO)
+        printf("open error; no reading process\n");
+    fd=open(FIFO_SERVER,O_WRONLY|O_NONBLOCK,0);
+    if(argc==1)
+       printf("Please send something\n");
+    strcpy(w_buf,argv[1]);
+    if((nwrite=write(fd,w_buf,100))==-1)
+    {
+       if(errno==EAGAIN)
+        printf("The FIFO has not been read yet.Please try later\n");
+    }
+    else
+       printf("write %s to the FIFO\n",w_buf);
+}
+-----------
+
+0,先執行
+./fifo_read
+Preparing for reading...
+1,再在用戶端執行
+./fifo_write p
+則伺服器端會出現
+Paused
+2,再在用戶端執行
+./fifo_write p
+則伺服器端會出現
+Playing
+3,再在用戶端執行
+./fifo_write q
+伺服器會退出
+exit
+
+
+/******************************************************************************/
+用GDB調試程式       ref: http://hi.baidu.com/zhxust/blog/item/ee7bb3f040c462a8a50f5252.html
+/******************************************************************************/
+一個調試示例
+#include <stdio.h>                                                                 
+ 
+int func(int n)
+{
+    int sum=0,i;
+    for(i=1; i<=n; i++)
+    {
+        sum+=i;
+    }
+    return sum;
+}
+
+int main()
+{
+    int i;
+    long result = 0;
+    for(i=1; i<=100; i++)
+    {
+        result += i;
+    }
+ 
+    printf("result[1-100] = %ld \n", result );
+    printf("result[1-250] = %d \n", func(250) );
+    return 0;
+}
+
+$gcc -g -Wall tst.c -o tst
+
+////////////////////////////////////////////////////////////////
+$ gdb tst   <---------- 啟動GDB
+GNU gdb 6.7.1-debian
+Copyright (C) 2007 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "i486-linux-gnu"...
+Using host libthread_db library "/lib/tls/i686/cmov/libthread_db.so.1".
+(gdb) l 1 <-------------------- l命令相當於list，從第一行開始列出源碼。
+1       #include <stdio.h>
+2
+3       int func(int n)
+4       {
+5               int sum=0,i;
+6               for(i=1; i<=n; i++)
+7               {
+8                       sum+=i;
+9               }
+10              return sum;
+(gdb)    <-------------------- 直接回車表示，重複上一次命令
+11      }
+12
+13
+14      int main()
+15      {
+16              int i;
+17              long result = 0;
+18              for(i=1; i<=100; i++)
+19              {
+20   result += i;
+(gdb) break 16    <-------------------- 設置斷點，在源程式第16行處。
+Breakpoint 1 at 0x80483b2: file tst.c, line 16.
+(gdb) break func   <-------------------- 設置斷點，在函數func()入口處。
+Breakpoint 2 at 0x804837a: file tst.c, line 5.
+(gdb) info break   <-------------------- 查看斷點資訊。
+Num Type           Disp Enb Address    What
+1   breakpoint     keep y   0x080483b2 in main at tst.c:16
+2   breakpoint     keep y   0x0804837a in func at tst.c:5
+(gdb) r    <--------------------- 運行程式，run命令簡寫
+Starting program: /home/dbzhang/tst 
+
+Breakpoint 1, main () at tst.c:17
+17  long result = 0;
+(gdb) n     <--------------------- 單條語句執行，next命令簡寫。
+18  for(i=1; i<=100; i++)
+(gdb) n
+20   result += i;
+(gdb) n
+18  for(i=1; i<=100; i++)
+(gdb) n
+20   result += i;
+(gdb) c    <--------------------- 繼續運行程式，continue命令簡寫。
+Continuing.
+result[1-100] = 5050    <----------程式輸出。
+
+Breakpoint 2, func (n=250) at tst.c:5
+5  int sum=0,i;
+(gdb) n
+6  for(i=1; i<=n; i++)
+(gdb) p i   <--------------------- 列印變數i的值，print命令簡寫。
+$1 = -1074568236
+(gdb) n
+8   sum+=i;
+(gdb) n
+6  for(i=1; i<=n; i++)
+(gdb) p sum
+$2 = 1
+(gdb) n
+8   sum+=i;
+(gdb) p i
+$3 = 2
+(gdb) n
+6  for(i=1; i<=n; i++)
+(gdb) p sum
+$4 = 3
+(gdb) bt   <--------------------- 查看函數堆棧。
+#0  func (n=250) at tst.c:6
+#1  0x080483f1 in main () at tst.c:24
+(gdb) finish   <--------------------- 退出函數。
+Run till exit from #0  func (n=250) at tst.c:6
+0x080483f1 in main () at tst.c:24
+24  printf("result[1-250] = %d \n", func(250) );
+Value returned is $5 = 31375
+(gdb) c   <--------------------- 繼續運行。
+Continuing.
+result[1-250] = 31375    <----------程式輸出。
+
+Program exited normally.   <--------程式退出，調試結束。
+(gdb) q   <--------------------- 退出gdb。
+
+
+/******************************************************************************/
+Ubuntu下C++編程     ref: http://hi.baidu.com/zhxust/blog/item/69265258aeab82d99d820476.html
+/******************************************************************************/
+1，以vim編輯程式代碼文件　HelloC++.cpp
+     命令為 $ vim HelloC++.cpp
+2，按i鍵進入編輯模式，輸入以下程式代碼
+     #include <iostream>
+     using namespace std;
+    
+     int main(void)
+     {
+         cout << "Hello C++!" << endl;
+     
+         return 0;
+     }
+3，存儲和關閉vim
+     按Esc跳出編輯模式，執行指令:wq保存文件並退出vim。
+
+4，用g++編譯程式
+     命令為 $ g++ -o a.out HelloC++.cpp
+
+5，執行編譯結果的可執行文件
+     命令為 $ ./a.out
+
+最終顯示結果為：
+Hello C++!
+
+
+/******************************************************************************/
+按鍵測試程式        ref: http://hi.baidu.com/zhxust/blog/item/eea067864259443667096edb.html
+/******************************************************************************/
+/*按鍵測試程式*/
+#include <stdio.h> /*標準輸入輸出頭文件*/
+#include <stdlib.h> /*標準庫*/
+#include <unistd.h> /*一些宏的定義在這裡*/
+#include <sys/ioctl.h> /*設備的控制*/
+#include <sys/types.h> /*定義了一些類型*/
+#include <sys/stat.h> /*狀態*/
+#include <fcntl.h> /*文件控制*/
+#include <sys/select.h> /*選擇?*/
+#include <sys/time.h> /*時間方面的函數*/
+#include <errno.h> /*有關錯誤方面的宏*/
+
+/*主函數入口*/
+int main(void)
+{
+    int i; /*鍵盤輸出時用到的循環變數*/
+    int buttons_fd; /*buttons設備號*/
+    int key_value[4]; /*四個按鍵的取值*/
+
+    /*打開鍵盤設備文件*/
+    buttons_fd = open("/dev/buttons",0); /*以0方式打開*/
+
+    /*打開出錯處理*/
+    if(buttons_fd < 0) /*打開出錯就會返回一個負值*/
+    {
+       perror("open device buttons"); /*perror函數?*/
+
+       exit(1); /*返回1*/
+    }
+
+    /*for無限循環,等待用戶輸入  這是很典型的程式執行方式*/
+    for(;;)
+    {
+       fd_set rds; /*fd_set是types.h中定義的類型,實質上是int型*/
+                                 /*rds用來存儲設備號*/
+       int ret; /*for循環內定義的局部變數ret*/
+       FD_ZERO(&rds); /*rds初始化*/
+         /*FD_ZERO是哪裡定義的呢?*/
+       FD_SET(buttons_fd,&rds); /*將buttons設備號賦給rds*/
+          /*FD_SET是哪裡定義的呢?*/
+
+       /*使用系統調用select檢查是否能夠從/dev/buttons設備讀取數據*/
+       /*select函數是幹什麼的呢?*/
+       ret = select(buttons_fd + 1,&rds,NULL,NULL,NULL);
+       /*返回值ret*/
+       /*返回值的具體意義是什麼呢?*/
+
+       /*對ret的處理*/
+       if(ret < 0) /*當ret小於0*/
+       {
+           perror("select");
+           exit(1);
+       }
+
+       if(ret == 0) /*當ret等於0*/
+       {
+           printf("Timeout.\n");
+       }
+       else /*能夠讀到數據*/
+       if(FD_ISSET(buttons_fd,&rds)) /*??*/
+       {
+           /*讀取鍵盤驅動發出的數據*/
+           /*key_value和鍵盤驅動中定義一致*/
+
+           int ret = read(buttons_fd,key_value,sizeof(key_value)); /*注意此處的ret和前面的ret有何不同*/
+                  /*注意鍵盤設備讀取的特點*/
+
+           /*對ret的處理*/
+           if(ret != sizeof(key_value)) /*沒有接收夠*/
+           {
+            if(errno != EAGAIN)   /*???*/
+             perror("read buttons\n");
+            continue;
+           }
+           else /*正確接收,則列印到標準終端*/
+           {
+            for(i = 0;i < 4;i++) /*最開始定義的循環變數i*/
+             printf("K%d %s, key value = 0x%02x\n",i,(key_value[i] & 0x80) ? "released" : key_value[i] ? "pressed down" : "",key_value[i]);
+             /*這一連串的輸出,要注意格式*/
+           }
+       }
+    }
+
+    /*關閉設備*/
+    close(buttons_fd);
+    return 0; /*主函數返回*/
+}
+
+
+
+
+/******************************************************************************/
+線程編程    ref: http://hi.baidu.com/zhxust/blog/item/bf62d9d8c1758a3d33fa1cd8.html
+/******************************************************************************/
+/*注意！編譯時要加上 -l pthread*/
+/*由於pthread 庫不是 Linux 系統默認的庫，連接時需要使用靜態庫 libpthread.a，所以在使用pthread_create()創建線程時，在編譯中要加 -lpthread參數。*/
+
+/*線程編程*/
+#include <stddef.h> /* */
+#include <stdio.h> /*標準輸入輸出*/
+#include <unistd.h> /* */
+#include <pthread.h> /*線程方面的東西*/
+
+/*提前聲明兩個函數*/
+/*reader_function()和writer_function()*/
+void reader_function(void); /* */
+void writer_function(void); /* */
+
+char buffer; /*全局字元變數*/
+int buffer_has_item = 0; /*全局變數*/
+pthread_mutex_t mutex; /*pthread_mutex_t是什麼類型呢?*/
+
+/*主函數入口*/
+main() /*這種主函數的書寫方式,有點意思*/
+{
+    pthread_t reader; /*pthread_t類型,應該是線程類型,實質估計就是非符號整型*/
+    pthread_mutex_init(&mutex,NULL); /*pthread_mutex_init()函數,是幹什麼的呢?*/
+
+    /*創建線程*/
+    /*pthread_create()函數的使用*/
+    /*&reader--創建的新線程,其線程號存放於此*/
+    /*兩個NULL先不理*/
+    /*(void*)&reader_function--此線程所調用的函數的地址,這一機制很有意思*/
+    /*線程終歸是要幹事情的,就是要調用函數的,而利用線程的機制,則是為了利於調度*/
+    /*從而更好地完成整個任務*/
+    pthread_create(&reader,NULL,(void*)&reader_function,NULL); /*創建完線程後,線程就會獨立地去完成其調用的函數*/
+
+    writer_function(); /*調用writer_function()函數*/
+         /*它與前面所創建的線程中調用的函數的執行幾乎是並行的*/
+         /*如果這兩個函數之間無任何依賴關係,則它們就幾乎並行地執行*/
+         /*實質是作業系統在安排它們的執行狀況*/
+
+}
+
+/*writer_function()的實現*/
+void writer_function(void)
+{
+    /*一個無限循環*/
+    while(1)
+    {
+       /*實現上鎖的功能 從而拒絕其它線程的訪問*/
+       pthread_mutex_lock(&mutex); /*pthread_mutex_lock()函數*/
+
+       if(buffer_has_item == 0) /*判斷buffer裡有數據沒?如果沒有,則寫入*/
+       {
+        buffer = 'a'; /*寫入字元a*/
+        printf("make a new item\n");
+        buffer_has_item = 1; /*這一步很重要,類似於標誌位*/
+       }
+
+       /*寫完之後就該解鎖了,這樣其它線程就可以訪問*/
+       pthread_mutex_unlock(&mutex); /*pthread_mutex_unlock()函數*/
+    }
+}
+
+/*reader_function()函數的實現*/
+void reader_function(void)
+{
+    /*無限循環*/
+    while(1)
+    {
+       /*上鎖*/
+       pthread_mutex_lock(&mutex);
+
+       /*判斷buffer裡是否有值,如果有,則讀取*/
+       if(buffer_has_item == 1)
+       {
+        buffer = '\0'; /*清零*/
+        printf("consume item\n");
+        buffer_has_item = 0; /*標誌位置0*/
+       }
+
+       /*解鎖*/
+       pthread_mutex_unlock(&mutex);
+    }
+}
+
+
+/******************************************************************************/
+進程的創建
+/******************************************************************************/
+父進程創建子進程後，兩進程共用後面的代碼，實現各司其職是通過判斷fork函數的返回值來進行的。
+調用fork函數之後，呈現了兩個進程，A進程是父進程，B進程是子進程。
+在A進程中，fork函數返回的是B進程的進程號，這個進程號是大於0的，我們把它存放到變數pid中。
+在B進程中，fork函數返回的是0，我們把它存放到變數pid中。
+這裡就是關鍵的疑惑之處！兩個pid，是不是一樣呢？
+這就需要分析進程的本質。
+A進程與B進程雖然共用後面的代碼，但是兩個進程擁有獨立的數據空間，因此，兩個pid變數是不一樣的。
+A進程空間中的pid存放的是B進程的進程號，而B進程空間中的pid存放的是0。
+從這裡，我們就可以得到一種機制，它通過判斷pid變數的值來確定正在運行的到底是哪一個進程，switch語句恰好有這種功能，從而用共用的代碼實現了不同的進程任務。
+
+下面是實例：
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+int main(void)
+{
+    pid_t pid;
+
+    int A=0;
+    int B=0;
+
+    printf("hello\n");
+    pid = fork();
+    for(;;)
+    {
+        switch(pid)
+        {
+            case -1:
+                printf("Failure!");
+                break;
+            case 0:
+                printf("Child!");
+                B ++;
+                printf("B = %d\n",B);
+                sleep(2);
+                break;
+            default:
+                printf("Father!");
+                A ++;
+                printf("A = %d\n",A);
+                sleep(1);
+                break;
+        }
+    }
+}
+
+
+/******************************************************************************/
+進程與線程的本質區別
+/******************************************************************************/
+不同進程之間擁有獨立的空間，而一個進程的不同線程之間共享空間。
+這一本質區別決定了，不同的進程所幹的是不同的任務，因為它們擁有各自的空間；
+一個進程的不同的線程幹的事情是一個任務的某一步驟，因為它們具有相同的空間。
+
+
+/******************************************************************************/
+信號與進程序控制制  ref: http://hi.baidu.com/zhxust/blog/item/fca603fd6e8dd74cd7887d64.html
+/******************************************************************************/
+可以通過發信號對進程進行控制。下面程式是一個父進程創建一個駐留子進程，我們可以通過發信號來控制這個駐留進程。
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+
+#define LOCK_FILE "/var/run/lock.pid"
+
+void quit(int signo)
+{
+    printf("Receive signal %d\n",signo);
+    unlink(LOCK_FILE);
+    exit(1);
+}
+
+void main()
+{
+    FILE *fp;
+    pid_t pid;
+    struct sigaction act;
+
+    if(access(LOCK_FILE,R_OK)==0)
+    {
+       printf("Existing copy of this daemon!\n");
+       exit(1);
+    }
+
+    pid = fork();
+    if(pid > 0)
+    {
+       printf("daemon on duty!\n");
+       fp = fopen(LOCK_FILE,"wt");
+       fprintf(fp,"%d",pid);
+       fclose(fp);
+       exit(0);
+    }
+    else
+    if(pid < 0)
+    {
+        printf("Can't fork!\n");
+        exit(-1);
+    }
+
+    act.sa_handler = quit;
+    act.sa_flags = 0;
+    sigemptyset(&act.sa_mask);
+
+    sigaction(SIGTERM,&act,NULL);
+    sigaction(SIGHUP,&act,NULL);
+    sigaction(SIGINT,&act,NULL);
+    sigaction(SIGQUIT,&act,NULL);
+    sigaction(SIGUSR1,&act,NULL);
+    sigaction(SIGUSR2,&act,NULL);
+
+    for(;;)
+    {
+       printf("I am the daemon!\n");
+       sleep(3);
+    }
+}
+
+運行之後，在另外一個Shell窗口輸入命令如下：
+#PID=$(cat /var/run/lock.pid)
+#kill -TERM $PID
+這樣就可以終止駐留進程了。
+sigaction(SIGTERM,&act,NULL)函數將信號與相應響應程式關聯起來，駐留進程接收到信號TERM後，就會調用信號響應程式act.sa_handler，
+由於前面已經賦值了，act.sa_handler = quit，即響應程式是前面的子函數quit()，這樣就構成了信號控制進程的整個過程。
+從程式中可以看到，也可以發送HUP、INT、QUIT、USR1、USR2等信號。
+
+
+
+/******************************************************************************/
+進程間的管道通信        ref: http://hi.baidu.com/zhxust/blog/item/7360ae06f85b4c7203088125.html
+/******************************************************************************/
+進程間的管道通信
+通過pipe函數創建了一個管道，並將管道的出口描述符與入口描述符存放在數組fd[2]中，即fd[0]是出口，fd[1]是入口。
+程式有兩個進程，子進程對管道進行寫操作，父進程對管道進行讀操作。如同對講機一樣，兩個進程不能同時操作。
+子進程在寫管道之前，要把管道的出口關閉，即close(fd[0])；
+而父進程在讀管道之前，要把管道的入口關閉，即close(fd[1])。
+
+下面是示例代碼：
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main(void)
+{
+    int fd[2],nbytes;
+    pid_t childpid;
+    char string[] = "Hello,world!\n";
+    char readbuffer[80];
+
+    pipe(fd);
+    childpid = fork();
+
+    if(childpid == -1)
+    {
+       perror("fork");
+       exit(1);
+    }
+    else
+    if(childpid == 0)
+    {
+     close(fd[0]);
+     write(fd[1],string,strlen(string));
+     exit(0);
+    }
+
+    close(fd[1]);
+    nbytes = read(fd[0],readbuffer,sizeof(readbuffer));
+    printf("Received string: %s",readbuffer);
+    exit(0);
+}
+
+
+/******************************************************************************/
+共享記憶體示例  ref: http://hi.baidu.com/zhxust/blog/item/b82c2bf81e2d0206d9f9fdb7.html
+/******************************************************************************/
+共享記憶體是進程間共享數據的一種最快的方法，下面是共享記憶體的示例，子進程往共享記憶體裡寫字串，父進程從共享記憶體裡讀字串。
+#include <sys/shm.h>
+#include <unistd.h>
+
+#define KEY 1234
+#define SIZE 1024
+
+main()
+{
+    int shmid;
+    char *shmaddr;
+    struct shmid_ds buf; /*共享記憶體有關的資訊結構體*/
+    shmid = shmget(KEY,SIZE,IPC_CREAT | 0600); /*創建共享記憶體*/
+
+    if(fork() == 0) /*子進程的操作*/
+    {
+       shmaddr = (char *)shmat(shmid,NULL,0); /*映射共享記憶體*/
+       strcpy(shmaddr,"Hi,I am child process!\n"); /*往共享記憶體裡寫字串*/
+       shmdt(shmaddr); /*脫離共享記憶體*/
+       return;
+    }
+    else /*父進程的操作*/
+    {
+       sleep(3);
+       shmctl(shmid,IPC_STAT,&buf); /*獲取共享記憶體的資訊*/
+
+       printf("shm_segsz = %d bytes\n",buf.shm_segsz); /*大小*/
+       printf("shm_cpid = %d \n",buf.shm_cpid); /*創建共享記憶體的進程號*/
+       printf("shm_lpid = %d \n",buf.shm_lpid); /*上一個操作共享記憶體的進程號*/
+
+       shmaddr = (char *)shmat(shmid,NULL,0);
+       printf("%s",shmaddr);
+       shmdt(shmaddr);
+       shmctl(shmid,IPC_RMID,NULL); /*刪除共享記憶體*/
+    }
+}
+
+
+/******************************************************************************/
+消息隊列示例    ref: http://hi.baidu.com/zhxust/blog/item/f934d0384938a8fbb211c789.html
+/******************************************************************************/
+有兩種標準的進程間通信：System V進程間通信和POSIX進程間通信。
+System V進程間通信方式包括：System V消息隊列、System V信號燈、System V共享記憶體。
+POSIX進程間通信包括：posix消息隊列、posix信號燈、posix共享記憶體。
+
+對於消息隊列，Redhat9支援POSIX，也就是它支援msgget、msgsnd、msgrcv、msgctl等函數，而不支援System V的open_queue、send_message等函數。
+這一點要注意！因為有些教程的進程間通信的例子遵循的是System V標準。
+下面是消息隊列的示例,跟共享內存的示例結構基本一樣。
+#include <unistd.h>
+#include <sys/msg.h>
+
+#define KEY 1234
+#define TEXT_SIZE 48
+
+struct msgbuffer {
+    long mtype;
+    char mtext[TEXT_SIZE];
+}msgp; /*消息結構體變數msgp*/
+
+main()
+{
+    int msqid; /*用於存儲消息隊列的ID*/
+    msqid = msgget(KEY,IPC_CREAT | 0600); /*創建消息隊列*/
+
+    if(fork() == 0) /*子進程的操作*/
+    {
+       /*對msgp的成員賦值*/
+       msgp.mtype = 1;
+       strcpy(msgp.mtext,"Hi,I am child process!\n");
+
+       /*發送消息*/
+       msgsnd(msqid,&msgp,TEXT_SIZE,0);
+       return;
+    }
+    else /*父進程的操作*/
+    {
+       sleep(3); /*睡眠3秒，確保子進程已經發送完畢*/
+       msgrcv(msqid,&msgp,TEXT_SIZE,0,0); /*接收消息*/
+       printf("parent receive mtext: %s\n",msgp.mtext);
+       msgctl(msqid,IPC_RMID,NULL); /*刪除消息隊列*/
+    }
+}
+
+
+/******************************************************************************/
+互斥鎖      ref: http://hi.baidu.com/zhxust/blog/item/1e57780e4c2407ee37d1225e.html
+/******************************************************************************/
+互斥鎖是共享資源的入口，在這一機制中，線程需要通過互斥鎖才能實現對共享資源的訪問。互斥鎖的操作步驟如下：
+互斥鎖初始化：pthread_mutex_init
+互斥鎖上鎖：pthread_mutex_lock
+互斥鎖判斷上鎖：pthread_mutex_trylock
+互斥鎖解鎖：pthread_mutex_unlock
+消除互斥鎖：pthread_mutex_destroy
+有三種類型的互斥鎖：快速互斥鎖、遞歸互斥鎖、檢錯互斥鎖。
+快速互斥鎖，是指一個線程訪問一個互斥鎖，如果發現該鎖已經上鎖，則線程阻塞，直到解鎖為止。
+
+這裡就有有趣的概念：死鎖。
+設有3個線程A、B、C，並有3個共享資源a、b、c。
+現在資源的佔有情況以及上鎖情況如下：
+A---mutexa---a
+B---mutexb---b
+C---mutexc---c
+
+如果
+線程A的繼續執行需要資源b，在獲得資源b之前是不會放棄資源a的，即不會將mutexa開鎖；
+線程B的繼續執行需要資源c，在獲得c之前不放棄a，即不開鎖mutexb;
+線程C的繼續執行需要資源a，在獲得a之前不放棄c,即不開鎖mutexc；
+並且，三把鎖mutexa、mutexb、mutexc都是快速互斥鎖，即不可被搶佔，
+那麼
+就會發生有趣的死鎖現象，也就是三個線程A、B、C都阻塞。
+防止發生死鎖現象的方法有兩種：1，不要形成環狀的資源訪問情況；
+                              2，互斥鎖不要設置成不可搶佔的快速互斥鎖。
+
+上面介紹了死鎖的概念。下面是互斥鎖的示例：
+主線程另外創建了兩個線程：線程1和線程2。
+線程1讓共享資源變數在兩秒鐘內每隔一秒自增1，之後暫停1秒；然後繼續在下面的兩秒種內每隔一秒自增1，如此下去。
+線程2則每隔3秒讀取一次。兩個線程對共享資源變數的訪問都是通過互斥鎖進行的。無論是寫還
+是讀，都要在上鎖之後才能進行。
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; /*互斥鎖*/
+int lock_var = 0; /*共享資源*/
+time_t end_time;
+
+void pthread1(void *arg); /*線程1執行的函數*/
+void pthread2(void *arg); /*線程2執行的函數*/
+
+int main(int argc, char *argv[])
+{
+    pthread_t id1,id2; /*線程號存儲在這兩個變數*/
+    int ret;
+    end_time = time(NULL)+10;
+
+    pthread_mutex_init(&mutex,NULL); /*創建互斥鎖*/
+    ret=pthread_create(&id1,NULL,(void *)pthread1, NULL); /*創建線程1*/
+    if(ret!=0)
+       perror("pthread cread1");
+
+    ret=pthread_create(&id2,NULL,(void *)pthread2, NULL); /*創建線程2*/
+    if(ret!=0)
+       perror("pthread cread2");
+
+    /*主線程等待線程1和線程2執行完畢*/
+    pthread_join(id1,NULL);
+    pthread_join(id2,NULL);
+
+    exit(0);
+}
+
+void pthread1(void *arg) /*線程1執行的函數*/
+{
+    int i;
+    while(time(NULL) < end_time)
+    {
+       if(pthread_mutex_lock(&mutex)!=0) /*加鎖*/
+       {
+           perror("pthread_mutex_lock");
+       }
+       else
+           printf("pthread1:pthread1 lock the variable\n");
+
+       for(i=0;i<2;i++) /*2秒*/
+       {
+           sleep(1);
+           lock_var++;
+       }
+
+       if(pthread_mutex_unlock(&mutex)!=0) /*解鎖*/
+       {
+           perror("pthread_mutex_unlock");
+       }
+       else
+           printf("pthread1:pthread1 unlock the variable\n");
+     
+       sleep(1); /*1秒*/
+    }
+}
+
+void pthread2(void *arg) /*線程2執行的函數*/
+{
+    int ret;
+
+    while(time(NULL) < end_time)
+    {
+       ret=pthread_mutex_trylock(&mutex); /*判斷上鎖,如果沒上鎖，則上鎖；如果已經上鎖，則不上*/
+       if(ret==EBUSY)
+           printf("pthread2:the variable is locked by pthread1\n");
+       else
+       {
+           if(ret!=0)
+           {
+               perror("pthread_mutex_trylock");
+               exit(1);
+           }
+           else
+               printf("pthread2:pthread2 got lock.The variable is %d\n",lock_var);
+
+           if(pthread_mutex_unlock(&mutex)!=0) /*解鎖*/
+           {
+               perror("pthread_mutex_unlock");
+           }
+           else
+               printf("pthread2:pthread2 unlock the variable\n");
+       }
+       sleep(3); /*3秒*/
+    }
+}
+文件名為mutex.c，則編譯命令為： #gcc -o mutex mutex.c -lpthread
+
+
+/******************************************************************************/
+TCP傳輸編程 ref: http://hi.baidu.com/zhxust/blog/item/4659ca5519adb7cdb645ae43.html
+/******************************************************************************/
+下面是tcp傳輸編程，一個伺服器，一個用戶端。
+先運行伺服器，則伺服器就開始監聽本伺服器的所有網卡的1234號連接埠。
+再另一機器上打開用戶端，則用戶端會和伺服器連接上，並且伺服器會發送過來歡迎話語。
+
+tcp_server.c
+--------------------------------------------
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#define PORT 1234 /*伺服器監聽的連接埠號*/
+
+main()
+{
+    int sockfd, newsockfd;
+    struct sockaddr_in addr;
+    int addr_len = sizeof(struct sockaddr_in);
+    fd_set readfds;
+    char msg[] = "Welcome to server!";
+
+    if((sockfd = socket(AF_INET,SOCK_STREAM,0)) < 0)
+    {
+       perror("socket");
+       exit(1);
+    }
+
+    /*addr結構體變數的賦值*/
+    bzero(&addr,addr_len);
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(PORT);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY); /*監聽本伺服器的所有IP，就是所有網卡*/
+
+    /*綁定sockfd*/
+    if(bind(sockfd,&addr,addr_len) < 0)
+    {
+       perror("bind");
+       exit(1);
+    }
+
+    /*監聽sockfd*/
+    if(listen(sockfd,3) < 0)
+    {
+       perror("listen");
+       exit(1);
+    }
+
+    while(1)
+    {
+       FD_ZERO(&readfds);
+       FD_SET(sockfd,&readfds);
+
+       /*如果sockfd可讀，則返回;否則，就等待*/
+       if(select(sockfd+1,&readfds,NULL,NULL,NULL) == 0) /*select函數*/
+        continue;
+
+       if(FD_ISSET(sockfd,&readfds))
+       {
+        /*接收到用戶端的socket*/
+        if((newsockfd = accept(sockfd,&addr,&addr_len)) < 0)
+         perror("accept");
+
+        write(newsockfd,msg,sizeof(msg));
+
+        printf("Connect from %s\n",inet_ntoa(addr.sin_addr));
+       }
+    }
+}
+
+-------------------------------
+tcp_client.c
+-------------------------------
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#define PORT 1234
+#define SERVER_IP "192.168.174.128"
+
+main()
+{
+    int s;
+    struct sockaddr_in addr;
+    char buffer[256];
+
+    if((s = socket(AF_INET,SOCK_STREAM,0)) < 0)
+    {
+       perror("socket");
+       exit(1);
+    }
+
+    bzero(&addr,sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(PORT);
+    addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+
+    if(connect(s,&addr,sizeof(addr)) < 0)
+    {
+       perror("connect");
+       exit(1);
+    }
+
+    recv(s,buffer,sizeof(buffer),0);
+    printf("%s\n",buffer);
+}
+------------------------------
+
+有以下幾點要注意：
+1,fd_set是長整型數組，它是用位來表示文件描述符的，如第一個長整型的32位，就分別表示0-31的文件描述符，而第二個長整型的32位則表示32-63的文件描述符，依次
+類推。FD_SET(0,&readfds)表示把第一個長整型的[0]位置1。
+2,select函數會監視readfds中的文件描述符，看哪個文件可讀了，才停止等待狀態，置其餘文件描述符的位為0，返回。我們可以用select函數監視多個文件描述符，並給出
+對應於每個文件可讀之後的處理函數，這是通過FD_ISSET函數來進行的，這就相當於switch、case語句。
+3,在網路中傳輸要統一變數的位元組存儲順序，因為有的系統是高位在前，低位在後，而有的系統則相反，所以要統一順序。比如htonl函數就是將主機位元組順序轉換為網路
+位元組順序。
+4,sockaddr_in結構體如下
+struct sockaddr_in{
+    short int sin_family; /*Internet地址族*/
+    unsigned short int sin_port; /*連接埠號*/
+    struct in_addr sin_addr; /*Internet地址*/
+    unsigned char sin_zero[8];
+};
+其中，in_addr結構體如下：
+struct in_addr{
+    unsigned long s_addr; /*Internet地址*/
+};
+5，伺服器端的流程是
+socket--bind--listen--accept--write
+用戶端的流程是
+socket--connect--recv
+
+
+/******************************************************************************/
+UDP網路編程 ref : http://hi.baidu.com/zhxust/blog/item/9b678bfb38a1906c034f56d9.html
+/******************************************************************************/
+/*UDP網路編程*/
+/*實質上是對網路設備驅動程式的測試*/
+/*如調用sendto()函數和recvfrom()函數*/
+/*這兩個函數相當於文件操作中的write()和read()函數*/
+/*它們就是網路設備驅動函數*/
+#include <sys/types.h> /*定義了一些類型*/
+#include <sys/socket.h> /*socket方面的一些東西*/
+#include <arpa/inet.h> /*網路方面的一些東西*/
+#include <stdio.h> /*標準輸入輸出*/
+
+#define BUFLEN 255 /*緩衝區的長度*/
+/*主函數入口*/
+int main(int argc,char **argv)  /*主函數輸入參數argv[0]--函數名,argv[1]--目的地址,argv[2]--目的連接埠,argv[3]--源地址,argv[4]--源連接埠*/
+{
+    struct sockaddr_in peeraddr,          /*存放對方IP和連接埠的socket地址,sockaddr_in結構體應該是在socket.h中定義的*/
+                       localaddr;         /*本端socket地址*/
+    int sockfd; /*socket號*/
+    char recmsg[BUFLEN+1]; /*加1是因為要在最後加上\0*/
+    int socklen, /*socket的長度?*/
+        n; /*接收狀態變數*/
+
+    /*輸入參數的檢測,檢測輸入參數的長度 這是經常要做的事情*/
+    if(argc != 5) /*如果長度不是5*/
+    {
+       printf("%s <dest IP address> <dest port> <source IP address> <source port>\n",
+             argv[0]);    /*提示輸入正確的參數*/
+       exit(0); /*返回0,有點意思*/
+    }
+
+    /*產生一個socket*/
+    sockfd = socket(AF_INET,SOCK_DGRAM,0); /*socket()函數的使用?*/
+           /*AF_INET,SOCK_DGRAM應該是在inet.h中定義的*/
+
+    /*對sockfd的處理,即如果沒有正確產生一個socket該怎麼辦*/
+    if(sockfd < 0) /*小於0則沒有正確產生socket*/
+    {
+       printf("socket creating err in udptalk\n");
+       exit(1); /*返回1,有意思*/
+    }
+    socklen = sizeof(struct sockaddr_in); /*socket地址的長度*/
+    memset(&peeraddr,0,socklen); /*0初始化對方socket的地址*/
+                                 /*memset()這個函數,要注意*/
+    /*對peeraddr的成員賦值*/
+    /*有三個成員,family,addr,port*/
+    /*對family成員賦值*/
+    peeraddr.sin_family = AF_INET; /*這個成員應該是整個所在的網路,比方說局域網*/
+                                   /*AF_INET估計是在inet.h中定義的*/
+    /*對連接埠的賦值*/
+    peeraddr.sin_port = htons(atoi(argv[2])); /*atoi()函數是幹什麼的呢*/
+                                              /*htons()函數是幹什麼的呢*/
+    /*對IP地址的賦值,並檢測IP地址*/
+    if(inet_pton(AF_INET,argv[1],&peeraddr.sin_addr) <= 0) /*inet_pton()函數的使用*/
+    {
+       printf("Wrong dest IP address!\n");
+       exit(0); /*返回0,有意思*/
+    }
+
+    /*對本端的socket地址操作了*/
+    memset(&localaddr,0,socklen); /*0初始化*/
+    localaddr.sin_family = AF_INET; /*family*/
+    localaddr.sin_port = htons(atoi(argv[4])); /*連接埠*/
+    if(inet_pton(AF_INET,argv[3],&localaddr.sin_addr) <= 0) /*IP地址*/
+    {
+       printf("Wrong source IP address!\n");
+       exit(0);
+    }
+
+    /*綁定socket號和socket地址*/
+    if(bind(sockfd,&localaddr,socklen) < 0) /*綁定sockfd和本端的地址*/
+    {
+       printf("bind local address err in udptalk!\n");
+       exit(2); /*返回2*/
+    }
+
+    /*從標準輸入設備中輸入資訊*/
+    if(fgets(recmsg,BUFLEN,stdin) == NULL)
+       exit(0);
+
+    /*發送*/
+    /*sendto()函數的使用*/
+    /*sockfd--是已綁定了local address的socket號*/
+    /*recmsg是資訊的存放地址*/
+    /*strlen(recmsg)是資訊的長度*/
+    /*0暫時不管*/
+    /*&peeraddr是對方socket地址變數的地址*/
+    /*socklen是socket地址變數的長度*/
+    if(sendto(sockfd,recmsg,strlen(recmsg),0,&peeraddr,socklen) < 0)
+    {
+       printf("sendto err in udptalk!\n");
+       exit(3); /*返回3*/
+    }
+
+    /*for(;;)循環*/
+    for(;;)
+    {
+       /*接收資訊循環*/
+       /*recvfrom()函數的使用*/
+       /*從對方的socket地址不斷接收資訊*/
+       /*存放在recmsg中,長度是BUFLEN*/
+       n = recvfrom(sockfd,recmsg,BUFLEN,0,&peeraddr,&socklen); /*n作為判斷接收狀態的依據*/
+              /*怪哉!這裡的&是怎麼回事?*/
+
+       if(n < 0) /*如果n小於0*/
+       {
+           printf("recvfrom err in udptalk!\n");
+           exit(4); /*返回4*/
+       }
+       else /*接收成功,則要輸出接收到的資訊*/
+       {
+           recmsg[n] = 0; /*結尾處理*/
+           printf("peer:%s",recmsg);
+       }
+
+       /*再試圖發送數據*/
+       /*從標準終端輸入資訊*/
+       if(fgets(recmsg,BUFLEN,stdin) == NULL) /*從標準輸入設備輸入,是很值得去捉摸的*/
+           exit(0);
+
+       /*再發送資訊*/
+       if(sendto(sockfd,recmsg,strlen(recmsg),0,&peeraddr,socklen) < 0)
+       {
+           printf("sendto err in udptalk!\n");
+           exit(3);
+       }
+    }
+}
+
+
+/******************************************************************************/
+用c寫cgi程式    ref: http://hi.baidu.com/zhxust/blog/item/3d60bbf44f5c88d0f3d38564.html
+/******************************************************************************/
+一、CGI概述
+CGI(Common Gateway Interface: 公用網關介面)規定了Web伺服器調用其他可執行程式(CGI程序)的介面協定標準。Web伺服器通過調用CGI程式實現和Web瀏覽器的交互,也
+就是CGI程式接受Web瀏覽器發送給Web伺服器的資訊,進行處理,將響應結果再回送給Web伺服器及Web瀏覽器。CGI程式一般完成Web網頁中表單(Form)數據的處理、數據庫查
+詢和實現與傳統應用系統的集成等工作。CGI程式可以用任何程式設計語言編寫,如Shell腳本語言、Perl、Fortran、Pascal、C語言等。但是用C語言編寫的CGI程式具有執
+行速度快、安全性高(因為C語言程式是編譯執行且不可被修改)等特點。
+CGI介面標準包括標準輸入、環境變數、標準輸出三部分。 
+1.標準輸入 
+　CGI程式像其他可執行程式一樣,可通過標準輸入(stdin)從Web伺服器得到輸入資訊,如Form中的數據,這就是所謂的向CGI程式傳遞數據的POST方法。這意味著在作業系統
+  命令行狀態可執行CGI程式,對CGI程式進行調試。POST方法是常用的方法,本文將以此方法為例,分析CGI程式設計的方法、過程和技巧。
+2.環境變數 
+  作業系統提供了許多環境變數,它們定義了程式的執行環境,應用程式可以存取它們。Web伺服器和CGI介面又另外設置了自己的一些環境變數,用來向CGI程式傳遞一些重
+  要的參數。CGI的GET方法還通過 環境變數QUERY-STRING向CGI程式傳遞Form中的數據。
+3.標準輸出 
+　　CGI程式通過標準輸出(stdout)將輸出資訊傳送給Web伺服器。傳送給Web伺服器的資訊可以用各種格式,通常是以純文本或者HTML文本的形式,這樣我們就可以在命令行
+    狀態調試CGI程式,並且得到它們的輸出。
+下面是一個簡單的CGI程式,它將HTML中Form的資訊直接輸出到Web瀏覽器。 
+#include <stdio.h> 
+#include <stdib.h> 
+main() 
+{ 
+    int i , n ;
+    printf ("Content type: text/plain\n\n");
+    n=0;
+    if(getenv("CONTENT-LENGTH"))
+        n=atoi(getenv("CONTENT-LENGTH"));
+
+    for (i=0;i<n;i++)
+        putchar(getchar());
+
+    putchar ('\n');
+    fflush(stdout);
+}
+下面對此程式作一下簡要的分析。 
+printf ("Content type :text/plain\n\n"); 
+此行通過標準輸出將字串"Content type :text/plain\n\n"傳送給Web伺服器。它是一個MIME頭資訊,它告訴Web伺服器隨後的輸出是以純ASCII文本的形式。請注意在這個
+頭資訊中有兩個新行符,這是因為Web伺服器需要在實際的文本資訊開始之前先看見一個空行。 
+if (getenv("CONTENT-LENGTH")) 
+    n=atoi (getenv("CONTENT-LENGTH")); 
+此行首先檢查環境變數CONTENT-LENGTH是否存在。Web伺服器在調用使用POST方法的CGI程式時設置此環境變數,它的文本值表示Web伺服器傳送給CGI程式的輸入中的字元數
+目,因此我們使用函數atoi() 將此環境變數的值轉換成整數,並賦給變數n。請注意Web伺服器並不以文件結束符來終止它的輸出,所以如果不檢查環境變數
+CONTENT-LENGTH,CGI程式就無法知道什麼時候輸入結束了。
+for (i=0;i<n;i++) 
+  　putchar(getchar()); 
+此行從0循環到(CONTENT-LENGTH-1)次將標準輸入中讀到的每一個字元直接拷貝到標準輸出,也就是將所有的輸入以ASCII的形式回送給Web伺服器。
+
+通過此例,我們可將CGI程式的一般工作過程總結為如下幾點。
+1.通過檢查環境變數CONTENT-LENGTH,確定有多少輸入;
+2.循環使用getchar()或者其他文件讀函數得到所有的輸入;
+3.以相應的方法處理輸入; (這一步很重要!!!)
+4.通過"Content type:"頭資訊,將輸出資訊的格式告訴Web伺服器;
+5.通過使用printf()或者putchar()或者其他的文件寫函數,將輸出傳送給Web伺服器。
+總之,CGI程式的主要任務就是從Web伺服器得到輸入資訊,進行處理,然後將輸出結果再送回給Web伺服器。
+
+二、環境變數
+環境變數是文本串(名字/值對),可以被OS Shell或其他程式設置 ,也可以被其他程式訪問。它們是Web伺服器傳遞數據給CGI程式的簡單手段,之所以稱為環境變數是因為它
+們是全局變數,任何程式都可以存取它們。
+下面是CGI程式設計中常常要用到的一些環境變數。 
+HTTP-REFERER:調用該CGI程式的網頁的URL。 
+REMOTE-HOST:調用該CGI程式的Web瀏覽器的機器名和域名。 
+REQUEST-METHOD:指的是當Web伺服器傳遞數據給CGI程式時所採用的方法,分為GET和POST兩種方法。GET方法僅通過環境變數(如QUERY-STRING)傳遞數據給CGI程式,而POST
+方法通過環境變數和標準輸入傳遞數據給CGI程式,因此POST方法可較方便地傳遞較多的數據給CGI程式。
+SCRIPT-NAME:該CGI程式的名稱。 
+QUERY-STRING:當使用POST方法時,Form中的數據最後放在QUERY-STRING中,傳遞給CGI程式。 
+CONTENT-TYPE:傳遞給CGI程式數據的MIME類型,通常為"application/x-www-form-url encodede",它是從HTML Form中以POST方法傳遞數據給CGI程式的數據編碼類型,稱為
+URL編碼類型。 
+CONTENT-LENGTH:傳遞給CGI程式的數據字元數(位元組數)。
+
+在C語言程式中,要訪向環境變數,可使用getenv()庫函數。例如: 
+if (getenv ("CONTENT-LENGTH")) 
+    n=atoi(getenv ("CONTENT-LENGTH")); 
+請注意程式中最好調用兩次getenv():第一次檢查是否存在該環境變數,第二次再使用該環境變數。這是因為函數getenv()在給定的環境變數名不存在時,返回一個
+NULL(空)指針,如果你不首先檢查而直接引用它,當該環境變數不存在時會引起CGI程式崩潰。
+
+三、Form輸入的分析和解碼
+1.分析名字/值對 
+當用戶提交一個HTML Form時,Web瀏覽器首先對Form中的數據以名字/值對的形式進行編碼,並發送給Web伺服器,然後由Web伺服器傳遞給CGI程式。其格式如下: 
+name1=value1&name2=value2&name3=value3&name4=value4&... 
+其中名字是Form中定義的INPUT、SELECT或TEXTAREA等標置(Tag)名字,值是用戶輸入或選擇的標置值。這種格式即為URL編碼,程式中需要對其進行分析和解碼。
+要分析這種數據流,CGI程式必須首先將數據流分解成一組組的名字/值對。
+這可以通過在輸入流中查找下面的兩個字元來完成。
+每當找到字元=,標誌著一個Form變數名字的結束;每當找到字元& ,標誌著一個Form變數值的結束。
+請注意輸入數據的最後一個變數的值不以&結束。
+一旦名字/值對分解後,還必須將輸入中的一些特殊字元轉換成相應的ASCII字元。
+這些特殊字元是: 
++:將+轉換成空格符;
+%xx:用其十六進位ASCII碼值表示的特殊字元。根據值xx將其轉換成相應的ASCII字元。
+對Form變數名和變數值都要進行這種轉換。
+
+下面是一個對Form數據進行分析並將結果回送給Web伺服器的CGI程式。
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+int htoi(char *);
+main()
+{
+    int i,n;
+    char c;
+    printf ("Contenttype: text/plain\n\n");
+    n=0;
+    if (getenv("CONTENT-LENGTH"))
+        n=atoi(getenv("CONTENT-LENGTH"));
+    for (i=0; i<n;i++)
+    {
+        int is-eq=0;
+        c=getchar();
+        switch (c)
+        {
+          case '&':
+            c='\n';
+          　break;
+          case '+':
+        　　c='　';
+        　　break;
+          case '%':
+          {
+        　　char s[3];
+        　　s[0]=getchar();
+        　　s[1]=getchar();
+        　　s[2]=0;
+        　　c=htoi(s);
+        　　i+=2;
+          }
+        　break;
+          case '=':
+        　  c=':';
+        　  is-eq=1;
+        　  break;
+        };
+
+        putchar(c);
+        if (is-eq) putchar('　');
+    }
+    putchar ('\n');
+    fflush(stdout);
+}
+
+/* convert hex string to int */
+int htoi(char *s)
+{
+    char *digits="0123456789ABCDEF";
+    if (islower (s[0])) s[0]=toupper(s[0]);
+    if (islower (s[1])) s[1]=toupper(s[1]);
+    return 16 * (strchr(digits, s[0]) -strchr (digits,'0'))+(strchr(digits,s[1])-strchr(digits,'0'));
+}
+上面的程式首先輸出一個MIME頭資訊給Web伺服器,檢查輸入中的字元數,並循環檢查每一個字元。當發現字元為&時,意味著一個名字/值對的結束,程式輸出一個空行;當發
+現字符為+時,將它轉換成空格; 當發現字元為%時,意味著一個兩字元的十六進位值的開始,調用htoi()函數將隨後的兩個字元轉換為相應的ASCII字元;當發現字元為=時,意
+味著一個名字/值對的名字部分的結束,並將它轉換成字元:。最後將轉換後的字元輸出給Web伺服器。
+
+四、產生HTML輸出
+CGI程式產生的輸出由兩部分組成:MIME頭資訊和實際的資訊。兩部分之間以一個空行分開。
+我們已經看到怎樣使用MIME頭資訊"Content type :text/plain\n\n"和printf()、put char()等函數調用來輸 出純ASCII文本給Web伺服器。
+實際上,我們也可以使用MIME頭資訊"Content type :text/html\n\n"來輸出HTML源代碼給Web伺服器。請注意任何MIME頭資訊後必須有一個空行。
+一旦發送這個MIME頭資訊給We b伺服器後,Web瀏覽器將認為隨後的文本輸出為HTML源代碼,在HTML源代碼中可以使用任何HTML結構,如超鏈、圖像、Form,及對其他CGI程序
+的調用。
+也就是說,我們可以在CGI程式中動態產生HTML源代碼輸出 ,下面是一個簡單的例子。
+
+#include <stdio.h>
+#include <string.h>
+main()
+{
+    printf("Contenttype:text/html\n\n");
+    printf("<html>\n");
+    printf("<head><title>An HTML Page From a CGI</title></h ead>\n");
+    printf("<body><br>\n");
+    printf("<h2> This is an HTML page generated from with i n a CGI program.. 　　.</h2>\n");
+    printf("<hr><p>\n");
+    printf("<a href="../output.html#two"><b> Go back to out put.html page </b></a>\n");
+    printf("</body>\n");
+    printf("</html>\n");
+    fflush(stdout);
+}
+上面的CGI程式簡單地用printf()函數來產生HTML源代碼。請注意在輸出的字串中如果有雙引號,在其前面必須有一個後斜字元\, 這是因為整個HTML代碼串已經在雙引號內,
+所以HTML代碼串中的雙引號符必須用一個後斜字元\來轉義。
+
+五、結束語
+本文詳細分析了用C語言進行CGI程式設計的方法、過程和技巧。C語言的CGI程式雖然執行速度快、可靠性高,但是相對於Perl語言來說,C語言缺乏強有力的字串處理能力,因
+此在實際應用中,應根據需 要和個人愛好來選擇合適的CGI程式設計語言。
+
+
+/******************************************************************************/
+c語言的cgi編譯全過程    ref: http://hi.baidu.com/zhxust/blog/item/74933bedbed9e94679f0554b.html
+/******************************************************************************/
+1,在Redhat9下建立hello.c文件
+-------------
+#include <stdio.h>
+#include <string.h>
+
+main()
+{
+    printf("Content type: text/html\n\n");
+    printf("<html>\n");
+    printf("<head><title>An html page from a cgi</title></head>\n");
+    printf("<body bgcolor=\"#666666\"></body>\n");
+    printf("</html>\n");
+    fflush(stdout);
+}
+
+--------------
+2,編譯生成hello.cgi文件。
+  #arm-linux-gcc -o hello.cgi hello.c
+
+3,將hello.cgi文件放到目標板網頁伺服器主目錄。
+
+4,修改其權限，這一步非常重要，我就是因為這一步走了很多彎路。
+  #chmod +x hello.cgi
+
+5,通過瀏覽器訪問
+地址欄寫入
+10.10.145.91/hello.cgi
+這樣就會顯示hello.cgi生成的頁面。
+注意，這裡只是輸出頁面能夠成功，但是，我做了另外的測試，
+比如用system函數來執行shell命令就會出現問題。
+
+
+/******************************************************************************/
+簡單的Linked List實現 (C/C++) (C) (Data Structure)
+/******************************************************************************/
+Abstraction
+使用C語言簡單的實現linked list，並用C++的std::vector實作出相同的功能作比較。
+Introduction
+學習資料結構，第一個要學的就是linked list，本文示範最簡單的linked list實現，包含建立與顯示，可把它當成linked list的標準範本，畢竟步驟都差不多。
+一個基本的問題：為什麼需要linked list?若要將大量資料存到記憶體，你會想到什麼?第一個想到的就是array，但C語言是個靜態語言，array必須事先宣告大小，
+這樣compiler才能進行最佳化，若到時候沒用這麼多記憶體，就白白浪費記憶體了。或許你會說array可以配合malloc()變成動態array，但前提是你必須告訴malloc()要建立
+多大的array，若連要建立多大的陣列也不確定，而是在run-time看有多少資料就建立多大，這時連malloc()的動態array也不能用了，此時就得靠linked list。
+linked list是資料結構的基礎，基本上就是靠struct如火車車廂那樣連在一起，run-time有需要時，在動態掛一個struct上去。
+C語言
+1 /* 
+2 (C) OOMusou 2008 http://oomusou.cnblogs.com
+3 
+4 Filename    : DS_linked_list_simple.c
+5 Compiler    : Visual C++ 8.0
+6 Description : Demo how to use malloc for linked list
+7 Release     : 03/22/2008 1.0
+8 */
+9 #include <stdio.h>
+10 #include <stdlib.h>
+11 #include <string.h>
+12 
+13 #define SLEN 255
+14 
+15 struct list {
+16   int  no;
+17   char name[SLEN];
+18   struct list *next;
+19 };
+20 
+21 int main() {
+22   int no;
+23   char s[255];
+24   
+25   struct list *head    = NULL;
+26   struct list *current = NULL;
+27   struct list *prev    = NULL;
+28   
+29   while(1) {
+30     printf("No. = ");
+31     scanf("%d", &no);
+32     
+33     if (no == 0)
+34       break;
+35   
+36     printf("Name = ");
+37     scanf("%s", s);
+38     
+39     current = (struct list *)malloc(sizeof(struct list));
+40     if (current == NULL)
+41       exit(EXIT_FAILURE);
+42       
+43     current->next = NULL;
+44     
+45     current->no = no;
+46     strncpy(current->name, s, SLEN -1);
+47     current->name[SLEN -1] = '\0';
+48     
+49     if (head == NULL)
+50       head = current;
+51     else
+52       prev->next = current;
+53       
+54     prev = current;
+55   }
+56   
+57   // display linked list
+58   current = head;
+59   while(current != NULL) {
+60     printf("No. = %d, Name = %s\n", current->no, current->name);
+61     current = current->next;
+62   }
+63   
+64   // free linked list
+65   current = head;
+66   while(current != NULL) {
+67     prev = current;
+68     current = current->next;
+69     free(prev);
+70   }
+71 }
+
+執行結果
+No. = 1
+Name = clare
+No. = 2
+Name = jessie
+No. = 0
+No. = 1, Name = clare
+No. = 2, Name = jessie
+
+15行
+struct list {
+  int  no;
+  char name[SLEN];
+  struct list *next;
+};
+linked list的基礎就是struct，所以先建立一個自訂的struct型別，因為linked list是靠struct串聯起來，所以最後要多一個struct pointer指向下一個struct。
+
+25行
+struct list *head    = NULL;
+struct list *current = NULL;
+struct list *prev    = NULL;
+建立linked list最基本需要三個指標，head指向linked list的第一個struct，current指向目前剛建立的struct，prev則指向前一個struct，目的在指向下一個struct，對於
+未使用的pointer，一律指定為NULL，這是一個好的coding style，可以藉由判斷是否為NULL判斷此pointer是否被使用。
+
+39行
+current = (struct list *)malloc(sizeof(struct list));
+if (current == NULL)
+  exit(EXIT_FAILURE);
+current->next = NULL;
+每當有新資料，需要建立一個新的struct時，就用malloc()要一塊記憶體，由於malloc()傳回的是void *，所以要手動轉型成struct list *。
+但malloc()並不是一定會成功，若記憶體不足時，仍然會失敗，所以必須判斷是否傳回NULL。
+由於一個新的node，一定是linked list最後一個node，所以將current->next接null。
+
+45行
+current->no = no;
+strncpy(current->name, s, SLEN -1);
+current->name[SLEN -1] = '\0';
+正式將輸入的資料填進struct，至於為什麼要用strncpy()而不用strcpy()呢? 雖然strcpy()也可以，但strncpy()比較安全，若輸入的字串大小超過struct所定義的字串大小
+，則會只接受struct所接受的字串大小，而不會因為找不到'\0'而造成程式錯誤。
+
+49行
+if (head == NULL)
+  head = current;
+else
+  prev->next = current;
+prev = current;
+判斷若是第一個node，則將目前的node當成head，若不是第一個node，則將前一個node指向目前的node，完成linked list的連接。最後將目前的node當成前一個node，以備指
+向下一個node。
+
+58行
+// display linked list
+current = head;
+while(current != NULL) {
+  printf("No. = %d, Name = %s\n", current->no, current->name);
+  current = current->next;
+}
+要重新顯示linked list，所以將指標再度指向第一個node，每當顯示一個node後，就指向下一個node，直到指到NULL為止。
+
+64行
+// free linked list
+current = head;
+while(current != NULL) {
+  prev = current;
+  current = current->next;
+  free(prev);
+}
+由於malloc()是將記憶體放在heap，而不是放在stack，所以並不會隨著function的結束而釋放，必須要手動使用free()釋放記憶體，否則會造成memory leak。
+
+
+再來看C++，由於STL已內建一些容器，所以不需再重新實作linked list，有兩個選擇：std::vector或者std::list。std::vector的優點是non-sequential access超快，新增
+資料於後端超快，但insert和erase任意資料則超慢；std::list則剛好相反，insert和erase速度超快，但non-sequential access超慢，由於本例只有新增與non-sequential
+ access，所以適合std::vector。不過由於STL使用泛型技術，若將來需求改變，想改用std::list也沒關係，只要將容器改掉即可，剩下的都不用改，因為STL的演算法並不挑
+ 容器，這正是泛型偉大之處。
+C++
+1 /* 
+2 (C) OOMusou 2008 http://oomusou.cnblogs.com
+3 
+4 Filename    : DS_linked_list_simple_vector_class.cpp
+5 Compiler    : Visual C++ 8.0
+6 Description : Demo how to use vector instead of linked list
+7 Release     : 03/22/2008 1.0
+8 */
+9 #include <iostream>
+10 #include <string>
+11 #include <vector>
+12 
+13 using namespace std;
+14 
+15 class List {
+16 public:
+17   int no;
+18   string name;
+19 };
+20 
+21 int main() {
+22   vector<List> vec;
+23   
+24   while(1) {
+25     List list;
+26     cout << "No. = ";
+27     cin >> list.no;
+28     
+29     if (list.no == 0)
+30       break;
+31   
+32     cout << "Name = ";
+33     cin >> list.name;
+34     
+35     vec.push_back(list);
+36   }
+37   
+38   vector<List>::iterator iter = vec.begin();
+39   for(; iter != vec.end(); ++iter)
+40     cout << "No. = " << iter->no << ", Name = " << iter->name << endl;
+41 }
+
+執行結果
+No. = 1
+Name = clare
+No. = 2
+Name = jessie
+No. = 0
+No. = 1, Name = clare
+No. = 2, Name = jessie
+
+15行由struct改用了class，不過若繼續使用struct亦可，至於其他的程式都很直觀，就不再多做解釋。
+Conclusion
+本文主要是討論使用C語言透過malloc()實現資料結構的linked list，以彌補靜態語言的不足，同時亦討論C++使用STL的替代方案與便利性，C與C++各擅勝場，你可自行決定
+使用C或C++。
+
+
+/******************************************************************************/
+使用 SSDP 發現 LAN 裡的其它機器
+/******************************************************************************/
+如果你想要像 MS 的網路芳臨 (netbios) 一樣，讓你的軟體能自動發現 LAN 上面其它正在執行相同軟體的機器，並在連上網路時，自動通知其它機器，那麼 SSDP 這個通訊
+協定能幫助你。本文討論如何使用 miniSSDPd，幫助你的應用程式使用 SSDP。 並以 Python 為例。
+
+SSDP -- Simple Service Discovery Protocol，如其名稱，在 LAN 環境下 提供 service 的搜尋/發現的服務。應用程式可以透過該協定，向 LAN 裡面的其它機器廣播應用
+程式所提供的 service， 也可以透過 SSDP 搜尋網路上所有的特定 service。 SSDP 的功能其實就和 DNS 差不多，用以查詢 service 和位址之間的對應關係。 和 DNS 不同
+的是， SSDP 不需要集中化 (centeralized) 的固定 server，而是 透過 multicasting 和 P2P 的方式運作。
+SSDP 其實不複雜，可以想成是在 multicasting 的 UDP 上執行 HTTP protocol (HTTPU)，而一般的 HTTP protocol 是使用 TCP。 因此，你可以透過 multicasting 的方式
+，把 HTTP 的 request 送到 LAN 裡的 每一台執行 SSDP 的機器。 收到 request 的 SSDP service 若有足夠的資訊，則回應該 request，反之則 丟掉該 request 不回應。
+因此， SSDP 不需要一個固定的 server。
+SSDP 有兩個重要的 request，一個是 NOTIFY，另一個則是 MSEARCH。 
+NOTIFY 是向其它機器廣播服務的項目和位址，你可以透過發送 NOTIFY 通知 LAN 裡 所有機器，告知你所提供的服務項目。 
+而 MSEARCH 則是用來尋問其它機器，是否有提供特定的 service，以取得這些 service 的位址。 因此，為了得知其它機器提供的 service，應用程式必需收集 NOTIFY，
+並/或送出 MSEARCH request。 實作這兩者都需要花一點時間，而且，你必需等待其它機器送 NOTIFY 或 MSEARCH 的回應。 因此，使用上很沒有效率。 miniSSDPd 是一個獨
+立的 daemon，隨時幫你收集透過 LAN 送來的 NOTIFY，並記錄下來。 因此，我們可以直接向 miniSSDPd 查詢，就能隨時取得最新的資訊，不用等待。
+
+如何廣播你的服務?
+當一個 SSDP 的服務上線之後，必需定期的在 LAN 上面進行廣播。 如此，其它機器才能知道該服務的存在。 這有點像網芳，當一台新機器上線時，在網路芳臨就會立即出現
+該電腦的 icon。 在 SSDP 是透過 multicast 一個 NOTIFY 的 request 到網路上。 
+request 的內容如下:
+NOTIFY *  HTTP/1.1
+HOST: 239.255.255.250:1900
+CACHE-CONTROL: max-age=120
+NT: urn:schemas-wifialliance-org:service:WFAWLANConfig:1
+USN: uuid:3b968ed4-7666-11e0-a686-002215d227b8
+SERVER: UNIX/unknown UPnP/1.0 dcports/1.0
+LOCATION: http://example.net/test
+NTS: ssdp:alive
+基本上就是一個 HTTP request， 只是 command 為 NOTIFY 而非 GET/POST/...。 
+將這個 request 透過一個 UDP 的 socket，傳送到 239.255.255.250:1900 這個 multicast IP 位址即可。
+
+import socket
+SSDP_PORT = 1900
+SSDP_MCAST_ADDR = '239.255.255.250'
+
+msg = 'NOTIFY * HTTP/1.1\r\n....'
+msock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+msock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+msock.sendto(msg, 0, (SSDP_MCAST_ADDR, SSDP_PORT))
+這個例子的 request 是告知其它機器，我有提供 IGD 的 service。 但通常，我們會定義自已的 service，這時你必需修改 NT 和 USN 欄位。 
+NT 是 service type，你可以定義自已的 service type，如 urn:my-company-domain:service:my-service:1 。 
+USN 則是一個代表該 service 的 unique number，你可以使用 uuidgen 為你的服務產生一個 USN。 
+而 LOCATION 欄位則是你的 service 的位址，你可以填入你的 URL 或 IP:port。 需要使用該服務的程式，就會使用連結該位址。
+這個 request 必需定時發送，你必需在 max-age 到達之前，重新傳送數次，以確保 其它機器知道你的服務還在線上。
+
+查詢網路上的服務和其位址
+這可以透過 miniSSDPd 幫我們查詢。 miniSSDPd 在上線之後，會持續收集 NOTIFY，因此我們只需向它查詢即可。 miniSSDPd 會在 "/var/run/minissdpd.sock" 這個位址上
+，開啟一個 unix domain 的 socket。 因此，我們只需開一個 socket，連到該位址，就可以向 miniSSDPd 發出查詢要求。 
+而透過該 socket 傳送的 command 格式請見 http://miniupnp.free.fr/minissdpd.html
+
+下面是一個 Python 的範例
+001     import socket
+002     
+003     def _encode_len(n):
+004         r = ''
+005         if n >= 268435456:
+006             r = r + chr(((n >> 28) & 0x7f) | 0x80)
+007             pass
+008         if n >= 2097152:
+009             r = r + chr(((n >> 21) & 0x7f)| 0x80)
+010             pass
+011         if n >= 16384:
+012             r = r + chr(((n >> 14) & 0x7f)| 0x80)
+013             pass
+014         if n >= 128:
+015             r = r + chr(((n >> 7) & 0x7f)| 0x80)
+016             pass
+017         r = r + chr(n & 0x7f)
+018         return r
+019     
+020     def _decode_len(s):
+021         n = 0
+022         for c in s:
+023             n = (n << 7) | (ord(c) & 0x7f)
+024             if not (ord(c) & 0x80):
+025                 break
+026             pass
+027         return n
+028     
+029     def _encode_str(s):
+030         n = len(s)
+031         r = _encode_len(n) + s
+032         return r
+033     
+034     def _decode_str(s):
+035         n = _decode_len(s)
+036         skip = len(_encode_len(n))
+037         r = s[skip: skip + n]
+038         
+039         return r, skip + n
+040     
+041     def query_service(sock, st):
+042         q = chr(1) + _encode_str(st)
+043         sock.send(q)
+044     
+045         rep = sock.recv(10240)
+046     
+047         n = _decode_len(rep)
+048         skip = len(_encode_len(n))
+049         
+050         result = []
+051         remain = rep[skip:]
+052         for i in range(n):
+053             location, skip = _decode_str(remain)
+054             remain = remain[skip:]
+055             
+056             r_st, skip = _decode_str(remain)
+057             remain = remain[skip:]
+058             
+059             r_usn, skip = _decode_str(remain)
+060             remain = remain[skip:]
+061             
+062             result.append((location, r_st, r_usn))
+063             pass
+064     
+065         return result
+066     
+067     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
+068     sock.connect('/var/run/minissdpd.sock')
+069     r = query_service(sock,
+070         'urn:schemas-wifialliance-org:service:WFAWLANConfig:1')
+071     print r
+072     
+這個範例會連到 miniSSDPd 的 unix domain socket，然後查詢網路上有那些機器提供 urn:schemas-wifialliance-org:service:WFAWLANConfig:1 這個服務。 
+通常這是 AP 或 NAT 機器等 IP 設備。 最後會傳回一個 list，包括網路上提供該 service 的設備資訊。 相同的，你也可以查詢你自已定義的 service。
+
+結論
+miniSSDPd 是一個簡單的 daemon，只有 18Kbytes (i386)， 而且 request 的格式很簡單，很容易和應用程式整合。 
+如果你也需要這種自動發現、通知的功能，不妨試試 miniSSDPd。
+
+
+/******************************************************************************/
+一些 C Macro 的技巧     from: http://chunchaichang.blogspot.tw/2011/12/c-macro.html
+/******************************************************************************/
+(Part I：不定變數)
+幾個學校課程不太會講到的技巧，第一個是不定變數的使用：
+#ifdef DEBUG
+#define debug_printf(str, ...)     do {         printf(str, __VA_ARGS__);     } while (0)
+#else
+#define debug_printf(str, ...)
+#endif
+關鍵是 __VA_ARGS__，這樣可以很愉快的使用 debug_printf()。
+
+(Part II：將傳入的參數變成字串)
+另外一個技巧是將傳入的參數變成字串：
+#define print_var(var)     do {         printf("%s: %s\n", #var, var);     } while (0)
+關鍵字是 #var。當輸入 print_var(argv[0]); 時就會把以上的 Macro 展開為 printf("%s: %s\n", "argv[0]", argv[0]);。
+
+(Part III：將傳入的參數名稱變化)
+假設你想要把傳入參數名稱再變化，用 ## 穿插其中：
+#define print_three_var(var)
+     do {
+         print_var(var);
+         print_var(var##2);
+         print_var(var##3);
+     } while (0)
+因為你不能用 var2 來表示 var + "2"，所以你必須用 ##。當你傳入print_three_var(telephone) 時，他會展開成：
+print_var(telephone);
+print_var(telephone2);
+print_var(telephone3);
+補充一下：這邊的 print_var() 是 Part II 裡的 print_var()。 
+
+
+/******************************************************************************/
+位元處理函式
+/******************************************************************************/
+/------------------------------------------------------
+function name :bitclr
+description :清除指定位元(0)
+Ex: bitclr(0xff,3)
+11111111 -> 11110111
+bitaddr :0~31
+------------------------------------------------------/
+unsigned int bitclr(unsigned int srcvalue,unsigned char bitaddr)
+{
+    unsigned int mask=1;
+    return srcvalue&(~(mask< 01011101
+    bitaddr :0~31
+
+------------------------------------------------------/
+unsigned int bitset(unsigned int srcvalue,unsigned char bitaddr)
+{
+unsigned int mask=1;
+return srcvalue|(mask< 10001001
+bitaddr :0~31
+------------------------------------------------------/
+unsigned int bitinv(unsigned int srcvalue,unsigned char bitaddr)
+{
+unsigned int mask=1;
+
+if((srcvalue>>bitaddr)&0x00000001==1)
+return srcvalue&(~(mask< false
+bitaddr :0~31
+return : 1:true , 0:false
+
+------------------------------------------------------/
+unsigned char bitcmp(unsigned int srcvalue,unsigned char bitaddr)
+{
+    if((srcvalue>>bitaddr)&0x00000001==1)
+        return 1;
+    else
+        return 0;
+}
+
+/------------------------------------------------------
+function name :bitget
+description :回指定bit 為 0 或 1
+Ex: bitget(0x55,3)
+01010101 -> 0
+bitaddr :0~31
+return : get bit value
+------------------------------------------------------/
+unsigned char bitget(unsigned int srcvalue,unsigned char bitaddr)
+{
+    return (srcvalue>>bitaddr)&0x00000001;
+}
+
+/------------------------------------------------------
+function name :bitput
+description :設定指定bit 為 0 或 1
+Ex: bitget(0x55,3,1)
+01010101 -> 01011101
+bitaddr :0~31
+return : put bit value
+------------------------------------------------------/
+unsigned int bitput(unsigned int srcvalue,unsigned char bitaddr,unsigned char value)
+{
+    if (value==1)
+        return bitset(srcvalue,bitaddr);
+    else
+        return bitclr(srcvalue,bitaddr);
+
+}
+
+/------------------------------------------------------
+function name :bitSwap
+description :將傳入數值low 與 high 位元完全互換
+Ex: bitSwap(0x55)
+01010101 -> 10101010
+return : swap bit value
+------------------------------------------------------/
+unsigned int bitSwap(unsigned int value)
+{
+    unsigned int tmpbit;
+    unsigned char i;
+
+    tmpbit=value;
+    for (i=0;i<32;i++) 
+    { 
+        tmpbit=bitput(tmpbit,31-i,bitget(value,i)); 
+    } 
+    return tmpbit; 
+}
+
+
+/******************************************************************************/
+UDP通訊實例
+/******************************************************************************/
+UDP協定的幾點好處：
+1.UDP不要求保持一個連接；
+2.UDP沒有因接收方認可收到數據包（或者當數據包沒有正確抵達而自動重傳）而帶來的開銷；
+3.設計UDP的目的是用於短應用和控制資訊；
+4.在一個數據包接一個數據包的基礎上，UDP要求的網路帶寬比TCP更小。
+UDP的幾個缺點：
+1.程式員必須創建代碼檢測傳輸錯誤並進行重傳（如果應用程式要求這樣做）；
+2.程式員必須把大數據包分片。
+
+code：
+<1>
+/*
+* sender.c--UDP protocol example
+*/ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
+int port = 6789;
+
+int main()
+{
+    int socket_descriptor;
+    int iter = 0;
+    char buf[80];
+    struct sockaddr_in address;
+
+    /* Initialize socket address structure for Interner Protocols */
+    bzero(&address, sizeof(address)); // empty data structure
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    address.sin_port = htons(port);
+
+    /* Create a UDP socket */
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+
+    //Loop 20 times (a nice round number ) sending data
+    for(iter = 0; iter <= 20; iter++)
+    {
+        sprintf(buf, "data packet with ID %d\n", iter);
+        sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address));
+    }    
+
+    /* send a termination message */
+    sprintf(buf, "stop\n");
+    sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address)); //address is the target of the message send
+    
+    close (socket_descriptor);
+    printf("Message Sent, Terminating\n");
+    return 0;
+}
+
+<2>
+/*
+* receiver.c--received of the UDP protocol
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
+int port = 6789;
+
+int main()
+{
+    int sin_len;
+    char message[256];
+    int socket_descriptor;
+    struct sockaddr_in sin;
+    printf("Waiting for data from sender\n");
+
+    // Initialize socket address structure for Internet Protocols
+    bzero(&sin, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port = htons(port);
+    sin_len = sizeof(sin);
+
+    //Create a UDP socket and bind it to the port
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+    bind(socket_descriptor, (struct sockaddr *)&sin, sizeof(sin));
+    
+    //Loop forever (or until a termination message is received)
+    // Received data through the socket and process it.The processing in this program is really simple --printing
+    while(1)
+    {
+        recvfrom(socket_descriptor, message, sizeof(message), 0, (struct sockaddr *)&sin, &sin_len);
+        printf("Response from server : %s\n", message);
+        if(strncmp(message, "stop", 4) == 0)
+        {
+            printf("sender has told me to end the connection\n");
+            break;
+        }
+    }
+    close(socket_descriptor);
+    return 0;
+}
+
+分別編譯產生sender、receiver兩個可執行文件。
+然後在兩個終端中分別一次運行，可以得到結果如下：
+[hyj@localhost udp_]$ ./receiver
+Waiting for data from sender
+Response from server : data packet with ID 0
+Response from server : data packet with ID 1
+Response from server : data packet with ID 2
+Response from server : data packet with ID 3
+Response from server : data packet with ID 4
+Response from server : data packet with ID 5
+Response from server : data packet with ID 6
+Response from server : data packet with ID 7
+Response from server : data packet with ID 8
+Response from server : data packet with ID 9
+Response from server : data packet with ID 10
+Response from server : data packet with ID 11
+Response from server : data packet with ID 12
+Response from server : data packet with ID 13
+Response from server : data packet with ID 14
+Response from server : data packet with ID 15
+Response from server : data packet with ID 16
+Response from server : data packet with ID 17
+Response from server : data packet with ID 18
+Response from server : data packet with ID 19
+Response from server : data packet with ID 20
+Response from server : stop
+sender has told me to end the connection
+發送端結果：
+[hyj@localhost udp_]$ ./sender
+Message Sent, Terminating
+
+說明：
+    sendto函數同send函數，該函數通過套介面發送一條消息。此時使用了無連接的套介面；消息發送的目的地址由address指定；
+    recfrom函數同sendto。注意：對於TCP和UDP你都可以使用recvfrom函數，但是recv只能用於TCP；
+ Compile Command: gcc -o receiver -lm receiver (lm for mathematic Liberary)
+    此外，如果在編譯時提示找不到socket函數，那麼在編譯時是需要指定Internet庫，在gcc命令中加入-lxnet選項，如：CC -o sender sender.c -lxnet
+  bind函數給套介面分配一個地址；
+    函數recvfrom等待來自於無連接套介面的一個數據包。它也在地址數據結構中返回發送方的地址。這個源地址在示例程式中沒有用，但是更高級的程式能夠用它打開一個返回發送方的套介面。如果你不關心這個地址，可以給參數傳遞NULL。
+
+以上代碼未加入任何錯誤處理程式，加入最少錯誤檢測後的代碼如下：
+/*
+* receiver2.c--received of the UDP protocol,add the error check
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+
+int port = 6789;
+
+int main()
+{
+    int sin_len;
+    char message[256];
+    int socket_descriptor;
+    struct sockaddr_in sin;
+
+    int bind_rc, close_rc;
+    ssize_t recv_rc;
+
+    printf("Waiting for data from sender\n");
+
+    // Initialize socket address structure for Internet Protocols
+    bzero(&sin, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port = htons(port);
+    sin_len = sizeof(sin);
+
+    //Create a UDP socket and bind it to the port
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+    if(socket_descriptor == -1)
+    {
+        perror("socket call failed");
+        exit(errno);
+    }
+
+    bind_rc = bind(socket_descriptor, (struct sockaddr *)&sin, sizeof(sin));
+    if(bind_rc == -1)
+    {
+        perror("bind call failed");
+        exit(errno);
+    }
+    
+    //Loop forever (or until a termination message is received)
+    // Received data through the socket and process it.The processing in this program is really simple --printing
+    while(1)
+    {
+        recv_rc = recvfrom(socket_descriptor, message, sizeof(message), 0, (struct sockaddr *)&sin, &sin_len);
+        if(recv_rc == -1)
+        {
+            perror("bind call failed");
+            exit(errno);
+        }
+        printf("Response from server : %s\n", message);
+        if(strncmp(message, "stop", 4) == 0)
+        {
+            printf("sender has told me to end the connection\n");
+            break;
+        }
+    }
+    close_rc = close(socket_descriptor);
+    if(close_rc == -1)
+    {
+        perror("close call failed");
+        exit(errno);
+    }
+    return 0;
+}
+
+
+/*
+* sender2.c--UDP protocol example, add the erro check
+*/ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+
+int port = 6789;
+
+int main()
+{
+    int socket_descriptor;
+    int iter = 0;
+
+    ssize_t sendto_rc;
+    int close_rc;
+
+    char buf[80];
+    struct sockaddr_in address;
+    struct hostent *hostbyname;
+
+    //Translate a host name to IP address
+    hostbyname = gethostbyname("127.0.0.1");
+    if(hostbyname == NULL)
+    {
+        perror("Gethostbyname failed");
+        exit(errno);
+    }
+
+    /* Initialize socket address structure for Interner Protocols.The address comes from the datastructure returned by gethostbyname() */
+    bzero(&address, sizeof(address)); // empty data structure
+    address.sin_family = AF_INET;
+
+    memcpy(&address.sin_addr.s_addr, hostbyname->h_addr, sizeof(address.sin_addr.s_addr));
+
+    //print the host IP
+    printf("The host IP is %s\n", inet_ntoa(*(struct in_addr*)hostbyname->h_addr));    
+
+    //address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    address.sin_port = htons(port);
+
+    /* Create a UDP socket */
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+    if(socket_descriptor == -1)
+    {
+        perror("socket call failed");
+        exit(errno);
+    }
+
+    //Loop 20 times (a nice round number ) sending data
+    for(iter = 0; iter <= 20; iter++)
+    {
+        sprintf(buf, "data packet with ID %d\n", iter);
+        sendto_rc = sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address));
+        if(sendto_rc == -1)
+        {
+            perror("sendto call failed");
+            exit(errno);
+        }
+    }    
+
+    /* send a termination message */
+    sprintf(buf, "stop\n");
+    sendto_rc = sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address)); //address is the target of the message send
+    if(sendto_rc == -1)
+    {
+        perror("sendto  STOP call failed");
+        exit(errno);
+    }
+    
+
+    //Most people don''t bother to check the return code returned by the close function
+    close_rc = close (socket_descriptor);
+    if(close_rc == -1)
+    {
+        perror("close call failed");
+        exit(errno);
+    }
+
+    printf("Message Sent, Terminating\n");
+    return 0;
+}
+   下面使用非阻塞I／O來對上面的接收程式做一些修改：
+/*
+* sender3.c--UDP protocol example, add the erro check,use sleep
+*/ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+
+int port = 6789;
+
+int main()
+{
+    int socket_descriptor;
+    int iter = 0;
+
+    ssize_t sendto_rc;
+    int close_rc;
+
+    char buf[80];
+    struct sockaddr_in address;
+    struct hostent *hostbyname;
+
+    //Translate a host name to IP address
+    hostbyname = gethostbyname("127.0.0.1");
+    if(hostbyname == NULL)
+    {
+        perror("Gethostbyname failed");
+        exit(errno);
+    }
+
+    /* Initialize socket address structure for Interner Protocols.The address comes from the datastructure returned by gethostbyname() */
+    bzero(&address, sizeof(address)); // empty data structure
+    address.sin_family = AF_INET;
+
+    memcpy(&address.sin_addr.s_addr, hostbyname->h_addr, sizeof(address.sin_addr.s_addr));
+
+    //print the host IP
+    printf("The host IP is %s\n", inet_ntoa(*(struct in_addr*)hostbyname->h_addr));    
+
+    //address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    address.sin_port = htons(port);
+
+    /* Create a UDP socket */
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+    if(socket_descriptor == -1)
+    {
+        perror("socket call failed");
+        exit(errno);
+    }
+
+    //Loop 20 times (a nice round number ) sending data
+    for(iter = 0; iter <= 20; iter++)
+    {
+        sprintf(buf, "data packet with ID %d\n", iter);
+        sendto_rc = sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address));
+        if(sendto_rc == -1)
+        {
+            perror("sendto call failed");
+            exit(errno);
+        }
+        
+        sleep(3); //this is the only difference form sender2.c
+        
+    }    
+
+    /* send a termination message */
+    sprintf(buf, "stop\n");
+    sendto_rc = sendto(socket_descriptor, buf, sizeof(buf), 0, (struct sockaddr *)&address, sizeof(address)); //address is the target of the message send
+    if(sendto_rc == -1)
+    {
+        perror("sendto  STOP call failed");
+        exit(errno);
+    }
+    
+
+    //Most people don''t bother to check the return code returned by the close function
+    close_rc = close (socket_descriptor);
+    if(close_rc == -1)
+    {
+        perror("close call failed");
+        exit(errno);
+    }
+
+    printf("Message Sent, Terminating\n");
+    return 0;
+}
+
+/*
+* receiver3.c--received of the UDP protocol,add the error check,this have some I/O no-blocking
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <errno.h>
+#include <fcntl.h>
+
+int port = 6789;
+
+int main()
+{
+    int sin_len;
+    char message[256];
+    int socket_descriptor;
+    struct sockaddr_in sin;
+
+    int bind_rc, close_rc;
+    ssize_t recv_rc;
+
+    long save_file_flags;
+
+    printf("Waiting for data from sender\n");
+
+    // Initialize socket address structure for Internet Protocols
+    bzero(&sin, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_ANY);
+    sin.sin_port = htons(port);
+    sin_len = sizeof(sin);
+
+    //Create a UDP socket and bind it to the port
+    socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0);
+    if(socket_descriptor == -1)
+    {
+        perror("socket call failed");
+        exit(errno);
+    }
+
+    bind_rc = bind(socket_descriptor, (struct sockaddr *)&sin, sizeof(sin));
+    if(bind_rc == -1)
+    {
+        perror("bind call failed");
+        exit(errno);
+    }
+
+    //set socket to non-blocking
+    save_file_flags = fcntl(socket_descriptor, F_GETFL);
+    printf("file flags are %ld\n", save_file_flags);
+    save_file_flags |= O_NONBLOCK;
+
+    if(fcntl(socket_descriptor, F_SETFL, save_file_flags) == -1)
+    {
+        perror("trying to set input socket to non-blocking");
+        exit(errno);
+    }
+
+    printf("file flags are now %ld\n", save_file_flags);
+    
+    //Loop forever (or until a termination message is received)
+    // Received data through the socket and process it.The processing in this program is really simple --printing
+    while(1)
+    {
+        sleep(1);  //wait a moment ...
+
+        recv_rc = recvfrom(socket_descriptor, message, sizeof(message), 0, (struct sockaddr *)&sin, &sin_len);
+        if(recv_rc == -1 && errno != EAGAIN)
+        {
+            fprintf(stderr, "errno %d ", errno);
+            perror("recvform call failed");
+            exit(errno);
+        }
+        else if(recv_rc == 0 | errno == EAGAIN) //no data
+        {
+            printf("no data yet\n");
+            errno = 0; // clear the error
+            continue;
+        }
+    
+        errno = 0; // clear the error 
+        printf("Response from server : %s\n", message);
+        if(strncmp(message, "stop", 4) == 0)
+        {
+            printf("sender has told me to end the connection\n");
+            break;
+        }
+    }
+    close_rc = close(socket_descriptor);
+    if(close_rc == -1)
+    {
+        perror("close call failed");
+        exit(errno);
+    }
+    return 0;
+}
+receiver3.c中最重要的新內容是fcntl調用，它允許對打開文件的控制標誌做修改。帶有參數F_GETEL的第一個調用用來取得當前控制標誌的狀態。然後O_NONBLOCK標誌被添加
+到當前標誌中。帶有參數F_SETFL的跌入個調用實際上改變了標誌。一旦這一步成功完成，對套介面的讀取 （recvfrom）操作就不再等候數據了。當然，程式要可是fcntl的第
+二次調用是成功的。
+
+
+/******************************************************************************/
+[Linux] 檢查網路是否有連線
+/******************************************************************************/
+#include  <stdio.h>
+#include  <stdlib.h>
+#include  <string.h>
+#include  <fcntl.h>
+#include  <errno.h>
+#include  <sys/ioctl.h>
+#include  <sys/types.h>
+#include  <sys/socket.h>
+#include  <linux/if.h>
+
+
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned char u8;
+
+#include  <linux/sockios.h>
+#include  <linux/ethtool.h>
+int get_netlink_status(const char *if_name);
+
+
+int main(int argc, char* argv[])
+{
+ if(argc != 2)
+ {
+              fprintf(stderr, "usage: %s <ethname>", argv[0]);
+     return -1;
+    }
+    if(getuid() != 0)
+    {
+        fprintf(stderr, "Netlink Status Check Need Root Power./n");
+        return 1;
+    }
+   
+    printf("Net link status: %s/n", get_netlink_status(argv[1])==1?"up":"down");
+    return 0;
+}
+// if_name like "ath0", "eth0". Notice: call this function
+// need root privilege.
+// return value:
+// -1 -- error , details can check errno
+// 1 -- interface link up
+// 0 -- interface link down.
+int get_netlink_status(const char *if_name)
+{
+    int skfd;
+    struct ifreq ifr;
+    struct ethtool_value edata;
+    edata.cmd = ETHTOOL_GLINK;
+    edata.data = 0;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, if_name, sizeof(ifr.ifr_name) - 1);
+    ifr.ifr_data = (char *) &edata;
+    if (( skfd = socket( AF_INET, SOCK_DGRAM, 0 )) == 0)
+        return -1;
+    if(ioctl( skfd, SIOCETHTOOL, &ifr ) == -1)
+    {
+        close(skfd);
+        return -1;
+    }
+    close(skfd);
+    return edata.data;
+}
+ 
+
+/******************************************************************************/
+[Linux] 解析字串
+/******************************************************************************/
+if (sscanf(argv[argn], "%dx%d", &g_width, &g_height) != 2)
+
+
+/******************************************************************************/
+[Linux] Share memory
+/******************************************************************************/
+事實上在程式傳遞Data有很多種方法
+這範例是利用share memory來傳遞
+可以參考看看~
+
+global.h
+#ifndef _GLOBAL_H
+#define _GLOBAL_H
+
+#define MAX_SENDDATE_STRING 50
+#define SENDDATE_SHARE_MEMORY "/var/test_share_memory"
+#define SENDDATE_MEMORY_ID 0x73
+
+typedef struct SendDate
+{
+    char string[MAX_SENDDATE_STRING];
+    int number;
+}SendDateS;
+
+#endif
+
+//-------------- 
+APP1.c
+//-------------- 
+#include "global.h"
+
+void create_share_mem(void)
+{
+    int fd = 0;
+    key_t shareMemoryKey = -1;
+    int shareMemoryId = -1;
+    char *shmStart = NULL;
+
+    remove(SENDDATE_SHARE_MEMORY);
+
+    if ( (fd = open(SENDDATE_SHARE_MEMORY, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO)) < 0 )
+    {
+        printf("%s create file %s fail\n", __FUNCTION__, SENDDATE_SHARE_MEMORY);
+        goto error;
+    }
+    close(fd);
+    fd = 0;
+
+    if ( (shareMemoryKey = ftok(SENDDATE_SHARE_MEMORY, SENDDATE_MEMORY_ID)) < 0 )
+    {
+        printf("%s create system V IPC error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shareMemoryId = shmget(shareMemoryKey, sizeof(SendDateS), IPC_CREAT | IPC_EXCL | 0666)) < 0 )
+    {
+        printf("%s create download message queue error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shmStart = (char *)shmat(shareMemoryId, NULL, 0 )) == NULL )
+    {
+        printf("%s create share memory start fail\n", __FUNCTION__);
+        goto error;
+    }
+
+    error:
+    if ( fd )
+    {
+        close(fd);
+    }
+    return;
+}
+
+/*
+void set_share_mem(SendDateS *pShareMemory)
+{
+    memcpy(shmStart, pShareMemory, sizeof(SendDateS));
+}*/
+
+void setSendDate(SendDateS *pShareMemory)
+{
+    key_t shareMemoryKey = -1;
+    int shareMemoryId = -1;
+    char *shmStart = NULL;
+
+    if ( (shareMemoryKey = ftok(SENDDATE_SHARE_MEMORY, SENDDATE_MEMORY_ID)) < 0 )
+    {
+        printf("%s create system V IPC error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shareMemoryId = shmget(shareMemoryKey, sizeof(SendDateS), 0)) < 0 )
+    {
+        printf("%s create download message queue error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shmStart = (char *)shmat(shareMemoryId, NULL, 0 )) == NULL )
+    {
+        printf("%s create share memory start fail\n", __FUNCTION__);
+        goto error;
+    }
+
+    memcpy(shmStart, pShareMemory,sizeof(SendDateS) );
+
+    error:
+    return;
+}
+
+void getSendDate(SendDateS *pShareMemory)
+{
+    key_t shareMemoryKey = -1;
+    int shareMemoryId = -1;
+    char *shmStart = NULL;
+
+    if ( (shareMemoryKey = ftok(SENDDATE_SHARE_MEMORY, SENDDATE_MEMORY_ID)) < 0 )
+    {
+        printf("%s create system V IPC error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shareMemoryId = shmget(shareMemoryKey, sizeof(SendDateS), 0)) < 0 )
+    {
+        printf("%s create download message queue error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shmStart = (char *)shmat(shareMemoryId, NULL, 0 )) == NULL )
+    {
+        printf("%s create share memory start fail\n", __FUNCTION__);
+        goto error;
+    }
+
+    memcpy( pShareMemory, shmStart, sizeof(SendDateS) );
+
+    error:
+    return;
+}
+
+int main(int argc, char *argv[])
+{
+    int idx = 100;
+
+    create_share_mem();
+    SendDateS pShareMemory;
+    pShareMemory.number = 100;
+    setSendDate(&pShareMemory);
+
+    while(idx < 110)
+    {
+        idx++;
+        sleep(3);
+        getSendDate(&pShareMemory);
+        printf("get_share_mem : %d\n", pShareMemory.number);
+    }
+
+
+    return 0;
+}
+
+//-------------- 
+APP2.c
+//-------------- 
+#include "global.h"
+
+void setSendDate(SendDateS *pShareMemory)
+{
+    key_t shareMemoryKey = -1;
+    int shareMemoryId = -1;
+    char *shmStart = NULL;
+
+    if ( (shareMemoryKey = ftok(SENDDATE_SHARE_MEMORY, SENDDATE_MEMORY_ID)) < 0 )
+    {
+        printf("%s create system V IPC error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shareMemoryId = shmget(shareMemoryKey, sizeof(SendDateS), 0)) < 0 )
+    {
+        printf("%s create download message queue error\n", __FUNCTION__);
+        goto error;
+    }
+
+    if ( (shmStart = (char *)shmat(shareMemoryId, NULL, 0 )) == NULL )
+    {
+        printf("%s create share memory start fail\n", __FUNCTION__);
+        goto error;
+    }
+
+    memcpy(shmStart, pShareMemory,sizeof(SendDateS) );
+
+    error:
+    return;
+}
+
+int main(int argc, char *argv[])
+{
+    SendDateS pShareMemory;
+    pShareMemory.number = 422;
+    setSendDate(&pShareMemory);
+    return 0;
+}
+
+
+/******************************************************************************/
+16進制字串轉16進制數值
+/******************************************************************************/
+long htoi(char *str)  
+{  
+    long   dec=0,   t;  
+    if(*str=='0')   str+=2;  
+    while(t=*str++)  
+    {  
+          dec<<=4;  
+          if(t<58)   t-=48;  
+          if(t>64&&t<71)   t-=55;  
+          if(t>96&&t<103)   t-=87;  
+          dec|=t;  
+    }  
+    return   dec;  
+}
+
+
+/******************************************************************************/
+Linux環境下C使用的XML解析庫:libxml2     ref: http://www.linuxidc.com/Linux/2010-09/28390.htm
+/******************************************************************************/
+Libxml是一個實現讀、創建及操縱XML數據功能的C語言庫。這個指南提供例子代碼並給出它基本功能的解釋。在這個項目的主頁上有Libxml及更多關於它可用的資料。
+包含有完整的API文檔。這個指南並不能替代這些完整的文檔，但是闡明功能需要使用庫來完成基本操作。
+這個指南基於一個簡單的XML應用，它使用我寫的一篇文章生成，它包含有元數據和文章的主體。
+本指南中的例子代碼示範如何做到：
+? 解析文檔
+? 取得指定元素的文本
+? 添加一個元素及它的內容
+? 添加一個屬性
+? 取得一個屬性的值
+例子的完整代碼包含在附錄中
+
+數據類型
+Libxml定義了許多數據類型，我們將反覆碰到它們，它隱藏了雜亂的來源以致你不必處理它 除非你有特定的需要。xmlChar 替代char,使用UTF-8編碼的一位元組字串。
+如果你的數據使用其它編碼，它必須被轉換到UTF-8才能使用libxml的函數。在libxml編碼 支援WEB頁面有更多關於編碼的有用資訊。
+XmlDoc 包含由解析文檔建立的樹結構，xmlDocPtr是指向這個結構的指針。
+xmlNodePtr and xmlNode 包含單一結點的結構xmlNodePtr是指向這個結構的指針，它被用於遍歷文檔樹。
+解析文檔
+解析文檔時僅僅需要文件名並只調用一個函數，並有錯誤檢查。完整代碼：附錄C, Keyword例程代碼
+１xmlDocPtr doc;
+２xmlNodePtr cur;
+３doc = xmlParseFile(docname);
+４if (doc == NULL ) {
+  fprintf(stderr,"Document not parsed successfully. \n");
+  return;
+}
+５cur = xmlDocGetRootElement(doc);
+６if (cur == NULL) {
+  fprintf(stderr,"empty document\n");
+  xmlFreeDoc(doc);
+  return;
+}
+７if (xmlStrcmp(cur->name, (const xmlChar *) "story")) {
+  fprintf(stderr,"document of the wrong type, root node != story");
+  xmlFreeDoc(doc);
+  return;
+}
+１定義解析文檔指針。
+２定義結點指針(你需要它為了在各個結點間移動)。
+４檢查解析文檔是否成功，如果不成功，libxml將指一個註冊的錯誤並停止。
+註釋
+一個常見錯誤是不適當的編碼。XML標準文檔除了用UTF-8或UTF-16外還可用其它編碼保存。如果文檔是這樣，libxml將自動地為你轉換到UTF-8。
+更多關於XML編碼資訊包含在XML標準中。
+５取得文檔根元素
+６檢查確認當前文檔中包含內容。
+７在這個例子中，我們需要確認文檔是正確的類型。「Story」是在這個指南中使用文檔的根類型。
+取得元素內容
+你找到在文檔樹中你要查找的元素後可以取得它的內容。在這個例子中我們查找「story」元素。
+進程將在冗長的樹中查找我們感興趣的元素。我們假定期你已經有了一個名為doc的xmlDocPtr和一個名為cur的xmlNodPtr。
+１cur = cur->xmlChildrenNode;
+２while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"storyinfo"))){
+  parseStory (doc, cur);
+}
+cur = cur->next;
+}
+１取得cur的第一個子結點，cur指向文檔的根，即「story」元素。
+２這個循環迭代通過「story」的子元素查找「storyinfo」。這是一個包含有我們將查找的「keywords」的元素。它使用了libxml字串比較函數xmlStrcmp。如果相符，它調用函數parseStory。
+
+void
+parseStory (xmlDocPtr doc, xmlNodePtr cur) {
+xmlChar *key;
+１ cur = cur->xmlChildrenNode;
+２while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"keyword"))) {
+３ key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+printf("keyword: %s\n", key);
+xmlFree(key);
+}
+cur = cur->next;
+}
+return;
+}
+１ 再次取得第一個子結點。
+２ 像上面那個循環一樣，我們能過迭代，查找我們感興趣的叫做「keyword」的元素。
+３ 當我們找到元素「keyword」時，我們需要列印它包含在XML中的記錄的內容，文本被包含於元素的子結點中，因此我們借助了 cur->xmlChildrenNode，為了取得文本，我們使用函數xmlNodeListGetString，它有一個文檔指針參數，在這個 例子中，我們僅僅列印它。
+註釋
+因為xmlNodeListGetString為它返回的字串分配記憶體，你必須使用xmlFree釋放它。
+
+使用XPath取得元素內容
+除了一步步遍歷文檔樹查找元素外，Libxml2包含支援使用Xpath表達式取得指定結點集。完整的Xpath API文檔在這裡。Xpath允許通過路徑文檔搜索匹配指定條件的結點。在下面的例子中，我們搜索文檔中所有的「keyword」元素。
+註釋
+下面是Xpath完整的討論。它詳細的使用資料，請查閱Xpath規範。
+這個例子完整的代碼參見附錄D，XPath例程代碼。
+Using XPath requires setting up an xmlXPathContext and then supplying the XPath expression and the context to the xmlXPathEvalExpression
+function.
+The function returns an xmlXPathObjectPtr, which includes the set of nodes satisfying the XPath expression.
+使用XPath需要安裝xmlXPathContext才支援XPath表達式及xmlXPathEvalExpression函數，這個函數返回一個xmlXPathObjectPtr，它包含有
+XPath表達式的結點集。
+xmlXPathObjectPtr
+getnodeset (xmlDocPtr doc, xmlChar *xpath){
+１xmlXPathContextPtr context;
+xmlXPathObjectPtr result;
+２context = xmlXPathNewContext(doc);
+３result = xmlXPathEval;
+４if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
+printf("No result\n");
+return NULL;
+}
+xmlXPathFreeContext(context);
+return result;
+}
+１首先定義變數
+２初始化變數context
+３應用XPath表達式
+４檢查結果
+由函數返回的xmlPathObjectPtr包含一個結點集和其它需要被迭代及操作的信 息。在這個例子中我們的函數返回xmlXPathObjectPtr，我們使用它列印我們文檔中keyword結點的內容。這個結點集對像包含在集合 (nodeNr)中的元素數目及一個結點(nodeTab)數組。
+
+１for (i=0; i < nodeset->nodeNr; i++) {
+２keyword = xmlNodeListGetString(doc,
+nodeset->nodeTab[i]->xmlChildrenNode, printf("keyword: %s\n", keyword);
+xmlFree(keyword);
+}
+１變數nodeset->Nr持有結點集中元素的數量。我們使用它遍歷數組。
+２列印每個結點包含的內容。
+註釋
+Note that we are printing the child node of the node that is returned, because the contents of the keyword element are a child text node.注意我們列印的是結點的子結點的返回值，因為keyword元素的內容是一個子文本結點。
+寫元素
+寫元素內容使用上面許多一樣的步驟—解析文檔並遍歷樹。我們先解析文檔然後遍歷樹查找我們想插入元素的位置。在這個例子中，我們再一次查找「storyinfo
+」元素並插入一個keyword。然後我們裝文件寫入磁碟。完整代碼：附錄E，添加keyword例程
+
+本例中主要的不同在於parseStory
+void
+parseStory (xmlDocPtr doc, xmlNodePtr cur, char *keyword) {
+１xmlNewTextChild (cur, NULL, "keyword", keyword);
+return;
+}
+１XmlNewTextChild函數添加一個當前結點的新的子元素到樹中
+一旦結點被添加，我們應當寫文檔到文件中。你是否想給元素指定一個命名空間？你能添加它，在我們的例子中，命名空間是NULL。
+xmlSaveFormatFile (docname, doc, 1);
+第一個參數是寫入文件的名，你注意到和我們剛剛讀入的文件名是一樣的。在這個例子中，我們僅僅覆蓋原來的文件。第二個參數是一個xmlDoc結構指針，第三個參數設定為1，保證在輸出上寫入。
+
+libxml（二）
+寫屬性
+寫屬性類似於給一個新元素寫文本。在這個例子中，我們將添加一個reference結點 URI屬性到我們的文檔中。完整代碼：附錄F，添加屬性例程代碼。reference是story元素的一個子結點，所以找到並插入新元素及其屬性是簡單 的。一旦我們在parseDoc進行了錯誤檢查，我們將在正確的位置加放我們的新元素。但進行之前我們需要定義一個此前我們不見過的數據類型。
+xmlAttrPtr newattr;
+我們也需要xmlNodePtr：
+xmlNodePtr newnode;
+剩下的parseDoc則和前面一樣，檢查根結點是否為story。如果是的，那我們知道我們將在指定的位置添加我們的元素。
+１ newnode = xmlNewTextChild (cur, NULL, "reference", NULL);
+２newattr = xmlNewProp (newnode, "uri", uri);
+１使用xmlNewTextChild函數添國一個新結點到當前結點位置。
+一旦結點被添加，文件應像前面的例子將我們添加的元素及文本內容寫入磁碟。
+取得屬性
+取得屬性值類似於前面我們取得一個結點的文本內容。在這個例子中，我們將取出我們在前一部分添加的URI的值。完整代碼：附錄G，取得屬性值例程代碼。
+這個例子的初始步驟和前面是類似的：解析文檔，查找你感興趣的元素，然後進入一個函數完成指定的請求任務。在這個例子中，我們調用getReference。
+void
+getReference (xmlDocPtr doc, xmlNodePtr cur) {
+xmlChar *uri;
+cur = cur->xmlChildrenNode;
+while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"reference"))) {
+１ uri = xmlGetProp(cur, "uri");
+printf("uri: %s\n", uri);
+xmlFree(uri);
+}
+cur = cur->next;
+}
+return;
+}
+１ 關鍵函數是xmlGetProp,它返回一個包含屬性值的xmlChar。在本例中，我們僅僅列印它。
+註釋
+如果你使用DTD定義屬性的固定值或缺省值，這個函數也將取得它。
+編碼轉換
+數據編碼相容問題是程式員新建普通的XML或特定XML時最常見的困難。按照這裡
+稍後的討論來思考設計你的應用程式將幫助你避免這個困難。實際上，libxml能以UTF-8格式保存和操縱多種數據
+你的程式使用其它的數據格式，比如常見的ISO-8859-1編碼，必須使用libxml函數轉換到UTF-8。如果你想你的程式以除UTF-8外的其它編碼方式輸出也必須做轉換。
+如果能有效地轉換數據Libxml將使用轉換器。無轉換器時，僅僅UTF-8、 UTF-16和ISO-8859-1能夠被作為外部格式使用。有轉換器時，它能將從其它格式與UTF-8互換的任何格式均可使用。當前轉換器支援大約 150種不同的編碼格式之間的相互轉換。實際支援的格式數量正在被實現。每一個實現在的轉換器盡可能的支援每一種格式。
+
+警告
+一個常見錯誤是在內部數據不同的部分使用不同的編碼格式。最常見的是情況是一個應用以ISO-8859-1作為內部數據格式，結合libxml部分使用UTF-8格式。結果是一個應用程式要面對不同地內部數據格式。一部分代碼執行後，它或其它部分代碼將使用曲解的數據。
+這個例子構造一個簡單的文檔，然後添加在命令行提供的內容到根元素並使用適當的編碼將結果輸出到標準輸出設備上。在這個例子中，我們使用ISO- 8859-1編碼。在命令輸入的內容將被從ISO-8859-1轉換到UTF-8。完整代碼：附件H，編碼轉換例程代碼。
+包含在例子中的轉換函數使用libxml的xmlFindCharEncodingHandler函數。
+１xmlCharEncodingHandlerPtr handler;
+２size = (int)strlen(in)+1;
+out_size = size*2-1;
+out = malloc((size_t)out_size);
+…
+３handler = xmlFindCharEncodingHandler(encoding);
+…
+４handler->input(out, &out_size, in, &temp);
+…
+５xmlSaveFormatFileEnc("-", doc, encoding, 1);
+１定義一個xmlCharEncodingHandler函數指針。
+２XmlCharEncodingHandler函數需要給出輸入和輸出字串的大小，這裡計算輸入輸出字串。
+３XmlFindCharEncodingHandler使用數據初始編碼作為參數搜索libxml已經完成的轉換器控制碼並將找到的函數指針返回，如果沒有找到則返回NULL。
+４The conversion function identified by handler requires as its arguments pointers to the input and output strings, along with the length of each. The lengths must be determined separately by the application.
+由控制碼指定的轉換函數請求輸入、輸出字元中及它們的長度作為參數。這個長度必須由應用程式分別指定。
+５用指定編碼而不是UTF-8輸出，我們使用xmlSaveFormatFileEnc指不定期編碼方式。
+
+A. 編譯
+Libxml包含一個腳本xml2-config，它一般用於編譯和鏈接程式到庫時產生標誌。
+為了取得預處理和編譯標誌，使用xml2-config –cflags，為了取得鏈接標誌，使用xml2-config –libs。其它有效的參數請使用xml2-config –help查閱。
+B. 示例文檔
+<?xml version="1.0"?>
+<story>
+<storyinfo>
+<author>John Fleck</author>
+<datewritten>June 2, 2002</datewritten>
+<keyword>example keyword</keyword>
+</storyinfo>
+<body>
+<headline>This is the headline</headline>
+<para>This is the body text.</para>
+</body>
+</story>
+C. Keyword例程代碼
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+void
+parseStory (xmlDocPtr doc, xmlNodePtr cur) {
+xmlChar *key;
+cur = cur->xmlChildrenNode;
+while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"keyword"))) {
+key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+printf("keyword: %s\n", key);
+xmlFree(key);
+}
+cur = cur->next;
+}
+return;
+}
+static void
+parseDoc(char *docname) {
+xmlDocPtr doc;
+xmlNodePtr cur;
+doc = xmlParseFile(docname);
+if (doc == NULL ) {
+fprintf(stderr,"Document not parsed successfully. \n");
+return;
+}
+cur = xmlDocGetRootElement(doc);
+if (cur == NULL) {
+fprintf(stderr,"empty document\n");
+xmlFreeDoc(doc);
+return;
+}
+if (xmlStrcmp(cur->name, (const xmlChar *) "story")) {
+fprintf(stderr,"document of the wrong type, root node != story");
+xmlFreeDoc(doc);
+return;
+}
+cur = cur->xmlChildrenNode;
+while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"storyinfo"))){
+parseStory (doc, cur);
+}
+cur = cur->next;
+}
+xmlFreeDoc(doc);
+return;
+}
+int
+main(int argc, char **argv) {
+char *docname;
+if (argc <= 1) {
+printf("Usage: %s docname\n", argv[0]);
+return(0);
+}
+docname = argv[1];
+parseDoc (docname);
+return (1);
+}
+libxml（三）
+D. XPath例程代碼
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+xmlDocPtr
+getdoc (char *docname) {
+xmlDocPtr doc;
+doc = xmlParseFile(docname);
+if (doc == NULL ) {
+fprintf(stderr,"Document not parsed successfully. \n");
+
+return NULL;
+}
+return doc;
+}
+xmlXPathObjectPtr
+getnodeset (xmlDocPtr doc, xmlChar *xpath){
+xmlXPathContextPtr context;
+xmlXPathObjectPtr result;
+context = xmlXPathNewContext(doc);
+result = xmlXPathEval;
+if(xmlXPathNodeSetIsEmpty(result->nodesetval)){
+printf("No result\n");
+return NULL;
+}
+xmlXPathFreeContext(context);
+return result;
+}
+int
+main(int argc, char **argv) {
+char *docname;
+xmlDocPtr doc;
+xmlChar *xpath = ("//keyword");
+xmlNodeSetPtr nodeset;
+xmlXPathObjectPtr result;
+int i;
+xmlChar *keyword;
+if (argc <= 1) {
+printf("Usage: %s docname\n", argv[0]);
+return(0);
+}
+docname = argv[1];
+doc = getdoc(docname);
+result = getnodeset (doc, xpath);
+if (result) {
+nodeset = result->nodesetval;
+for (i=0; i < nodeset->nodeNr; i++) {
+keyword = xmlNodeListGetString(doc, nodeset->nodeTab[i]->printf
+("keyword: %s\n", keyword);
+xmlFree(keyword);
+}
+xmlXPathFreeObject (result);
+}
+xmlFreeDoc(doc);
+xmlCleanupParser();
+return (1);
+}
+E. 添加keyword例程代碼
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+void
+parseStory (xmlDocPtr doc, xmlNodePtr cur, char *keyword) {
+xmlNewTextChild (cur, NULL, "keyword", keyword);
+return;
+}
+xmlDocPtr
+parseDoc(char *docname, char *keyword) {
+xmlDocPtr doc;
+xmlNodePtr cur;
+doc = xmlParseFile(docname);
+if (doc == NULL ) {
+fprintf(stderr,"Document not parsed successfully. \n");
+return (NULL);
+}
+cur = xmlDocGetRootElement(doc);
+if (cur == NULL) {
+fprintf(stderr,"empty document\n");
+xmlFreeDoc(doc);
+return (NULL);
+}
+if (xmlStrcmp(cur->name, (const xmlChar *) "story")) {
+fprintf(stderr,"document of the wrong type, root node != story");
+xmlFreeDoc(doc);
+return (NULL);
+}
+cur = cur->xmlChildrenNode;
+while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"storyinfo"))){
+parseStory (doc, cur, keyword);
+}
+cur = cur->next;
+}
+return(doc);
+}
+int
+main(int argc, char **argv) {
+char *docname;
+char *keyword;
+xmlDocPtr doc;
+if (argc <= 2) {
+printf("Usage: %s docname, keyword\n", argv[0]);
+return(0);
+}
+docname = argv[1];
+keyword = argv[2];
+doc = parseDoc (docname, keyword);
+if (doc != NULL) {
+xmlSaveFormatFile (docname, doc, 0);
+xmlFreeDoc(doc);
+}
+return (1);
+}
+F. 添加屬性例程代碼
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+xmlDocPtr
+parseDoc(char *docname, char *uri) {
+xmlDocPtr doc;
+xmlNodePtr cur;
+xmlNodePtr newnode;
+xmlAttrPtr newattr;
+doc = xmlParseFile(docname);
+if (doc == NULL ) {
+fprintf(stderr,"Document not parsed successfully. \n");
+return (NULL);
+}
+cur = xmlDocGetRootElement(doc);
+if (cur == NULL) {
+fprintf(stderr,"empty document\n");
+xmlFreeDoc(doc);
+return (NULL);
+}
+if (xmlStrcmp(cur->name, (const xmlChar *) "story")) {
+fprintf(stderr,"document of the wrong type, root node != story");
+xmlFreeDoc(doc);
+return (NULL);
+}
+newnode = xmlNewTextChild (cur, NULL, "reference", NULL);
+newattr = xmlNewProp (newnode, "uri", uri);
+return(doc);
+}
+int
+main(int argc, char **argv) {
+char *docname;
+char *uri;
+xmlDocPtr doc;
+if (argc <= 2) {
+printf("Usage: %s docname, uri\n", argv[0]);
+return(0);
+}
+docname = argv[1];
+uri = argv[2];
+doc = parseDoc (docname, uri);
+if (doc != NULL) {
+xmlSaveFormatFile (docname, doc, 1);
+xmlFreeDoc(doc);
+}
+return (1);
+}
+G. 取得屬性值例程代碼
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+void
+getReference (xmlDocPtr doc, xmlNodePtr cur) {
+xmlChar *uri;
+cur = cur->xmlChildrenNode;
+while (cur != NULL) {
+if ((!xmlStrcmp(cur->name, (const xmlChar *)"reference"))) {
+uri = xmlGetProp(cur, "uri");
+printf("uri: %s\n", uri);
+xmlFree(uri);
+}
+cur = cur->next;
+}
+return;
+}
+void
+parseDoc(char *docname) {
+xmlDocPtr doc;
+xmlNodePtr cur;
+doc = xmlParseFile(docname);
+if (doc == NULL ) {
+fprintf(stderr,"Document not parsed successfully. \n");
+return;
+}
+cur = xmlDocGetRootElement(doc);
+if (cur == NULL) {
+fprintf(stderr,"empty document\n");
+xmlFreeDoc(doc);
+return;
+}
+if (xmlStrcmp(cur->name, (const xmlChar *) "story")) {
+fprintf(stderr,"document of the wrong type, root node != story");
+xmlFreeDoc(doc);
+return;
+}
+getReference (doc, cur);
+xmlFreeDoc(doc);
+return;
+}
+int
+main(int argc, char **argv) {
+char *docname;
+if (argc <= 1) {
+printf("Usage: %s docname\n", argv[0]);
+return(0);
+}
+docname = argv[1];
+parseDoc (docname);
+return (1);
+}
+H. 編碼轉換例程代碼
+#include <string.h>
+#include <libxml/parser.h>
+unsigned char*
+convert (unsigned char *in, char *encoding)
+{
+unsigned char *out;
+int ret,size,out_size,temp;
+xmlCharEncodingHandlerPtr handler;
+size = (int)strlen(in)+1;
+out_size = size*2-1;
+out = malloc((size_t)out_size);
+if (out) {
+handler = xmlFindCharEncodingHandler(encoding);
+if (!handler) {
+free(out);
+out = NULL;
+}
+}
+if (out) {
+temp=size-1;
+ret = handler->input(out, &out_size, in, &temp);
+if (ret || temp-size+1) {
+if (ret) {
+printf("conversion wasn't successful.\n");
+} else {
+printf("conversion wasn't successful. converted: }
+free(out);
+out = NULL;
+} else {
+out = realloc(out,out_size+1);
+out[out_size]=0; /*null terminating out*/
+}
+} else {
+printf("no mem\n");
+}
+return (out);
+}
+int
+main(int argc, char **argv) {
+unsigned char *content, *out;
+xmlDocPtr doc;
+xmlNodePtr rootnode;
+char *encoding = "ISO-8859-1";
+if (argc <= 1) {
+printf("Usage: %s content\n", argv[0]);
+return(0);
+}
+content = argv[1];
+out = convert(content, encoding);
+doc = xmlNewDoc ("1.0");
+rootnode = xmlNewDocNode(doc, NULL, (const xmlChar*)"root", out);
+xmlDocSetRootElement(doc, rootnode);
+xmlSaveFormatFileEnc("-", doc, encoding, 1);
+return (1);
+}
+…………………………………………………………………………………………
+char *convert(char *instr,char *encoding)
+{
+xmlCharEncodingHandlerPtr handler;
+xmlBufferPtr in,out;
+handler = xmlFindCharEncodingHandler(encoding);
+if(NULL != handler)
+{
+in = xmlBufferCreate();
+xmlBufferWriteChar(in,instr);
+out = xmlBufferCreate();
+if(xmlCharEncInFunc(handler, out, in)
+{
+xmlBufferFree(in);
+xmlBufferFree(out);
+return NULL;
+}
+else
+{
+xmlBufferFree(in);
+return (char *)out-〉content;
+}
+}
+}
+
+
+/******************************************************************************/
+linux c語言 select函數用法
+/******************************************************************************/
+Select在Socket編程中還是比較重要的，可是對於初學Socket的人來說都不太愛用Select寫程式，他們只是習慣寫諸如
+connect、accept、recv或recvfrom這樣的阻塞程式（所謂阻塞方式block，顧名思義，就是進程或是線程執行到這些函
+數時必須等待某個事件的發生，如果事件沒有發生，進程或線程就被阻塞，函數不能立即返回）。 
+可是使用Select就可以完成非阻塞（所謂非阻塞方式non-block，就是進程或線程執行此函數時不必非要等待事件的發生
+，一旦執行肯定返回，以返回值的不同來反映函數的執行情況，如果事件發生則與阻塞方式相同，若事件沒有發生則返
+回一個代碼來告知事件未發生，而進程或線程繼續執行，所以效率較高）方式工作的程式，它能夠監視我們需要監視的
+文件描述符的變化情況——讀寫或是異常。 
+
+下面詳細介紹一下！ 
+Select的函數格式(我所說的是Unix系統下的伯克利socket編程，和windows下的有區別，一會兒說明)： 
+int select(int maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout); 
+先說明兩個結構體： 
+第一，struct fd_set可以理解為一個集合，這個集合中存放的是文件描述符(filedescriptor)，即文件控制碼，這可以
+是我們所說的普通意義的文件，當然Unix下任何設備、管道、FIFO等都是文件形式，全部包括在內，所以毫無疑問一個
+socket就是一個文件，socket控制碼就是一個文件描述符。 
+fd_set集合可以通過一些宏由人為來操作，比如 
+清空集合FD_ZERO(fd_set *)； 
+將一個給定的文件描述符加入集合之中FD_SET(int ,fd_set*)； 
+將一個給定的文件描述符從集合中刪除FD_CLR(int ,fd_set*)； 
+檢查集合中指定的文件描述符是否可以讀寫FD_ISSET(int ,fd_set* )。一會兒舉例說明。 
+第二，struct timeval是一個大家常用的結構，用來代表時間值，有兩個成員，一個是秒數，另一個是毫秒數。 
+具體解釋select的參數： 
+int maxfdp是一個整數值，是指集合中所有文件描述符的範圍，即所有文件描述符的最大值加1，不能錯！在Windows中
+這個參數的值無所謂，可以設置不正確。 
+fd_set*readfds是指向fd_set結構的指針，這個集合中應該包括文件描述符，我們是要監視這些文件描述符的讀變化的
+，即我們關心是否可以從這些文件中讀取數據了，如果這個集合中有一個文件可讀，select就會返回一個大於0的值，表
+示有文件可讀，如果沒有可讀的文件，則根據timeout參數再判斷是否超時，若超出timeout的時間，select返回0，若發
+生錯誤返回負值。可以傳入NULL值，表示不關心任何文件的讀變化。 
+fd_set*writefds是指向fd_set結構的指針，這個集合中應該包括文件描述符，我們是要監視這些文件描述符的寫變化的
+，即我們關心是否可以向這些文件中寫入數據了，如果這個集合中有一個文件可寫，select就會返回一個大於0的值，表
+示有文件可寫，如果沒有可寫的文件，則根據timeout參數再判斷是否超時，若超出timeout的時間，select返回0，若發
+生錯誤返回負值。可以傳入NULL值，表示不關心任何文件的寫變化。 
+fd_set *errorfds同上面兩個參數的意圖，用來監視文件錯誤異常。 
+struct timeval *timeout是select的超時時間，這個參數至關重要，它可以使select處於三種狀態，第一，若將NULL以
+形參傳入，即不傳入時間結構，就是將select置於阻塞狀態，一定等到監視文件描述符集合中某個文件描述符發生變化
+為止；第二，若將時間值設為0秒0毫秒，就變成一個純粹的非阻塞函數，不管文件描述符是否有變化，都立刻返回繼續
+執行，文件無變化返回0，有變化返回一個正值；第三，timeout的值大於0，這就是等待的超時時間，即select在
+timeout時間內阻塞，超時時間之內有事件到來就返回了，否則在超時後不管怎樣一定返回，返回值同上述。 
+返回值： 
+負值：select錯誤 正值：某些文件可讀寫或出錯 0：等待超時，沒有可讀寫或錯誤的文件 
+在有了select後可以寫出像樣的網路程式來！舉個簡單的例子，就是從網路上接受數據寫入一個文件中。 
+例子： 
+main() 
+{ 
+    int sock; 
+    FILE *fp; 
+    struct fd_set fds; 
+    struct timeval timeout={3,0}; //select等待3秒，3秒輪詢，要非阻塞就置0 
+    char buffer[256]={0}; //256位元組的接收緩衝區 
+    /* 假定已經建立UDP連接，具體過程不寫，簡單，當然TCP也同理，主機ip和port都已經給定，要寫的文件已經打開 
+    sock=socket(...); 
+    bind(...); 
+    fp=fopen(...); */ 
+    while(1) 
+   { 
+        FD_ZERO(&fds); //每次循環都要清空集合，否則不能檢測描述符變化 
+        FD_SET(sock,&fds); //添加描述符 
+        FD_SET(fp,&fds); //同上 
+        maxfdp=sock>fp?sock+1:fp+1;    //描述符最大值加1 
+        switch(select(maxfdp,&fds,&fds,NULL,&timeout))   //select使用 
+        { 
+            case -1: exit(-1);break; //select錯誤，退出程式 
+            case 0:break; //再次輪詢 
+            default: 
+                  if(FD_ISSET(sock,&fds)) //測試sock是否可讀，即是否網路上有數據 
+                  { 
+                        recvfrom(sock,buffer,256,.....);//接受網路數據 
+                        if(FD_ISSET(fp,&fds)) //測試文件是否可寫 
+                            fwrite(fp,buffer...);//寫入文件 
+                         buffer清空; 
+                   }// end if break; 
+          }// end switch 
+     }//end while 
+}//end main 
+文章出處：DIY部落(http://www.diybl.com/course/6_system/linux/Linuxjs/20090308/159832.html) 
+linux c語言 select函數用法 
+  
+表頭文件 ＃i nclude<sys/time.h> 
+＃i nclude<sys/types.h> 
+＃i nclude<unistd.h> 
+定義函數 int select(int n,fd_set * readfds,fd_set * writefds,fd_set * exceptfds,struct timeval * timeout); 
+函數說明 select()用來等待文件描述詞狀態的改變。參數n代表最大的文件描述詞加1，參數readfds、writefds 和exceptfds 稱為描述詞組，是用來回傳該描述詞的讀，寫或例外的狀況。底下的宏提供了處理這三種描述詞組的方式: 
+FD_CLR(inr fd,fd_set* set)；用來清除描述詞組set中相關fd 的位 
+FD_ISSET(int fd,fd_set *set)；用來測試描述詞組set中相關fd 的位是否為真 
+FD_SET（int fd,fd_set*set）；用來設置描述詞組set中相關fd的位 
+FD_ZERO（fd_set *set）； 用來清除描述詞組set的全部位 
+參數 timeout為結構timeval，用來設置select()的等待時間，其結構定義如下 
+struct timeval 
+{ 
+time_t tv_sec; 
+time_t tv_usec; 
+}; 
+返回值 如果參數timeout設為NULL則表示select（）沒有timeout。 
+錯誤代碼 執行成功則返回文件描述詞狀態已改變的個數，如果返回0代表在描述詞狀態改變前已超過timeout時間，當有錯誤發生時則返回-1，錯誤原因存於errno，此時參數readfds，writefds，exceptfds和timeout的值變成不可預測。 
+EBADF 文件描述詞為無效的或該文件已關閉 
+EINTR 此調用被信號所中斷 
+EINVAL 參數n 為負值。 
+ENOMEM 核心記憶體不足 
+範例 常見的程式片段:fs_set readset； 
+FD_ZERO(&readset); 
+FD_SET(fd,&readset); 
+select(fd+1,&readset,NULL,NULL,NULL); 
+if(FD_ISSET(fd,readset){……} 
+
+下面是linux環境下select的一個簡單用法 
+
+＃i nclude <sys/time.h> 
+＃i nclude <stdio.h> 
+＃i nclude <sys/types.h> 
+＃i nclude <sys/stat.h> 
+＃i nclude <fcntl.h> 
+＃i nclude <assert.h> 
+
+int main () 
+{ 
+int keyboard; 
+int ret,i; 
+char c; 
+fd_set readfd; 
+struct timeval timeout; 
+keyboard = open("/dev/tty",O_RDONLY | O_NONBLOCK); 
+assert(keyboard>0); 
+while(1) 
+    { 
+timeout.tv_sec=1; 
+timeout.tv_usec=0; 
+FD_ZERO(&readfd); 
+FD_SET(keyboard,&readfd); 
+ret=select(keyboard+1,&readfd,NULL,NULL,&timeout); 
+if(FD_ISSET(keyboard,&readfd)) 
+    { 
+      i=read(keyboard,&c,1); 
+          if('\n'==c) 
+          continue; 
+      printf("hehethe input is %c\n",c); 
+     
+       if ('q'==c) 
+      break; 
+      } 
+} 
+} 
+用來循環讀取鍵盤輸入 
+
+2007年9月17日，將例子程式作一修改，加上了time out,並且考慮了select得所有的情況： 
+
+#include <stdio.h> 
+#include <sys/types.h> 
+#include <sys/stat.h> 
+#include <fcntl.h> 
+#include <assert.h> 
+
+int main () 
+{ 
+int keyboard; 
+int ret,i; 
+char c; 
+fd_set readfd; 
+struct timeval timeout; 
+keyboard = open("/dev/tty",O_RDONLY | O_NONBLOCK); 
+assert(keyboard>0); 
+while(1) 
+{ 
+      timeout.tv_sec=5; 
+      timeout.tv_usec=0; 
+      FD_ZERO(&readfd); 
+      FD_SET(keyboard,&readfd); 
+      ret=select(keyboard+1,&readfd,NULL,NULL,&timeout); 
+
+      //select error when ret = -1 
+      if (ret == -1) 
+          perror("select error"); 
+
+      //data coming when ret>0 
+      else if (ret) 
+      { 
+          if(FD_ISSET(keyboard,&readfd)) 
+          { 
+              i=read(keyboard,&c,1); 
+              if('\n'==c) 
+                  continue; 
+              printf("hehethe input is %c\n",c); 
+
+              if ('q'==c) 
+              break; 
+          } 
+      } 
+
+      //time out when ret = 0 
+      else if (ret == 0) 
+          printf("time out\n"); 
+} 
+} 
+
+
+#include <string.h> 
+#include <unistd.h> 
+#include <sys/time.h> 
+#include <sys/types.h> 
+
+下面是我寫的一個例程： 
+在標準輸入讀取9個位元組數據。 
+用select函數實現超時判斷！ 
+
+int main(int argc, char ** argv) 
+{ 
+char buf[10] = ""; 
+fd_set rdfds;// 
+struct timeval tv; //store timeout 
+int ret; // return val 
+FD_ZERO(&rdfds); //clear rdfds 
+FD_SET(1, &rdfds); //add stdin handle into rdfds 
+tv.tv_sec = 3; 
+tv.tv_usec = 500; 
+ret = select(1 + 1, &rdfds, NULL, NULL, &tv); 
+if(ret < 0) 
+perror("\nselect"); 
+else if(ret == 0) 
+printf("\ntimeout"); 
+else 
+{ 
+printf("\nret=%d", ret); 
+} 
+
+if(FD_ISSET(1, &rdfds)) 
+{ 
+printf("\nreading"); 
+fread(buf, 9, 1, stdin); // read form stdin 
+} 
+// read(0, buf, 9); /* read from stdin */ 
+// fprintf(stdout, "%s\n", buf); /* write to stdout */ 
+write(1, buf, strlen(buf)); //write to stdout 
+printf("\n%d\n", strlen(buf)); 
+return 0; 
+
+
+/******************************************************************************/
+GNU C __attribute__ 機制簡介
+/******************************************************************************/
+分享: 7Headlines facebook PLURK twitter  
+來源： http://hi.baidu.com/speaksoftlylove/blog/item/a580b2512440fb8b8d543079.html
+
+GNU C的一大特色（卻不被初學者所知）就是__attribute__機制。__attribute__可以設置函數屬性（Function Attribute）、變數屬性（Variable Attribute）和類型屬性（Type Attribute）。
+__attribute__書寫特徵是：__attribute__前後都有兩個下劃線，並切後面會緊跟一對原括弧，括弧裡面是相應的__attribute__參數。
+
+__attribute__語法格式為：
+__attribute__ ((attribute-list))
+其位置約束為：
+放於聲明的尾部「；」之前。
+
+函數屬性（Function Attribute）
+ 函數屬性可以幫助開發者把一些特性添加到函數聲明中，從而可以使編譯器在錯誤檢查方面的功能更強大。__attribute__機制也很容易同非GNU應用程式做到相容之功效。
+GNU CC需要使用 –Wall編譯器來擊活該功能，這是控制警告資訊的一個很好的方式。下面介紹幾個常見的屬性參數。
+__attribute__ format
+該__attribute__屬性可以給被聲明的函數加上類似printf或者scanf的特徵，它可以使編譯器檢查函數聲明和函數實際調用參數之間的格式化字串是否匹配。該功能十分有用，尤其是處理一些很難發現的bug。
+format的語法格式為：
+format (archetype, string-index, first-to-check)
+format屬性告訴編譯器，按照printf, scanf, strftime或strfmon的參數表格式規則對該函數的參數進行檢查。
+「archetype」指定是哪種風格；「string-index」指定傳入函數的第幾個參數是格式化字串；「first-to-check」指定從函數的第幾個參數開始按上述規則進行檢查。
+具體使用格式如下：
+__attribute__((format(printf,m,n)))
+__attribute__((format(scanf,m,n)))
+
+其中參數m與n的含義為：
+m：第幾個參數為格式化字串（format string）；
+n：參數集合中的第一個，即參數「…」裡的第一個參數在函數參數總數排在第幾，注意，有時函數參數里還有「隱身」的呢，後面會提到；
+在使用上，__attribute__((format(printf,m,n)))是常用的，而另一種卻很少見到。下面舉例說明，其中myprint為自己定義的一個帶有可變參數的函數，其功能類似於printf：
+//m=1；n=2
+extern void myprint(const char *format,...) __attribute__((format(printf,1,2)));
+//m=2；n=3
+extern void myprint(int l，const char *format,...) __attribute__((format(printf,2,3)));
+需要特別注意的是，如果myprint是一個函數的成員函數，那麼m和n的值可有點「懸乎」了，例如：
+//m=3；n=4
+extern void myprint(int l，const char *format,...) __attribute__((format(printf,3,4)));
+其原因是，類成員函數的第一個參數實際上一個「隱身」的「this」指針。（有點C++基礎的都知道點this指針，不知道你在這裡還知道嗎？）
+這裡給出測試用例：attribute.c，代碼如下：
+ 1：
+ 2：extern void myprint(const char *format,...) __attribute__((format(printf,1,2)));
+ 3：
+ 4：void test()
+ 5：{
+ 6：      myprint("i=%d\n",6);
+ 7：      myprint("i=%s\n",6);
+ 8：      myprint("i=%s\n","abc");
+ 9：      myprint("%s,%d,%d\n",1,2);
+10：}
+
+運行$gcc –Wall –c attribute.c attribute後，輸出結果為：
+attribute.c: In function `test':
+attribute.c:7: warning: format argument is not a pointer (arg 2)
+attribute.c:9: warning: format argument is not a pointer (arg 2)
+attribute.c:9: warning: too few arguments for format
+
+如果在attribute.c中的函數聲明去掉__attribute__((format(printf,1,2)))，再重新編譯，既運行$gcc –Wall –c attribute.c attribute後，則並不會輸出任何警告資訊。
+注意，默認情況下，編譯器是能識別類似printf的「標準」庫函數。
+__attribute__ noreturn
+該屬性通知編譯器函數從不返回值，當遇到類似函數需要返回值而卻不可能運行到返回值處就已經退出來的情況，該屬性可以避免出現錯誤資訊。C庫函數中的abort（）和exit（）的聲明格式就採用了這種格式，如下所示：
+extern void exit(int)   __attribute__((noreturn));
+extern void abort(void) __attribute__((noreturn));
+
+為了方便理解，大家可以參考如下的例子：
+//name: noreturn.c ；測試__attribute__((noreturn))
+extern void myexit();
+int test(int n) {
+    if ( n > 0 )
+    {
+        myexit();
+        /* 程式不可能到達這裡*/
+    }
+    else
+    return 0;
+}
+編譯顯示的輸出資訊為：
+$gcc –Wall –c noreturn.c
+noreturn.c: In function `test':
+noreturn.c:12: warning: control reaches end of non-void function
+
+警告資訊也很好理解，因為你定義了一個有返回值的函數test卻有可能沒有返回值，程式當然不知道怎麼辦了！
+加上__attribute__((noreturn))則可以很好的處理類似這種問題。把
+extern void myexit();
+修改為：
+extern void myexit() __attribute__((noreturn));
+之後，編譯不會再出現警告資訊。
+
+__attribute__ const
+該屬性只能用於帶有數值類型參數的函數上。當重複調用帶有數值參數的函數時，由於返回值是相同的，所以此時編譯器可以進行優化處理，除第一次需要運算外，其它只需要返回第一次的結果就可以了，進而可以提高效率。
+該屬性主要適用於沒有靜態狀態（static state）和副作用的一些函數，並且返回值僅僅依賴輸入的參數。
+為了說明問題，下面舉個非常「糟糕」的例子，該例子將重複調用一個帶有相同參數值的函數，具體如下：
+extern int square(int n) __attribute__((const));
+...
+for (i = 0; i < 100; i++ )
+{
+    total += square(5) + i;
+}
+通過添加__attribute__((const))聲明，編譯器只調用了函數一次，以後只是直接得到了相同的一個返回值。
+事實上，const參數不能用在帶有指針類型參數的函數中，因為該屬性不但影響函數的參數值，同樣也影響到了參數指向的數據，它可能會對代碼本身產生嚴重甚至是不可恢復的嚴重後果。
+並且，帶有該屬性的函數不能有任何副作用或者是靜態的狀態，所以，類似getchar（）或time（）的函數是不適合使用該屬性的。
+-finstrument-functions
+該參數可以使程式在編譯時，在函數的入口和出口處生成instrumentation調用。恰好在函數入口之後並恰好在函數出口之前，將使用當前函數的地址和調用地址來調用下面的 profiling 函數。
+（在一些平台上，__builtin_return_address不能在超過當前函數範圍之外正常工作，所以調用地址資訊可能對profiling函數是無效的。）
+void __cyg_profile_func_enter(void *this_fn, void *call_site);
+void __cyg_profile_func_exit(void *this_fn, void *call_site);
+其中，第一個參數this_fn是當前函數的起始地址，可在符號表中找到；第二個參數call_site是指調用處地址。
+instrumentation 也可用於在其它函數中展開的內聯函數。從概念上來說，profiling調用將指出在哪裡進入和退出內聯函數。
+這就意味著這種函數必須具有可尋址形式。如果函數包含內聯，而所有使用到該函數的程式都要把該內聯展開，這會額外地增加代碼長度。如果要在C 代碼中使用extern inline聲明，必須提供這種函數的可尋址形式。
+可對函數指定no_instrument_function屬性，在這種情況下不會進行instrumentation操作。
+例如，可以在以下情況下使用no_instrument_function屬性：上面列出的profiling函數、高優先級的中斷例程以及任何不能保證profiling正常調用的函數。
+no_instrument_function
+如果使用了-finstrument-functions ，將在絕大多數用戶編譯的函數的入口和出口點調用profiling函數。使用該屬性，將不進行instrument操作。
+constructor/destructor
+若函數被設定為constructor屬性，則該函數會在main（）函數執行之前被自動的執行。類似的，若函數被設定為destructor屬性，則該函數會在main（）函數執行之後或者exit（）被調用後被自動的執行。
+擁有此類屬性的函數經常隱式的用在程式的初始化數據方面。
+這兩個屬性還沒有在ObjC中實現。
+
+同時使用多個屬性
+可以在同一個函數聲明裡使用多個__attribute__，並且實際應用中這種情況是十分常見的。使用方式上，你可以選擇兩個單獨的__attribute__，或者把它們寫在一起，可以參考下面的例子：
+/* 把類似printf的消息傳遞給stderr 並退出 */
+extern void die(const char *format, ...)
+__attribute__((noreturn))
+__attribute__((format(printf, 1, 2)));
+或者寫成
+extern void die(const char *format, ...)
+__attribute__((noreturn, format(printf, 1, 2)));
+如果帶有該屬性的自定義函數追加到庫的頭文件裡，那麼所以調用該函數的程式都要做相應的檢查。
+和非GNU編譯器的相容性
+慶幸的是，__attribute__設計的非常巧妙，很容易作到和其它編譯器保持相容，也就是說，如果工作在其它的非GNU編譯器上，可以很容易的忽略該屬性。即使__attribute__使用了多個參數，
+也可以很容易的使用一對圓括弧進行處理，例如：
+/* 如果使用的是非GNU C, 那麼就忽略__attribute__ */
+#ifndef __GNUC__
+# define __attribute__(x) /*NOTHING*/
+#endif
+需要說明的是，__attribute__適用於函數的聲明而不是函數的定義。所以，當需要使用該屬性的函數時，必須在同一個文件裡進行聲明，例如：
+/* 函數聲明 */
+void die(const char *format, ...) __attribute__((noreturn))
+__attribute__((format(printf,1,2)));
+
+void die(const char *format, ...)
+{
+/* 函數定義 */
+}
+更多的屬性含義參考：
+http://gcc.gnu.org/onlinedocs/gcc-4.0.0/gcc/Function-Attributes.html
+
+變數屬性（Variable Attributes）
+關鍵字__attribute__也可以對變數（variable）或結構體成員（structure field）進行屬性設置。這裡給出幾個常用的參數的解釋，更多的參數可參考本文給出的連接。
+在使用__attribute__參數時，你也可以在參數的前後都加上「__」（兩個下劃線），例如，使用__aligned__而不是aligned，這樣你就可以在相應的頭文件裡使用它而不用關心頭文件裡是否有重名的宏定義。
+aligned (alignment)
+該屬性規定變數或結構體成員的最小的對齊格式，以位元組為單位。例如：
+int x __attribute__ ((aligned (16))) = 0;
+編譯器將以16位元組（注意是byte不是bit）對齊的方式分配一個變數。也可以對結構體成員變數設置該屬性，例如，創建一個雙byte對齊的int對，可以這麼寫：
+struct foo { int x[2] __attribute__ ((aligned (8))); };
+如上所述，你可以手動指定對齊的格式，同樣，你也可以使用默認的對齊方式。如果aligned後面不緊跟一個指定的數字值，那麼編譯器將依據你的目標機器情況使用最大最有益的對齊方式。例如：
+short array[3] __attribute__ ((aligned));
+選擇針對目標機器最大的對齊方式，可以提高拷貝操作的效率。
+aligned屬性使被設置的對象佔用更多的空間，相反的，使用packed可以減小對像佔用的空間。
+需要注意的是，attribute屬性的效力與你的連接器也有關，如果你的連接器最大隻支援16位元組對齊，那麼你此時定義32位元組對齊也是無濟於事的。
+packed
+使用該屬性可以使得變數或者結構體成員使用最小的對齊方式，即對變數是一位元組對齊，對域（field）是bit對齊。
+下面的例子中，x成員變數使用了該屬性，則其值將緊放置在a的後面：
+struct test{
+    char a;
+    int x[2] __attribute__ ((packed));
+};
+其它可選的屬性值還可以是：cleanup，common，nocommon，deprecated，mode，section，shared，tls_model，transparent_union，unused，vector_size，weak，dllimport，dlexport等，
+詳細資訊可參考：http://gcc.gnu.org/onlinedocs/gcc-4.0.0/gcc/Variable-Attributes.html#Variable-Attributes
+
+類型屬性（Type Attribute）
+關鍵字__attribute__也可以對結構體（struct）或共用體（union）進行屬性設置。大緻有六個參數值可以被設定，即：aligned, packed, transparent_union, unused, deprecated 和 may_alias。
+在使用__attribute__參數時，你也可以在參數的前後都加上「__」（兩個下劃線），例如，使用__aligned__而不是aligned，這樣，你就可以在相應的頭文件裡使用它而不用關心頭文件裡是否有重名的宏定義。
+aligned (alignment)
+該屬性設定一個指定大小的對齊格式（以位元組為單位），例如：
+struct S { short f[3]; } __attribute__ ((aligned (8)));
+typedef int more_aligned_int __attribute__ ((aligned (8)));
+該聲明將強制編譯器確保（盡它所能）變數類型為struct S或者more-aligned-int的變數在分配空間時採用8位元組對齊方式。
+如上所述，你可以手動指定對齊的格式，同樣，你也可以使用默認的對齊方式。如果aligned後面不緊跟一個指定的數字值，那麼編譯器將依據你的目標機器情況使用最大最有益的對齊方式。例如：
+struct S { short f[3]; } __attribute__ ((aligned));
+這裡，如果sizeof（short）的大小為2（byte），那麼，S的大小就為6。取一個2的次方值，使得該值大於等於6，則該值為8，所以編譯器將設置S類型的對齊方式為8位元組。
+aligned屬性使被設置的對象佔用更多的空間，相反的，使用packed可以減小對像佔用的空間。
+需要注意的是，attribute屬性的效力與你的連接器也有關，如果你的連接器最大隻支援16位元組對齊，那麼你此時定義32位元組對齊也是無濟於事的。
+packed
+使用該屬性對struct或者union類型進行定義，設定其類型的每一個變數的記憶體約束。當用在enum類型定義時，暗示了應該使用最小完整的類型（it indicates that the smallest integral type should be used）。
+下面的例子中，my-packed-struct類型的變數數組中的值將會緊緊的靠在一起，但內部的成員變數s不會被「pack」，如果希望內部的成員變數也被packed的話，my-unpacked-struct也需要使用packed進行相應的約束。
+struct my_unpacked_struct
+{
+char c;
+int i;
+};
+
+struct my_packed_struct 
+{
+char c;
+int i;
+struct my_unpacked_struct s;
+}__attribute__ ((__packed__));
+
+其它屬性的含義見：http://gcc.gnu.org/onlinedocs/gcc-4.0.0/gcc/Type-Attributes.html#Type-Attributes
+
+變數屬性與類型屬性舉例
+下面的例子中使用__attribute__屬性定義了一些結構體及其變數，並給出了輸出結果和對結果的分析。
+程式代碼為：
+struct p
+{
+int a;
+char b;
+char c;
+}__attribute__((aligned(4))) pp;
+
+struct q
+{
+int a;
+char b;
+struct n qn;
+char c;
+}__attribute__((aligned(8))) qq;
+int main()
+{
+printf("sizeof(int)=%d,sizeof(short)=%d.sizeof(char)=%d\n",sizeof(int),sizeof(short),sizeof(char));
+printf("pp=%d,qq=%d \n", sizeof(pp),sizeof(qq));
+
+return 0;
+}
+
+輸出結果：
+sizeof(int)=4,sizeof(short)=2.sizeof(char)=1
+pp=8,qq=24
+
+分析：
+sizeof(pp):
+sizeof(a)+ sizeof(b)+ sizeof(c)=4+1+1=6<23=8= sizeof(pp)
+sizeof(qq):
+sizeof(a)+ sizeof(b)=4+1=5
+sizeof(qn)=8;即qn是採用8位元組對齊的，所以要在a，b後面添3個空餘位元組，然後才能存儲qn，
+4+1+（3）+8+1=17
+因為qq採用的對齊是8位元組對齊，所以qq的大小必定是8的整數倍，即qq的大小是一個比17大又是8的倍數的一個最小值，由此得到
+17<24+8=24= sizeof(qq)
+更詳細的介紹見：http://gcc.gnu.org
+下面是一些便捷的連接：GCC 4.0 Function Attributes；GCC 4.0 Variable Attributes ；GCC 4.0 Type Attributes ；GCC 3.2 Function Attributes ；GCC 3.2 Variable Attributes ；GCC 3.2 Type Attributes ；GCC 3.1 Function Attributes ；GCC 3.1 Variable Attributes
+
+Reference：
+1．有關__attribute__的相對簡單的介紹：http://www.unixwiz.net/techtips/gnu-c-attributes.html
+2．__attribute__詳細介紹：http://gcc.gnu.org
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+http://hi.baidu.com/lyhlinux/blog/category/%B6%E0%C3%BD%CC%E5
+http://hi.baidu.com/zifengshen/blog/category/linux%BC%BC%CA%F5%CE%C4%D5%C2
+http://hi.baidu.com/zhxust/blog/category/%D1%A7%CF%B0/index/2
+/******************************************************************************/
+
+
+
+
+ 

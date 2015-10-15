@@ -1,0 +1,265 @@
+
+/******************************************************************************/
+什麼是 NFC？
+/******************************************************************************/
+使用 NFC (近距離無線通訊) 可在您的手機與其他 NFC 裝置之間傳輸資訊，例如手機、NFC標籤或支付裝置。例如，您可以共享網址、通訊錄、電話號碼、樂曲、影片或相片。
+NFC 標籤是經過程式化設定的小型資訊區域，可內嵌於海報、佈告欄公告或零售店面的產品旁邊。觸碰標籤即可提供其他資訊，例如地圖、網址和電影預告片。使兩個NFC裝置相互靠近，即可啟動NFC。 
+NFC為Near Field Communication近距離無線通訊縮寫，主要由PHILIPS、NOKIA與SONY共同研發的技術，原理是使用單1晶片，結合感應讀卡器、感應式卡片，利用點對點功能，在20公分距離內以13.56MHz頻率範圍運作；它可讓行動設備在20公分近距離內進行交易存取，最常見的應用有如捷運悠遊卡感應，未來也可當門禁卡使用。NFC是一種無線連接技術，可以和目前現有的非接觸式智慧卡技術相容(例如"免接觸式射頻識別RFID")。再者，由於目前NFC已經漸漸成為多家主要廠商提供支援的正式標準。NFC同時還是一種近距離連接協定，允許讓各種設備在彼此之間輕鬆、安全、迅速而自動的通訊和傳遞資料。與無線世界中的連接方式相較，NFC是一種近距離的私密通訊方式。
+透過NFC所提供的無線網路和識別等功能，對國人不可或缺的手機而言，手機將是包含通訊、 娛樂、攝影及導航等多重用途的實用工具，甚至成為我們唯一所需的可攜式設備。透過將NFC整合在手機系統的解決方案中，手機的可用性、多功能性及附加價值大幅提升，所以安全付費、對等連接以及身份辨識等都將成為現實。 
+
+那RFID跟NFC又有什麼不同呢？
+事實上RFID跟NFC是很相似的，RFID是一種長距離的射頻識別技術，而NFC是短距離的無線通訊技術，有效距離只有20公分的通訊模式。撇開這些技術不談，簡單的說 NFC就是把一個RFID的晶片跟讀卡機放在手機裡面，就是NFC了。
+
+NFC vs Bluetooth
+NFC和藍牙都是短程通信技術，而且都被整合到行動電話。但NFC不需要複雜的設定程式。NFC也可以簡化藍芽連接。
+NFC 略勝 Bluetooth 的地方在於設定程式較短，但無法達到Bluetooth的低功率。
+NFC的最大資料傳輸量是 424 kbit/s 遠小於 Bluetooth V2.1 (2.1 Mbit/s)。雖然NFC在傳輸速度與距離比不上BlueTooth，但是NFC技術不需要電源，對於行動電話或是行動消費性電子產品來說，NFC的使用比較方便。NFC的短距離通訊特性正是其優點，由於耗電量低、一次只和一台機器連結，擁有較高的保密性與安全性，NFC有利於信用卡交易時避免被盜用。NFC的目標並非是取代藍芽等其他無線技術，而是在不同的場合、不同的領域起到相互補充的作用。
+NFC 相容於被動式 RFID (13.56 MHz ISO/IEC 18000-3) 基礎。
+
+NFC的應用
+NFC的應用實在是太五花八門了，在日本NFC最常用在電子錢包，因為NFC跟手機做了連結，也有了身份的確認，所以可以加速NFC在電子錢包上的應用。
+
+我舉幾個例子來說說NFC還可以怎麼用：
+手機：除了電子小額付款外，兩個具有NFC的手機可以做資料交換，就像名片交換一樣。大家就會說啦，那現在的藍芽就可以做得到了，為什麼還需要用到NFC？大家可以想想，我們平常在操作藍芽配對的時候，花的時間差不多要好幾秒，有時候就是打死都配對不成功，但是NFC的配對非常的快速，就像是我們在坐捷運嗶一下這麼快，而且安全性很高，不會讓其他Hacker有機會入侵您的藍芽設備。
+印表機：有了NFC的印表機，您可以拿您的手機跟印表機接觸之後，就可以選擇您要列印的文章或是圖片。
+耳機：無線的耳機只要感應到NFC的設備就能完備配對。
+遙控器：外面賣場常會有賣萬用的遙控器，若是這個遙控器有NFC的設備，那配對就簡單多了，碰一下電視就能遙控電視，碰一下音響就能遙控音響。
+數位相框：當您拍完照片要放在數位相框時，不再需要使用USB轉來轉去，只需要碰一下，就能將您的照片，自動上傳到相框裡面。
+
+
+/******************************************************************************/
+Near Field Communications (NFC)
+/******************************************************************************/
+Android 2.3加入了NFC(近場通訊)的支援。官網developer.android.com的英文介紹如下：
+Near Field Communications (NFC)
+Android 2.3 includes an NFC stack and framework API that lets developers read NDEF tags that are discovered as a user touches an NFC-enabled device to tag elements embedded in stickers, smart posters, and even other devices.
+The platform provides the underlying NFC services that work with the device hardware to discover tags when they come into range. On discovering a tag, the platform notifies applications by broadcasting an Intent, appending the tag's NDEF messages to the Intent as extras. Applications can create Intent filters to recognize and handle targeted tags and messages. For example, after receiving a tag by Intent, applications extract the NDEF messages, store them, alert the user, or handle them in other ways.
+The NFC API is available in the android.nfc package. The key classes are:
+NfcAdapter, which represents the NFC hardware on the device.
+NdefMessage, which represents an NDEF data message, the standard format in which "records" carrying data are transmitted between devices and tags. 
+   Applications can receive these messages from ACTION_TAG_DISCOVERED Intents.
+NdefRecord, delivered in an NdefMessage, which describes the type of data being shared and carries the data itself.
+NFC communication relies on wireless technology in the device hardware, so support for the platform's NFC features on specific devices is determined by 
+their manufacturers. To determine the NFC support on the current device, applications can call isEnabled() to query the NfcAdapter. 
+The NFC API is always present, however, regardless of underlying hardware support.
+To use the NFC API, applications must request permission from the user by declaring <uses-permission android:name="android.permission.NFC"> in their 
+manifest files.
+Additionally, developers can request filtering on Android Market, such that their applications are not discoverable to users whose devices do not support 
+NFC. To request filtering, add <uses-feature android:name="android.hardware.nfc" android:required="true"> to the application's manifest.
+
+NFC的應用場景有很多，但Android 2.3目前API只提供了"電子標籤閱讀器"的功能。相信隨著Android的版本升級，後續會增加很多應用場景和 API。
+功能是少一點，但從無到有的第一步總是不容易的。從架構上看，至少有以下幾部分的改動：
+Android Framework層，為應用開發增加了相關API（即英文中的framework API）。
+協定層，增加NFC的協定棧（即英文中的NFC Stack）。
+硬體適配層，為硬體生產商提供適配介面，此層應該與NFC硬體的 Linux驅動通訊（實現方式待驗證）。
+工作流程是當支援NFC功能的手機或其他電子終端（後面簡稱手機）在用戶開啟NFC功能的時候，如果手機內置的NFC掃瞄器（相當於類NfcAdapter的功能）掃瞄到電子標籤後，
+就會向相關用戶程式發送ACTION_TAG_DISCOVERED的Intent，Itent的 extras架構中會包含NDEF（NFC Data Exchange Format）消息。如何處理此NDEF消息，就是用戶程式的事
+情了。
+NFC的API在android.nfc的包中提供，這個包主要提供三個大類，其中：NfcAdapter描述的就是手機中的NFC硬體，Android 2.3中可以暫時理解為電子標籤掃瞄器。電子標籤和
+掃瞄器中的消息通過NdefMessage來表示，這個類很簡單，只是封裝了NdefRecord。每個NdefMessage中可以包含多個NdefRecord，通過類NdefMessage的方法getRecords()可以
+查詢到消息的所有NdefRecord。NdefRecord才是資訊的真正載體，正確理解這個類是理解NFC技術的一個重點。
+NFC的技術規範[url=link.php?url=http://www.nfc-forum.org%2Fspecs%2Fspec_list%2F]http://www.nfc-forum.org/specs/spec_list/[/url]是理解這個類不可或缺的資料。
+應用程式的編程思路是：
+1.通過android.nfc.NfcAdapter.getDefaultAdapter() 取得手機的objNfcAdapter
+2.通過objNfcAdapter.isEnabled()查詢該手機是否支援NFC
+3.如果手機支援NFC，就申請接收ACTION_TAG_DISCOVERED 的Intent
+4.如果接收到ACTION_TAG_DISCOVERED，就提取NdefMessage，並在此基礎上進而提取 NdefRecord，整個是一個消息解析過程
+
+
+/******************************************************************************/
+學習筆記-翻譯資料：Android 2.3.3 近場通信NFC介紹
+/******************************************************************************/
+NFC(近場通信)
+NFC是一套短距離的無線通信，通常距離是4厘米或更短。NFC工作頻率是13.56M Hz,傳輸速率是106kbit/s 到848kbit/s. NFC總是在一個發起者和一個被動目標之間發生。
+發起者發出近場無線電波，這個近場可以給被動目標供電。這些被動的目標包括不需要電源的標籤，卡，也可以是有電源的設備。
+與其他無線通信技術比較， 例如藍牙和WiFi， NFC提供更低帶寬和距離，並且低成本，不需要供電，不需要實現匹配，整個通信過程僅僅是短短的靠近一秒就能完成。
+一個帶有NFC支援的android設備通常是一個發起者。也可以作為NFC的讀寫設備。他將檢測NFC tags並且打開一個Activity來處理. Android 2.3.3還有支援有限的P2P。
+
+Tags分很多種，其中簡單的只提供讀寫段，有的只能讀。
+複雜的tags可以支援一些運算，加密來控制對tags裡數據段的讀寫。
+甚至一些tags上有簡單的作業系統，允許一些複雜的交互和可以執行一些代碼。
+
+API概覽
+Android.nfc  package包含頂層類用來與本地NFC適配器交互. 這些類可以表示被檢測到的tags和用NDEF數據格式。
+Class
+Description
+NfcManager
+一個NFC adapter的管理器，可以列出所有此android設備支援的NFC adapter.只不過大部分android 設備只有一個NFC adapter，所以你大部分情況下可以直接用靜態方法 getDefaultAdapter(context)來取適配器。
+NfcAdapter
+表示本設備的NFC adapter,可以定義Intent來請求將系統檢測到tags的提醒發送到你的Activity.並提供方法去註冊前台tag提醒發佈和前台NDEF推送。 前台NDEF推送是當前android版本唯一支援的p2p NFC通信方式。
+NdefMessage and NdefRecord
+NDEF是NFC論壇定義的數據結構，用來有效的存數據到NFC tags.比如文本，URL，和其他MIME類型。一個NdefMessage扮演一個容器，這個容器存哪些發送和讀到的數據。一個NdefMessage對像包含0或多個NdefRecord,每個NDEF record有一個類型，比如文本，URL，智慧型海報/廣告，或其他MIME數據。在NDEFMessage裡的第一個NfcRecord的類型用來發送tag到一個android設備上的activity.
+
+Tag
+標示一個被動的NFC目標，比如tag，card，鑰匙掛扣，甚至是一個電話模擬的的NFC卡.
+當一個tag被檢測到，一個tag對像將被創建並且封裝到一個Intent裡，然後NFC 發佈系統將這個Intent用startActivity發送到註冊了接受這種Intent的activity裡。你可以用getTechList()方法來得到這個tag支援的技術細節和創建一個android.nfc.tech提供的相應的TagTechnology對象。
+android.nfc.tech package 包含那些對tag查詢屬性和進行I/O操作的類。這些類分別標示一個tag支援的不同的NFC技術標準。
+Class
+Description
+TagTechnology
+這個介面是下面所有tag technology類必須實現的。
+NfcA
+支援ISO 14443-3A 標準的操作。Provides access to NFC-A (ISO 14443-3A) properties and I/O operations.
+NfcB
+Provides access to NFC-B (ISO 14443-3B) properties and I/O operations.
+NfcF
+Provides access to NFC-F (JIS 6319-4) properties and I/O operations.
+NfcV
+Provides access to NFC-V (ISO 15693) properties and I/O operations.
+IsoDep
+Provides access to ISO-DEP (ISO 14443-4) properties and I/O operations.
+Ndef
+提供對那些被格式化為NDEF的tag的數據的訪問和其他操作。
+Provides access to NDEF data and operations on NFC tags that have been formatted as NDEF.
+NdefFormatable
+對那些可以被格式化成NDEF格式的tag提供一個格式化的操作
+
+MifareClassic
+如果android設備支援MIFARE，提供對MIFARE Classic目標的屬性和I/O操作。
+MifareUltralight
+如果android設備支援MIFARE，提供對MIFARE Ultralight目標的屬性和I/O操作。
+
+
+/******************************************************************************/
+iso14443標準協定概述 [轉貼 2008-7-31 17:07:12]  http://erin.blog.hexun.com.tw/21583589_d.html 
+/******************************************************************************/
+    我們做門禁工程的，要想瞭解門禁系統，首先必須要瞭解的就是ISO14443標準和RFID技術。ISO14443標準是門禁系統的基礎，本文將給大家詳細介紹ISO14443標準。
+ISO14443標準中的非接觸式智慧卡的類型可以分為Type A 和Type B。Type C-G 目前已經暫時被列入ISO14443 標準之外。
+範圍：
+ISO/IEC14443的這一部分規定了鄰近卡（PICC）的物理特性。它應用於在耦合設備附近操作的ID－1型識別卡。
+ISO/IEC14443的這一部分應與正在制定的ISO/IEC14443後續部分關聯使用。
+
+Type A
+  Type A 是開放式的非接觸式智慧卡標準。所有的讀寫操作可以由具體的應用系統開發者定義。正由於Type A 具有開放式特點，所以每個廠家在具體設計、生產其本身的智
+  慧卡產品時，將會把其本身的一些保密特性融入其產品中，例如加密的算法，認證的方式等等。
+Type B
+  Type B是由Philips(Siemen)等半導體公司最先首次開發和使用。在亞洲等地區，Type B技術和產品佔據了很大的市場份額。代表Type B 非接觸智慧卡晶片主要有：
+
+Mifare Light (MF1 IC L10 系列)、MIFARE1 (S50 系列、內置ASIC)、Mifare2 (即：Mifare Pro) 
+（MF2 ICD8x 系列：接觸/非接觸雙介面系列、內置相容Intel18051的微處理控制器MCU）等。相應的TypeB 卡片讀寫設備核心ASIC 晶片，以及由此組成的核心保密模組MCM
+（Mifare Core module）的主要代表有：RC150、RC170、RC500 等，以及MCM200、MCM500 等。所以，總體來說，TypeB 技術的確是一個非常優秀的非接觸技術，設計簡單
+扼要，應用項目的開發週期可以很短，同時又能起到足夠的保密作用，可以適用於非常多的應用場合。
+
+Type B 和 Type A 之間的比較：
+Type B                                                  
+副載波頻率fs        847.5 kHz(13.56MHz/16)              
+Manchester                                              
+(bit encoding)      具有較低的信噪比SNR(讀寫器一方)     
+                    防衝突特性(Anti Collision)可以控制在位(bit)層次上
+                    對於用軟體來實現編碼技術(bit encoding)來說太快，需要使用硬體電路嚴實現位編碼/解碼
+數據速度            106 Kbps
+
+Type A
+副載波頻率fs        847.5 kHz(13.56MHz/16)
+BPSK
+(bit encoding)      具有較高的信噪比SNR(讀寫器一方)
+                    防衝突特性(Anti Collision)只能控制在資訊(message)層次上，而不是位(bit)層次上（比Type A 差）
+                    幾乎都用軟體來直接實現位編碼/解碼技術(bit encoding)，不需要使用硬體電路來實現位編碼/解碼
+數據速度            106 Kbps
+
+
+Type C
+Type C由日本索尼公司研製。其Feilica非接觸式智慧卡（也稱「八達卡」）及RC-S 系列讀寫器成功地應用於香港的地鐵運營系統。
+新加坡MRT（地鐵）/LRT（輕軌）/BUS 等公共交通系統（EasyLink）等也將/正在使用SONY 公司的非接觸式智慧卡技術，作為交通一卡通使用。
+SONY 公司的非接觸智慧卡技術在整個非接觸式智慧卡技術領域中獨樹一幟。其獨特的天線結構和技術，使其讀寫器的卡片讀寫距離可以非常穩定地達到10cm 以上。
+其天線結構中鑲嵌的特殊材料（鐵氧體等材料）使其整個天線電磁場的讀寫距離非常均勻，沒有「死區」現象出現。香港地區以及新加坡陸路交通管理局等對SONY 公司的
+技術產品使用後均表示了非常一致的滿意。同時，SONY 非接觸智慧卡還有一個非常重要的特性，即數據寫操作挫敗時的數據憂恢復功能。在對卡片讀寫操作時，為了保證
+在同一時間內，多個數據塊的寫入操作僅用一個寫操作命令，因此當寫入這些數據塊時，寫入數據塊中任何一小部分如果出現寫入失敗的話，所有的數據塊內容將會自動
+返回到以前的狀態，也即數據被寫入之前的狀態（內容）。此時所有舊的數據仍然保留，新的準備寫入的數據（已經出錯的數據）將被丟棄。
+
+項 目                                                                   數 據
+通信速度                                                                211.875 kbps
+電源傳輸    頻 率                       中心頻率                        13.56 MHz
+                                        頻偏(Frequency Tolerance)       小於±6.78kHz
+                                        頻率範圍                        13.56 MHz+(±6.78kHz)
+
+            電能傳送(Power Transfer)    輸出功率                        350mW
+                                        輸出功率偏差範圍                小於±3dB
+                                        天線增益(Antenna Gain)          在±3dB 之內(-50dBi 時)
+
+數據傳輸    讀寫器→卡片                中心頻率                        13.56MHz
+                                        頻率範圍                        13.56MHz(±6.78kHz)
+                                        調製方式(Modulation Method)     ASK
+                                        調製幅度(Modulation Amplitude)  12%±2%
+                                        位編碼(Bit Coding)              Manchester(曼徹底斯特編碼)
+                                        位元組編碼(Byte Coding)         NRZ(MSB First)
+            卡片→讀寫器                中心頻率                        13.56MHz
+                                        頻率範圍                        小於±250kHz
+                                        調製方式(Modulation Method)     負載切換方式(load switching)
+                                        調製幅度(Modulation Amplitude)  15%的初始負載(initial load)
+                                        位編碼(Bit Coding)              Manchester(曼徹底斯特編碼)
+                                        位元組編碼(Byte Coding)         NRZ(MSB First)
+
+Type D
+Cubic 是一家歷史非常悠久的跨國電子集團公司，創建於1951 年。
+Cubic 總公司主要分為兩部分， 一部分為「 Defense-Group 」 ， 另一部分為「Transportation-Systems-Group」。
+「GO CARD@System」是Cubic「交通系統集團」中一個非常典型的非接觸式智慧卡的創新和應用，創立於1989 年前後。
+Cubic 將其開發的非接觸式智慧卡技術「GO CARD@System」首次成功地應用在英國Longdon 的地鐵營運系統中。所有的卡片讀寫機具也都由Cubic 自己開發和提供。
+「GO CARD@System」系統的非接觸方式讀卡/認證速度非常快速，約為70ms左右，並且實話了數據加密技術，開創了交通系統中「刷卡」的先例。作為非接觸智慧卡技術的
+延伸，Cubic 將一些人體的生物特性，例如指紋、面部圖案識別等融入於非接觸智慧卡技術中，開創了非接觸智慧卡生物識別的新領域。這也是非接觸智慧卡目前一個非
+常重要的應用領域。
+
+Type E
+OTI 公司創建於1990 年，是一家非接觸式智慧卡技術和應用處於領先地位的以色列公司。
+OTI 的應用市場主要在歐洲和美國等地。OTI 獨創的一些非接觸智慧卡技術（如可編程介面天線等），可以使一個接觸式智慧卡提升成為一個非接觸式智慧卡，命她與眾不同
+。OTI 研究開發的獨特的非接觸智慧卡晶片：單晶片解決方案和雙（微）模組解決方案在非接觸式智慧卡中獨樹一幟。支援接觸式和非接觸式(13.56MHz)兩種介面應用，並自
+動識別和轉換：程式ROM 空間達到達24kbytes；數據EEPROM 空間達到8kbytes；支援13.56MHz 載波頻率的10%ASK和100%ASK 兩種調製方式， 用戶在初始化時可以選擇
+ISO14443-2(TypeB) 方式或ISO14443-2(Type E:OTI) 方式。當被設置為ISO14443-2(TypeB)時，支援讀寫器→卡片：10%ASK NRZ 調製(速度：106kbps)，以及卡片→讀寫
+器：BPSK-NRZ 負載調製(106kbps)，副載波頻率為847kHz。當被除數設置為ISO14443-2(Type E：OTI)方式時，支援讀寫器→卡片：100%ASK PWM 脈寬調製(速度：106kbps)，
+以及卡片→讀寫器：PWM 脈寬調製(106kbps)，副載波頻率為847kHz。讀寫器→卡片的NRZ 和PWM 位編碼(Bit-Coding)採用軟體方式實現；同樣，卡片→讀寫器的BPSK 和PWM 
+位編碼也採用軟體方式處理非接觸智慧卡片的讀寫距離達到10cm 以上，並且支援多個智慧卡片的AntiCollision(防突衝)特性。支援卡片內TRIPLE-DE 運算，最快速度達到
+77.9μsec 等等。雙（微）模組解決方案(TwoDie Solution)更使OTI 的非接觸智慧卡技術更上一層樓。在雙（微）模組解決方案中，OTI 分別設置了2 個獨立的以微處理器MCU
+ 為核心的兩個微模組。其中一個微模組負責非接觸智慧卡片數字數據處理/認證等操作；另外一個微模組用於管理和讀寫器通信的RF 介面，特別是RF 天線信號處理等。兩個
+ 微模組既相互獨立又相互協調，使整個模組的速度極快，特性非常優秀。
+
+Type F
+LEGIC 是一家歐洲著名的非接觸式智慧卡專業公司，只研發非接觸智慧卡及其相關產品技術。其保密系統的產品在歐洲的市場佔有率達到60%以上。LEGIC(讀寫)保密模組包括
+SM05(-S)、SM100(-S)、SM300/400(-S)等。保密模組SM的轉化產品有：移動式智慧存儲器初始化設備保密模組MSM、移動式智慧存儲器媒體初始化設備MIMIU、無線電頻率系統
+保密模組RFSM、無線電頻率系統固定單元RFSU、(智慧卡片)智慧卡片讀寫設備單元WRU 等等。LEGIC 所有保密模組SM100系列產品包括：SM100-ST（標準型號）、SM100-SE（電
+子票卡應用）、SM100-SC（電子錢包應用）以及SM100-SX（電子標卡/電子錢包應用）。保密模組SM05和SM300/400 等具有和SM100 相同的產品分類和特性等。
+
+SM100 系列保密模組基本性能：
+無線和高功率RF 輸出，適用於中等（讀寫）距離（約30cm）的應用場合； 
+可以實現雙天線切換同時工作； 
+無須外部任何元器件連接即可工作； 
+具有多重分段應用處理能力（一卡多用）。可以直接對每一個指定的段存儲器（一個應用）進行數據存取，並可以自由地選擇存取操作規程； 
+SM100 系列產品內部數據不能被擦除，不能被複製，具有唯一的授權識別號碼； 
+內置安全保密規則。對傳輸的所有數據進行硬體和軟體加密； 
+可以選擇和上位PC 電腦的通信速度； 
+保密模組可以由軟體激活控制，進入靜止待命模式； 
+無線電頻率RF 功率輸出可以控制； 
+通過簡單的軟體命令，使SM100 系列產品很容易集成到其它的應用系統中； 
+具體標準的天線輸出阻抗：50 歐姆； 
+含有4 個可以由用戶自由使用的數字輸入/輸出引腳，用於繼電器等輸出控制等； 
+使用系統授權卡片（AM 卡片）可以對系統進行快速重新設置； 
+具有非常成熟的電子票卡/電子錢包應用，支援動態分段操作功能； 
+具有集成化蚊子存儲器管理以及高級命令管理；
+Type G
+事實上，我們中國的非接觸智慧卡技術（Type G）在應用層面上所體現出的技術的先進性等，一點也不比亞洲的周邊國家和地區（如新加坡、馬來西亞、韓國、泰國以及臺灣
+等地區），甚至歐洲國家來得低調，雖然，我們中國在非接觸智慧卡技術在應用層面上已經有著非常多的經驗，但是在非接觸智慧卡核心技術的研發和掌握上、微電子工業基
+礎設施和設備上，和國外公司相比還有一定差距。
+
+
+/******************************************************************************/
+自製偽SONY SmartTag 的NFC       ref: http://blog.alexw.net/4547/diy-%E8%87%AA%E8%A3%BD%E5%81%BDsony-smarttag-%E7%9A%84nfc/
+/******************************************************************************/
+選寫入URL
+把原本的http://www. 全部刪掉
+然後依照你想要模擬Sony SmartTag的顏色 輸入後面字串
+星星(最愛): semc://liveware/A1/1/NT1/0/smarttags1
+SmartTAG 1
+藍色(汽車)  semc://liveware/A1/1/NT1/1/smarttags1
+紅色(家)    semc://liveware/A1/1/NT1/2/smarttags1
+黑色(臥室)  semc://liveware/A1/1/NT1/3/smarttags1
+白色(上班)  semc://liveware/A1/1/NT1/4/smarttags1
+SmartTAG 2
+灰色(活動)  semc://liveware/A1/2/NT2/5/smarttags2
+橘色(聆聽)  semc://liveware/A1/2/NT2/6/smarttags2
+紫色(觀看)  semc://liveware/A1/2/NT2/7/smarttags2
+綠色(遊戲)  semc://liveware/A1/2/NT2/8/smarttags2
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

@@ -1,0 +1,2022 @@
+
+/******************************************************************************/
+產品開發專有名詞 (RFQ,KICK-OFF,EVT,DVT,PVT,MP)
+/******************************************************************************/
+Kickoff – 專案正式開案，時間上不一定在那一個階段
+選料 – 零件的規格是H/W Engineer在畫線路圖的時候就決定了，料是採購決定
+備料 – 準備生產時要用的零件材料
+線路圖 – 標示各個IC和零件之間線路連結狀況的文件
+Layout – 標示各個IC和零件在PCB上面相對位置和線路走線情況的文件
+Co-Lay – 在PCB同一個位子上保留可以放置其他不同規格零件的狀況
+Gerber out – PCB廠用來生產PCB時需要的檔案，通常可以由Layout軟體產生
+PCB out – PCB裸版做好的時候，上面都沒有零件
+打件 – 把零件放到PCB上面的過程
+SMP件 – IC或是其他元件的針腳是直接接觸PCB平面的，像是BGA封裝的IC
+DIP件 – IC或是其他元件的針腳是穿過PCB的貫孔，像是鋁質電容
+Rework – 電路板成品之後需要透過人工的方式修改跳現或是更動元件位置
+EVT – Engineering Validate Time專案流程 工程驗證階段
+DVT – Design Validation Test專案流程 開發驗證階段
+DVT – Production Verification Test 生產驗證測試階段
+PreMP (Pre-Production) – 專案流程 小量試量產
+MP (Mess Production) – 專案流程 正式量產產品
+
+
+1. 試做 (研發階段) Trial, Test, Research & Development
+2. 量試 (類似小批試做) Pilot Run
+3. 限量生產 Batch Production
+4. 大量生產 Mass Production, Flow Production
+5. 樣品 Sample
+6. 試用 Trial
+
+◇ 先導生產模式 Pilot Run
+它介於實驗室與工廠量產之間的生產規模
+實驗室 Laboratory → Pilot Plant→ 工廠 Manufactory
+
+◇ 手工生產 Craft Production
+Craft production is the process of manufacturing by hand with or without the aid of tools. 
+手工生產是製造過程是經由手工或不需依賴工具。
+
+◇ 限量生產 Batch Production
+Batch production is used to produce or process any product in groups that are called batches, as opposed to a continuous production process, or a one-time production. 
+An example of batch production can be found in a bakery.
+限量生產是使用在生產或加工一批產品，相對於連續生產或單一生產。限量生產的一個例子就如麵包糕餅店。
+→ 限量發行 Limited Edition
+
+◇ 連續生產 Continuous Production
+Continuous production is a method used to produce or process any product without interruption. 
+There is no discrete rate at which goods are produced, as opposed to a batch production process, or a one-time production. 
+Examples of continuous production are those used to make pens, paper, cars and computers.
+連續生產是使用在生產或加工任何不間斷作業的產品。產品製造中沒有不連接的作業，相對於限量生產或單一生產。連續生產的例子如製造筆、紙、汽車、電腦。
+
+◇ 大量生產 Mass Production, Flow Production 
+Mass production (also called flow production or repetitive flow production) is the production of large amounts of standardized products on production lines.
+大量生產也稱流動生產是於生產線製造大量標準的產品。
+
+參考資料網站
+http://en.wikipedia.org/wiki/Mass-production
+
+備料工令 material work order
+備料數量 Required Material volume
+工令備料單 Material request- work order
+工令應備數量 Required volume for the order
+本次應備數量 Required volume for the batch
+備料代號 Material code ( or material number)
+預設庫別 default warehouse 
+扣帳庫別 withdrawing warehouse
+預定領料日 Planned date to withdraw
+他庫數量   Volume in other warehouse
+實備數量   Actual volume
+
+
+guarantee 保證
+price 價格
+detail 詳細;細節
+quotation 報價單
+request 要求
+P/P (pilot run) 試產
+M/P (Mass production) 量產
+
+Fowarder 報關行
+PO 訂單
+Invoice 發票
+L/C 信用狀
+Forecast 預估（下單用)
+BOM cost　材料成本 不含RD的研發成本
+Buy-in cost 買進成本
+Rebate 回饋(給經銷商的, 買xx件, 就回饋某筆金額)
+Sample 樣品
+Shipping list 出貨清單
+FOB Shanghai/Taiwan(貨物交到上海/台灣)
+AVL 相容品列表
+Failure rate 不良率
+SKU 產品規格(不知怎麼翻, 有點類似spec又不大像)
+BSMI 商檢局認證
+EMI 磁檢證明
+
+TT 匯款(通常指現金)
+PP 跌價補償
+DOA 新品故障
+RMA 退回原廠維修
+in Stock 有現貨
+N/A 沒有
+Briefing 簡報
+Golden 準備量產
+ES 工程樣本
+Warrnty 保固
+OS license 作業系統版權(費用）
+
+SKU=Stock Keeping Unit
+產品規格不過不是SPEC
+類似MODEL NAME的細分類
+
+BSMI
+台灣的電磁法規認證
+
+EMI=Electromagnetic Interference 
+電磁干擾
+EMC=Electromagnetic Compatibility
+電磁相容
+EMS=Electromagnetic Susceptibility
+電磁耐受
+EMC=EMI+EMS
+
+/******************************************************************************/
+PM, ID, ME, EE & PE, HR, IE, PE, QA , SCM, CM 廠內產品研發相關單
+/******************************************************************************/
+a.人力資源（HR），這個跟學校裡面學的差不多～
+b.工業工程（IE），主要是利用IE的手法（就是生產及作業管理學的那些）來進行生產製程(包含產線配置、生產排表及分配、產線內各工位工作分擔等)，或是各單位間作業流程的最佳化。
+c.專案管理（PM），一般來說其業務包括各生產單位間協調、與客戶接觸之窗口、報價（看到客戶產品就要會根據其所需工藝技術及各種材料估算大約的成本）、議價（跟sales差不多，討價還價博感情）、客戶與廠間的溝通協調。另外還有部分的新市場開發部分。需求知識包括市場分析（產業分析、競爭對手分析、供應商分析等等）、議價能力、文書處理（WORD、EXCEL、POWERPOINT）等。
+d.生產開發（PE），負責主導新機種的技術開發，所有技術問題均是由他們處理，協調，並解決。這部分多半需要的是理工背景的人！
+e.品質保證（QA），負責各生產單位的成品品質問題。會用到很多統計方法去查驗產品良率，以及改進良率問題。所以（感覺）很需要統計的能力！！
+f.供應鏈管理（SCM），分為四塊，多半是需要物流方面的人才，在成大就是交通管理科學系那一塊！交管（產品量產後負責出貨相關事宜）、企劃（得知客戶出貨需求後排配各廠的產線及時間排配等）、關務物流（負責海關進出口相關程式以及貨運運輸調配事宜）、採購（負責採買一些生產過程中所需的小物件，主要是組裝廠，另外還有一些辦公用品之類的）。
+g.經管（CM，Cost Management），負責財務方面的管理與成本控制，會比較需要財務或是會計背景的人，也會針對市場做財務分析之類的工作。
+
+PM(專案經理)
+ID(工業設計)
+ME(機構工程)
+EE(電子工程)
+PE (生技單位)
+
+業務就負責跟客戶談價錢還有交期
+PM基本上就是跟著產品完成跑,他是你跟客戶以及廠內溝通最主要的橋樑.
+工業設計算是研發的部份.
+ME EE就是開案後負責把東西設計出來的.
+PE是製造現場的技術支援.
+
+科技業工程單位的職稱
+RD:研發設計類的工程師
+QA:品質管理工程師
+SQE: Supplier Quality Engineer 供應商品管工程師
+IE: Industrial Engineer 工業工程師
+TE: Test Engineer 測試工程師
+EE: Equipment Engineer 設備工程師
+EE: Electronic Engineer 電子工程師
+OP:  Operator , 作業員
+QA:  quality assurance engineer , 品保工程師
+QE:  quality (control) engineer, 品管工程師
+QS:  quality system engineer , 品質系統工程師
+SQE: supplier quality engineer , 供應商品管工程師
+ME:  manufacturing engineer , 機製工程師
+PM:  Project Manager , 專案經理
+PE : Product Engineer , 產品工程師 
+PE:project engineer , 專案工程師
+PE:procurement engineer , 採購工程師
+PIE: Process Integration Engineer , 製程整合工程
+PC:  Production Control , 生產控管
+TF:  Thin Film , 薄膜製程
+ET:  Etch , 蝕刻製程
+LIT: Litho or Photo , 黃光製程
+DF:  Diffusion , 擴散製程
+IE:  industrial engineer , 工業工程師
+MIS:資訊管理人員
+IE:  industrial engineer , 工業工程師
+IE:  test engineer , 測試工程師
+ID:  Industrial Designer 工業設計師
+CIM: Computer Integrated Manufacturing CIM工程師 
+
+職務縮寫的全名及其定義
+SA(SA: System Analyst) 系統分析師：
+在軟體開發團隊中，屬於中高階的基層管理者與領導者。
+他們除了須具備優秀的文字、語言溝通能力之外，還要有良好的分析、組織、邏輯思考能力。
+當然也需要有良好的人際關係，以及深厚的技術背景與知識。
+系統分析師的工作內容，依階段劃分大致可分為下述幾個階段：
+系統分析：分析現行系統:確定系統的功能需求;確定系統的資源:保護及績效需求，
+發展系統架構確定使用單位將面臨的環境及組織變遷。
+初步設計：劃分作業子系統．擬定子系統的輸入、輸出、介面及作業處理流程:
+子系統人工作業規格:邏輯質料庫設計:開列系統軟、硬體規格。
+細步設計：設計實體資料庫:設計人工作業程式;設計文件表格及輸出、入格式;
+擬訂程式規格及細步流程:確定公用常式與共用程式。
+系統測試：根據分析階段所訂定的各種功能．加以測試，錯誤資料收集與分析。
+資料轉換：整理及彙編文件．指派工作人員及進行訓練．進行資料轉換。
+系統維護：更正系統內潛伏的錯誤:因適應環境的改變而做適度的調整
+
+SD(System Analyst)系統設計師：
+系統設計師與 SA 所不同的是，
+SA 所建構的是屬於偏向於領域的概念模型；而 SD 則是根據領域模型，
+再配合實體的平台，考量其效能、穩定、分散與安全性等，所建構而得的軟體規格模型。
+SD 的主要產出，仍包括了類別圖、循序圖以及 Database Schema，
+而這些產出，都會與實體的平台相依。
+而系統內部的分析與設計，是交由 SA 與 SD 來負責的，而 SA 與 SD 的界限，
+可以以是否有與實體的平台相依來界定。
+我們也可以以兩句話來說明分析與設計的關係：
+「Do the right thing (分析)」and 「Do the thing right (設計)」。
+
+RD（"R"esearch and "D"evelopment engineer）研發設計工程師，簡稱研發工程師：
+RD的分類: 
+一般有可能會遇到二種RD：一種是會不斷發問的RD. 一種是都沒有問題的RD. 
+然而，常問問題的人大多數是Key man. 是公司重要的人物. 
+會問問題代表著學習心強. 表達能力良好。
+RD在公司的地位: 
+RD部門在公司是重要的單位. 但不代表有地位.
+只要企劃, 業務或者是老闆有了想法, 
+不管有理無理, RD就要想辦法把他們的想法具體的實現出來. 
+採購, 倉管,工程每天追著RD要求配合, 
+生產線的媽媽,大姐們更是得罪不得, 
+她們會為了一顆電容擺放位置不好焊來跟你吵半天. 更別提客服部門的抱怨. 
+
+PG（Programming）程式設計師：
+從每一個資訊的專業職位來看,程式設計師的定義都有一點差異,
+但基本上你必須要具備幾項基本的資訊技術,
+才得以勝任多數的資訊工作職位,以下的建議提供參考: 
+1. 必須至少專精一種程式語言.C,C++,Java都可以. 
+2. 必須至少專精一種作業系統.Windows,Linux.(可以管理與架設伺服器) 
+3. 瞭解資料庫. 
+4. 熟悉網路架構. 
+5. 要能讀懂英文的技術文件. 
+
+PM (Project Manager) 專案經理：
+一般而言，比較大的公司才會有專案管理部 (Project Management Department)。
+負責解決新機種生產、還有新產品研發過程中所有的問題。
+PM專案管理師隸屬於專案管理部，通稱「專案經理」，簡稱 PM (Project Manager)，
+另外依功能不同，又可稱為「產品經理」 (Product Manager)。
+所以，作為一個好的PM，必須 
+1.熟悉該產業的生產製造流程；
+2.有好的溝通協調、管理能力；
+3.良好的外語能力(英、日語為主)
+要瞭解工廠內各部門(製造部、工程部、測試工程部、產品線、
+開發採購、倉儲、物流處、關務...等等)的運作，
+還有研發中心各部門(包括EE、ME、Layout、安規、EMI)的訴求和考量。
+
+DBA (Database Administrator) 資料庫設計與管理人員：
+資料庫設計與管理人員，最好本身也有寫程式的能力，這樣在管理上會如虎添翼，
+就這部份的準備方式跟系統平台類似，熱門的SQL、Oracle、Sybase...等，
+要能有一樣是最擅長的，其他的多少都要懂一點，有很多公司都是從SQL開始，
+到後來轉成Oracle，所以如果跟不上企業的轉變，會是很大的缺憾。
+
+MIS (Management Information System)管理資訊系統，即網管人員：
+MIS依管理決策之需要，應用資料庫將一個機構之資訊整合處理分析，
+以便即時提供各階層管理者使用。
+
+ 
+/******************************************************************************/
+企業管理常用縮寫術語中英文對照
+/******************************************************************************/
+5S:　5S管理
+6σ：六西格瑪管理
+A
+ABC: 作業製成本制度 (Activity-Based Costing)
+ABB: 實施作業制預算制度 (Activity-Based Budgeting)
+ABM: 作業製成本管理 (Activity-Base Management)
+APS: 先進規劃與排程系統 (Advanced Planning and Scheduling)
+ASP: 應用程式服務供貨商（Application Service Provider）
+ATP: 可承諾量 (Available To Promise)
+AVL: 認可的供貨商清單(Approved Vendor List)
+B
+BOM:　物料清單 (Bill Of Material)
+BPR:　企業流程再造 (Business Process Reengineering)
+BSC:　平衡記分卡 (Balanced ScoreCard)
+BTF:　計劃生產 (Build To Forecast)
+BTO:　訂單生產 (Build To Order)
+C
+CPM:　要徑法 (Critical Path Method)
+CPM:　每一百萬個使用者會有幾次抱怨(Complaint per Million)
+CRM:　客戶關係管理 (Customer Relationship Management)
+CRP:　產能需求規劃 (Capacity Requirements Planning)
+CTO:　客制化生產 (Configuration To Order)
+D
+DBR:　限制驅導式排程法 (Drum-Buffer-Rope)
+DMT： 成熟度驗證(Design Maturing Testing)
+DVT:　設計驗證(Design Verification Testing)
+DRP:　運銷資源計劃 (Distribution Resource Planning)
+DSS:　決策支援系統 (Decision Support System)
+DP： 需求計劃（Demand Planning）
+E
+ECN：[設計變更]]／工程變更 (Engineer Change)
+     工程變更通知書（Engineering Change Notice）
+ECR：設計變更申請單（Engineering Change Request)
+EC： 電子商務 (Electronic Commerce)
+ECRN: 原件規格更改通知(Engineer Change Request Notice)
+EDI:　電子數據交換 (Electronic Data Interchange)
+EIS:　主管決策系統 (Executive Information System)
+EMC:　電磁相容(Electric Magnetic Capability)
+EOQ:　基本經濟訂購量 (Economic Order Quantity)
+ERP:　企業資源規劃 (Enterprise Resource Planning)
+F
+FAE:　應用工程(Field Application Engineer)
+FCST: 預估(Forecast)
+FMS:　彈性製造系統 (Flexible Manufacture System)
+FQC:　成品質量管理 (Finish or Final Quality Control)
+I
+IE: 工業工程 (Industrial Engineering)
+IPQC:　製程質量管理 (In-Process Quality Control)
+IQC:　 進料質量管理 (Incoming Quality Control)
+ISO:　 國際標準組織 (International Organization for Standardization)
+ISAR:　首批樣品認可(Initial Sample Approval Request)
+J
+JIT:　 實時管理 (Just In Time)
+K
+KM：　 知識管理 (Knowledge Management)
+L
+L4L:　 逐批訂購法 (Lot-for-Lot)
+LTC:　 最小總成本法 (Least Total Cost)
+LUC:　 最小單位成本 (Least Unit Cost)
+M
+MES:　 製造執行系統 (Manufacturing Execution System)
+MO:　　制令(Manufacture Order)
+MPS:　 主生產排程 (Master Production Schedule)
+MRO:　 請修(購)單(Maintenance Repair Operation)
+MRP:　 物料需求規劃 (Material Requirement Planning)
+MRPII: 製造資源計劃 (Manufacturing Resource Planning)
+N
+NFCF:　更改預估量的通知（Notice for Changing Forecast）
+O
+OEM:　 委託代工 (Original Equipment Manufacture)
+ODM:　 委託設計與製造 (Original Design & Manufacture)
+OLAP:　線上分析處理 (On-Line Analytical Processing)
+OLTP:　線上交易處理 (On-Line Transaction Processing)
+OPT:　 最佳生產技術 (Optimized Production Technology)
+OQC:　 出貨質量管理 (Out-going Quality Control)
+P
+PDCA:　PDCA管理迴圈 (Plan-Do-Check-Action)
+PDM:　 產品數據管理系統 (Product Data Management)
+PERT: 計劃評核術 (Program Evaluation and Review Technique)
+PO:　　訂單(Purchase Order)
+POH:　 預估在手量 (Product on Hand)
+PR:　　採購申請（Purchase Request）
+PTP: 從購買到付款（procure to pay）
+Q
+QA:　　質量保證(Quality Assurance)
+QC:　　質量管理(Quality Control)
+QCC:　 品管圈 (Quality Control Circle)
+QE:　　質量工程(Quality Engineering)
+R
+RCCP:　粗略產能規劃 (Rough Cut Capacity Planning)
+RMA:　 退貨驗收Returned Material Approval
+ROP:　 再訂購點 (Re-Order Point)
+S
+SCM:　 供應鏈管理 (Supply Chain Management)
+SFC:　 現場控制 (Shop Floor Control)
+SIS:　 策略資訊系統 (Strategic Information System)
+SO:　　訂單(Sales Order)
+SOR:　 特殊訂單需求(Special Order Request)
+SPC:　 統計製程管制 (Statistic Process Control)
+SQE:供應商質量工程師（Supplier Quality Engineer）
+T
+TOC:　 限制理論 (Theory of Constraints)
+TPM:　 全面生產管理Total Production Management
+TQC:　 全面質量控制 (Total Quality Control)
+TQM:　 全面質量管理 (Total Quality Management)
+W
+WIP:　 在製品 (Work In Process)
+
+/******************************************************************************/
+製造業中常用的英文縮寫
+/******************************************************************************/
+品質人員名稱類
+QC      quality control              品質管理人員
+FQC     final quality control        終點質量管理人員
+IPQC    in process quality control  製程中的質量管理人員
+OQC     output quality control       最終出貨質量管理人員
+IQC     incoming quality control     進料質量管理人員
+TQC     total quality control        全面質量管理 
+POC     passage quality control      段檢人員
+QA      quality assurance            質量保證人員
+OQA     output quality assurance     出貨質量保證人員
+QE      quality engineering          品質工程人員
+
+品質保證類
+FAI     first article inspection               新品首件檢查 
+FAA     first article assurance                首件確認
+CP      capability index                        能力指數 媵
+CPK     capability process index               模具製程能力參數
+SSQA    standardized supplier quality audit   合格供貨商品質評估
+FMEA    failure model effectiveness analysis  失效模式分析
+
+FQC運作類
+AQL     Acceptable Quality Level        運作類允收品質水準 
+S/S     Sample size                     抽樣檢驗樣本大小
+ACC     Accept                          允收
+REE     Reject                          拒收
+CR      Critical                        極嚴重的
+MAJ     Major                           主要的
+MIN     Minor                           輕微的 
+Q/R/S   Quality/Reliability/Service     品質/可靠度/服務
+P/N     Part Number                     料號 稨
+L/N     Lot Number                      批號
+AOD     Accept On Deviation             特采
+UAI     Use As It                       特采
+FPIR    First Piece Inspection Report   首件檢查報告
+PPM     Percent Per Million             百萬分之一
+
+製程統計品管專類
+SPC     Statistical Process Control     統計製程管制
+SQC     Statistical Quality Control     統計質量管理 
+GRR     Gauge Reproductiveness & Repeatability 量具之再製性及重測性判斷量可靠與否
+DIM     Dimension  尺寸
+DIA     Diameter   直徑 
+N       Number     樣品數
+
+其它品質術語類
+QIT     Quality Improvement Team     品質改善小組  
+ZD      Zero Defect                  零缺點
+QI      Quality Improvement          品質改善 
+QP      Quality Policy               目標方針
+TQM     Total Quality Management     全面品質管理 
+RMA     Return Material Audit        退料認可
+7QCTools  7 Quality Control Tools    品管七大手法
+
+通用之件類
+ECN     Engineering Change Notice    工程變更通知(供貨商)
+ECO     Engineering Change Order     工程改動要求(客戶)  
+PCN     Process Change Notice        工序改動通知
+PMP     Product Management Plan      生產管制計劃
+SIP     Standard Inspection Procedure    製程檢驗標準程式  
+SOP     Standard Operation Procedure     製造作業規範 □  
+IS      Inspection Specification         成品檢驗規範   
+BOM     Bill Of Material       物料清單 
+PS      Package Specification   包裝規範  
+SPEC    Specification         規格 
+DWG     Drawing                圖面
+
+系統文件類
+ES      Engineering Standard                 工程標準
+IWS     International Workman Standard       工藝標準   
+ISO     International Standard Organization  國際標準化組織   
+GS      General Specification                 一般規格
+
+部類 
+PMC     Production & Material Control   生產和物料控制
+PCC     Product control center          生產管制中心
+PPC     Production Plan Control         生產計劃控制
+MC      Material Control                物料控制
+DC      Document Center                 資料中心
+QE      Quality Engineering             品質工程(部)
+QA      Quality Assurance               品質保證(處)
+QC      Quality Control                 質量管理(課)
+PD      Product Department              生產部
+LAB     Laboratory                     實驗室  
+IE      Industrial Engineering          工業工程   
+R&D     Research & Design              設計開發部
+
+生產類 
+PCs     Pieces               個(根,塊等) 
+PRS     Pairs                雙(對等)   
+CTN     Carton               卡通箱   
+PAL     Pallet/skid          棧板  
+PO      Purchasing Order     採購訂單 
+MO      Manufacture Order    生產單   
+D/C     Date Code            生產日期碼  
+ID/C    Identification Code  (供貨商)識別碼]
+SWR     Special Work Request           特殊工作需求
+L/N     Lot Number                     批號 
+P/N     Part Number                     料號 
+OEM     Original Equipment Manufacture  原設備製造  
+PC      Personal Computer                個人電腦 
+CPU     Central Processing Unit         中央處理器 □  
+A.S.A.P As Soon As Possible         儘可能快的   
+E-MAIL  Electrical-Mail              電子郵件
+N/A     Not Applicable       不適用 
+QTY     Quantity             數量  
+I/O     input/output         輸入/輸出   
+NG      Not Good              不行,不合格 
+C=0     Critical=0           極嚴重不允許
+APP     Approve              核准,認可,承認
+CHK     Check                確認  
+ASS''Y  Assembly           裝配,組裝  
+T/P     True Position        真位度 
+5WIH    When, Where, Who, What, Why, How to 
+6M      Man, Machine, Material, Method, Measurement, Message 
+4MTH    Man, Material, Money, Method, Time, How   人力,物力,財務,技術,時間(資源) 
+SQA     Strategy Quality Assurance              策略品質保證
+DQA     Design Quality Assurance                設計品質保證  
+MQA     Manufacture Quality Assurance            製造品質保證
+SSQA    Sales and service Quality Assurance     銷售及服務品質保證  
+LRR     Lot Reject Rate                           批退率
+
+DVD     Digital Video Disk
+VCD     Video Compact Disk  
+LCD     Liquid Crystal Display 
+CAD     Computer Aided Design 
+CAM     Computer Aided Manufacturing 
+CAE     Computer Aided Engineering  
+PCB     Printed Circuit Board           印刷電路板   
+CAR     Correction Action Report        改善報告
+NG      Not Good                         不良 
+WDR     Weekly Delivery Requirement     周出貨要求   
+PPM     Percent Per Million             百萬分之一  
+TPM     Total Production Maintenance    全面生產保養  
+MRP     Material Requirement Planning   物料需計劃
+OS      Operation System                 作業系統   
+TBA     To Be Assured                   待定,定缺 
+D/C     Drawing Change 
+P/P     Plans & Procedure 
+EMI     Electrical-Music Industry       電子音樂工業 
+        Electrical Magnetic Interference    電子干擾
+RFI     Read Frequency Input            讀頻輸入
+MMC     Maximum Material Condition  
+MMS     Maximum Material Size Xs
+LMC     Least Material Condition
+LMS     Least Material Size Um  
+LED     lighting-emitting diode           發光二極管
+QBR     Quarter Business Record
+CIP     Continuous improvement process
+FGI     Forecasted Goal Inventory
+CNC     Computerized numeral controller
+B2C     Business to customer
+B2B     Business to business
+AVL     Approved vendor list
+POP     Procedure of packaging
+EOL     End of life
+VDCS    Vender defect correcting sheet 
+PDCS    Process defect correcting sheet   
+GRN     Goods receiving note 
+A/R     Accounting receivable 
+A/P     Accounting payable
+
+
+/******************************************************************************/
+工業常用的英文縮寫
+/******************************************************************************/
+品質人員名稱類
+QC      quality control      品質管理人員
+FQC     final quality control      終點品質管制人員
+IPQC    in process quality control      製程中的品質管制人員
+OQC     output quality control      最終出貨品質管制人員
+IQC     incoming quality control      進料品質管制人員
+TQC     total quality control      全面質量管理
+POC     passage quality control      段檢人員
+QA      quality assurance      質量保證人員
+OQA     output quality assurance      出貨質量保證人員
+QE      quality engineering      品質工程人員
+
+品質保證類
+FAI     first article inspection      新品首件檢查
+FAA     first article assurance      首件確認
+CP      capability index      能力指數
+CPK     capability process index      模具製程能力參數
+SSQA    standardized supplier quality audit      合格供應商品質評估
+FMEA    failure model effectiveness analysis      失效模式分析
+
+FQC運作類
+AQL     Acceptable Quality Level      運作類允收品質水準
+S/S     Sample size      抽樣檢驗樣本大小
+ACC     Accept      允收
+REE     Reject      拒收
+CR      Critical      極嚴重的
+MAJ     Major      主要的
+MIN     Minor      輕微的
+Q/R/S   Quality/Reliability/Service      品質/可靠度/服務
+P/N     Part Number      料號
+L/N     Lot Number      批號
+AOD     Accept On Deviation      特采
+UAI     Use As It      特采
+FPIR    First Piece Inspection Report         首件檢查報告
+PPM     Percent Per Million      百萬分之一
+
+製程統計品管專類
+SPC     Statistical Process Control      統計製程管制
+SQC     Statistical Quality Control      統計品質管制
+GRR     Gauge Reproductiveness & Repeatability      量具之再制性及重測性判斷量可靠與否
+DIM     Dimension      尺寸
+DIA     Diameter      直徑
+N       Number      樣品數
+
+其它品質術語類
+QIT     Quality Improvement Team      品質改善小組
+ZD      Zero Defect      零缺點
+QI      Quality Improvement      品質改善
+QP      Quality Policy      目標方針
+TQM     Total Quality Management      全面品質管理
+RMA     Return Material Audit      退料認可
+7QCTools      7 Quality Control Tools      品管七大手法
+
+通用之件類
+ECN     Engineering Change Notice      工程變更通知(供應商)
+ECO     Engineering Change Order      工程改動要求(客戶)
+PCN     Process Change Notice      工序改動通知
+PMP     Product Management Plan      生產管制計劃
+SIP     Standard Inspection Procedure      製程檢驗標準程式
+SOP     Standard Operation Procedure      製造作業規範
+IS      Inspection Specification      成品檢驗規範
+BOM     Bill Of Material      物料清單
+PS      Package Specification      包裝規範
+SPEC    Specification      規格
+DWG     Drawing      圖面
+
+系統文件類
+ES      Engineering Standard      工程標準
+CGOO    China General      PCE龍華廠文件
+IWS     International Workman Standard      工藝標準
+ISO     International Standard Organization      國際標準化組織
+GS      General Specification      一般規格
+
+部類
+PMC     Production & Material Control      生產和物料控制
+PCC     Product control center             生產管制中心
+PPC     Production Plan Control      生產計劃控制
+MC      Material Control      物料控制
+DC      Document Center      資料中心
+QE      Quality Engineering      品質工程(部)
+QA      Quality Assurance      品質保證(處)
+QC      Quality Control      品質管制(課)
+PD      Product Department      生產部
+LAB     Laboratory      實驗室
+IE      Industrial Engineering      工業工程
+R&D      Research & Design      設計開發部
+
+生產類
+PCs      Pieces      個(根,塊等)
+PRS      Pairs      雙(對等)
+CTN      Carton      卡通箱
+PAL      Pallet/skid      棧板
+PO      Purchasing Order      採購訂單
+MO      Manufacture Order      生產單
+D/C      Date Code      生產日期碼
+ID/C      Identification Code      (供應商)識別碼
+SWR      Special Work Request      特殊工作需求
+L/N      Lot Number      批號
+P/N      Part Number      料號
+OEM      Original Equipment Manufacture      原設備製造
+PC      Personal Computer      個人電腦
+CPU      Central Processing Unit      中央處理器
+A.S.A.P      As Soon As Possible      盡可能快的
+E-MAIL      Electrical-Mail      電子郵件
+N/A      Not Applicable      不適用
+QTY      Quantity      數量
+I/O      input/output      輸入/輸出
+NG      Not Good      不行,不合格
+C=0      Critical=0      極嚴重不允許
+APP      Approve      核準,認可,承認
+CHK      Check      確認
+ASS'Y      Assembly      裝配,組裝
+T/P      True Position      真位度
+5WIH      When, Where, Who, What, Why, How to
+6M      Man, Machine, Material, Method, Measurement, Message
+4MTH      Man, Material, Money, Method, Time, How      人力,物力,財務,技術,時間(資源)
+SQA      Strategy Quality Assurance      策略品質保證
+DQA      Design Quality Assurance      設計品質保證
+MQA      Manufacture Quality Assurance      製造品質保證
+SSQA      Sales and service Quality Assurance      銷售及服務品質保證
+LRR      Lot Reject Rate      批退率
+SPS      Switching power supply      電源箱
+DT      Desk Top      臥式(機箱)
+MT      Mini-Tower      立式(機箱)
+DVD      Digital Video Disk
+VCD      Video Compact Disk
+LCD      Liquid Crystal Display
+CAD      Computer Aided Design
+CAM      Computer Aided Manufacturing
+CAE      Computer Aided Engineering
+PCB      Printed Circuit Board      印刷電路板
+CAR      Correction Action Report      改善報告
+NG      Not Good      不良
+WDR      Weekly Delivery Requirement      周出貨要求
+PPM      Percent Per Million      百萬分之一
+TPM      Total Production Maintenance      全面生產保養
+MRP      Material Requirement Planning      物料需計劃
+OS      Operation System      作業系統
+TBA      To Be Assured      待定,定缺
+D/C      Drawing Change
+P/P      Plans & Procedure
+EMI      Electrical-Music Industry      電子音樂工業
+      Electrical Magnetic Interference           電子干擾
+RFI      Read Frequency Input      讀頻輸入
+MMC      Maximum Material Condition
+MMS      Maximum Material Size
+LMC      Least Material Condition
+LMS      Least Material Size
+LED     lighting-emitting diode 發光二極管
+QBR     Quarter Business Record
+CIP     Continuous improvement process         
+FGI     Forecasted Goal Inventory
+CNC     Computerized numeral controller
+B2C     Business to customer
+B2B     Business to business
+AVL     Approved vendor list
+POP     Procedure of packaging
+EOL     End of life
+VDCS     Vender defect correcting sheet
+PDCS     Process defect correcting sheet
+GRN       Goods receiving note
+A/R       Accounting receivable
+A/P       Accounting payable
+
+專業詞彙
+通用類
+president董事長
+operator作業員
+position職務
+general manager總經理
+special assistant 特助
+deputy manager |'depjuti| =vice manager副理
+deputy supervisor =vice supervisor副課長
+group leader組長
+line leader線長
+supervisor 課長
+responsible department負責單位
+Human Resources Department
+人力資源部
+Head count 人頭數
+production department生產部門
+planning department企劃部
+QC Section品管課
+stamping factory沖壓廠
+painting factory烤漆廠
+molding factory成型廠
+administration/general affairs dept./總務部
+production unit生產單位
+meeting minutes會議記錄
+distribution department分發單位
+subject主題
+conclusion結論
+decision items決議事項
+pre-fixed finishing date預定完成日
+Color management   顏色管理             
+Visual management 目視管理   
+production capacity生產力
+first count初盤
+first check初盤復櫂
+second count 復盤
+second check復盤覆核
+quantity of physical inventory second count 復盤點數量
+physical inventory盤點數量
+physical count quantity帳面數量
+difference quantity差異量
+spare parts physical inventory list備品盤點清單
+cause analysis原因分析
+waste materials廢料
+description品名
+specification 規格
+model機種
+work order工令
+revision版次
+remark備註registration登記
+registration card登記卡
+to control管制
+application form for purchase請購單
+consume, consumption消耗
+to notify通知
+to fill in填寫
+to collect, to gather收集
+statistics統計
+cosmetic inspection standard 外觀檢驗規範         
+computer case 電腦外殼(元件)
+personal computer enclosure 電腦機箱產品         
+front plate前板
+rear plate後板
+chassis |'∫?si| 基座
+bezel panel面板
+Hood   上蓋     ?
+base pan 基座                         
+bezel   面板       
+riser card 擴充卡     
+flat cable 排線                           
+TOP　driver cage   上磁架           
+bottom driver cage   下磁架             
+resin film       樹脂膜                 
+raw materials原料
+materials物料
+steel plate鋼板
+roll/coil material捲料
+spare parts =buffer備品
+plastic parts塑膠件
+sheet metal parts/stamping parts 沖件
+material check list物料檢查表
+finished product成品
+semi-finished product半成品
+good product/accepted goods/ accepted parts/good parts良品
+defective product/non-good parts不良品
+disposed goods處理品
+warehouse/hub倉庫
+packing material包材
+basket蝴蝶竺
+plastic basket膠筐
+flow chart流程表單
+production tempo生產進度現狀
+lots of production生產批量
+manufacture procedure製程
+to revise, modify修訂
+to switch over to, switch—to, switching over切換
+engineering bottleneck, project difficulty工程瓶頸
+glove(s)手套
+glove(s) with exposed fingers割手套
+Band-Aid創可貼
+Industrial alcohol工業酒精
+broom掃把
+mop拖把
+vacuum cleaner吸塵器
+rag 抹布
+garbage container灰箕
+garbage can垃圾箱
+garbage bag垃圾袋
+liaison聯絡單
+rags抹布
+lamp holder燈架
+to mop the floor拖地
+to clean a table擦桌子
+air pipe 氣管
+delivery deadline交貨期
+die worker模工
+production, to produce生產
+equipment設備
+resistance電阻
+beacon警示燈
+coolant冷卻液
+crusher破碎機
+club car高爾夫球車
+plate電鍍
+power button電源按鍵
+reset button重置鍵
+forklift叉車 
+Workshop traveler 天車
+trailer =long vehicle拖板車
+Hydraulic trolley手壓車
+hydraulic hand jack油壓板車
+casing = containerization裝箱velocity速度
+patent專利
+coordinate座標
+supply and demand供求
+career card履歷卡
+barricade隔板
+carton box紙箱
+to pull and stretch拉深
+work cell/work shop工作間
+sub-line支線
+bottleneck   瓶頸
+
+模具工程類
+plain die簡易模
+pierce die沖孔模
+forming die成型模
+progressive die連續模
+stage die工程模
+compound die復合模
+shearing die剪邊模
+riveting die鉚合模
+feature die公母模
+male die公模
+female die母模
+cavity型控 母模
+core模心 公模
+die change 換模
+to fix a die裝模
+to repair a die修模
+punch set上模座
+punch pad上墊板
+punch holder上夾板
+stripper pad脫料背板
+up stripper上脫料板
+upper plate上範本
+lower plate下範本
+die pad下墊板
+die holder下夾板
+die set下模座
+bottom block下墊腳
+bottom plate下托板(底板) 
+upper supporting blank上承板
+upper padding plate blank上墊板
+top plate上托板（頂板）
+top block上墊腳
+stripping plate內外打(脫料板)
+outer stripper外脫料板
+inner stripper內脫料板
+lower stripper下脫料板punch沖頭
+insert入塊(嵌入件)
+deburring punch壓毛邊沖子
+groove punch壓線沖子
+stamped punch字模沖子
+round punch圓沖子
+special shape punch異形沖子
+bending block折刀
+roller滾軸
+baffle plate擋塊
+located block定位塊
+supporting block for location
+定位支承塊
+air cushion plate氣墊板
+air-cushion eject-rod氣墊頂桿
+trimming punch切邊沖子
+stiffening rib punch = stinger 加強筋衝子
+ribbon punch壓筋沖子
+reel-stretch punch卷圓壓平沖子
+guide plate定位板
+sliding block滑塊
+sliding dowel block滑塊固定塊
+die locker鎖模器
+pressure plate =plate pinch壓板
+thickness gauge厚薄規
+cutting die, blanking die沖裁模
+die block模組
+folded block折彎塊
+sliding block滑塊
+location pin定位銷
+lifting pin頂料銷
+die plate, front board範本
+padding block墊塊
+stepping bar墊條
+panel board鑲塊
+to load a die裝上模具
+to unload a die 御模具
+active plate活動板
+lower sliding plate下滑塊板
+upper holder block上壓塊
+upper mid plate上中間板
+spring box彈簧箱
+spring-box eject-rod彈簧箱頂桿
+spring-box eject-plate彈簧箱頂板
+bushing block襯套
+cover plate蓋板
+guide pad導料塊
+pilot導正筒
+trim剪外邊
+pierce剪內邊
+pocket for the punch head掛鉤槽
+slug hole廢料孔
+radius半徑
+shim/wedge/heel/pad/spacer/gasket楔子
+torch-flame cut火焰切割
+set screw止付螺絲
+form block折刀
+round pierce punch =die button圓沖子
+shape punch =die insert異形子
+stock located block定位塊
+metal plate鈑金
+miller銑床
+grinder磨床
+tolerance公差
+score =groove壓線
+sliding block滑塊lathe車
+active plate活動板
+baffle plate擋塊
+cover plate蓋板
+groove punch壓線沖子
+air-cushion eject-rod氣墊頂桿
+spring-box eject-plate彈簧箱頂板
+capability能力
+parameter參數
+factor係數
+driller鉆床
+set up die架模
+height of die setting up架模高度
+analog-mode device類模器
+inner guiding post內導柱
+inner hexagon screw內六角螺釘
+dowel pin固定銷
+coil spring彈簧
+lifter pin頂料銷
+eq-height sleeves =spool等高套筒
+pin銷
+lifter guide pin浮升導料銷
+guide pin導正銷
+wire spring圓線彈簧
+outer guiding post外導柱
+stop screw止付螺絲
+located pin定位銷
+outer bush外導套
+press specification沖床規格
+die height閉模高度
+flow mark流痕
+welding mark溶合痕
+post screw insert螺紋套筒埋值
+self tapping screw自攻螺絲
+stripper plate脫料板
+piston活塞
+handle mold手持式模具
+flash mold溢流式模具
+positive mold擠壓式模具
+split mold分割式模具
+die lifter舉模器
+top stop上死點
+bottom stop下死點
+one stroke一行程
+to continue, cont.連動
+to grip(material)吸料
+location lump, locating piece, location block定位塊
+reset復位
+to file burr 銼毛刺
+embedded lump |in'bed| |l?mp|鑲塊
+stamping-missing漏沖
+to tight a bolt擰緊螺栓
+to loosen a bolt擰鬆螺栓
+punched hole沖孔
+to cut edge =side cut =side scrap 切邊
+to bending折彎
+to pull, to stretch拉伸
+engraving, to engrave刻印
+stamping 油印
+to stake鉚合
+designing, to design設計
+design modification       設計脩改成
+gauge(or jig)治具
+pedal踩踏板
+stopper阻擋器
+flow board流水板
+torque扭矩
+spline =the multiple keys花鍵
+quenching淬火
+tempering回火
+annealing退火
+carbonization碳化
+alloy合金
+tungsten high speed steel鎢高速的
+moly high speed steel鉬高速的
+forming成型(抽凸,沖凸)
+draw hole抽孔
+bending折彎
+emboss凸點
+dome凸圓
+semi-shearing半剪
+stamp mark沖記號
+deburr or coin壓毛邊
+punch riveting沖壓鉚合
+side stretch側衝壓平
+reel stretch卷圓壓平
+groove壓線
+stamp letter沖字(料號)
+tick-mark nearside正面壓印
+tick-mark farside反面壓印
+
+沖壓類
+punch, press沖
+punching machine 沖床
+hydraulic machine油壓機
+jack升降機
+decoiler整平機
+manufacture management製造管理
+stamping, press沖壓
+feeder送料機
+rack, shelf, stack料架
+taker取料機
+to reverse material 翻料
+to load material上料
+to unload material卸料
+to return material/stock to退料
+scraped |'skr?pid|報廢
+scrape ..v.刮;削
+robot機械手
+production line流水線
+packaging tool打包機
+packaging打包
+
+成型類
+well type蓄料井
+insulated runner絕緣澆道方式
+hot runner熱澆道
+runner plat澆道模組
+valve gate閥門澆口
+band heater環帶狀的電熱器
+spindle閥針
+spear head鉋尖頭
+slag well冷料井
+cold slag冷料渣
+air vent排氣道
+welding line熔合痕
+eject pin頂出針
+knock pin頂出銷
+return pin回位銷反頂針
+sleeve套筒
+stripper plate脫料板
+insert core放置入子
+runner stripper plate澆道脫料板
+guide pin導銷
+eject rod (bar)（成型機）頂業捧
+subzero深冷處理
+three plate三極式模具
+runner system澆道系統
+stress crack應力電裂
+orientation定向
+sprue gate射料澆口，直澆口
+nozzle射嘴
+sprue lock pin料頭鉤銷(拉料桿)
+slag well冷料井
+side gate側澆口
+edge gate側緣澆口
+tab gate搭接澆口
+film gate薄膜澆口
+flash gate閘門澆口
+slit gate縫隙澆口
+fan gate扇形澆口
+dish gate因盤形澆口
+diaphragm gate隔膜澆口
+ring gate環形澆口
+submarine gate潛入式澆口
+tunnel gate隧道式澆口
+pin gate針點澆口
+runner less無澆道
+sprue less   無射料管方式
+long nozzle延長噴嘴方式
+spur澆口;溶     
+waste廢料
+board看板
+sliding rack滑料架
+to impose lines壓線
+to compress, compressing壓縮
+character die字模
+to feed, feeding送料
+material change, stock change材料變更
+feature change 特性變更
+prepare for, make preparations for 準備
+rotating speed, revolution轉速
+abnormal handling異常處理
+
+組裝類
+Assembly line組裝線
+Layout佈置圖
+Conveyer流水線運輸帶
+Rivet machine拉釘機
+Rivet gun拉釘槍
+Screw driver起子
+Electric screw driver電動起子
+Hydraulic machine 液壓機
+Pneumatic screw driver氣動起子
+automation自動化
+to stake, staking, riveting鉚合
+add lubricant oil加潤滑油
+argon welding氬焊
+cylinder油缸
+robot機械手
+conveying belt輸送帶
+transmission rack輸送架
+to draw holes抽孔
+bolt螺栓
+nut 螺母
+screw 螺絲
+identification tag標示單
+screwdriver plug起子插座
+automatic screwdriver電動啟子
+to move, to carry, to handle搬運
+be put in storage入庫
+packing包裝
+staker = riveting machine鉚合機
+fit together組裝在一起
+fasten鎖緊(螺絲)
+fixture 夾具(治具)
+pallet/skid棧板
+barcode條碼
+barcode scanner條碼掃瞄器
+fuse together熔合
+fuse machine/heat stake熱熔機
+processing, to process加工
+delivery, to deliver 交貨
+to return delivery to. to send delivery back to return of goods退貨
+easily damaged parts易損件
+standard parts標準件
+to lubricate潤滑
+spring 彈簧
+spare tools location/buffer手工備品倉
+spare molds location模具備品倉
+tox machine自鉚機
+
+烤漆類
+phosphate皮膜化成
+viscosity塗料粘度
+alkalidipping脫脂
+main manifold主集流脈
+organic solvent有機溶劑
+demagnetization去磁;消磁
+high-speed transmission高速傳遞
+heat dissipation熱傳
+rack上料
+volatile揮發性
+degrease脫脂
+rinse水洗
+alkaline etch齡咬
+desmot剝黑膜
+D.I. rinse純水次
+Chromate鉻酸處理
+Anodize陽性處理
+seal封孔
+scraped products報放品
+disposed products處理品
+dismantle the die折模
+auxiliary function輔助功能
+heater band 加熱片
+thermocouple熱電偶
+derusting machine除銹機
+degate打澆口
+dryer烘乾機
+induction感應
+induction light感應光
+response =reaction =interaction感應
+ram連桿
+edge finder巡邊器
+concave凸
+convex凹
+cold slug冷塊
+blush 導色
+gouge溝槽;鑿槽
+satin texture段面咬花
+witness line證示線
+grit沙礫
+granule =pellet =grain細粒
+sand blasting噴沙
+grit maker抽粒機
+cushion緩衝
+fillet鑲;嵌邊
+roller pin formality滾針形式
+cam driver鍘楔
+shank摸柄
+crank shaft曲柄軸
+
+品質類
+qualified products, up-to-grade products良品
+defective products, not up-to-grade products不良品
+defective product box不良品箱
+poor processing 製程不良
+poor incoming part來件不良
+exposed metal/bare metal金屬裸露
+excessive defect過多的缺陷
+critical defect極嚴重缺陷
+major defect主要缺陷
+minor defect次要缺陷
+not up to standard不合規格
+cosmetic defect外觀不良
+lack of painting烤漆不到位
+slipped screw head/slippery slipped thread滑絲
+missing part漏件
+wrong part錯件
+oxidation氧化
+defective threading抽芽不良
+poor staking鉚合不良
+deficient purchase來料不良
+deficient manufacturing procedure製程不良
+cosmetic inspection外觀檢查     
+inner parts inspection內部檢查
+blister 氣泡
+angular offset 角度偏差
+dent 壓痕
+scratch 刮傷
+deformation 變形
+filings 鐵削
+defective label 不良標籤
+abrasion 磨損
+Breaking. (be)broken,(be)cracked 斷裂
+short射料不足
+nick缺口
+speck瑕疪
+shine亮班
+splay 銀紋
+gas mark焦痕
+delaminating起鱗
+speckle斑點
+mildewed =moldy = mouldy發霉
+deformation變形
+burr(金屬)flash(塑件)毛邊
+poor staking鉚合不良
+excessive gap間隙過大
+grease/oil stains油污
+inclusion雜質
+shrinking/shrinkage縮水
+mixed color雜色
+fold of packaging belt打包帶折皺
+painting make-up補漆
+discoloration羿色
+water spots水漬
+impurity     雜質
+Mismatch   錯位
+failure, trouble   故障
+deformation   變形
+rust         生銹
+peel         脫漆
+Shrink       縮水
+Contamination   臟污
+water spots     水漬
+Gap         間隙
+label error     標籤錯誤
+Missing label   漏貼
+rejection criteria   拒收標準
+Suspected rejects     可疑庇
+abrasion       損傷、磨損
+Texture surface   印花紋表面
+Streak           條紋
+stains           污點
+Blotch           斑點
+discoloration       脫色
+Inclusion         雜質
+slug mark         壓痕
+dirt grime       灰塵 
+blush         毛邊薄膜
+sink           下凹
+Hickey         漏漆
+labels and logos   貼紙與商標
+Configuration labels 組合貼紙 
+corrugated container 瓦擺紙箱
+Delaminating     脫層
+splattering       散點
+Gouge         銼孔 
+puckering       折痕
+
+/******************************************************************************/
+電子專業的英文
+/******************************************************************************/
+AI :Auto-Insertion 自動插件
+AQL :acceptable quality level 允收水準
+ATE :automatic test equipment 自動測試
+ATM :atmosphere 氣壓
+BGA :ball grid array 球形矩陣
+CCD :charge coupled device 監視連接元件(攝影機)
+CLCC :Ceramic leadless chip carrier 陶瓷引腳載具
+COB :chip-on-board 晶片直接貼附在電路板上
+cps :centipoises(黏度單位) 百分之一
+CSB :chip scale ball grid array 晶片尺寸BGA
+CSP :chip scale package 晶片尺寸構裝
+CTE :coefficient of thermal expansion 熱膨脹係數
+DIP :dual in-line package 雙內線包裝(泛指手插元件)
+FPT :fine pitch technology 微間距技術
+FR-4 :flame-retardant substrate 玻璃纖維膠片(用來製作PCB材質)
+IC :integrate circuit 積體電路
+IR :infra-red 紅外線
+Kpa :kilopascals(壓力單位)
+LCC :leadless chip carrier 引腳式晶片承載器
+MCM :multi-chip module 多層晶片模組
+MELF :metal electrode face 二極體
+MQFP :metalized QFP 金屬四方扁平封裝
+NEPCON :National Electronic Package and
+Production Conference 國際電子包裝及生產會議
+PBGA :plastic ball grid array 塑膠球形矩陣
+PCB :printed circuit board 印刷電路板
+PFC :polymer flip chip
+PLCC :plastic leadless chip carrier 塑膠式有引腳晶片承載器
+Polyurethane 聚亞胺酯(刮刀材質)
+ppm :parts per million 指每百萬PAD(點)有多少個不良PAD(點)
+psi :pounds/inch2 磅/英吋2
+PWB :printed wiring board 電路板
+QFP :quad flat package 四邊平坦封裝
+SIP :single in-line package
+SIR :surface insulation resistance 絕緣阻抗
+SMC :Surface Mount Component 表面黏著元件
+SMD :Surface Mount Device 表面黏著元件
+SMEMA :Surface Mount Equipment
+Manufacturers Association 表面黏著設備製造協會
+SMT :surface mount technology 表面黏著技術
+SOIC :small outline integrated circuit
+SOJ :small out-line j-leaded package
+SOP :small out-line package 小外型封裝
+SOT :small outline transistor 電晶體
+SPC :statistical process control 統計過程序控制制
+SSOP :shrink small outline package 收縮型小外形封裝
+TAB :tape automaticed bonding 帶狀自動結合
+TCE :thermal coefficient of expansion 膨脹(因熱)係數
+Tg :glass transition temperature 玻璃轉換溫度
+THD :Through hole device 須穿過洞之元件(貫穿孔)
+TQFP :tape quad flat package 帶狀四方平坦封裝
+UV :ultraviolet 紫外線
+uBGA :micro BGA 微小球型矩陣
+cBGA :ceramic BGA 陶瓷球型矩陣
+PTH :Plated Thru Hole 導通孔
+IA Information Appliance 資訊家電產品
+MESH 網目
+OXIDE 氧化物
+FLUX 助焊劑
+LGA (Land Grid Arry)封裝技術 LGA封裝不需植球，適合輕薄短小產品應用。
+TCP (Tape Carrier Package)
+ACF Anisotropic Conductive Film 異方性導電膠膜製程
+Solder mask 防焊漆
+Soldering Iron 烙鐵
+Solder balls 錫球
+Solder Splash 錫渣
+Solder Skips 漏焊
+Cold-Weld 冷焊
+Lap-Weld 搭焊
+Spot-Weld 點焊
+Unsolder 脫焊 把…脫焊,熔化焊接處以拆開;使分離
+Unwelded 未焊接的
+Through hole 貫穿孔
+Touch up 補焊
+Welding seam 焊縫
+Briding 穚接(短路)
+Solder Wires 焊錫線
+Solder Bars 錫棒
+Green Strength 未固化強度(紅膠)
+Transter Pressure 轉印壓力(印刷)
+Screen Printing 刮刀式印刷
+Solder Powder 錫顆粒
+Wetteng ability 潤濕能力
+Viscosity 黏度
+Solderability 焊錫性
+Applicability 使用性
+Flip chip 覆晶
+Depaneling Machine 組裝電路板切割機
+Solder Recovery System 錫料回收再使用系統
+Wire Welder 主機板補線機
+X-Ray Multi-layer Inspection System X-Ray孔偏檢查機
+BGA Open/Short X-Ray Inspection Machine BGA X-Ray檢測機
+Prepreg Copper Foil Sheeter P.P. 銅箔裁切機
+Flex Circuit Connections 軟性排線焊接機
+LCD Rework Station 液晶顯示器修護機
+Battery Electro Welder 電池電極焊接機
+PCMCIA Card Welder PCMCIA卡連接器焊接
+Laser Diode 半導體雷射
+Ion Lasers 離子雷射
+Nd: YAG Laser 石榴石雷射
+DPSS Lasers 半導體激發固態雷射
+Ultrafast Laser System 超快雷射系統
+MLCC Equipment 積層元件生產設備
+Green Tape Caster, Coater 薄帶成型機
+ISO Static Laminator 積層元件均壓機
+Green Tape Cutter 元件切割機
+Chip Terminator 積層元件端銀機
+MLCC Tester 積層電容測試機
+Components Vision Inspection System晶片元件外觀檢查機
+高壓恆溫恆濕壽命測試機 High Voltage Burn-In Life Tester
+電容漏電流壽命測試機 Capacitor Life Test with Leakage Current
+晶片打帶包裝機 Taping Machine
+元件表面黏著設備 Surface Mounting Equipment
+電阻銀電極沾附機 Silver Electrode Coating Machine
+TFT-LCD(薄膜電晶體液晶顯示器) 筆記型用
+STN-LCD(中小尺寸超扭轉向液晶顯示器 行動電話用
+PDA(個人數位助理器)
+CMP(化學機械研磨)製程
+研磨液(Slurry)，
+Compact Flash Memory Card (簡稱CF記憶卡) MP3、PDA、數位相機
+Dataplay Disk(微光碟)。
+交換式電源供應器(SPS)
+專業電子製造服務 (EMS)，
+PCB
+高密度連結板（HDI board， 指線寬／線距小於4／4 mil）微小孔板（Micro-viaboard），孔俓5-6mil以下水溝效應（Puddle Effect）：早期大面積鬆寬線路之蝕刻銀貫孔(STH)銅貫孔(CTH)
+組裝電路板切割機 Depaneling Machine
+NONCFC＝無氟氯碳化合物。
+Support pin＝支撐柱
+F.M.＝光學點
+ENTEK 裸銅板上塗一層化學藥劑使PCB的pad比較不會生鏽
+QFD：品質機能展開
+PMT：產品成熟度測試
+ORT：持續性壽命測試
+FMEA：失效模式與效應分析
+TFT-LCD(薄膜電晶體液晶顯示器) (Liquid-Crystal Displays Addressed by Thin-Film Transistors)
+導線架（Lead Frame）：單體導線架（Discrete Lead Frame）及積體線路導線架（IC Lead Frame）二種
+ISP的全名是Internet Service Provider，指的是網際網路服務提供
+ADSL即為非對稱數位用戶迴路數據機
+SOP: Standard Operation Procedure（標準操作手冊）
+DOE: Design Of Experiment （實驗計劃法）
+打線接合（Wire Bonding）
+捲帶式自動接合（Tape Automated Bonding, TAB）
+覆晶接合（Flip Chip）
+品質規範:
+JIS 日本工業標準
+ISO 國際
+
+/******************************************************************************/
+PCB綜合詞彙中英文對照：
+/******************************************************************************/
+1、 印製電路：printed circuit
+2、 印製線路：printed wiring
+3、 印製板：printed board
+4、 印製板電路：printed circuit board (pcb)
+5、 印製線路板：printed wiring board(pwb)
+6、 印製元件：printed component
+7、 印製接點：printed contact
+8、 印製板裝配：printed board assembly
+9、 板：board
+10、 單面印製板：single-sided printed board(ssb)
+11、 雙面印製板：double-sided printed board(dsb)
+12、 多層印製板：mulitlayer printed board(mlb)
+13、 多層印製電路板：mulitlayer printed circuit board
+14、 多層印製線路板：mulitlayer prited wiring board
+15、 剛性印製板：rigid printed board
+16、 剛性單面印製板：rigid single-sided printed borad
+17、 剛性雙面印製板：rigid double-sided printed borad
+18、 剛性多層印製板：rigid multilayer printed board
+19、 撓性多層印製板：flexible multilayer printed board
+20、 撓性印製板：flexible printed board
+21、 撓性單面印製板：flexible single-sided printed board
+22、 撓性雙面印製板：flexible double-sided printed board
+23、 撓性印製電路：flexible printed circuit (fpc)
+24、 撓性印製線路：flexible printed wiring
+25、 剛性印製板：flex-rigid printed board, rigid-flex printed board
+26、 剛性雙面印製板：flex-rigid double-sided printed board, rigid-flex double-sided printed
+27、 剛性多層印製板：flex-rigid multilayer printed board, rigid-flex multilayer printed board
+28、 齊平印製板：flush printed board
+29、 金屬芯印製板：metal core printed board
+30、 金屬基印製板：metal base printed board
+31、 多重布線印製板：mulit-wiring printed board
+32、 陶瓷印製板：ceramic substrate printed board
+33、 導電膠印製板：electroconductive paste printed board
+34、 模塑電路板：molded circuit board
+35、 模壓印製板：stamped printed wiring board
+36、 順序層壓多層印製板：sequentially-laminated mulitlayer
+37、 散線印製板：discrete wiring board
+38、 微線印製板：micro wire board
+39、 積層印製板：buile-up printed board
+40、 積層多層印製板：build-up mulitlayer printed board (bum)
+41、 積層撓印製板：build-up flexible printed board
+42、 表面層合電路板：surface laminar circuit (slc)
+43、 埋入凸塊連印製板：b2it printed board
+44、 多層膜基板：multi-layered film substrate(mfs)
+45、 層間全內導通多層印製板：alivh multilayer printed board
+46、 載晶片板：chip on board (cob)
+47、 埋電阻板：buried resistance board
+48、 母板：mother board
+49、 子板：daughter board
+50、 背板：backplane
+51、 裸板：bare board
+52、 鍵盤板夾心板：copper-invar-copper board
+53、 動態撓性板：dynamic flex board
+54、 靜態撓性板：static flex board
+55、 可斷拼板：break-away planel
+56、 電纜：cable
+57、 撓性扁平電纜：flexible flat cable (ffc)
+58、 薄膜開關：membrane switch
+59、 混合電路：hybrid circuit
+60、 厚膜：thick film
+61、 厚膜電路：thick film circuit
+62、 薄膜：thin film
+63、 薄膜混合電路：thin film hybrid circuit
+64、 互連：interconnection
+65、 導線：conductor trace line
+66、 齊平導線：flush conductor
+67、 傳輸線：transmission line
+68、 跨交：crossover
+69、 板邊插頭：edge-board contact
+70、 增強板：stiffener
+71、 基底：substrate
+72、 基板面：real estate
+73、 導線面：conductor side
+74、 元件面：component side
+75、 焊接面：solder side
+76、 印製：printing
+77、 網格：grid
+78、 圖形：pattern
+79、 導電圖形：conductive pattern
+80、 非導電圖形：non-conductive pattern
+81、 字元：legend
+82、 標誌：mark
+
+
+/******************************************************************************/
+PCB基材類詞彙中英文對照：
+/******************************************************************************/
+1、 基材：base material
+2、 層壓板：laminate
+3、 覆金屬箔基材：metal-clad bade material
+4、 覆銅箔層壓板：copper-clad laminate (ccl)
+5、 單面覆銅箔層壓板：single-sided copper-clad laminate
+6、 雙面覆銅箔層壓板：double-sided copper-clad laminate
+7、 復合層壓板：composite laminate
+8、 薄層壓板：thin laminate
+9、 金屬芯覆銅箔層壓板：metal core copper-clad laminate
+10、 金屬基覆銅層壓板：metal base copper-clad laminate
+11、 撓性覆銅箔絕緣薄膜：flexible copper-clad dielectric film
+12、 基體材料：basis material
+13、 預浸材料：prepreg
+14、 粘結片：bonding sheet
+15、 預浸粘結片：preimpregnated bonding sheer
+16、 環氧玻璃基板：epoxy glass substrate
+17、 加成法用層壓板：laminate for additive process
+18、 預制內層覆箔板：mass lamination panel
+19、 內層芯板：core material
+20、 催化板材：catalyzed board ,coated catalyzed laminate
+21、 塗膠催化層壓板：adhesive-coated catalyzed laminate
+22、 塗膠無催層壓板：adhesive-coated uncatalyzed laminate
+23、 粘結層：bonding layer
+24、 粘結膜：film adhesive
+25、 塗膠粘劑絕緣薄膜：adhesive coated dielectric film
+26、 無支撐膠粘劑膜：unsupported adhesive film
+27、 覆蓋層：cover layer (cover lay)
+28、 增強板材：stiffener material
+29、 銅箔面：copper-clad surface
+30、 去銅箔面：foil removal surface
+31、 層壓板面：unclad laminate surface
+32、 基膜面：base film surface
+33、 膠粘劑面：adhesive faec
+34、 原始光潔面：plate finish
+35、 粗面：matt finish
+36、 縱向：length wise direction
+37、 模向：cross wise direction
+38、 剪切板：cut to size panel
+39、 酚醛紙質覆銅箔板：phenolic cellulose paper copper-clad laminates(phenolic/paper ccl)
+40、 環氧紙質覆銅箔板：epoxide cellulose paper copper-clad laminates (epoxy/paper ccl)
+41、 環氧玻璃布基覆銅箔板：epoxide woven glass fabric copper-clad laminates
+42、 環氧玻璃布紙復合覆銅箔板：
+     epoxide cellulose paper core, glass cloth surfaces copper-clad laminates
+43、 環氧玻璃布玻璃纖維復合覆銅箔板：
+     epoxide non woven/woven glass reinforced copper-clad laminates
+44、 聚酯玻璃布覆銅箔板：ployester woven glass fabric copper-clad laminates
+45、 聚□亞胺玻璃布覆銅箔板：polyimide woven glass fabric copper-clad laminates
+46、 雙馬來□亞胺三秦環氧玻璃布覆銅箔板：
+     bismaleimide/triazine/epoxide woven glass fabric copper-clad lamimates
+47、 環氧合成纖維布覆銅箔板：epoxide synthetic fiber fabric copper-clad laminates
+48、 聚四乙烯玻璃纖維覆銅箔板：teflon/fiber glass copper-clad laminates
+49、 超薄型層壓板：ultra thin laminate
+50、 陶瓷基覆銅箔板：ceramics base copper-clad laminates
+51、 紫外線阻擋型覆銅箔板：uv blocking copper-clad laminates
+
+/******************************************************************************/
+PCB原材料化學用語中英文對照：
+/******************************************************************************/
+1、 a階樹脂：a-stage resin
+2、 b階樹脂：b-stage resin
+3、 c階樹脂：c-stage resin
+4、 環氧樹脂：epoxy resin
+5、 酚醛樹脂：phenolic resin
+6、 聚酯樹脂：polyester resin
+7、 聚□亞胺樹脂：polyimide resin
+8、 雙馬來□亞胺三秦樹脂：bismaleimide-triazine resin
+9、 丙烯酸樹脂：acrylic resin
+10、 三聚氰胺甲醛樹脂：melamine formaldehyde resin
+11、 多官能環氧樹脂：polyfunctional epoxy resin
+12、 溴化環氧樹脂：brominated epoxy resin
+13、 環氧酚醛：epoxy novolac
+14、 氟樹脂：fluroresin
+15、 矽樹脂：silicone resin
+16、 矽烷：silane
+17、 聚合物：polymer
+18、 無定形聚合物：amorphous polymer
+19、 結晶現象：crystalline polamer
+20、 雙晶現象：dimorphism
+21、 共聚物：copolymer
+22、 合成樹脂：synthetic
+23、 熱固性樹脂：thermosetting resin
+24、 熱塑性樹脂：thermoplastic resin
+25、 感光性樹脂：photosensitive resin
+26、 環氧當量：weight per epoxy equivalent (wpe)
+27、 環氧值：epoxy value
+28、 雙氰胺：dicyandiamide
+29、 粘結劑：binder
+30、 膠粘劑：adesive
+31、 固化劑：curing agent
+32、 阻燃劑：flame retardant
+33、 遮光劑：opaquer
+34、 增塑劑：plasticizers
+35、 不飽和聚酯：unsatuiated polyester
+36、 聚酯薄膜：polyester
+37、 聚□亞胺薄膜：polyimide film (pi)
+38、 聚四氟乙烯：polytetrafluoetylene (ptfe)
+39、 聚全氟乙烯丙烯薄膜：perfluorinated ethylene-propylene copolymer film (fep)
+40、 增強材料：reinforcing material
+41、 玻璃纖維：glass fiber
+42、 e玻璃纖維：e-glass fibre
+43、 d玻璃纖維：d-glass fibre
+44、 s玻璃纖維：s-glass fibre
+45、 玻璃布：glass fabric
+46、 非織布：non-woven fabric
+47、 玻璃纖維墊：glass mats
+48、 紗線：yarn
+49、 單絲：filament
+50、 絞股：strand
+51、 緯紗：weft yarn
+52、 經紗：warp yarn
+53、 但尼爾：denier
+54、 經向：warp-wise
+55、 緯向：weft-wise, filling-wise
+56、 織物經緯密度：thread count
+57、 織物組織：weave structure
+58、 平紋組織：plain structure
+59、 壞布：grey fabric
+60、 稀鬆織物：woven scrim
+61、 弓緯：bow of weave
+62、 斷經：end missing
+63、 缺緯：mis-picks
+64、 緯斜：bias
+65、 折痕：crease
+66、 雲織：waviness
+67、 魚眼：fish eye
+68、 毛圈長：feather length
+69、 厚薄段：mark
+70、 裂縫：split
+71、 捻度：twist of yarn
+72、 浸潤劑含量：size content
+73、 浸潤劑殘留量：size residue
+74、 處理劑含量：finish level
+75、 浸潤劑：size
+76、 偶聯劑：couplint agent
+77、 處理織物：finished fabric
+78、 聚□胺纖維：polyarmide fiber
+79、 聚酯纖維非織布：non-woven polyester fabric
+80、 浸漬絕緣縱紙：impregnating insulation paper
+81、 聚芳□胺纖維紙：aromatic polyamide paper
+82、 斷裂長：breaking length
+83、 吸水高度：height of capillary rise
+84、 濕強度保留率：wet strength retention
+85、 白度：whitenness
+86、 陶瓷：ceramics
+87、 導電箔：conductive foil
+88、 銅箔：copper foil
+89、 電解銅箔：electrodeposited copper foil (ed copper foil)
+90、 壓延銅箔：rolled copper foil
+91、 退火銅箔：annealed copper foil
+92、 壓延退火銅箔：rolled annealed copper foil (ra copper foil)
+93、 薄銅箔：thin copper foil
+94、 塗膠銅箔：adhesive coated foil
+95、 塗膠脂銅箔：resin coated copper foil (rcc)
+96、 復合金屬箔：composite metallic material
+97、 載體箔：carrier foil
+98、 殷瓦：invar
+99、 箔（剖面）輪廓：foil profile
+100、 光面：shiny side
+101、 粗糙面：matte side
+102、 處理面：treated side
+103、 防銹處理：stain proofing
+104、 雙面處理銅箔：double treated foil
+
+
+/******************************************************************************/
+PCB線路設計詞彙中英文對照：
+/******************************************************************************/
+1、 原理圖：shematic diagram
+2、 邏輯圖：logic diagram
+3、 印製線路布設：printed wire layout
+4、 布設總圖：master drawing
+5、 可製造性設計：design-for-manufacturability
+6、 電腦輔助設計：computer-aided design.(cad)
+7、 電腦輔助製造：computer-aided manufacturing.(cam)
+8、 電腦集成製造：computer integrat manufacturing.(cim)
+9、 電腦輔助工程：computer-aided engineering.(cae)
+10、 電腦輔助測試：computer-aided test.(cat)
+11、 電子設計自動化：electric design automation .(eda)
+12、 工程設計自動化：engineering design automaton .(eda2)
+13、 組裝設計自動化：assembly aided architectural design. (aaad)
+14、 電腦輔助製圖：computer aided drawing
+15、 電腦控制顯示：computer controlled display .(ccd)
+16、 佈局：placement
+17、 布線：routing
+18、 布圖設計：layout
+19、 重布：rerouting
+20、 模擬：simulation
+21、 邏輯模擬：logic simulation
+22、 電路模擬：circit simulation
+23、 時序模擬：timing simulation
+24、 模組化：modularization
+25、 布線完成率：layout effeciency
+26、 機器描述格式：machine descriptionm format .(mdf)
+27、 機器描述格式數據庫：mdf databse
+28、 設計數據庫：design database
+29、 設計原點：design origin
+30、 優化（設計）：optimization (design)
+31、 供設計優化坐標軸：predominant axis
+32、 表格原點：table origin
+33、 鏡像：mirroring
+34、 驅動文件：drive file
+35、 中間文件：intermediate file
+36、 製造文件：manufacturing documentation
+37、 隊列支撐數據庫：queue support database
+38、 元件安置：component positioning
+39、 圖形顯示：graphics dispaly
+40、 比例因子：scaling factor
+41、 掃瞄填充：scan filling
+42、 矩形填充：rectangle filling
+43、 填充域：region filling
+44、 實體設計：physical design
+45、 邏輯設計：logic design
+46、 邏輯電路：logic circuit
+47、 層次設計：hierarchical design
+48、 自頂向下設計：top-down design
+49、 自底向上設計：bottom-up design
+50、 線網：net
+51、 數位化：digitzing
+52、 設計規則檢查：design rule checking
+53、 走（布）線器：router (cad)
+54、 網路表：net list
+55、 電腦輔助電路分析：computer-aided circuit analysis
+56、 子線網：subnet
+57、 目標函數：objective function
+58、 設計後處理：post design processing (pdp)
+59、 交互式製圖設計：interactive drawing design
+60、 費用矩陣：cost metrix
+61、 工程圖：engineering drawing
+62、 方塊框圖：block diagram
+63、 迷宮：moze
+64、 元件密度：component density
+65、 巡迴售貨員問題：traveling salesman problem
+66、 自由度：degrees freedom
+67、 入度：out going degree
+68、 出度：incoming degree
+69、 曼哈頓距離：manhatton distance
+70、 歐幾里德距離：euclidean distance
+71、 網路：network
+72、 陣列：array
+73、 段：segment
+74、 邏輯：logic
+75、 邏輯設計自動化：logic design automation
+76、 分線：separated time
+77、 分層：separated layer
+78、 定順序：definite sequence
+
+/******************************************************************************/
+PCB線路形狀與尺寸詞彙中英文對照：
+/******************************************************************************/
+1、 導線（通道）：conduction (track)
+2、 導線（體）寬度：conductor width
+3、 導線距離：conductor spacing
+4、 導線層：conductor layer
+5、 導線寬度/間距：conductor line/space
+6、 第一導線層：conductor layer no.1
+7、 圓形盤：round pad
+8、 方形盤：square pad
+9、 菱形盤：diamond pad
+10、 長方形焊盤：oblong pad
+11、 子彈形盤：bullet pad
+12、 淚滴盤：teardrop pad
+13、 雪人盤：snowman pad
+14、 v形盤：v-shaped pad
+15、 環形盤：annular pad
+16、 非圓形盤：non-circular pad
+17、 隔離盤：isolation pad
+18、 非功能連接盤：monfunctional pad
+19、 偏置連接盤：offset land
+20、 腹（背）裸盤：back-bard land
+21、 盤址：anchoring spaur
+22、 連接盤圖形：land pattern
+23、 連接盤網格陣列：land grid array
+24、 孔環：annular ring
+25、 元件孔：component hole
+26、 安裝孔：mounting hole
+27、 支撐孔：supported hole
+28、 非支撐孔：unsupported hole
+29、 導通孔：via
+30、 鍍通孔：plated through hole (pth)
+31、 余隙孔：access hole
+32、 盲孔：blind via (hole)
+33、 埋孔：buried via hole
+34、 埋/盲孔：buried /blind via
+35、 任意層內部導通孔：any layer inner via hole (alivh)
+36、 全部鑽孔：all drilled hole
+37、 定位孔：toaling hole
+38、 無連接盤孔：landless hole
+39、 中間孔：interstitial hole
+40、 無連接盤導通孔：landless via hole
+41、 引導孔：pilot hole
+42、 端接全隙孔：terminal clearomee hole
+43、 准表面間鍍覆孔：quasi-interfacing plated-through hole
+44、 准尺寸孔：dimensioned hole
+45、 在連接盤中導通孔：via-in-pad
+46、 孔位：hole location
+47、 孔密度：hole density
+48、 孔圖：hole pattern
+49、 鑽孔圖：drill drawing
+50、 裝配圖：assembly drawing
+51、 印製板組裝圖：printed board assembly drawing
+52、 參考基準：datum referance
+54、 基準尺寸：reference dimension
+55、 參考尺寸：reaerence dimension
+56、 直接量定尺寸：direct dimensioning
+57、 基準圖：datum feature
+58、 基準邊：reference edge
+59、 導線設計距離：design space of conductor
+60、 導線設計寬度：design width of conductor
+61、 中心距：center to center spacing
+62、 線寬/間距：conductor width/space
+63、 節距：pitch
+64、 精細節距：fine pitch
+65、 層：layer
+66、 層間距：layer-to-layer spacing
+67、 邊距：edge spacing
+68、 外形線：trim line
+69、 截面積：crossection area
+70、 真實值表測量：truth table test
+71、 準確位置：true position tolerance
+72、 精確位置：accuracy
+73、 精確位置誤差：cumulative tolerance
+74、 精確度：accuracy
+75、 累積誤差：cumulative tolerance
+76、 焊墊：footprint
+77、 外層：external layer
+78、 內層：internal layer
+79、 接地層：ground plane
+80、 接地層隔離：ground plane clearance
+81、 電壓層：voltage plane
+82、 電源層隔離：voltage plane clearance
+83、 電源層：power plane, bus plane
+84、 導通網路：basic grid
+85、 導通網格：track grid
+86、 導通孔網格：via grid
+87、 連通盤網格：pad (land) grid
+88、 定位偏差：positional tolerance
+89、 對準靶標：bornb sight
+90、 梳狀圖形：comb pattern
+91、 對準標記：register mark
+92、 散熱層：heat sink plane
+
+/******************************************************************************/
+PCB線路電氣互連詞彙中英文對照：
+/******************************************************************************/
+1、 表面間連接：interlayer connection
+2、 層間連接：interlayer connection
+3、 內層連接：innerlayer connection
+4、 非功能表面連接：nonfunctional interfacial connection
+5、 跨接線：jumper wire
+6、 節（交）點：node
+7、 附加線：haywire
+8、 端接（點）：terminal
+9、 連接線：terminated line
+10、 端接：termination
+11、 連接端：pad, land
+12、 貫穿連接：through connection
+13、 支線：stub
+14、 印製插頭：tab
+15、 鍵槽：keying slot
+16、 連接器：connector
+17、 板邊連接器：edge board connector
+18、 連接器區：connector area
+19、 直角板邊連接器：right angle edge connector
+20、 偏槽口：polarizing slot
+21、 偏置端接區：offset terminal area
+22、 接地：ground
+23、 端接隔離（空環）：terminal clearance
+24、 連通性：continuity
+25、 連接器接觸：connector contact
+26、 接觸面積：contact area
+27、 接觸間距：contact spacing
+28、 接觸電阻：contact resistance
+29、 接觸尺寸：contact size
+30、 元件引腿（腳）：component lead
+31、 元件插針：component pin
+32、 最小電氣間距：minimum electrical spacing
+33、 導電性：conductivity
+34、 邊卡連接器：card-edge connector
+35、 插卡連接器：card-insertion connector
+36、 載流量：current-carrying capacity
+37、 蹯徑：path
+38、 最短路徑：shortest path
+39、 關鍵路徑：critical path
+40、 倒角：miter
+41、 串推：daisy chain
+42、 斯坦納樹：steiner tree
+43、 最小生成樹：minimum spanning tree (MST)
+44、 瓶頸寬度：necked width
+45、 短叉長度：spur length
+46、 短柱長度：stub length
+47、 曼哈頓路徑：manhattan path
+48、 連接度（性）：connectivity
+
+/******************************************************************************/
+PCB線路板其他相關中英文對照：
+/******************************************************************************/
+1、 主面：primary side
+2、 輔面：secondary side
+3、 支撐面：supporting plane
+4、 信號：signal
+5、 信號導線：signal conductor
+6、 信號地線：signal ground
+7、 信號速率：signal rate
+8、 信號標準化：signal standardization
+9、 信號層：signal layer
+10、 寄生信號：spurious signal
+11、 串擾：crosstalk
+12、 電容：capacitance
+13、 電容耦合：capacitive coupling
+14、 電磁干擾：electromagnetic interference
+15、 電磁屏蔽：electromangetic shielding
+16、 噪音：noise
+17、 電磁相容性：electromagnetic compatbility
+18、 特性阻抗：impedance
+19、 阻抗匹配：impedance match
+20、 電感：inductance
+21、 延遲：delay
+22、 微帶線：microstrip
+23、 帶狀線：stripline
+24、 探測點：probe point
+25、 開窗口：cross hatching
+26、 跨距：span
+27、 共面性（度）：coplanarity
+28、 埋入電阻：buried resistance
+29、 黃金板：golden board
+30、 芯板：core board
+31、 薄基芯：thin core
+32、 非均衡傳輸線：unbalanced transmission line
+33、 閥值：threshold
+34、 極限值：threshold limit value(TLV)
+35、 散熱層：heat sink plane
+36、 熱隔離：heat sink plane
+37、 導通孔堵塞：via filiing
+38、 波動：surge
+39、 卡板：card
+40、 卡板盒/卡板櫃：card cages/card racks
+41、 薄型多層板：thin type multilayer board
+42、 埋/盲孔多層板：
+43、 模組：module
+44、 單晶片模組：single chip module (SCM)
+45、 多晶片模組：multichip module (MCM)
+46、 多晶片模組層壓基板：laminate substrate version of multichip module (MCM-L)
+47、 多晶片模組陶瓷基數板：ceramic substrate version o fmultichip module (MCM-C)
+48、 多晶片模組薄膜基板：deposition thin film substrate version of multilayer module (MCM-D)
+49、 嵌入凸塊互連技術：buried bump interconnection technology (B2 it)
+50、 自動測試技術：automatic test equipment (ATE)
+51、 芯板導通孔堵塞：core board viafilling
+52、 對準標記：alignment mark
+53、 基準標記：fiducial mark
+54、 拐角標記：corner mark
+55、 剪切標記：crop mark
+56、 銑切標記：routing mark
+57、 對位標記：registration mark
+58、 縮減標記：reduvtion mark
+59、 層間重合度：layer to layer registration
+60、 狗骨結構：dog hone
+61、 熱設計：thermal design
+62、 熱阻：thermal resistance
+
+
+/******************************************************************************/
+JS Manufacturers
+/******************************************************************************/
+泓源匯  
+榮采
+三星    samsung
+國巨    Yageo(http://www.yageo.com/)
+弘峰
+自己工廠生產 Manufacture by JS
+
+秉創    Prometek(http://www.prometek.com.tw/)
+澳浪    AOSIDA(http://aosida.com.pe168.com/)
+世盟    Shimeng(http://www.shimeng.org/)
+
+聚興/Atmel
+/
+/
+晶華/自己工廠生產
+蘭芯薇/TDK
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

@@ -1,0 +1,487 @@
+
+/******************************************************************************/
+SSDP
+/******************************************************************************/
+「簡式服務探索通訊協定」(Simple Service Discovery Protocol，SSDP) 一如名稱
+所示，主要在定義如何在網路上探索網路服務。SSDP 是以 HTTPU 和 HTTPMU 為根據
+來定義方法，讓控制點在網路上尋找有興趣的資源，並且讓裝置宣告它們在網路上的
+可用性。
+
+SSDP 是以定義搜尋要求和存在宣告的方式，省去只採用其中一種機制所需的費用。
+因此，網路上的每一個控制點，既能夠降低網路資料量，又能夠保有完整的網路狀態
+資訊。
+
+控制點和裝置都是採用 SSDP。UPnP 控制點在啟動時，會傳送一個 SSDP 搜尋要求
+(透過 HTTPMU)，來探索網路上可用的裝置和服務。控制點可以縮小搜尋範圍，只尋找
+某種類型的裝置 (如 VCR)、某種類型的服務 (如執行時鐘服務的裝置)，或者甚至是
+某一種裝置。
+
+UPnP 裝置會接聽多點傳送連接埠。只要一收到搜尋要求，該裝置便會檢查搜尋條件，
+判斷它們是否相符。如果找到一個相符的項目，便會傳送一個單點傳送 SSDP (透過
+HTTPU) 回應到控制點。
+
+同樣的，裝置在插入網路之後，也會送出多個 SSDP 存在宣告，告知大家它支援哪些
+服務。
+
+
+以上擷取自http://www.microsoft.com/taiwan/technet/prodtechnol/winxppro/
+evaluate/upnpxp.htm
+
+
+/******************************************************************************/
+UDP廣播與多播
+/******************************************************************************/
+使用UDP協定進行資訊的傳輸之前不需要建議連接。
+換句話說就是用戶端向伺服器發送資訊，用戶端只需要給出伺服器的ip地址和連接埠號，然後將資訊封裝到一個待發送的報文中並且發送出去。
+至於伺服器端是否存在，或者能否收到該報文，用戶端根本不用管。
+通常我們討論的udp的程式都是一對一的單播程式。
+本章將討論一對多的服務：廣播（broadcast）、多播（multicast）。
+對於廣播，網路中的所有主機都會接收一份數據副本。
+對於多播，消息只是發送到一個多播地址，網路知識將數據分發給哪些表示想要接收發送到該多播地址的數據的主機。總得來說，只有UDP套接字允許廣播或多播。
+
+UDP廣播
+廣播UDP與單播UDP的區別就是IP地址不同，廣播使用廣播地址255.255.255.255，將消息發送到在同一廣播網路上的每個主機。
+值得強調的是：本地廣播資訊是不會被路由器轉發。當然這是十分容易理解的，因為如果路由器轉發了廣播資訊，那麼勢必會引起網路癱瘓。
+這也是為什麼IP協定的設計者故意沒有定義互聯網範圍的廣播機制。
+廣播地址通常用於在網路遊戲中處於同一本地網路的玩家之間交流狀態資訊等。廣播就不在寫演示程式了，讀者可以將ECHO程式的ip地址改為廣播地址即可。
+其實廣播顧名思義，就是想局域網內所有的人說話，但是廣播還是要指明接收者的連接埠號的，因為不可能接受者的所有連接埠都來收聽廣播。
+
+UDP多播
+同樣的UDP多播也要指明接受者的連接埠號，而且與廣播相似的是多播與單播之間的區別還在於地址。
+ipv4中的多播地址範圍是：224.0.0.0到239.255.255.255。
+在JAVA中，多播一樣十分好實現，要實現多播，就要用到MulticastSocket類，其實該類就是DatagramSocket的子類，在使用時除了多播自己的一些特性外，
+把它當做DatagramSocket類使用就可以了。
+ 
+下面將給出一個簡單的多播接受數據的例子：
+Java代碼
+package cn.edu.heut.zcl.multicast;  
+  
+import java.net.DatagramPacket;  
+import java.net.InetAddress;  
+import java.net.MulticastSocket;  
+  
+public class UDPMulticastServer {  
+         final static int RECEIVE_LENGTH = 1024;  
+         static String multicastHost="224.0.0.1";  
+         static int localPort = 9998;  
+         public static void main(String[] args) throws Exception {  
+  
+                   InetAddress receiveAddress =InetAddress.getByName(multicastHost);  
+                   if(!receiveAddress.isMulticastAddress()){ //測試是否為多播地址  
+                            throw new Exception("請使用多播地址");  
+                   }  
+  
+                   int port = localPort;  
+                   MulticastSocket receiveMulticast = new MulticastSocket(port);  
+                   receiveMulticast.joinGroup(receiveAddress);  
+                   DatagramPacket dp = new DatagramPacket(new byte[RECEIVE_LENGTH], RECEIVE_LENGTH);  
+                   receiveMulticast.receive(dp);  
+                   System.out.println(new String(dp.getData()).trim());  
+                   receiveMulticast.close();  
+         }  
+}  
+ 
+接下來實現多播發送方的代碼：
+Java代碼
+package cn.edu.heut.zcl.multicast;  
+  
+import java.net.DatagramPacket;  
+import java.net.InetAddress;  
+import java.net.MulticastSocket;  
+  
+public class UDPMulticastClient {  
+                   static String destAddressStr = "224.0.0.1";  
+                   static int destPortInt = 9998;  
+                   static int TTLTime = 4;  
+         public static void main(String[] args) throws Exception {  
+  
+                   InetAddress destAddress = InetAddress.getByName(destAddressStr);  
+                   if(!destAddress.isMulticastAddress()){//檢測該地址是否是多播地址  
+                            throw new Exception("地址不是多播地址");  
+                   }  
+
+                   int destPort = destPortInt;  
+                   int TTL = TTLTime;  
+                   MulticastSocket multiSocket =new MulticastSocket();  
+                   multiSocket.setTimeToLive(TTL);  
+                   byte[] sendMSG = "11#msg".getBytes();  
+                   DatagramPacket dp = new DatagramPacket(sendMSG, sendMSG.length, destAddress  , destPort);  
+                   multiSocket.send(dp);  
+                   multiSocket.close();  
+         }  
+}  
+ 
+在多播中設置了TTl值（Time to live），每一個ip數據報文中都包含一個TTL，每當有路由器轉發該報文時，TTL減1，知道減為0時，生命週期結束，報文即時沒有到達目的地
+，也立即宣佈死亡。當然在Java中，ttl並不是十分準確的，曾經在一本書中介紹過報文的傳播距離是不會超過ttl所設置的值的。
+ 
+
+/******************************************************************************/
+UDP初步
+/******************************************************************************/
+使用UDP協定進行資訊的傳輸之前不需要建議連接。
+換句話說就是用戶端向伺服器發送資訊，用戶端只需要給出伺服器的ip地址和連接埠號，然後將資訊封裝到一個待發送的報文中並且發送出去。
+至於伺服器端是否存在，或者能否收到該報文，用戶端根本不用管。
+明白了上一段的內容對使用udp協定進行編程十分有用。
+在最開始學java時，我總是追求別寫速度快，想像自己能構想電影裡的駭客一樣，在電腦面前快速敲擊鍵盤，然後很快就能寫出超讚的程式。
+所以盲目的追求API的使用熟練，忘記了語言的精髓不是語法的純熟，而在於真正有價值的是你要說什麼。說什麼有意義，有深度，只有明白了這樣，才能繼續往深處走。
+以為的追求api的使用沒有絲毫的價值。
+
+簡單UDP連接
+從最簡單的內容開始，首先要建立一個簡單的udp連接，大致要實現的內容如下：
+首先編寫伺服器端，伺服器監聽一個連接埠，然後一直阻塞等待用戶端發來的消息。
+用戶端向伺服器端的這個連接埠發送一個數據報，此時伺服器端將接受的該數據報，然後列印出來。
+首先實現伺服器端，對於伺服器端，他不需要知道是誰發送給他的數據就能接受到數據報。
+但是伺服器端必須要制定一個連接埠，不然用戶端將不知道發送到伺服器端的那個連接埠。
+代碼如下：
+Java代碼
+package cn.edu.zcl.udp.unicast;  
+
+import java.io.IOException;  
+import java.net.DatagramPacket;  
+import java.net.DatagramSocket;  
+import java.net.SocketException;  
+   
+public class UDPUnicastServer {  
+         /** 
+          * @param args 
+          * @throws SocketException 
+          */  
+         public static void main(String[] args) throws SocketException {  
+                   DatagramSocket clientDSocket ;  
+                   DatagramPacket receiveDP = new DatagramPacket(new byte[1024], 1024);  
+                   clientDSocket = new DatagramSocket(9998);  
+                   try {  
+                            clientDSocket.receive(receiveDP);  
+                            System.out.println(receiveDP.getAddress()+"   "+receiveDP.getPort());  
+                   } catch (IOException e) {  
+                            e.printStackTrace();  
+                   }  
+         }  
+}  
+
+接下來是用戶端，用戶端首先需要知道伺服器端的ip地址和連接埠號，然後把要發送的資訊連同數據報一起封裝，這樣用戶端才知道把數據報發送到哪個地方。
+之後通過DatagramSocket的send方法就可以將封裝好的數據報發送出去。具體代碼如下：  
+package cn.edu.zcl.udp.unicast;  
+   
+import java.io.IOException;  
+import java.net.DatagramPacket;  
+import java.net.DatagramSocket;  
+import java.net.InetAddress;  
+import java.net.SocketException;  
+   
+public class UDPUnicastClient {  
+   
+         /** 
+          * @param args 
+          * @throws SocketException 
+          */  
+         public static void main(String[] args) throws Exception {  
+                   DatagramSocket clientDSocket ;  
+                   DatagramPacket sendDP =  
+                            new DatagramPacket(new byte[1024], 1024,InetAddress.getByName("localhost"),9998);  
+                   clientDSocket = new DatagramSocket(9199);  
+                   try {  
+                            clientDSocket.send(sendDP);  
+                   } catch (IOException e) {  
+                            e.printStackTrace();  
+                   }  
+         }  
+}  
+ 
+以上是最簡單的udp通訊的一個模型，代碼可以在代碼包中找到。接下來將介紹如何將數據封裝在數據報中發送出去。
+接下來的代碼只是對上面的代碼進行簡單的修改：
+udp協定傳輸的是byte數組，所以對於字串，只要將字串資訊轉換成byte數組就可以了，執行String類的getBytes()方法就可實現以上操作。
+而在伺服器端只要通過數據包的getData（）方法就可以接收到該byte數組。這部分代碼的改動不大，讀者可以參考UDPUnicastSendDataClient與UDPUnicastSendDataServer代碼。
+ 
+UDP不同類型數據的傳輸
+問題接種而來，字串的類中提供了轉換成byte數組的方法，但是對於int型、float型、double….應該如何操作呢？
+對對於這部分知識，如果對電腦組成原理等相關課程學得好的同學，應該是小菜一碟。
+byte(位元組)是8用8bit(二進位位)來表示的，而整數類型是由32bit來表示。
+如果要用byte來表示int的話，就需要4個byte才可以。
+我是這樣設計的，首先在byte[0]中，存儲int的最低八位，然後byte[1]中存儲int的次低八位，依次類推，這樣就可以將int存儲在byte中了。
+當讀取時採用相反操作就ok了。以下是代碼。
+Java代碼
+package cn.edu.zcl.util.bytearray;  
+   
+import java.io.IOException;  
+/** 
+ * 該類實現不同數據類型與byte數組之間的轉換 
+ * @author Legend 
+ * 
+ */  
+public class ByteArrayUtil {  
+          
+         /** 
+          * 將指定的int數組轉換為byte[]數組 
+          * @param i 指定待轉換的int類型變數 
+          * @return 返回轉換後的byte數組 
+          * @throws IOException 
+          */  
+         public static byte[] toByteArrayFromInt(int i) throws IOException {  
+                   byte[] b= new byte[4];  
+                   b[0] = (byte)i;  
+                   b[1] = (byte)(i>>8);  
+                   b[2] = (byte)(i>>16);  
+                   b[3] = (byte)(i>>24);  
+                   return b ;  
+         }  
+         /** 
+          * 將指定的byte位元組數組轉換成int類型數據 
+          * @param byteArray 待轉換數組 
+          * @return 轉換後的 
+          * @throws IOException 
+          */  
+         public static int toIntFromByteArray(byte[] byteArray) throws IOException {  
+                   int result = 0;  
+                   result = (int)(byteArray[0]|byteArray[1]<< 8 | byteArray[2] << 16 | byteArray[3] << 24);  
+                   return  result;  
+          
+         }  
+         public static void main(String[] args) throws IOException{  
+                   byte[] b =toByteArrayFromInt(22);  
+                   int i = toIntFromByteArray(b);  
+                   System.out.println(i);  
+                    
+         }  
+}
+ 
+ 
+對於以上代碼在文件ByteArrayUtil.java中。
+對於其他類型轉換，暫時先不在做講解，讀者可以自行百度，如果後有時間，我會將這部分的內容補充完整。
+剛開始沒有注意，博文寫完之後才發現，所有的類中的沒有添加套接字關閉的動作，不過源代碼已將上次，就不在修改了。
+ 
+
+/******************************************************************************/
+網路壓力測試工具Iperf
+/******************************************************************************/
+這個工具就是Iperf，可以在這個地方下載:
+http://www.noc.ucf.edu/Tools/Iperf/iperf.exe
+
+使用方式:
+這於這個工具是Server Client架構，所以需要在兩台電腦上測試，中間經過什麼東西，
+就是想測試效能的設備，比如Firewall,VPN,SSL- VPN,Wireless AP...，所以先找兩台電腦，
+一台當Server，一台當Client:
+Step.1 下載: 到http://www.noc.ucf.edu/Tools/Iperf/iperf.exe 將程式下載，之後將程式copy到想存放的地方，比如說D:/之下。
+Step.2 開啟dos視窗: 執行->cmd
+Step.3 執行Server: 從comandline輸入 D:/iperf.exe -s (其它參數)
+Step.4 執行Client: 從comandline輸入 D:/iperf.exe -c serverip (其它參數)
+
+參數參考:
+Client端/Server端 都可用的參數:
+-f, --format [kmKM] 以什麼方式顯示: Kbits, Mbits, KBytes, MBytes
+-i, --interval # 每隔多少秒顯更新頻寬資訊
+-l, --len #[KM] 設定讀寫的緩衝區長度 (預設 8 KB)
+-m, --print_mss 顯示TCP/IP標頭的MTU(最大segment)大小
+-o, --output 將report或錯誤訊息輸出到這個檔案裡
+-p, --port # 設定server與client的溝通port
+-u, --udp 使用UDP代替TCP測試
+-w, --window #[KM] TCP的window大小(socket buffer size)
+-B, --bind bind某,結合某介面或multicast的位址用
+-C, --compatibility 與舊版本比較用，不送任何封包
+-M, --mss # 設定TCP最大segment大小 (MTU - 40 bytes)
+-N, --nodelay 設定無TCP延遲，取消Nagle's演算法
+-V, --IPv6Version 設定為IPv6格式
+
+Server 端參數:
+-s, --server 執行Server模式
+-D, --daemon 執行Server背景模式
+-R, --remove 移除服務
+
+Client 端參數:
+-b, --bandwidth #[KM] UDP參數，以bits/sec傳送(預設 1 Mbit/sec, implies -u)
+-c, --client 執行Client模式，並連線到Server的IP:
+-d, --dualtest 同時執行雙向的模擬測試
+-n, --num #[KM] 傳輸多少bytes封包 (取代-t)
+-r, --tradeoff 單獨執行雙向的模擬測試
+-t, --time # 每隔幾秒傳輸一次 (預設10 秒)
+-F, --fileinput 選取某檔案傳輸測試
+-I, --stdin 將鍵盤輸入的資料進行傳輸測試
+-L, --listenport # 進行雙測試時，接收回應的port
+-P, --parallel # 同時執行多少個Client連線
+-T, --ttl # 進行Multicat的time-to-live(預設為 1)
+
+其它參數:
+-h, --help 顯示help 資訊
+-v, --version 顯示版本
+
+範例:
+1. Server端:
+    iperf -s -u -i 1 -l 1024 -p 5001
+設置Server只接收UDP封包，每隔1秒更新顯示一次，進行讀寫的緩衝區大小為1020k，進行監聽的port為5001
+
+2.Client端:
+    iperf -c 192.168.4.88 -u -i 1 -l 1024 -p 5001 -t 200 -b 1m
+設置 Client端，連向ServerIP為192.168.4.88，以UDP傳送，每隔1秒更新顯示一次，進行寫的緩衝區大小為1020k，從 5001port丟封包出去，每隔200秒丟一次1M的封包
+
+
+/******************************************************************************/
+網路效能與壓力測試工具-IPERF
+/******************************************************************************/
+但是如果今天是針對無線網路或是區域網路的話,就必須採用測試工具
+其中IPERF屬於其中簡單而易用的一種,DOS命令列模式,架設方便
+他另外有一種JPERF,是用java編寫的window視窗版本
+IPERF的使用方式簡單,這邊使用IPERF 1.70版本分項列出常用參數如下:
+
+※如何執行
+IPERF的使用相當簡單,首先你必須準備兩台電腦(PC1,PC2)
+其中一台設定為Server,一台設定為Client即可
+PC1:IPERF Server (10.10.10.1)
+PC2:IPERF Client (192.168.1.2)
+
+待測試物: 某廠牌分享器
+┌───┐                                  ┌───┐
+  PC2     -----LAN--- 待測試物 ----WAN----    PC1
+└───┘                                  └───┘
+
+PC1啟動方式:
+iperf -s
+
+PC2啟動方式: 
+iperf -c PC1的IP
+
+example:
+iperf -c 10.10.10.1
+
+※如何變更tcp或是udp型態
+iperf 的預設協定是tcp,如果要變更為udp,請下參數 -u
+example:
+iperf -c 10.10.10.1 -u
+
+但是-u的預設值流量是1Mbit/s,如要提高請使用-b
+example: 100Mbit/s
+iperf -c 10.10.10.1 -u -b 1024000000
+
+※如何增加IPERF connection數
+TCP protocol有定義window size
+這個東西形同網路封包的多工作業,如果同時間只處理一個封包串流,有可能無法享用所有頻寬
+因此我們可以透過增加tcp的connection,來讓iperf搾出最多的效能
+這個值受PC等級與待側物的性能影響,需要反覆測試才知道最佳數據會落在幾個session
+參數為-P
+example: 5個IPERF connection
+iperf -c 10.10.10.1 -P 5
+※如何設定測試時間
+IPERF其實不是一個很穩定的測試工具,數據常有起落,建議測試時間至少要30秒
+參數: -t
+example: 30秒
+iperf -c 10.10.10.1 -t 30
+※如何讓他批次執行
+IPERF這個工具除了數據不太穩定,長時間運行也可能自己就突然crash
+
+改善的方式就是用批次檔,簡易的DOS 批次檔迴圈寫法如下:
+example: client
+:loop
+iperf -c 10.10.10.1
+goto loop
+example: server
+:loop
+iperf -s
+goto loop
+
+
+/******************************************************************************/
+[轉貼]如何正確使用Windows的Ping指令
+/******************************************************************************/
+對於Windows下ping指令相信大家已經再熟悉不過了，但是能把ping的功能發揮到最大的人卻並不是很多，當然我也並不是說我可以讓ping發揮最大的功能，我也只不過經常用ping這個工具，也總結了一些小經驗，現在和大家分享一下。 
+現在我就參照ping指令的說明說明來給大家說說我使用ping時會用到的技巧，ping只有在安裝了TCP/IP協定以後才可以使用： 
+ping [-t] [-a] [-n count] [-l length] [-f] [-i ttl] [-v tos] [-r count] [-s count] [[-j computer-list] | [-k computer-list]] [-w timeout] destination-list
+
+Options:
+-t Ping the specified host until stopped.To see statistics and continue - type Control-Break;To stop - type Control-C.
+不停的ping地方主機，直到你按下Control-C。
+此功能沒有什麼特別的技巧，不過可以配合其他參數使用，將在下面提到。
+
+-a Resolve addresses to hostnames.
+解析電腦NetBios名。
+範例：C:＼>ping -a 192.168.1.21
+Pinging iceblood.yofor.com [192.168.1.21] with 32 bytes of data:
+Reply from 192.168.1.21: bytes=32 time<10ms TTL=254
+Reply from 192.168.1.21: bytes=32 time<10ms TTL=254
+Reply from 192.168.1.21: bytes=32 time<10ms TTL=254
+Reply from 192.168.1.21: bytes=32 time<10ms TTL=254
+Ping statistics for 192.168.1.21:
+Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),Approximate round trip times in milli-seconds:
+Minimum = 0ms, Maximum = 0ms, Average = 0ms
+從上面就可以知道IP為192.168.1.21的電腦NetBios名為iceblood.yofor.com。
+
+-n count Number of echo requests to send.
+發送count指定的Echo封包數。
+在預設情況下，一般都只發送四個封包，透過這個指令可以自己定義發送的個數，對衡量網路速度很有說明，比如我想測試發送50個封包的返回的平均時間為多少，最快時間為多少，最慢時間為多少就可以透過以下獲知：
+C:＼>ping -n 50 202.103.96.68
+Pinging 202.103.96.68 with 32 bytes of data:
+Reply from 202.103.96.68: bytes=32 time=50ms TTL=241
+Reply from 202.103.96.68: bytes=32 time=50ms TTL=241
+Reply from 202.103.96.68: bytes=32 time=50ms TTL=241
+Request timed out.
+………………
+Reply from 202.103.96.68: bytes=32 time=50ms TTL=241
+Reply from 202.103.96.68: bytes=32 time=50ms TTL=241
+Ping statistics for 202.103.96.68:
+Packets: Sent = 50, Received = 48, Lost = 2 (4% loss),Approximate round trip times in milli-seconds:
+Minimum = 40ms, Maximum = 51ms, Average = 46ms
+從以上我就可以知道在給202.103.96.68發送50個封包的過程當中，返回了48個，其中有兩個由於未知原因丟失，這48個封包當中返回速度最快為40ms，最慢為51ms，平均速度為46ms。
+
+-l size Send buffer size.
+定義echo封包大小。
+在預設的情況下windows的ping發送的封包大小為32byt，我們也可以自己定義它的大小，但有一個大小的限制，就是最大只能發送65500byt，也許有人會問為什麼要限制到65500byt，因為Windows系列的系統都有一個安全漏洞(也許還包括其他系統)就是當向對方一次發送的封包大於或等於65532時，對方就很有可能擋機，所以微軟公司為瞭解決這一安全漏洞於是限制了ping的封包大小。雖然微軟公司已經做了此限制，但這個參數配合其他參數以後危害依然非常強大，比如我們就可以透過配合-t參數來實現一個帶有攻擊性的指令：(以下介紹帶有危險性，僅用於試驗，請勿輕易施於別人機器上，否則後果自負)
+C:＼>ping -l 65500 -t 192.168.1.21
+Pinging 192.168.1.21 with 65500 bytes of data:
+Reply from 192.168.1.21: bytes=65500 time<10ms TTL=254
+Reply from 192.168.1.21: bytes=65500 time<10ms TTL=254
+………………
+face=Verdana>
+這樣它就會不停的向192.168.1.21電腦發送大小為65500byt的封包，如果你只有一臺電腦也許沒有什麼效果，但如果有很多電腦那麼就可以使對方完全癱瘓，我曾經就做過這樣的試驗，當我同時使用10臺以上電腦ping一臺Win2000Pro系統的電腦時，不到5分鐘對方的網路就已經完全癱瘓，網路嚴重堵塞，HTTP和FTP服務完全停止，由此可見威力非同小可。
+
+-f Set Don't Fragment flag in packet.
+在封包中發送「不要分段」標誌。
+在一般你所發送的封包都會透過路由分段再發送給對方，加上此參數以後路由就不會再分段處理。
+
+-i TTL Time To Live.
+指定TTL值在對方的系統裡停留的時間。
+此參數同樣是說明你檢查網路運轉情況的。
+
+-v TOS Type Of Service.
+將「服務類型」欄位設定為 tos 指定的值。
+
+-r count Record route for count hops.
+在「記錄路由」欄位中記錄傳出和返回封包的路由。
+在一般情況下你發送的封包是透過一個個路由才到達對方的，但到底是經過了哪些路由呢？透過此參數就可以設定你想探測經過的路由的個數，不過限制在了9個，也就是說你只能跟蹤到9個路由，如果想探測更多，可以透過其他指令實現，我將在以後的文章中給大家講解。以下為範例：
+C:＼>ping -n 1 -r 9 202.96.105.101 (發送一個封包，最多記錄9個路由)
+Pinging 202.96.105.101 with 32 bytes of data:
+Reply from 202.96.105.101: bytes=32 time=10ms TTL=249
+Route: 202.107.208.187 ->
+202.107.210.214 ->
+61.153.112.70 ->
+61.153.112.89 ->
+202.96.105.149 ->
+202.96.105.97 ->
+202.96.105.101 ->
+202.96.105.150 ->
+61.153.112.90
+Ping statistics for 202.96.105.101:
+Packets: Sent = 1, Received = 1, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+Minimum = 10ms, Maximum = 10ms, Average = 10ms
+從上面我就可以知道從我的電腦到202.96.105.101一共透過了202.107.208.187 ，202.107.210.214 , 61.153.112.70 , 61.153.112.89 , 202.96.105.149 , 202.96.105.97這幾個路由。
+-s count Timestamp for count hops.
+指定 count 指定的躍點數的時間戳。
+此參數和-r差不多，只是這個參數不記錄封包返回所經過的路由，最多也只記錄4個。
+-j host-list Loose source route along host-list.
+利用 computer-list 指定的電腦清單路由封包。連續電腦可以被中間閘道器分隔(路由稀疏源)IP 允許的最大數量為 9。
+-k host-list Strict source route along host-list.
+利用 computer-list 指定的電腦清單路由封包。連續電腦不能被中間閘道器分隔(路由嚴格源)IP 允許的最大數量為 9。
+-w timeout Timeout in milliseconds to wait for each reply.
+指定逾時間隔，單位為毫秒。
+此參數沒有什麼其他技巧。
+ping指令的其他技巧：在一般情況下還可以透過ping對方讓對方返回給你的TTL值大小，粗略的判斷目的主機的系統類型是Windows系列還是UNIX/Linux系列，一般情況下Windows系列的系統返回的TTL值在100-130之間，而UNIX/Linux系列的系統返回的TTL值在240-255之間，當然TTL的值在對方的主機裡是可以修改的，Windows系列的系統可以透過修改登錄以下鍵值實現：
+[HKEY_LOCAL_MACHINE＼SYSTEM＼CurrentControlSet＼Services＼Tcpip＼Parameters]
+"DefaultTTL"=dword:000000ff
+255---FF
+128---80
+64----40
+32----20
+
+/******************************************************************************/
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

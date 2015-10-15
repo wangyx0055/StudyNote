@@ -1,0 +1,2080 @@
+/******************************************************************************/
+Android.bluetooth【翻譯】
+/******************************************************************************/
+android.bluetooth
+提供了皆如掃瞄設備、連接設備以及對設備間的數據傳輸進行管理的類，這些類對藍牙設備進行功能性管理。
+藍牙模組API提供的應用包括了：
+●掃瞄其它藍牙設備
+●通過查詢本地藍牙適配器來匹配藍牙設備
+●建立RFCOMM（無線射頻通信協定）的通道/連接埠
+●從其他的藍牙設備中連接到指定的連接埠
+●傳輸數據到其他設備，或者從其他設備中接收數據
+如需運用這些API來執行藍牙通信，應用程式必須聲明BLUETOOTH許可。對於皆如尋找設備請求等的一些附加功能，也同樣需要BLUETOOTH_ADMIN許可。
+如需要使用藍牙API的更詳細的指引，參看Bluetooth Dev Guide topic.
+
+Classes
+BluetoothAdapter
+代表本地的藍牙適配器設備
+BluetoothClass
+代表一個描述了設備通用特性和功能的藍牙類 
+BluetoothClass.Device
+定義了所有設備類的常量
+BluetoothClass.Device.Major
+定義了所有主要設備類的常量
+BluetoothClass.Service
+定義了所有服務類的常量
+BluetoothDevice
+代表一個遠端的藍牙設備
+BluetoothServerSocket
+監聽藍牙服務的連接埠
+BluetoothSocket
+一個雙向連接的藍牙連接埠
+
+public final class 
+BluetoothAdapter
+extends Object
+java.lang.Object
+? android.bluetooth.BluetoothAdapter
+
+Class Overview
+代表本地的藍牙適配器設備。BluetoothAdapter類讓用戶能執行基本的藍牙任務。例如：初始化設備的搜索，查詢可匹配的設備集，使用一個已知的MAC地址來初始化一個BluetoothDevice類，創建一個BluetoothServerSocket類以監聽其它設備對本機的連接請求等。
+為了得到這個代表本地藍牙適配器的BluetoothAdapter類，調用getDefaultAdapter()這一靜態方法。這是所有藍牙動作使用的第一步。當擁有本地適配器以後，用戶可以獲得一系列的BluetoothDevice對像，這些對像代表所有擁有getBondedDevice()方法的已經匹配的設備；用startDiscovery()方法來開始設備的搜尋；或者創建一個BluetoothServerSocket類，通過listenUsingRfcommWithServiceRecord(String, UUID)方法來監聽新來的連接請求。
+Note：大部分方法需要BLUETOOTH類的許可，一些方法同時需要BLUETOOT_ADMIN類的許可。
+
+Summary
+常量
+String
+ACTION_DISCOVERY_FINISHED
+廣播事件：本地藍牙適配器已經完成設備的搜尋過程。 
+String
+ACTION_DISCOVERY_STARTED
+廣播事件：本地藍牙適配器已經開始對遠端設備的搜尋過程。 
+String
+ACTION_LOCAL_NAME_CHANGED
+廣播事件：本地藍牙適配器已經更改了它的藍牙名稱。 
+String
+ACTION_REQUEST_DISCOVERABLE
+活動事件：顯示一個請求被搜尋模式的系統活動。 
+String
+ACTION_REQUEST_ENABLE
+活動事件：顯示一個允許用戶打開藍牙模組的系統活動。 
+String
+ACTION_SCAN_MODE_CHANGED
+廣播事件：指明藍牙掃瞄模組或者本地適配器已經發生變化 
+String
+ACTION_STATE_CHANGED
+廣播事件：本來的藍牙適配器的狀態已經改變。 
+int ERROR
+標記該類的錯誤值 
+String
+EXTRA_DISCOVERABLE_DURATION
+試圖在ACTION_REQUEST_DISCOVERABLE常量中作為一個可選的整型附加域，來為短時間內的設備發現請求一個特定的持續時間。 
+String
+EXTRA_LOCAL_NAME
+試圖在ACTION_LOCAL_NAME_CHANGED常量中作為一個字串附加域，來請求本地藍牙的名稱。 
+String
+EXTRA_PREVIOUS_SCAN_MODE
+試圖在ACTION_SCAN_MODE_CHANGED常量中作為一個整型附加域，來請求以前的掃瞄模式 
+String
+EXTRA_PREVIOUS_STATE
+試圖在ACTION_STATE_CHANGED常量中作為一個整型附加域，來請求以前的供電狀態。 
+String
+EXTRA_SCAN_MODE
+試圖在ACTION_SCAN_MODE_CHANGED常量中作為一個整型附加域，來請求當前的掃瞄模式 
+String
+EXTRA_STATE
+試圖在ACTION_STATE_CHANGED常量中作為一個整型附加域，來請求當前的供電狀態。 
+int SCAN_MODE_CONNECTABLE
+指明在本地藍牙適配器中，查詢掃瞄功能失效，但頁面掃瞄功能有效 
+int SCAN_MODE_CONNECTABLE_DISCOVERABLE
+指明在本地藍牙適配器中，查詢掃瞄功能和頁面掃瞄功能都有效 
+int SCAN_MODE_NONE
+指明在本地藍牙適配器中，查詢掃瞄功能和頁面掃瞄功能都失效 
+int STATE_OFF
+指明本地藍牙適配器模組已經關閉 
+int STATE_ON
+指明本地藍牙適配器模組已經打開，並且準備被使用。 
+int STATE_TURNING_OFF
+指明本地藍牙適配器模組正在關閉 
+int STATE_TURNING_ON
+指明本地藍牙適配器模組正在打開 
+Public Methods
+boolean cancelDiscovery() 
+.取消當前的設備發現查找進程 
+static boolean checkBluetoothAddress(String address) 
+驗證皆如"00:43:A8:23:10:F0"之類的藍牙地址，字母必須為大寫才有效。 
+boolean disable() 
+關閉本地藍牙適配器—不能在沒有明確關閉藍牙的用戶動作中使用。 
+boolean enable() 
+打開本地藍牙適配器—不能在沒有明確打開藍牙的用戶動作中使用。 
+String 
+getAddress() 
+返回本地藍牙適配器的硬體地址 
+Set<BluetoothDevice> 
+getBondedDevices() 
+返回已經匹配到本地適配器的BluetoothDevice類的對象集合 
+synchronized static BluetoothAdapter 
+getDefaultAdapter() 
+獲取對默認本地藍牙適配器的的操作權限。 
+String 
+getName() 
+獲取本地藍牙適配器的藍牙呢稱 
+BluetoothDevice 
+getRemoteDevice(String address) 
+為給予的藍牙硬體地址獲取一個BluetoothDevice對象。 
+int getScanMode() 
+獲取本地藍牙適配器的當前藍牙掃瞄模式 
+int getState() 
+獲取本地藍牙適配器的當前狀態 
+boolean isDiscovering() 
+如果當前藍牙適配器正處於設備發現查找進程中，則返回真值 
+boolean isEnabled() 
+如果藍牙正處於打開狀態並可用，則返回真值 
+BluetoothServerSocket 
+listenUsingRfcommWithServiceRecord(String name, UUID uuid) 
+創建一個正在監聽的安全的帶有服務記錄的無線射頻通信藍牙連接埠。
+
+boolean setName(String name) 
+設置藍牙或者本地藍牙適配器的暱稱. 
+boolean startDiscovery() 
+開始對遠端設備進行查找的進程
+
+Constants
+public static final String ACTION_DISCOVERY_FINISHED 
+Since: API Level 5 
+廣播事件：本地藍牙適配器已經完成設備的搜尋過程。Requires BLUETOOTH to receive. 
+常量值: "android.bluetooth.adapter.action.DISCOVERY_FINISHED" 
+public static final String ACTION_DISCOVERY_STARTED 
+Since: API Level 5 
+廣播事件：本地藍牙適配器已經開始對遠端設備的搜尋過程。
+它通常牽涉到一個大概需時12秒的查詢掃瞄過程，緊跟著是一個對每個獲取到自身藍牙名稱的新設備的頁面掃瞄。
+Register for ACTION_FOUND to be notified as remote Bluetooth devices are found. 
+用戶會發現一個把ACTION_FOUND常量通知為遠端藍牙設備的註冊。
+設備查找是一個重量級過程。當查找正在進行的時候，用戶不能嘗試對新的遠端藍牙設備進行連接，同時存在的連接將獲得有限制的帶寬以及高等待時間。用戶可用cencelDiscovery()類來取消正在執行的查找進程。
+需要BLUETOOTH類來接收。
+常量名："android.bluetooth.adapter.action.DISCOVERY_STARTED" 
+public static final String ACTION_LOCAL_NAME_CHANGED 
+Since: API Level 5 
+廣播事件：本地藍牙適配器已經更改了它的藍牙名稱。
+該名稱對遠端藍牙設備是可見的。 
+它總是包含了一個帶有名稱的EXTRA_LOCAL_NAME附加域。
+它需要請求BLUETOOTH類去獲取這個名字。
+常量值: "android.bluetooth.adapter.action.LOCAL_NAME_CHANGED" 
+public static final String ACTION_REQUEST_DISCOVERABLE 
+Since: API Level 5 
+活動事件：顯示一個請求被搜尋模式的系統活動。如果藍牙模組當前未打開，該活動也將請求用戶打開藍牙模組。 
+被搜尋模式和SCAN_MODE_CONNECTABLE_DISCOVERABLE等價。當遠端設備執行查找進程的時候，它允許其發現該藍牙適配器。
+從隱私安全考慮，Android不會將被搜尋模式設置為默認狀態。
+該意圖的發送者可以選擇性地運用EXTRA_DISCOVERABLE_DURATION這個附加域去請求發現設備的持續時間。普遍來說，對於每一請求，默認的持續時間為120秒，最大值則可達到300秒。
+Android運用onActivityResult(int, int, Intent)回收方法來傳遞該活動結果的通知。被搜尋的時間（以秒為單位）將通過resultCode值來顯示，如果用戶拒絕被搜尋，或者設備產生了錯誤，則通過RESULT_CANCELED值來顯示。
+每當掃瞄模式變化的時候，應用程式可以為通過ACTION_SCAN_MODE_CHANGED值來監聽全局的消息通知。比如，當設備停止被搜尋以後，該消息可以被系統通知給應用程式。
+需要BLUETOOTH類
+常量值: "android.bluetooth.adapter.action.REQUEST_DISCOVERABLE" 
+public static final String ACTION_REQUEST_ENABLE 
+Since: API Level 5 
+活動事件：顯示一個允許用戶打開藍牙模組的系統活動。
+當藍牙模組完成打開工作，或者當用戶決定不打開藍牙模組時，系統活動將返回該值。
+Android運用onActivityResult(int, int, Intent)回收方法來傳遞該活動結果的通知。如果藍牙模組被打開，將通過resultCode值來顯示；如果用戶拒絕該請求，或者設備產生了錯誤，則通過RESULT_CANCELED值來顯示。
+每當藍牙模組被打開或者關閉，應用程式可以為通過ACTION_SCAN_MODE_CHANGED值來監聽全局的消息通知。
+需要BLUETOOTH類
+常量值: "android.bluetooth.adapter.action.REQUEST_ENABLE" 
+public static final String ACTION_SCAN_MODE_CHANGED 
+Since: API Level 5 
+廣播事件：指明藍牙掃瞄模組或者本地適配器已經發生變化
+它總是包含EXTRA_SCAN_MODE和EXTRA_PREVIOUS_SCAN_MODE。這兩個附加域各自包含了新的和舊的掃瞄模式。
+需要BLUETOOTH類
+常量值: "android.bluetooth.adapter.action.SCAN_MODE_CHANGED" 
+public static final String ACTION_STATE_CHANGED 
+Since: API Level 5 
+廣播事件：本來的藍牙適配器的狀態已經改變。
+比如：藍牙模組已經被打開或者關閉。
+它總是包含EXTRA_STATE和EXTRA_PREVIOUS_STATE。這兩個附加域各自包含了新的和舊的狀態。
+需要BLUETOOTH類去接收
+常量值: "android.bluetooth.adapter.action.STATE_CHANGED" 
+public static final int ERROR 
+Since: API Level 5 
+標記該類的錯誤值。確保和該類中的任意其它整數常量不相等。它為需要一個標記錯誤值的函數提供了便利。例如： Intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR) 
+常量值: -2147483648 (0x80000000) 
+public static final String EXTRA_DISCOVERABLE_DURATION 
+Since: API Level 5 
+試圖在ACTION_REQUEST_DISCOVERABLE常量中作為一個可選的整型附加域，來為短時間內的設備發現請求一個特定的持續時間。預設值為120秒，超過300秒的請求將被限制。這些值是可以變化的。 
+常量值: "android.bluetooth.adapter.extra.DISCOVERABLE_DURATION"
+
+
+
+public static final String EXTRA_LOCAL_NAME 
+Since: API Level 5 
+試圖在ACTION_LOCAL_NAME_CHANGED常量中作為一個字串附加域，來請求本地藍牙的名稱。
+常量值: "android.bluetooth.adapter.extra.LOCAL_NAME" 
+public static final String EXTRA_PREVIOUS_SCAN_MODE 
+Since: API Level 5 
+試圖在ACTION_SCAN_MODE_CHANGED常量中作為一個整型附加域，來請求以前的掃瞄模式。可能值有: SCAN_MODE_NONE, SCAN_MODE_CONNECTABLE, SCAN_MODE_CONNECTABLE_DISCOVERABLE, 
+常量值: "android.bluetooth.adapter.extra.PREVIOUS_SCAN_MODE" 
+public static final String EXTRA_PREVIOUS_STATE 
+Since: API Level 5 
+試圖在ACTION_STATE_CHANGED常量中作為一個整型附加域，來請求以前的供電狀態。 可能值有: STATE_OFF, STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF, 
+常量值: "android.bluetooth.adapter.extra.PREVIOUS_STATE" 
+public static final String EXTRA_SCAN_MODE 
+Since: API Level 5 
+試圖在ACTION_SCAN_MODE_CHANGED常量中作為一個整型附加域，來請求當前的掃瞄模式.可能值有: SCAN_MODE_NONE, SCAN_MODE_CONNECTABLE, SCAN_MODE_CONNECTABLE_DISCOVERABLE, 
+常量值: "android.bluetooth.adapter.extra.SCAN_MODE" 
+public static final String EXTRA_STATE 
+Since: API Level 5 
+試圖在ACTION_STATE_CHANGED常量中作為一個整型附加域，來請求當前的供電狀態。 可能值有: STATE_OFF, STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF, 
+常量值: "android.bluetooth.adapter.extra.STATE"
+
+
+
+
+public static final int SCAN_MODE_CONNECTABLE 
+Since: API Level 5 
+指明在本地藍牙適配器中，查詢掃瞄功能失效，但頁面掃瞄功能有效。因此該設備不能被遠端藍牙設備發現，但如果以前曾經發現過該設備，則遠端設備可以對其進行連接。
+常量值: 21 (0x00000015) 
+public static final int SCAN_MODE_CONNECTABLE_DISCOVERABLE 
+Since: API Level 5 
+指明在本地藍牙適配器中，查詢掃瞄功能和頁面掃瞄功能都有效。因此該設備既可以被遠端藍牙設備發現，也可以被其連接。
+常量值: 23 (0x00000017) 
+public static final int SCAN_MODE_NONE 
+Since: API Level 5 
+指明在本地藍牙適配器中，查詢掃瞄功能和頁面掃瞄功能都失效. 因此該設備既不可以被遠端藍牙設備發現，也不可以被其連接。
+常量值: 20 (0x00000014) 
+public static final int STATE_OFF 
+Since: API Level 5 
+指明本地藍牙適配器模組已經關閉
+常量值: 10 (0x0000000a) 
+public static final int STATE_ON 
+Since: API Level 5 
+指明本地藍牙適配器模組已經打開，並且準備被使用。
+常量值: 12 (0x0000000c) 
+public static final int STATE_TURNING_OFF 
+Since: API Level 5 
+指明本地藍牙適配器模組正在關閉。本地用戶端可以立刻嘗試友好地斷開任意外部連接。
+常量值: 13 (0x0000000d)
+
+
+public static final int STATE_TURNING_ON 
+Since: API Level 5 
+指明本地藍牙適配器模組正在打開. 然而本地客戶在嘗試使用這個適配器之前需要為STATE_ON狀態而等待。 
+常量值: 11 (0x0000000b) 
+Public Methods
+public boolean cancelDiscovery () 
+Since: API Level 5 
+.取消當前的設備發現查找進程
+需要BLUETOOTH_ADMIN類 
+因為對藍牙適配器而言，查找是一個重量級的過程，因此這個方法必須在嘗試連接到遠端設備前使用用connect()方法進行調用。發現的過程不會由活動來進行管理，但是它會作為一個系統服務來運行，因此即使它不能直接請求這樣的一個查詢動作，也必需取消該搜索進程。
+返回值：
+成功則返回true，有錯誤則返回false。
+public static boolean checkBluetoothAddress (String address) 
+Since: API Level 5 
+驗證皆如"00:43:A8:23:10:F0"之類的藍牙地址，字母必須為大寫才有效。
+
+參數
+地址 字串形式的藍牙模組地址
+返回
+地址正確則返回true，否則返回false。
+public boolean disable () 
+Since: API Level 5 
+關閉本地藍牙適配器—不能在沒有明確關閉藍牙的用戶動作中使用。
+這個方法友好地停止所有的藍牙連接，停止藍牙系統服務，以及對所有基礎藍牙硬體進行斷電。
+沒有用戶的直接同意，藍牙永遠不能被禁止。這個disable()方法只提供了一個應用，該應用包含了一個改變系統設置的用戶界面（例如「電源控制」應用）。
+這是一個異步調用方法：該方法將馬上獲得返回值，用戶要通過監聽ACTION_STATE_CHANGED值來獲取隨後的適配器狀態改變的通知。如果該調用返回true值，則該適配器狀態會立刻從STATE_ON轉向STATE_TURNING_OFF，稍後則會轉為STATE_OFF或者STATE_ON。如果該調用返回false，那麼系統已經有一個保護藍牙適配器被關閉的問題—比如該適配器已經被關閉了。
+需要BLUETOOTH_ADMIN類的許可 
+返回值
+如果藍牙適配器的停止進程已經開啟則返回true，如果產生錯誤則返回false。
+public boolean enable () 
+Since: API Level 5 
+打開本地藍牙適配器—不能在沒有明確打開藍牙的用戶動作中使用。
+該方法將為基礎的藍牙硬體供電，並且啟動所有的藍牙系統服務。
+沒有用戶的直接同意，藍牙永遠不能被禁止。如果用戶為了創建無線連接而打開了藍牙模組，則其需要ACTION_REQUEST_ENABLE值，該值將提出一個請求用戶允許以打開藍牙模組的會話。這個enable()值只提供了一個應用，該應用包含了一個改變系統設置的用戶界面（例如「電源控制」應用）。
+這是一個異步調用方法：該方法將馬上獲得返回值，用戶要通過監聽ACTION_STATE_CHANGED值來獲取隨後的適配器狀態改變的通知。如果該調用返回true值，則該適配器狀態會立刻從STATE_OFF轉向STATE_TURNING_ON，稍後則會轉為STATE_OFF或者STATE_ON。如果該調用返回false，那麼說明系統已經有一個保護藍牙適配器被打開的問題—比如飛行模式，或者該適配器已經被打開。
+需要BLUETOOTH_ADMIN類的許可 
+如果藍牙適配器的打開進程已經開啟則返回true，如果產生錯誤則返回false。
+public String getAddress () 
+Since: API Level 5 
+返回本地藍牙適配器的硬體地址
+例如： "00:11:22:AA:BB:CC". 
+需要BLUETOOTH類
+返回值
+字串形式的藍牙模組地址
+public Set<BluetoothDevice> getBondedDevices () 
+Since: API Level 5 
+返回已經匹配到本地適配器的BluetoothDevice類的對象集合
+需要BLUETOOTH類
+返回值
+未被修改的BluetoothDevice類的對象集合，如果有錯誤則返回null。
+public static synchronized BluetoothAdapter getDefaultAdapter () 
+Since: API Level 5 
+獲取對默認本地藍牙適配器的的操作權限。
+目前Andoird只支援一個藍牙適配器，但是API可以被擴展為支援多個適配器。該方法總是返回默認的適配器。
+返回值
+返回默認的本地適配器，如果藍牙適配器在該硬體平台上不能被支援，則返回null。
+public String getName () 
+Since: API Level 5 
+獲取本地藍牙適配器的藍牙呢稱
+這個呢稱對於外界藍牙設備而言是可見的。
+需要BLUETOOTH類
+返回值
+該藍牙適配器名稱，如果有錯誤則返回null
+public BluetoothDevice getRemoteDevice (String address) 
+Since: API Level 5 
+為給予的藍牙硬體地址獲取一個BluetoothDevice對象。
+Valid Bluetooth hardware addresses must be upper case, in a format such as "00:11:22:33:AA:BB". The helper checkBluetoothAddress(String) is available to validate a Bluetooth address. 
+合法的藍牙硬體地址必須為大寫，格式類似於"00:11:22:33:AA:BB"。checkBluetoothAddress(String)方法可以用來驗證藍牙地址的正確性。
+A BluetoothDevice will always be returned for a valid hardware address, even if this adapter has never seen that device.
+BluetoothDevice類對於合法的硬體地址總會產生返回值，即使這個適配器從未見過該設備。
+參數
+地址 合法的藍牙MAC地址
+異常拋出
+IllegalArgumentException
+如果地址不合法
+public int getScanMode () 
+Since: API Level 5 
+獲取本地藍牙適配器的當前藍牙掃瞄模式
+藍牙掃瞄模式決定本地適配器可連接並且/或者可被遠端藍牙設備所連接。
+可能值有: SCAN_MODE_NONE, SCAN_MODE_CONNECTABLE, SCAN_MODE_CONNECTABLE_DISCOVERABLE. 
+需要BLUETOOTH類
+返回值
+掃瞄模式 
+public int getState () 
+Since: API Level 5 
+獲取本地藍牙適配器的當前狀態
+可能值有 STATE_OFF, STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF. 
+需要BLUETOOTH類
+返回值
+藍牙適配器的當前狀態 
+public boolean isDiscovering () 
+Since: API Level 5 
+如果當前藍牙適配器正處於設備發現查找進程中，則返回真值
+設備查找是一個重量級過程。當查找正在進行的時候，用戶不能嘗試對新的遠端藍牙設備進行連接，同時存在的連接將獲得有限制的帶寬以及高等待時間。用戶可用cencelDiscovery()類來取消正在執行的查找進程。
+
+應用程式也可以為ACTION_DISCOVERY_STARTED或者ACTION_DISCOVERY_FINISHED進行註冊，從而當查找開始或者完成的時候，可以獲得通知。
+需要BLUETOOTH類
+返回值
+如果正在查找，則返回true
+public boolean isEnabled () 
+Since: API Level 5 
+如果藍牙正處於打開狀態並可用，則返回真值
+和 getBluetoothState()==STATE_ON 等價
+需要BLUETOOTH類
+返回值
+如果本地適配器已經打開，則返回true
+public BluetoothServerSocket listenUsingRfcommWithServiceRecord (String name, UUID uuid) 
+Since: API Level 5 
+創建一個正在監聽的安全的帶有服務記錄的無線射頻通信（RFCOMM）藍牙連接埠。
+
+一個對該連接埠進行連接的遠端設備將被認證，對該連接埠的通訊將被加密。
+
+使用accpet（）方法可以獲取從監聽BluetoothServerSocket處新來的連接
+該系統分配一個未被使用的無線射頻通信通道來進行監聽。
+The system will also register a Service Discovery Protocol (SDP) record with the local SDP server containing the specified UUID, service name, and auto-assigned channel. Remote Bluetooth devices can use the same UUID to query our SDP server and discover which channel to connect to. This SDP record will be removed when this socket is closed, or if this application closes unexpectedly. 
+該系統也將註冊一個服務探索協定（SDP）記錄，該記錄帶有一個包含了特定的通用唯一識別碼（Universally Unique Identifier，UUID），伺服器名稱和自動分配通道的本地SDP服務。遠端藍牙設備可以用相同的UUID來查詢自己的SDP伺服器，並搜尋連接到了哪個通道上。如果該連接埠已經關閉，或者如果該應用程式異常退出，則這個SDP記錄會被移除。
+Use createRfcommSocketToServiceRecord(UUID) to connect to this socket from another device using the same UUID. 
+使用createRfcommSocketToServiceRecord(UUID)從另一使用相同UUID的設備來連接到這個連接埠
+需要BLUETOOTH類
+Parameters
+名字 SDP記錄下的伺服器名
+UUID SDP記錄下的UUID
+返回值
+一個正在監聽的無線射頻通信藍牙服務連接埠
+拋出異常
+IOException
+產生錯誤，比如藍牙設備不可用，或者許可無效，或者通道被佔用。
+public boolean setName (String name) 
+Since: API Level 5 
+設置藍牙或者本地藍牙適配器的暱稱. 
+這個名字對於外界藍牙設備而言是可見的。
+Valid Bluetooth names are a maximum of 248 UTF-8 characters, however many remote devices can only display the first 40 characters, and some may be limited to just 20. 
+合法的藍牙名稱最多擁有248位UTF-8字元，但是很多外界設備只能顯示前40個字元，有些可能只限制前20個字元。
+需要BLUETOOTH_ADMIN類
+參數
+名稱 一個合法的藍牙名稱
+返回值
+如果該名稱已被設定，則返回true，否則返回false
+public boolean startDiscovery () 
+Since: API Level 5 
+開始對遠端設備進行查找的進程
+它通常牽涉到一個大概需時12秒的查詢掃瞄過程，緊跟著是一個對每個獲取到自身藍牙名稱的新設備的頁面掃瞄。
+這是一個異步調用方法：該方法將馬上獲得返回值，註冊ACTION_DISCOVERY_STARTED and ACTION_DISCOVERY_FINISHED意圖準確地確定該探索是處於開始階段或者完成階段。註冊ACTION_FOUND以活動遠端藍牙設備已找到的通知。
+設備查找是一個重量級過程。當查找正在進行的時候，用戶不能嘗試對新的遠端藍牙設備進行連接，同時存在的連接將獲得有限制的帶寬以及高等待時間。用戶可用cencelDiscovery()類來取消正在執行的查找進程。發現的過程不會由活動來進行管理，但是它會作為一個系統服務來運行，因此即使它不能直接請求這樣的一個查詢動作，也必需取消該搜索進程。
+Device discovery will only find remote devices that are currently discoverable (inquiry scan enabled). Many Bluetooth devices are not discoverable by default, and need to be entered into a special mode. 
+設備搜尋只尋找已經被連接的遠端設備。許多藍牙設備默認不會被搜尋到，並且需要進入到一個特殊的模式當中。
+需要BLUETOOTH_ADMIN類
+返回值
+成功則返回true，有錯誤則返回false。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public final class 
+BluetoothClass
+extends Object
+implements Parcelable 
+java.lang.Object
+? android.bluetooth.BluetoothClass
+Class Overview
+代表一個描述了設備通用特性和功能的藍牙類。比如，一個藍牙類會指定皆如電話、電腦或耳機的通用設備類型，可以提供皆如音頻或者電話的服務。
+每個藍牙類都是有0個或更多的服務類，以及一個設備類組成。設備類將被分解成主要和較小的設備類部分。
+BluetoothClass 用作一個能粗略描述一個設備（比如關閉用戶界面上一個圖示的設備）的線索，但當藍牙服務事實上是被一個設備所支撐的時候，BluetoothClass的介紹則不那麼可信任。精確的服務搜尋通過SDP請求來完成。當運用createRfcommSocketToServiceRecord(UUID) 和listenUsingRfcommWithServiceRecord(String, UUID)來創建RFCOMM連接埠的時候，SDP請求就會自動執行。
+使用getBluetoothClass()方法來獲取為遠端設備所提供的類。
+
+Summary
+嵌套類
+class BluetoothClass.Device
+定義所有設備類的常量 
+class BluetoothClass.Service
+定義所有服務類的常量 
+常量
+Creator<BluetoothClass>
+CREATOR
+
+繼承常量
+From interface android.os.Parcelable 
+int CONTENTS_FILE_DESCRIPTOR
+使用describeContents()方法的位屏蔽：每個位代表一種在數據流序列中被認為具有特殊意義的對象
+int PARCELABLE_WRITE_RETURN_VALUE
+使用writeToParcel(Parcel, int)方法的標誌：這個被寫入的對象是一個返回值，它是一個皆如"Parcelable someFunction()", "void someFunction(out Parcelable)", or "void someFunction(inout Parcelable)"等函數的結果。
+
+公共方法
+int describeContents() 
+描述了包含在Parcelable's marshalled representation中的特殊對象的種類。
+
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。 
+int getDeviceClass() 
+返回BluetoothClass.中的設備類部分（主要的和較小的）
+
+int getMajorDeviceClass() 
+返回BluetoothClass.中設備類的主要部分
+
+boolean hasService(int service) 
+如果該指定服務類被BluetoothClass.所支援，則返回true
+
+int hashCode()
+返回這個對象的整型哈希碼 
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹 
+void writeToParcel(Parcel out, int flags) 
+將類的數據寫入外部提供的Parcel中（註：此處沒有按照原文翻譯，實在看不懂原文的意思，囧） 
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回這個對象的整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生所有在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了該對像中的notify()或notifyAll()方法
+
+From interface android.os.Parcelable 
+abstract int describeContents() 
+描述了包含在Parcelable's marshalled representation.中的特殊對象的種類。
+abstract void writeToParcel(Parcel dest, int flags) 
+將類的數據寫入外部提供的Parcel中
+
+Constants
+public static final Creator<BluetoothClass> CREATOR 
+Since: API Level 5 
+Public Methods
+public int describeContents () 
+Since: API Level 5 
+描述了包含在Parcelable's marshalled representation.中的特殊對象的種類。
+返回值
+一個指示被Parcelabel所排列的特殊對像類型集合的位屏蔽。
+public boolean equals (Object o) 
+Since: API Level 5 
+比較帶有特定目標的常量。如果他們相等則標示出來。 為了保證其相等，o必須代表相同的對象，該對像作為這個使用類依賴比較的常量。通常約定，該比較既要可移植又需靈活 
+當且僅當o是一個作為接收器（使用==操作符來做比較）的精確相同的對象是，這個對象的實現才返回true值。子類通常實現equals(Object)方法，這樣它才會重視這兩個對象的類型和狀態。
+通常約定，對於equals(Object)和hashCode() 方法，如果equals對於任意兩個對像返回真值，那麼hashCode()必須對這些對像返回相同的紙。這意味著對象的子類通常都覆蓋或者都不覆蓋這兩個方法。
+參數
+o 需要對比常量的對象
+返回值
+如果特定的對象和該對像相等則返回true，否則返回false。
+public int getDeviceClass () 
+Since: API Level 5 
+返回BluetoothClass.中的設備類部分（主要的和較小的）
+從函數中返回的值可以和在BluetoothClass.Device中的公共常量做比較，從而確定哪個設備類在這個藍牙類中是被編碼的。
+返回值
+設備類部分
+public int getMajorDeviceClass () 
+Since: API Level 5 
+返回BluetoothClass.中設備類的主要部分
+從函數中返回的值可以和在BluetoothClass.Device.Major中的公共常量做比較，從而確定哪個主要類在這個藍牙類中是被編碼的。
+返回值
+主要設備類部分
+public boolean hasService (int service) 
+Since: API Level 5 
+如果該指定服務類被BluetoothClass.所支援，則返回true 
+在BluetoothClass.Service中，合法的服務類是公共常量，比如AUDIO.類。
+參數
+服務 合法服務類
+返回值
+如果該服務類可被支援，則返回true
+public int hashCode () 
+Since: API Level 5 
+返回這個對象的整型哈希碼。按約定，任意兩個在equals(Object)中返回true的對象必須返回相同的哈希碼。這意味著對象的子類通常通常覆蓋或者都不覆蓋這兩個方法。
+返回值
+該對象的哈希碼
+public String toString () 
+Since: API Level 5 
+返回這個對象的字串，該字串包含精確且可讀的介紹。系統鼓勵子類去重寫該方法，並且提供了能對該對象的類型和數據進行重視的實現方法。默認的實現方法只是簡單地把類名、「@「符號和該對像hashCode()方法的16進制數連接起來（如下列所示的表達式）： 
+getClass().getName() + '@' + Integer.toHexString(hashCode())
+
+返回值
+該對像中一個可被列印的字串。
+public void writeToParcel (Parcel out, int flags) 
+Since: API Level 5 
+將類的數據寫入外部提供的Parcel中
+Parameters
+out 對像需要被寫入的Parcel
+flags 和對像需要如何被寫入有關的附加標誌。可能是0，或者可能是PARCELABLE_WRITE_RETURN_VALUE。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public static class 
+BluetoothClass.Device
+extends Object
+java.lang.Object
+? android.bluetooth.BluetoothClass.Device
+Class Overview
+定義所有的設備類常量
+每個BluetoothClass對一個帶有主要和較小部分的設備類進行編碼。
+BluetoothClass.Device中的常量代表主要和較小的設備類部分（完整的設備類）的組合。BluetoothClass.Device.Major的常量只能代表主要設備類。
+
+Summary
+嵌套類
+class BluetoothClass.Device.Major
+定義了所有的主要設備類常量 
+Constants
+int AUDIO_VIDEO_CAMCORDER
+
+int AUDIO_VIDEO_CAR_AUDIO
+
+int AUDIO_VIDEO_HANDSFREE
+
+int AUDIO_VIDEO_HEADPHONES
+
+int AUDIO_VIDEO_HIFI_AUDIO
+
+int AUDIO_VIDEO_LOUDSPEAKER
+
+int AUDIO_VIDEO_MICROPHONE
+
+int AUDIO_VIDEO_PORTABLE_AUDIO
+
+int AUDIO_VIDEO_SET_TOP_BOX
+
+int AUDIO_VIDEO_UNCATEGORIZED
+
+int AUDIO_VIDEO_VCR
+
+int AUDIO_VIDEO_VIDEO_CAMERA
+
+int AUDIO_VIDEO_VIDEO_CONFERENCING
+
+int AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER
+
+int AUDIO_VIDEO_VIDEO_GAMING_TOY
+
+int AUDIO_VIDEO_VIDEO_MONITOR
+
+int AUDIO_VIDEO_WEARABLE_HEADSET
+
+int COMPUTER_DESKTOP
+
+int COMPUTER_HANDHELD_PC_PDA
+
+int COMPUTER_LAPTOP
+
+int COMPUTER_PALM_SIZE_PC_PDA
+
+int COMPUTER_SERVER
+
+int COMPUTER_UNCATEGORIZED
+
+int COMPUTER_WEARABLE
+
+int HEALTH_BLOOD_PRESSURE
+
+int HEALTH_DATA_DISPLAY
+
+int HEALTH_GLUCOSE
+
+int HEALTH_PULSE_OXIMETER
+
+int HEALTH_PULSE_RATE
+
+int HEALTH_THERMOMETER
+
+int HEALTH_UNCATEGORIZED
+
+int HEALTH_WEIGHING
+
+int PHONE_CELLULAR
+
+int PHONE_CORDLESS
+
+int PHONE_ISDN
+
+int PHONE_MODEM_OR_GATEWAY
+
+int PHONE_SMART
+
+int PHONE_UNCATEGORIZED
+
+int TOY_CONTROLLER
+
+int TOY_DOLL_ACTION_FIGURE
+
+int TOY_GAME
+
+int TOY_ROBOT
+
+int TOY_UNCATEGORIZED
+
+int TOY_VEHICLE
+
+int WEARABLE_GLASSES
+
+int WEARABLE_HELMET
+
+int WEARABLE_JACKET
+
+int WEARABLE_PAGER
+
+int WEARABLE_UNCATEGORIZED
+
+int WEARABLE_WRIST_WATCH
+
+公共構造器
+BluetoothClass.Device() 
+
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+Constants
+public static final int AUDIO_VIDEO_CAMCORDER 
+Since: API Level 5 
+常量值: 1076 (0x00000434) 
+public static final int AUDIO_VIDEO_CAR_AUDIO 
+Since: API Level 5 
+常量值: 1056 (0x00000420) 
+public static final int AUDIO_VIDEO_HANDSFREE 
+Since: API Level 5 
+常量值: 1032 (0x00000408) 
+public static final int AUDIO_VIDEO_HEADPHONES 
+Since: API Level 5 
+常量值: 1048 (0x00000418) 
+public static final int AUDIO_VIDEO_HIFI_AUDIO 
+Since: API Level 5 
+常量值: 1064 (0x00000428) 
+public static final int AUDIO_VIDEO_LOUDSPEAKER 
+Since: API Level 5 
+常量值: 1044 (0x00000414) 
+public static final int AUDIO_VIDEO_MICROPHONE 
+Since: API Level 5 
+常量值: 1040 (0x00000410) 
+public static final int AUDIO_VIDEO_PORTABLE_AUDIO 
+Since: API Level 5 
+常量值: 1052 (0x0000041c) 
+public static final int AUDIO_VIDEO_SET_TOP_BOX 
+Since: API Level 5 
+常量值: 1060 (0x00000424) 
+public static final int AUDIO_VIDEO_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 1024 (0x00000400) 
+public static final int AUDIO_VIDEO_VCR 
+Since: API Level 5 
+常量值: 1068 (0x0000042c) 
+public static final int AUDIO_VIDEO_VIDEO_CAMERA 
+Since: API Level 5 
+常量值: 1072 (0x00000430) 
+public static final int AUDIO_VIDEO_VIDEO_CONFERENCING 
+Since: API Level 5 
+常量值: 1088 (0x00000440) 
+public static final int AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER 
+Since: API Level 5 
+常量值: 1084 (0x0000043c) 
+public static final int AUDIO_VIDEO_VIDEO_GAMING_TOY 
+Since: API Level 5 
+常量值: 1096 (0x00000448) 
+public static final int AUDIO_VIDEO_VIDEO_MONITOR 
+Since: API Level 5 
+常量值: 1080 (0x00000438) 
+public static final int AUDIO_VIDEO_WEARABLE_HEADSET 
+Since: API Level 5 
+常量值: 1028 (0x00000404) 
+public static final int COMPUTER_DESKTOP 
+Since: API Level 5 
+常量值: 260 (0x00000104) 
+public static final int COMPUTER_HANDHELD_PC_PDA 
+Since: API Level 5 
+常量值: 272 (0x00000110) 
+public static final int COMPUTER_LAPTOP 
+Since: API Level 5 
+常量值: 268 (0x0000010c) 
+public static final int COMPUTER_PALM_SIZE_PC_PDA 
+Since: API Level 5 
+常量值: 276 (0x00000114) 
+public static final int COMPUTER_SERVER 
+Since: API Level 5 
+常量值: 264 (0x00000108) 
+public static final int COMPUTER_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 256 (0x00000100) 
+public static final int COMPUTER_WEARABLE 
+Since: API Level 5 
+常量值: 280 (0x00000118) 
+public static final int HEALTH_BLOOD_PRESSURE 
+Since: API Level 5 
+常量值: 2308 (0x00000904) 
+public static final int HEALTH_DATA_DISPLAY 
+Since: API Level 5 
+常量值: 2332 (0x0000091c) 
+public static final int HEALTH_GLUCOSE 
+Since: API Level 5 
+常量值: 2320 (0x00000910) 
+public static final int HEALTH_PULSE_OXIMETER 
+Since: API Level 5 
+常量值: 2324 (0x00000914) 
+public static final int HEALTH_PULSE_RATE 
+Since: API Level 5 
+常量值: 2328 (0x00000918) 
+public static final int HEALTH_THERMOMETER 
+Since: API Level 5 
+常量值: 2312 (0x00000908) 
+public static final int HEALTH_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 2304 (0x00000900) 
+public static final int HEALTH_WEIGHING 
+Since: API Level 5 
+常量值: 2316 (0x0000090c) 
+public static final int PHONE_CELLULAR 
+Since: API Level 5 
+常量值: 516 (0x00000204) 
+public static final int PHONE_CORDLESS 
+Since: API Level 5 
+常量值: 520 (0x00000208) 
+public static final int PHONE_ISDN 
+Since: API Level 5 
+常量值: 532 (0x00000214) 
+public static final int PHONE_MODEM_OR_GATEWAY 
+Since: API Level 5 
+常量值: 528 (0x00000210) 
+public static final int PHONE_SMART 
+Since: API Level 5 
+常量值: 524 (0x0000020c) 
+public static final int PHONE_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 512 (0x00000200) 
+public static final int TOY_CONTROLLER 
+Since: API Level 5 
+常量值: 2064 (0x00000810) 
+public static final int TOY_DOLL_ACTION_FIGURE 
+Since: API Level 5 
+常量值: 2060 (0x0000080c) 
+public static final int TOY_GAME 
+Since: API Level 5 
+常量值: 2068 (0x00000814) 
+public static final int TOY_ROBOT 
+Since: API Level 5 
+常量值: 2052 (0x00000804) 
+public static final int TOY_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 2048 (0x00000800) 
+public static final int TOY_VEHICLE 
+Since: API Level 5 
+常量值: 2056 (0x00000808) 
+public static final int WEARABLE_GLASSES 
+Since: API Level 5 
+常量值: 1812 (0x00000714) 
+public static final int WEARABLE_HELMET 
+Since: API Level 5 
+常量值: 1808 (0x00000710) 
+public static final int WEARABLE_JACKET 
+Since: API Level 5 
+常量值: 1804 (0x0000070c) 
+public static final int WEARABLE_PAGER 
+Since: API Level 5 
+常量值: 1800 (0x00000708) 
+public static final int WEARABLE_UNCATEGORIZED 
+Since: API Level 5 
+常量值: 1792 (0x00000700) 
+public static final int WEARABLE_WRIST_WATCH 
+Since: API Level 5 
+常量值: 1796 (0x00000704)
+
+
+
+
+
+
+
+
+
+
+public static class 
+BluetoothClass.Device.Major
+extends Object
+java.lang.Object
+? android.bluetooth.BluetoothClass.Device.Major
+Class Overview
+定義所有的主要設備類函數
+Summary
+常量
+int AUDIO_VIDEO
+
+int COMPUTER
+
+int HEALTH
+
+int IMAGING
+
+int MISC
+
+int NETWORKING
+
+int PERIPHERAL
+
+int PHONE
+
+int TOY
+
+int UNCATEGORIZED
+
+int WEARABLE
+
+公共構造器
+BluetoothClass.Device.Major() 
+
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+Constants
+public static final int AUDIO_VIDEO 
+Since: API Level 5 
+常量值: 1024 (0x00000400) 
+public static final int COMPUTER 
+Since: API Level 5 
+常量值: 256 (0x00000100) 
+public static final int HEALTH 
+Since: API Level 5 
+常量值: 2304 (0x00000900) 
+public static final int IMAGING 
+Since: API Level 5 
+常量值: 1536 (0x00000600) 
+public static final int MISC 
+Since: API Level 5 
+常量值: 0 (0x00000000) 
+public static final int NETWORKING 
+Since: API Level 5 
+常量值: 768 (0x00000300) 
+public static final int PERIPHERAL 
+Since: API Level 5 
+常量值: 1280 (0x00000500) 
+public static final int PHONE 
+Since: API Level 5 
+常量值: 512 (0x00000200) 
+public static final int TOY 
+Since: API Level 5 
+常量值: 2048 (0x00000800) 
+public static final int UNCATEGORIZED 
+Since: API Level 5 
+常量值: 7936 (0x00001f00) 
+public static final int WEARABLE 
+常量值: 1792 (0x00000700) 
+Public Constructors
+public BluetoothClass.Device.Major () 
+public static final class 
+BluetoothClass.Service
+extends Object
+java.lang.Object
+? android.bluetooth.BluetoothClass.Service
+Class Overview
+定義所有的服務類常量
+任意BluetoothClass由0或多個服務類編碼。
+Summary
+常量
+int AUDIO
+
+int CAPTURE
+
+int INFORMATION
+
+int LIMITED_DISCOVERABILITY
+
+int NETWORKING
+
+int OBJECT_TRANSFER
+
+int POSITIONING
+
+int RENDER
+
+int TELEPHONY
+
+公共構造器
+BluetoothClass.Service() 
+
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+Constants
+public static final int AUDIO 
+Since: API Level 5 
+常量值: 2097152 (0x00200000) 
+public static final int CAPTURE 
+Since: API Level 5 
+常量值: 524288 (0x00080000) 
+public static final int INFORMATION 
+Since: API Level 5 
+常量值: 8388608 (0x00800000) 
+public static final int LIMITED_DISCOVERABILITY 
+Since: API Level 5 
+常量值: 8192 (0x00002000) 
+public static final int NETWORKING 
+Since: API Level 5 
+常量值: 131072 (0x00020000) 
+public static final int OBJECT_TRANSFER 
+Since: API Level 5 
+常量值: 1048576 (0x00100000) 
+public static final int POSITIONING 
+Since: API Level 5 
+常量值: 65536 (0x00010000) 
+public static final int RENDER 
+Since: API Level 5 
+常量值: 262144 (0x00040000) 
+public static final int TELEPHONY 
+Since: API Level 5 
+常量值: 4194304 (0x00400000) 
+Public Constructors
+public BluetoothClass.Service ()
+
+
+
+
+
+
+
+
+
+
+public final class 
+BluetoothDevice
+extends Object
+implements Parcelable 
+java.lang.Object
+? android.bluetooth.BluetoothDevice
+Class Overview
+代表一個遠端藍牙設備。讓你創建一個帶有各自設備的BluetoothDevice或者查詢其皆如名稱、地址、類和連接狀態等資訊。
+對於藍牙硬體地址而言，這個類僅僅是一個瘦包裝器。這個類的對象是不可改變的。這個類上的操作會使用這個用來創建BluetoothDevice類的BluetoothAdapter類執行在遠端藍牙硬體上。
+為了獲得BluetoothDevice,類，使用BluetoothAdapter.getRemoteDevice(String)方法去創建一個表示已知MAC地址的設備（用戶可以通過帶有BluetoothAdapter類來完成對設備的查找）或者從一個通過BluetoothAdapter.getBondedDevices()得到返回值的有聯繫的設備集合來得到該設備。
+NOTE:需要BLUETOOTH類的許可
+Summary
+常量
+String
+ACTION_ACL_CONNECTED
+廣播活動：指明一個與遠端設備建立的低級別（ACL）連接 
+String
+ACTION_ACL_DISCONNECTED
+廣播活動：指明一個來自於遠端設備的低級別（ACL）連接的斷開 
+String
+ACTION_ACL_DISCONNECT_REQUESTED
+廣播活動：指明一個為遠端設備提出的低級別（ACL）的斷開連接請求，並即將斷開連接。 
+String
+ACTION_BOND_STATE_CHANGED
+廣播活動：指明一個遠端設備的連接狀態的改變 
+String
+ACTION_CLASS_CHANGED
+廣播活動：一個已經改變的遠端設備的藍牙類。 
+String
+ACTION_FOUND
+廣播活動：發現遠端設備 
+String
+ACTION_NAME_CHANGED
+廣播活動：指明一個遠端設備的暱稱第一次找到，或者自從最後一次找到該暱稱開始已經改變。 
+int BOND_BONDED
+指明遠端設備已經匹配 
+int BOND_BONDING
+指明和遠端設備的匹配正在進行中 
+int BOND_NONE
+指明遠端設備並未匹配 
+Creator<BluetoothDevice>
+CREATOR
+
+int ERROR
+該類的錯誤標誌值 
+String
+EXTRA_BOND_STATE
+作為一個ACTION_BOND_STATE_CHANGED的整型附加域
+
+String
+EXTRA_CLASS
+作為一個ACTION_FOUND and和ACTION_CLASS_CHANGED的Parcelabe BluetoothClass附加域。 
+String
+EXTRA_DEVICE
+每次通過該類進行廣播時，作為Parcelable BluetoothDevice的附加域 
+String
+EXTRA_NAME
+作為ACTION_NAME_CHANGED和ACTION_FOUND的字串附加域 
+String
+EXTRA_PREVIOUS_BOND_STATE
+作為ACTION_BOND_STATE_CHANGED的整型附加域
+
+String
+EXTRA_RSSI
+作為ACTION_FOUND的可選短整型附加域 
+繼承常量
+來自介面android.os.Parcelable 
+int CONTENTS_FILE_DESCRIPTOR
+使用describeContents()方法的位屏蔽：每個位代表一種在數據流序列中被認為具有特殊意義的對象
+int PARCELABLE_WRITE_RETURN_VALUE
+使用writeToParcel(Parcel, int)方法的標誌：這個被寫入的對象是一個返回值，它是一個皆如"Parcelable someFunction()", "void someFunction(out Parcelable)", or "void someFunction(inout Parcelable)"等函數的結果。
+
+Public Methods
+BluetoothSocket 
+createRfcommSocketToServiceRecord(UUID uuid) 
+創建一個RFCOMM 以準備開始一個對使用uuid的SDP查找的遠端設備進行安全而友好的連接。 
+int describeContents() 
+描述了包含在Parcelable's marshalled representation中的特殊對象的種類。 
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。 
+String 
+getAddress() 
+返回該藍牙設備的硬體地址 
+BluetoothClass 
+getBluetoothClass() 
+獲得遠端設備的藍牙類 
+int getBondState() 
+獲得遠端設備的連接狀態 
+String 
+getName() 
+獲得遠端設備的藍顏暱稱 
+int hashCode() 
+返回該對象的一個整型哈希值 
+String 
+toString() 
+返回該藍牙設備的字串表達式 
+void writeToParcel(Parcel out, int flags) 
+將類的數據寫入外部提供的Parcel中 
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+From interface android.os.Parcelable 
+abstract int describeContents() 
+描述了包含在Parcelable's marshalled representation中的特殊對象的種類。
+abstract void writeToParcel(Parcel dest, int flags) 
+將類的數據寫入外部提供的Parcel中
+
+Constants
+public static final String ACTION_ACL_CONNECTED 
+Since: API Level 5 
+指明一個與遠端設備建立的低級別（ACL）連接
+總是包含EXTRA_DEVICE.附加域
+ACL連接通過Android藍牙棧自動進行管理
+需要BLUETOOTH去獲取
+常量值: "android.bluetooth.device.action.ACL_CONNECTED" 
+public static final String ACTION_ACL_DISCONNECTED 
+Since: API Level 5 
+廣播活動：指明一個來自於遠端設備的低級別（ACL）連接的斷開
+總是包含EXTRA_DEVICE.附加域
+ACL連接通過Android藍牙棧自動進行管理
+需要BLUETOOTH去獲取
+常量值: "android.bluetooth.device.action.ACL_DISCONNECTED" 
+public static final String ACTION_ACL_DISCONNECT_REQUESTED 
+Since: API Level 5 
+指明一個為遠端設備提出的低級別（ACL）的斷開連接請求，並即將斷開連接。 
+對於友好的斷開連接，該常量是有作用的。應用程式可以用它作為暗示去馬上中斷對遠端設備的高級別的連接（RFCOMM,L2CAP,或者其它連接）。
+總是包含EXTRA_DEVICE.附加域
+需要BLUETOOTH去獲取
+常量值: "android.bluetooth.device.action.ACL_DISCONNECT_REQUESTED" 
+public static final String ACTION_BOND_STATE_CHANGED 
+Since: API Level 5 
+指明一個遠端設備的連接狀態的改變。
+比如，當一個設備已經被匹配。
+總是包含EXTRA_DEVICE, EXTRA_BOND_STATE和 EXTRA_PREVIOUS_BOND_STATE.這些附加域
+需要BLUETOOTH去獲取
+常量值: "android.bluetooth.device.action.BOND_STATE_CHANGED" 
+public static final String ACTION_CLASS_CHANGED 
+Since: API Level 5 
+廣播活動：一個已經改變的遠端設備的藍牙類。
+總是包含EXTRA_DEVICE和EXTRA_BOND_STATE這些附加域
+需要BLUETOOTH去獲取
+See Also
+ERROR(BluetoothClass} /{@link BluetoothClass})
+
+常量值: "android.bluetooth.device.action.CLASS_CHANGED" 
+public static final String ACTION_FOUND 
+Since: API Level 5 
+廣播活動：發現遠端設備
+當一個遠端設備在查找過程中被發現時，發送該常量值。
+總是包含EXTRA_DEVICE和EXTRA_CLASS.這些附加域。如果可用的話，也可包含EXTRA_NAME和/或EXTRA_RSSI這些附加域。
+需要BLUETOOTH去接收
+常量值: "android.bluetooth.device.action.FOUND" 
+public static final String ACTION_NAME_CHANGED 
+Since: API Level 5 
+廣播活動：指明一個遠端設備的暱稱第一次找到，或者自從最後一次找到該暱稱開始已經改變。
+總是包含EXTRA_DEVICE和EXTRA_NAME這些附加域
+需要BLUETOOTH去接收
+常量值: "android.bluetooth.device.action.NAME_CHANGED" 
+public static final int BOND_BONDED 
+Since: API Level 5 
+指明遠端設備已經匹配。
+一個共享的連接鍵為了遠端設備而存在於本地，因而設備間的通訊可以被認證和加密。
+和遠端設備的匹配並不意味著設備間已經成功連接。它只意味著匹配過程已經在稍早之前完成，並且連接鍵已經存儲在本地，準備在下次連接的時候使用。
+常量值: 12 (0x0000000c) 
+public static final int BOND_BONDING 
+Since: API Level 5 
+指明和遠端設備的匹配正在進行中
+
+常量值: 11 (0x0000000b) 
+public static final int BOND_NONE 
+Since: API Level 5 
+指明遠端設備未被匹配。
+There is no shared link key with the remote device, so communication (if it is allowed at all) will be unauthenticated and unencrypted. 
+不存在為了遠端設備而已經共享的連接鍵，因而設備間的通訊（如果完全被允許）不可被認證和加密。
+常量值: 10 (0x0000000a) 
+public static final Creator<BluetoothDevice> CREATOR 
+Since: API Level 5 
+public static final int ERROR 
+Since: API Level 5 
+該類的錯誤標誌值. 標記該類的錯誤值。確保和該類中的任意其它整數常量不相等。它為需要一個標記錯誤值的函數提供了便利。例如： Intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR) 
+常量值: -2147483648 (0x80000000) 
+public static final String EXTRA_BOND_STATE 
+Since: API Level 5 
+作為一個ACTION_BOND_STATE_CHANGED的整型附加域。包含了遠端設備的匹配狀態。 
+可能值有: BOND_NONE, BOND_BONDING, BOND_BONDED. 
+常量值: "android.bluetooth.device.extra.BOND_STATE" 
+public static final String EXTRA_CLASS 
+Since: API Level 5 
+作為一個ACTION_FOUND and和ACTION_CLASS_CHANGED的Parcelabe BluetoothClass附加域。
+
+常量值: "android.bluetooth.device.extra.CLASS" 
+public static final String EXTRA_DEVICE 
+Since: API Level 5 
+每次通過該類進行廣播時，作為Parcelable BluetoothDevice的附加域。它包含了該常量適用的BluetoothDevice類。 
+常量值: "android.bluetooth.device.extra.DEVICE" 
+public static final String EXTRA_NAME 
+Since: API Level 5 
+作為ACTION_NAME_CHANGED和ACTION_FOUND的字串附加域。它包含了這個藍牙暱稱。
+常量值: "android.bluetooth.device.extra.NAME" 
+public static final String EXTRA_PREVIOUS_BOND_STATE 
+Since: API Level 5 
+作為ACTION_BOND_STATE_CHANGED的整型附加域。包含了遠端設備以前的匹配狀態。 
+可能值有: BOND_NONE, BOND_BONDING, BOND_BONDED. 
+常量值: "android.bluetooth.device.extra.PREVIOUS_BOND_STATE" 
+public static final String EXTRA_RSSI 
+Since: API Level 5 
+作為ACTION_FOUND的可選短整型附加域。包含了被藍牙硬體通知的遠端設備的RSSI(Receive Signal Strength Indication，接收信號強度指示)值。 
+常量值: "android.bluetooth.device.extra.RSSI" 
+Public Methods
+public BluetoothSocket createRfcommSocketToServiceRecord (UUID uuid) 
+Since: API Level 5 
+創建一個RFCOMM 以準備開始一個對使用uuid的SDP查找的遠端設備進行安全而友好的連接。
+This is designed to be used with listenUsingRfcommWithServiceRecord(String, UUID) for peer-peer Bluetooth applications. 
+該方法是為了使用帶有listenUsingRfcommWithServiceRecord(String, UUID)方法來進行對等的藍牙應用而設計的
+使用connect()初始化這個外界連接。它也將執行一個已給與UUID的SDP查找，從而確定連接到哪個通道上。
+遠端設備將被認證，在這個連接埠上的通訊會被加密。
+需要BLUETOOTH去接收
+參數
+uuid 查詢RFCOMM通道的服務記錄UUID
+返回值
+一個準備好外界連接的RFCOMM藍牙服務連接埠
+異常拋出
+IOException
+出現錯誤，比如藍牙模組不可用，或者許可無效。
+public int describeContents () 
+Since: API Level 5 
+描述了包含在Parcelable's marshalled representation中的特殊對象的種類。
+Returns
+一個指示被Parcelabel所排列的特殊對像類型集合的位屏蔽。
+
+
+
+public boolean equals (Object o) 
+Since: API Level 5 
+比較帶有特定目標的常量。如果他們相等則標示出來。 為了保證其相等，o必須代表相同的對象，該對像作為這個使用類依賴比較的常量。通常約定，該比較既要可移植又需靈活 
+當且僅當o是一個作為接收器（使用==操作符來做比較）的精確相同的對象是，這個對象的實現才返回true值。子類通常實現equals(Object)方法，這樣它才會重視這兩個對象的類型和狀態。
+通常約定，對於equals(Object)和hashCode() 方法，如果equals對於任意兩個對像返回真值，那麼hashCode()必須對這些對像返回相同的紙。這意味著對象的子類通常都覆蓋或者都不覆蓋這兩個方法。
+參數
+o 需要對比常量的對象
+返回值
+如果特定的對象和該對像相等則返回true，否則返回false。
+public String getAddress () 
+Since: API Level 5 
+返回該藍牙設備的硬體地址
+例如： "00:11:22:AA:BB:CC".
+返回值
+字串類型的藍牙硬體地址
+public BluetoothClass getBluetoothClass () 
+Since: API Level 5 
+獲取遠端設備的藍牙類
+需要BLUETOOTH類
+返回值
+藍牙類對像，出錯時返回空值、
+public int getBondState () 
+Since: API Level 5 
+獲取遠端設備的連接狀態。
+連接狀態的可能值有: BOND_NONE, BOND_BONDING, BOND_BONDED. 
+需要BLUETOOTH類
+返回值
+連接狀態。
+public String getName () 
+Since: API Level 5 
+獲取遠端設備的藍牙暱稱。
+當執行設備掃瞄的時候，本地適配器將自動尋找遠端名稱。該方法只返回來自存儲器中該設備的名稱。
+需要BLUETOOTH類
+返回值
+藍牙暱稱，如果出現問題則返回控制。
+public int hashCode () 
+Since: API Level 5 
+返回該對象的一個整型哈希值. 通常約定，如果equals對於任意兩個對像返回真值，那麼hashCode()必須對這些對像返回相同的值。這意味著對象的子類通常都覆蓋或者都不覆蓋這兩個方法。
+返回值
+該對象的哈希值
+public String toString () 
+Since: API Level 5 
+返回該藍牙設備的字串表達式。
+這是一個藍牙硬體地址，例如"00:11:22:AA:BB:CC".然而，如果用戶明確需要藍牙硬體地址以防以後toString()表達式會改變的話，用戶總是需要使用getAddress()方法。
+返回值
+該藍牙設備的字串表達式。
+public void writeToParcel (Parcel out, int flags) 
+Since: API Level 5 
+將類的數據寫入外部提供的Parcel中
+Parameters
+out 對像需要被寫入的Parcel
+flags 和對像需要如何被寫入有關的附加標誌。可能是0，或者可能是PARCELABLE_WRITE_RETURN_VALUE。
+public final class 
+BluetoothServerSocket
+extends Object
+implements Closeable 
+java.lang.Object
+? android.bluetooth.BluetoothServerSocket
+Class Overview
+一個藍牙監聽連接埠
+藍牙連接埠監聽介面和TCP連接埠類似：Socket和ServerSocket類。在伺服器端，使用BluetoothServerSocket類來創建一個監聽服務連接埠。當一個連接被BluetoothServerSocket所接受，它會返回一個新的BluetoothSocket來管理該連接。在用戶端，使用一個單獨的BluetoothSocket類去初始化一個外接連接和管理該連接。
+最通常使用的藍牙連接埠是RFCOMM，它是被Android API支援的類型。RFCOMM是一個面向連接，通過藍牙模組進行的數據流傳輸方式，它也被稱為串行連接埠規範（Serial Port Profile，SPP）。
+為了創建一個對準備好的新來的連接去進行監聽BluetoothServerSocket類，使用BluetoothAdapter.listenUsingRfcommWithServiceRecord()方法。然後調用accept()方法去監聽該鏈接的請求。在連接建立之前，該調用會被阻斷，也就是說，它將返回一個BluetoothSocket類去管理該連接。每次獲得該類之後，如果不再需要接受連接，最好調用在BluetoothServerSocket類下的close()方法。關閉BluetoothServerSocket類不會關閉這個已經返回的BluetoothSocket類
+BluetoothSocket類線程安全。特別的，close()方法總會馬上放棄外界操作並關閉伺服器連接埠。
+Note: 需要BLUETOOTH類的許可。
+
+
+
+
+
+Summary
+公共方法
+BluetoothSocket 
+accept() 
+阻塞直到一個連接已經建立 
+BluetoothSocket 
+accept(int timeout) 
+阻塞直到一個帶有超時的連接已經建立 
+void close() 
+馬上關閉連接埠，並釋放所有相關的資源。 
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+From interface java.io.Closeable 
+abstract void close() 
+關閉對象並且釋放任意該對像持有的系統資源。
+
+Public Methods
+public BluetoothSocket accept () 
+Since: API Level 5 
+阻塞直到一個連接已經建立
+在一個成功建立的連接上返回一個已連接的BluetoothSocket類。
+每當該調用返回的時候，它可以在此調用去接收以後新來的連接。
+close()方法可以用來放棄從另一線程來的調用。
+返回值
+已連接的 BluetoothSocket
+異常拋出
+IOException
+出現錯誤，比如該調用被放棄，或者超時。 
+public BluetoothSocket accept (int timeout) 
+Since: API Level 5 
+阻塞直到一個帶超時的連接已經建立
+在一個成功建立的連接上返回一個已連接的BluetoothSocket類。
+每當該調用返回的時候，它可以在此調用去接收以後新來的連接。
+close()方法可以用來放棄從另一線程來的調用。
+返回值
+已連接的 BluetoothSocket
+異常拋出
+IOException
+出現錯誤，比如該調用被放棄，或者超時。 
+public void close () 
+Since: API Level 5 
+馬上關閉連接埠，並釋放所有相關的資源。
+在其他線程的該連接埠中引起阻塞，從而使系統馬上拋出一個IO異常。
+關閉BluetoothServerSocket不會關閉接受自accept()的任意BluetoothSocket。
+異常拋出
+IOException
+
+public final class 
+BluetoothSocket
+extends Object
+implements Closeable 
+java.lang.Object
+? android.bluetooth.BluetoothSocket
+Class Overview
+藍牙連接埠監聽介面和TCP連接埠類似：Socket和ServerSocket類。在伺服器端，使用BluetoothServerSocket類來創建一個監聽服務連接埠。當一個連接被BluetoothServerSocket所接受，它會返回一個新的BluetoothSocket來管理該連接。在用戶端，使用一個單獨的BluetoothSocket類去初始化一個外接連接和管理該連接。
+最通常使用的藍牙連接埠是RFCOMM，它是被Android API支援的類型。RFCOMM是一個面向連接，通過藍牙模組進行的數據流傳輸方式，它也被稱為串行連接埠規範（Serial Port Profile，SPP）。
+為了創建一個BluetoothSocket去連接到一個已知設備，使用方法BluetoothDevice.createRfcommSocketToServiceRecord()。然後調用connect()方法去嘗試一個面向遠端設備的連接。這個調用將被阻塞指導一個連接已經建立或者該鏈接失效。
+為了創建一個BluetoothSocket作為服務端（或者「主機」），查看BluetoothServerSocket文檔。
+每當該連接埠連接成功，無論它初始化為用戶端，或者被接受作為伺服器端，通過getInputStream()和getOutputStream()來打開IO流，從而獲得各自的InputStream和OutputStream對像
+BluetoothSocket類線程安全。特別的，close()方法總會馬上放棄外界操作並關閉伺服器連接埠。
+Note: 需要BLUETOOTH類的許可。
+
+
+
+Summary
+公共方法
+void close() 
+馬上關閉該連接埠並且釋放所有相關的資源。 
+void connect() 
+嘗試連接到遠端設備。 
+InputStream 
+getInputStream() 
+通過連接的連接埠獲得輸入數據流 
+OutputStream 
+getOutputStream() 
+通過連接的連接埠獲得輸出數據流. 
+BluetoothDevice 
+getRemoteDevice() 
+獲得該連接埠正在連接或者已經連接的遠端設備。 
+繼承方法
+From class java.lang.Object 
+Object 
+clone() 
+創建並返回該對象的複製品.
+boolean equals(Object o) 
+比較帶有特定目標的常量。如果他們相等則標示出來。
+void finalize() 
+對象的記憶體被虛擬機收回前需要調用該方法
+final Class<? extends Object> 
+getClass() 
+返回一個唯一的Class常量，該常量代表這個對象類
+int hashCode() 
+返回該對象的一個整型哈希碼
+final void notify() 
+產生一個在該對像監測器中等待被喚醒（通過wait() 方法進行調用）的線程
+final void notifyAll() 
+產生在對像監測器中等待被喚醒（通過wait() 方法進行調用）的所有線程
+String 
+toString() 
+返回這個對象的字串，該字串包含精確且可讀的介紹
+final void wait(long millis, int nanos) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait(long millis) 
+產生一個調用線程，該線程將等待，直到另一個線程調用了notify()或notifyAll()方法，或者直到產生一個精確的超時。
+final void wait() 
+產生一個調用線程，該線程將等待，直到另一個線程調用了在該對像中的notify()或notifyAll()方法。
+
+From interface java.io.Closeable 
+abstract void close() 
+關閉對象並且釋放任意該對像持有的系統資源。
+
+Public Methods
+public void close () 
+Since: API Level 5 
+馬上關閉該連接埠並且釋放所有相關的資源。
+在其它線程的該連接埠中引起阻塞，從而使系統馬上拋出一個IO異常。
+異常拋出
+IOException
+
+public void connect () 
+Since: API Level 5 
+嘗試連接到遠端設備。
+該方法將阻塞，指導一個連接建立或者失效。如果該方法沒有返迥異常值，則該連接埠現在已經建立。
+當設備查找正在進行的時候，創建對遠端藍牙設備的新連接不可被嘗試。在藍牙適配器上，設備查找是一個重量級過程，並且肯定會降低一個設備的連接。使用cancelDiscovery()方法去取消一個外界的查詢。查詢並不由活動所管理，而作為一個系統服務來運行，所以即使它不能直接請求一個查詢，應用程式也總會調用cancelDiscovery()方法。。
+close()方法可以用來放棄從另一線程而來的調用。
+異常拋出
+IOException
+on error, for example connection failure 
+public InputStream getInputStream () 
+Since: API Level 5 
+通過連接的連接埠獲得輸入數據流
+即使該連接埠未連接，該輸入數據流也會返回。不過在該數據流上的操作將拋出異常，直到相關的連接已經建立。
+返回值
+輸入流
+異常拋出
+IOException
+
+public OutputStream getOutputStream () 
+Since: API Level 5 
+通過連接的連接埠獲得輸出數據流
+即使該連接埠未連接，該輸出數據流也會返回。不過在該數據流上的操作將拋出異常，直到相關的連接已經建立。
+返回值
+輸出流
+異常拋出
+IOException
+
+public BluetoothDevice getRemoteDevice () 
+Since: API Level 5 
+獲得該連接埠正在連接或者已經連接的遠端設備。
+返回值
+遠端設備
+
+轉自：
+http://www.android-wiki.net/index.php?title=Android.bluetooth
+
+
+ 
+/******************************************************************************/
+Android中如何使用藍牙設備—翻譯官方guide                http://doandroid.info/android%E4%B8%AD%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E8%93%9D%E7%89%99%E8%AE%BE%E5%A4%87-%E7%BF%BB%E8%AF%91%E5%AE%98%E6%96%B9guide/
+/******************************************************************************/
+本文原文見 Bluetooth.
+The Android platform includes support for the Bluetooth network stack, which allows a device to wirelessly exchange data with other Bluetooth devices.
+Android平台包含藍牙網路棧的支援，即允許設備同其他藍牙設備無線交換數據。
+
+The application framework provides access to the Bluetooth functionality through the Android Bluetooth APIs. These APIs let applications wirelessly connect to other Bluetooth devices, enabling point-to-point and multipoint wireless features.
+應用框架提供了通過Android Bluetooth API訪問藍牙功能的方法。這些API運行應用無線連接到其他藍牙設備，運行點對點和多點無線特性。
+
+Using the Bluetooth APIs, an Android application can perform the following:
+Scan for other Bluetooth devices
+Query the local Bluetooth adapter for paired Bluetooth devices
+Establish RFCOMM channels
+Connect to other devices through service discovery
+Transfer data to and from other devices
+Manage multiple connections
+使用這些藍牙API，一個Android應用可以執行下列操作：
+掃瞄其他藍牙設備
+查詢本地藍牙適配器中的配對藍牙設備
+建立RFCOMM通道
+通過服務發現功能連接其他設備
+同其他設備傳輸數據
+管理多連接
+
+The Basics
+基礎知識
+This document describes how to use the Android Bluetooth APIs to accomplish the four major tasks necessary to communicate using Bluetooth: setting up Bluetooth, finding devices that are either paired or available in the local area, connecting devices, and transferring data between devices.
+本文檔描述如何使用Android藍牙API完成四個使用藍牙設備交互主要任務：配置藍牙，查找本地區域配對或者可用設備，連接設備，設備間傳輸數據。
+All of the Bluetooth APIs are available in the android.bluetooth package. Here』s a summary of the classes and interfaces you will need to create Bluetooth connections:
+所有藍牙API都在android.bluetooth的包中。這裡列出的是你需要創建藍牙連接的類和介面的匯總。
+
+BluetoothAdapter
+Represents the local Bluetooth adapter (Bluetooth radio). The BluetoothAdapter is the entry-point for all Bluetooth interaction. Using this, you can discover other Bluetooth devices, query a list of bonded (paired) devices, instantiate a BluetoothDevice using a known MAC address, and create a BluetoothServerSocket to listen for communications from other devices.
+表示本地藍牙適配器。BluetoothAdapter是所有藍牙交互的入口。使用它，你可以發現其他藍牙設備，查詢配對設備的數組，使用一個已知的MAC地址實例化一個BluetoothDevice，創建一個BluetoothServerSocket 監聽同其他設備的交互。
+
+BluetoothDevice
+Represents a remote Bluetooth device. Use this to request a connection with a remote device through a BluetoothSocket or query information about the device such as its name, address, class, and bonding state.
+表示一個遠端藍牙設備。通過使用這個類和BluetoothSocket去請求一個同遠端藍牙設備的連接以查詢藍牙設備的名稱，地址，類，和連接狀態資訊。
+
+BluetoothSocket
+Represents the interface for a Bluetooth socket (similar to a TCP Socket). This is the connection point that allows an application to exchange data with another Bluetooth device via InputStream and OutputStream.
+表示藍牙Socket的介面（跟TCP Socket相似）。該類允許應用程式同其他藍牙設備通過InputStream和OutputStream交換數據。
+
+BluetoothServerSocket
+Represents an open server socket that listens for incoming requests (similar to a TCP ServerSocket). In order to connect two Android devices, one device must open a server socket with this class. When a remote Bluetooth device makes a connection request to the this device, the BluetoothServerSocket will return a connected BluetoothSocket when the connection is accepted.
+BluetoothServerSocket表示一個伺服器端Socket，監聽連接進入的請求（跟TCP ServerSocket相似）。為了連接兩個Android設備，必須其中一個設備使用這個類打開伺服器端的Socket。當一個遠端藍牙設備啟動一個到本設備的連接時，BluetoothServerSocket 會返回一個接受連接的BluetoothSocket。
+
+BluetoothClass
+Describes the general characteristics and capabilities of a Bluetooth device. This is a read-only set of properties that define the device』s major and minor device classes and its services. However, this does not reliably describe all Bluetooth profiles and services supported by the device, but is useful as a hint to the device type.
+BluetoothClass描述一個普通藍牙設備的特徵和屬性。是一個只讀的屬性系列。
+
+BluetoothProfile
+An interface that represents a Bluetooth profile. A Bluetooth profile is a wireless interface specification for Bluetooth-based communication between devices. An example is the Hands-Free profile. For more discussion of profiles, see Working with Profiles
+BluetoothProfile是一個表示藍牙資料的介面。如免提資訊。
+
+BluetoothHeadset
+Provides support for Bluetooth headsets to be used with mobile phones. This includes both Bluetooth Headset and Hands-Free (v1.5) profiles.
+BluetoothHeadset提供移動電話藍牙耳機的支援。包含藍牙耳機和免提資訊。
+
+BluetoothA2dp
+Defines how high quality audio can be streamed from one device to another over a Bluetooth connection. 「A2DP」 stands for Advanced Audio Distribution Profile.
+BluetoothA2dp定義了高質量音頻，能通過藍牙連接從一個設備中傳輸到另外一個設備中。A2DP表示高級音頻發佈屬性。
+
+BluetoothProfile.ServiceListener
+An interface that notifies BluetoothProfile IPC clients when they have been connected to or disconnected from the service (that is, the internal service that runs a particular profile).
+BluetoothProfile.ServiceListener是一個介面，當設備連接或者斷開的時候通知藍牙IPC用戶端。
+
+Bluetooth Permissions
+藍牙權限
+In order to use Bluetooth features in your application, you need to declare at least one of two Bluetooth permissions: BLUETOOTH and BLUETOOTH_ADMIN.
+為了在你的應用中使用藍牙特性，你需要定義至少兩個藍牙權限的一個：BLUETOOTH and BLUETOOTH_ADMIN.
+You must request the BLUETOOTH permission in order to perform any Bluetooth communication, such as requesting a connection, accepting a connection, and transferring data.
+你必須請求藍牙權限，以執行任意的藍牙交互操作。如請求一個連接，接受一個連接，傳輸數據等。
+You must request the BLUETOOTH_ADMIN permission in order to initiate device discovery or manipulate Bluetooth settings. Most applications need this permission solely for the ability to discover local Bluetooth devices. The other abilities granted by this permission should not be used, unless the application is a 「power manager」 that will modify Bluetooth settings upon user request. Note: If you use BLUETOOTH_ADMIN permission, then must also have the BLUETOOTH permission.
+為了初始化設備的發現和操作藍牙設置，你必須使用BLUETOOTH_ADMIN權限。大部分應用需要這個權限去發現本地藍牙設備。其他的一般不需要使用。
+注意，如果使用了BLUETOOTH_ADMIN權限，必須同時包含BLUETOOTH權限。
+
+Declare the Bluetooth permission(s) in your application manifest file. For example:
+在你的應用的Manifest.xml中定義藍牙權限。下例：
+...
+See the reference for more information about declaring application permissions.
+更多說明可以查看參考。
+
+Setting Up Bluetooth
+配置藍牙設備
+Figure 1: The enabling Bluetooth dialog.
+Before your application can communicate over Bluetooth, you need to verify that Bluetooth is supported on the device, and if so, ensure that it is enabled.
+在你的應用通過藍牙交互之前，你需要本設備是否支援藍牙設備，如果存在，則需要確定他是否啟用。
+If Bluetooth is not supported, then you should gracefully disable any Bluetooth features. If Bluetooth is supported, but disabled, then you can request that the user enable Bluetooth without leaving your application. This setup is accomplished in two steps, using the BluetoothAdapter.
+如果藍牙設備不支援，你需要優雅的禁用所有藍牙特性。如果支援，但是禁用了，你可以提示用戶啟用藍牙設備。這個配置使用BluetoothAdapter由兩步完成。
+
+Get the BluetoothAdapter
+The BluetoothAdapter is required for any and all Bluetooth activity. To get the BluetoothAdapter, call the static getDefaultAdapter() method. This returns a BluetoothAdapter that represents the device』s own Bluetooth adapter (the Bluetooth radio). There』s one Bluetooth adapter for the entire system, and your application can interact with it using this object. If getDefaultAdapter() returns null, then the device does not support Bluetooth and your story ends here. For example:
+所有藍牙的Activity都需要BluetoothAdapter 。為了得到BluetoothAdapter ，你需要調用靜態方法getDefaultAdapter。它將返回當前設備的藍牙適配器的BluetoothAdapter。
+系統中只有一個藍牙適配器，你的應用可以同這個對象交互。如果getDefaultAdapter返回null，表示你的設備不支援藍牙，後面的功能都將不支援。
+BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+if (mBluetoothAdapter == null) {
+    // Device does not support Bluetooth
+}
+
+Enable Bluetooth
+Next, you need to ensure that Bluetooth is enabled. Call isEnabled() to check whether Bluetooth is currently enable. If this method returns false, then Bluetooth is disabled. To request that Bluetooth be enabled, call startActivityForResult() with the ACTION_REQUEST_ENABLE action Intent. This will issue a request to enable Bluetooth through the system settings (without stopping your application). For example:
+啟用藍牙
+下一步，你需要確認藍牙啟動了。調用isEnabled方法查詢當前藍牙是否被啟用。如果這個方法返回false，表示藍牙被禁用了。為了請求藍牙啟用，啟用一個ACTION_REQUEST_ENABLE操作的Intent，調用startActivityForResult方法。這樣將在系統設置中啟用藍牙（不需要停止你的應用）。
+
+if (!mBluetoothAdapter.isEnabled()) {
+    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+}
+A dialog will appear requesting user permission to enable Bluetooth, as shown in Figure 1. If the user responds 「Yes,」 the system will begin to enable Bluetooth and focus will return to your application once the process completes (or fails).
+類似圖一的提示，如果點擊yes，系統會啟用藍牙，同時返回你的應用。
+If enabling Bluetooth succeeds, your Activity will receive the RESULT_OK result code in the onActivityResult() callback. If Bluetooth was not enabled due to an error (or the user responded 「No」) then the result code will be RESULT_CANCELED.
+如果啟用藍牙成功，你的Activity將會在onActivityResult函數中接收到RESULT_OK的返回值。如果藍牙啟動失敗，返回碼為RESULT_CANCELED。
+Optionally, your application can also listen for the ACTION_STATE_CHANGED broadcast Intent, which the system will broadcast whenever the Bluetooth state has changed. This broadcast contains the extra fields EXTRA_STATE and EXTRA_PREVIOUS_STATE, containing the new and old Bluetooth states, respectively. Possible values for these extra fields are STATE_TURNING_ON, STATE_ON, STATE_TURNING_OFF, and STATE_OFF. Listening for this broadcast can be useful to detect changes made to the Bluetooth state while your app is running.
+另外，您的應用可以監聽ACTION_STATE_CHANGED的broadcast Intent，如果藍牙狀態改變，系統會廣播。廣播包含輔助字段EXTRA_STATE和EXTRA_PREVIOUS_STATE，表示之前藍牙狀態和當前藍牙狀態。可能的狀態是STATE_TURNING_ON、STATE_ON, STATE_TURNING_OFF和STATE_OFF。當你的應用運行的時候，通過監聽這個廣播來檢測藍牙狀態變化是有用的。
+Tip: Enabling discoverability will automatically enable Bluetooth. If you plan to consistently enable device discoverability before performing Bluetooth activity, you can skip step 2 above. Read about enabling discoverability, below.
+提示：啟用可發現功能會自動啟用藍牙。
+
+Finding Devices
+查找設備
+Using the BluetoothAdapter, you can find remote Bluetooth devices either through device discovery or by querying the list of paired (bonded) devices.
+使用BluetoothAdapter，你可以通過設備發現或者查詢配對設備列表來查找遠端藍牙設備。
+Device discovery is a scanning procedure that searches the local area for Bluetooth enabled devices and then requesting some information about each one (this is sometimes referred to as 「discovering,」 「inquiring」 or 「scanning」). However, a Bluetooth device within the local area will respond to a discovery request only if it is currently enabled to be discoverable. If a device is discoverable, it will respond to the discovery request by sharing some information, such as the device name, class, and its unique MAC address. Using this information, the device performing discovery can then choose to initiate a connection to the discovered device.
+設備發現時一個掃瞄過程，搜索本地啟動了藍牙的設備然後請求一些該設備基本資訊。儘管如此，一個在本地範圍內的藍牙設備當允許被發現的時候，會給一個回應。如果一個設備是可發現的，他會將設備名稱，唯一的MAC地址發過來。使用這個資訊，源設備就可以建立連接了。
+Once a connection is made with a remote device for the first time, a pairing request is automatically presented to the user. When a device is paired, the basic information about that device (such as the device name, class, and MAC address) is saved and can be read using the Bluetooth APIs. Using the known MAC address for a remote device, a connection can be initiated with it at any time without performing discovery (assuming the device is within range).
+如果第一次同遠端設備建立了連接，用戶會看到一個配對的請求。當一個設備配對成功，這個設備的基本資訊（如設備名稱，Mac地址）會保存。下次可以通過藍牙API讀取到。任何時間使用已知的MAC地址連接遠端設備，不需要執行搜索就可以建立連接（當然假設設備在範圍內）。
+Remember there is a difference between being paired and being connected. To be paired means that two devices are aware of each other』s existence, have a shared link-key that can be used for authentication, and are capable of establishing an encrypted connection with each other. To be connected means that the devices currently share an RFCOMM channel and are able to transmit data with each other. The current Android Bluetooth API』s require devices to be paired before an RFCOMM connection can be established. (Pairing is automatically performed when you initiate an encrypted connection with the Bluetooth APIs.)
+這裡需要注意配對成功和連接成功是有區別的。配對成功是兩個設備知道彼此的存在的意思，他們有一個共享的連接密鑰，能夠彼此使用這個密鑰建立一個加密的連接。連接成功的意思是設備之間目前共享了一個RFCOMM頻道，同時能夠彼此間傳輸數據。當前Android藍牙API需要設備配對成功才可以建立RFCOMM連接。
+The following sections describe how to find devices that have been paired, or discover new devices using device discovery.
+下面的章節將描述如何查找已經配對的設備或者發現使用設備發現功能發現新設備。
+Note: Android-powered devices are not discoverable by default. A user can make the device discoverable for a limited time through the system settings, or an application can request that the user enable discoverability without leaving the application. How to enable discoverability is discussed below.
+說明：Android設備默認是不允許被發現的。用戶可以通過系統設置去設置設備可發現。
+
+Querying paired devices
+查詢配對設備
+Before performing device discovery, its worth querying the set of paired devices to see if the desired device is already known. To do so, call getBondedDevices(). This will return a Set of BluetoothDevices representing paired devices. For example, you can query all paired devices and then show the name of each device to the user, using an ArrayAdapter:
+在執行設備發現之前，可以先看看已經配對設備列表裡面是否已經有我們需要的設備。可以通過調用getBondedDevices()函數。這將會返回一系列的已經配對的藍牙設備BluetoothDevices。下面是例子：
+Set pairedDevices = mBluetoothAdapter.getBondedDevices();
+// If there are paired devices
+if (pairedDevices.size() > 0) {
+    // Loop through paired devices
+    for (BluetoothDevice device : pairedDevices) {
+        // Add the name and address to an array adapter to show in a ListView
+        mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+    }
+}
+All that』s needed from the BluetoothDevice object in order to initiate a connection is the MAC address. In this example, it』s saved as a part of an ArrayAdapter that』s shown to the user. The MAC address can later be extracted in order to initiate the connection. You can learn more about creating a connection in the section about Connecting Devices.
+從BluetoothDevice 對像初始化藍牙連接的資訊是MAC地址。在下面的例子裡面，他將以ArrayAdapter一部分的方式保存。MAC地址將在後面用來初始化連接。在後面的章節中你可以看到更多關於創建連接的資訊。
+
+Discovering devices
+發現設備
+To start discovering devices, simply call startDiscovery(). The process is asynchronous and the method will immediately return with a boolean indicating whether discovery has successfully started. The discovery process usually involves an inquiry scan of about 12 seconds, followed by a page scan of each found device to retrieve its Bluetooth name.
+通過簡單調用startDiscovery函數就開始發現設備。這個過程是異步的。函數會立即範圍一個boolean值表明是否發現動作成功啟動了。發現過程一般包含一個大約12秒的查詢掃瞄，然後將發現的每個藍牙設備的名稱列出。
+Your application must register a BroadcastReceiver for the ACTION_FOUND Intent in order to receive information about each device discovered. For each device, the system will broadcast the ACTION_FOUND Intent. This Intent carries the extra fields EXTRA_DEVICE and EXTRA_CLASS, containing a BluetoothDevice and a BluetoothClass, respectively. For example, here』s how you can register to handle the broadcast when devices are discovered:
+你的應用必須註冊一個BroadcastReceiver，Intent為ACTION_FOUND，用來接受每個被發現設備的資訊。對每個設備，系統都將廣播ACTION_FOUND Intent。這個Intent攜帶了附加自動EXTRA_DEVICE和EXTRA_CLASS，包含一個BluetoothDevice 和BluetoothClass。例如，這裡你可以註冊處理控制碼。
+// Create a BroadcastReceiver for ACTION_FOUND
+private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        // When discovery finds a device
+        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            // Get the BluetoothDevice object from the Intent
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            // Add the name and address to an array adapter to show in a ListView
+            mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+        }
+    }
+};
+// Register the BroadcastReceiver
+IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+All that』s needed from the BluetoothDevice object in order to initiate a connection is the MAC address. In this example, it』s saved as a part of an ArrayAdapter that』s shown to the user. The MAC address can later be extracted in order to initiate the connection. You can learn more about creating a connection in the section about Connecting Devices.
+為了初始化一個連接，我們需要從BluetoothDevice 對像獲取的數據時MAC地址。在這個例子裡面，他是ArrayAdapter 一部分。後面初始化連接的時候可以從中提取出來。在後面的章節裡面你可以學到如何創建一個連接。
+Caution: Performing device discovery is a heavy procedure for the Bluetooth adapter and will consume a lot of its resources. Once you have found a device to connect, be certain that you always stop discovery with cancelDiscovery() before attempting a connection. Also, if you already hold a connection with a device, then performing discovery can significantly reduce the bandwidth available for the connection, so you should not perform discovery while connected.
+注意：執行藍牙發現是一個比較龐大的過程，會消耗很多資源。一旦你發現一個需要連接的設備，在嘗試建立連接之前最好調用cancelDiscovery來停止發現功能。相應的，如果你已經同設備建立了連接，然後執行發現功能將會減少這個連接的藍牙信號覆蓋範圍，所以當你建立連接後，你最好不要執行藍牙發現功能。
+
+Enabling discoverability
+啟用發現功能
+If you would like to make the local device discoverable to other devices, call startActivityForResult(Intent, int) with the ACTION_REQUEST_DISCOVERABLE action Intent. This will issue a request to enable discoverable mode through the system settings (without stopping your application). By default, the device will become discoverable for 120 seconds. You can define a different duration by adding the EXTRA_DISCOVERABLE_DURATION Intent extra. The maximum duration an app can set is 3600 seconds, and a value of 0 means the device is always discoverable. Any value below 0 or above 3600 is automatically set to 120 secs). For example, this snippet sets the duration to 300:
+如果你想讓本地設備對其他設備可見，調用startActivityForResult(Intent, int)方法，其中Intent Action設置為ACTION_REQUEST_DISCOVERABLE。這將會通過系統設置來請求啟用藍牙可發現模式（不會停止你的應用）。默認，設備將在120秒內變成可發現模式。你可以通過設置Intent的Extra參數EXTRA_DISCOVERABLE_DURATION來改變這個時間。在一個應用裡面最大的時間是3600秒，如果設置為0表示設備一直可見。任意小於0或者大於3600的值都將被設置為120秒。比如下面例子設置為300秒。
+Intent discoverableIntent = new
+Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+startActivity(discoverableIntent);
+Figure 2: The enabling discoverability dialog.
+A dialog will be displayed, requesting user permission to make the device discoverable, as shown in Figure 2. If the user responds 「Yes,」 then the device will become discoverable for the specified amount of time. Your Activity will then receive a call to the onActivityResult()) callback, with the result code equal to the duration that the device is discoverable. If the user responded 「No」 or if an error occurred, the result code will be Activity.RESULT_CANCELLED.
+在圖二可以看到，系統顯示一個對話方塊，請求是否允許使得設備可發現的權限。如果用戶點擊」Yes」，設備將在用戶設置的時間內變得可發現。你的應用將會在onActivityResult()函數里面得到一個回饋，返回值是您設置的設備可發現時間，比如這裡將返回300。如果用戶點擊」No」或者發生錯誤，Activity裡面的onActivityResult()返回值將是Activity.RESULT_CANCELLED。
+Note: If Bluetooth has not been enabled on the device, then enabling device discoverability will automatically enable Bluetooth.
+說明：如果藍牙沒有被啟動，開啟藍牙可發現將自動啟用藍牙功能。
+The device will silently remain in discoverable mode for the allotted time. If you would like to be notified when the discoverable mode has changed, you can register a BroadcastReceiver for the ACTION_SCAN_MODE_CHANGED Intent. This will contain the extra fields EXTRA_SCAN_MODE and EXTRA_PREVIOUS_SCAN_MODE, which tell you the new and old scan mode, respectively. Possible values for each are SCAN_MODE_CONNECTABLE_DISCOVERABLE, SCAN_MODE_CONNECTABLE, or SCAN_MODE_NONE, which indicate that the device is either in discoverable mode, not in discoverable mode but still able to receive connections, or not in discoverable mode and unable to receive connections, respectively.
+設備將會在你設置的時間內，悄悄的保持可發現模式。如果你想得到藍牙設備可發現狀態的改變的通知資訊，你可以註冊一個攜帶ACTION_SCAN_MODE_CHANGED的Intent的BroadcastReceiver。這會保護附加字段EXTRA_SCAN_MODE和EXTRA_PREVIOUS_SCAN_MODE，會告訴你之前的藍牙狀態和當前的藍牙狀態。他們的可能值為SCAN_MODE_CONNECTABLE_DISCOVERABLE，SCAN_MODE_CONNECTABLE，SCAN_MODE_NONE，分別表示藍牙處於可發現模式，不在可發現模式但可以接受連接，不在可發現模式也不允許接受連接。
+You do not need to enable device discoverability if you will be initiating the connection to a remote device. Enabling discoverability is only necessary when you want your application to host a server socket that will accept incoming connections, because the remote devices must be able to discover the device before it can initiate the connection.
+如果你想同遠端設備初始化一個連接，你不需要啟用藍牙可發現功能。啟用藍牙可發現功能僅僅是當你希望你的應用作為一個伺服器端運行其他用戶端連接，因為在初始化連接之前遠端設備必須能夠發現你的當前藍牙設備。
+
+Connecting Devices
+連接設備
+In order to create a connection between your application on two devices, you must implement both the server-side and client-side mechanisms, because one device must open a server socket and the other one must initiate the connection (using the server device』s MAC address to initiate a connection). The server and client are considered connected to each other when they each have a connected BluetoothSocket on the same RFCOMM channel. At this point, each device can obtain input and output streams and data transfer can begin, which is discussed in the section about Managing a Connection. This section describes how to initiate the connection between two devices.
+為了在你的應用中為兩個設備創建連接，你必須同時實現伺服器端和用戶端機制，因為必須一個設備打開伺服器端Socket，另外一個設備初始化連接（使用伺服器端Mac地址初始化連接）。當伺服器端和用戶端在同一個RFCOMM通道上面有一個已經連接的BluetoothSocket的時候，表面他們成功建立了連接。這時，每個設備都可以輸入和輸出數據流，也可以傳輸數據，在後面的章節將會討論如何管理連接的。這節將描述如何在兩個設備間初始化連接。
+The server device and the client device each obtain the required BluetoothSocket in different ways. The server will receive it when an incoming connection is accepted. The client will receive it when it opens an RFCOMM channel to the server.
+伺服器端設備和用戶端設備以不同的方式獲得BluetoothSocket。當一個用戶端連接被接受的時候，Accept的返回就是伺服器端的BluetoothSocket。當用戶端打開一個到伺服器端的RFCOMM通道的時候，返回值就是用戶端的BluetoothSocket。
+Figure 3: The Bluetooth pairing dialog.
+One implementation technique is to automatically prepare each device as a server, so that each one has a server socket open and listening for connections. Then either device can initiate a connection with the other and become the client. Alternatively, one device can explicitly 「host」 the connection and open a server socket on demand and the other device can simply initiate the connection.
+一種實現技術是自動為每個設備實現伺服器端，這樣的話每個設備都將有一個伺服器端Socket同時可以監聽其他用戶端的連接。這樣的話，任何設備都可以同其他設備初始化一個連接然後自己成為用戶端。另外，一個設備可以在需要的時候明確的作為主機並打開一個伺服器端Socket，其他設備可以簡單的初始化一個連接。
+Note: If the two devices have not been previously paired, then the Android framework will automatically show a pairing request notification or dialog to the user during the connection procedure, as shown in Figure 3. So when attempting to connect devices, your application does not need to be concerned about whether or not the devices are paired. Your RFCOMM connection attempt will block until the user has successfully paired, or will fail if the user rejects pairing, or if pairing fails or times out.
+提示：如果兩個設備之前沒有配對，在連接的過程中，Android框架將會自動顯示一個配對請求通知或者一個對話方塊，見圖3。因此，當你嘗試連接設備的時候，你的應用不需要關心設備知否已經配對。你的RFCOMM連接嘗試會被阻塞，直到用戶配對成功或者用戶拒絕配對而返回失敗，或者配對失敗以及超時。
+
+Connecting as a server
+When you want to connect two devices, one must act as a server by holding an open BluetoothServerSocket. The purpose of the server socket is to listen for incoming connection requests and when one is accepted, provide a connected BluetoothSocket. When the BluetoothSocket is acquired from the BluetoothServerSocket, the BluetoothServerSocket can (and should) be discarded, unless you want to accept more connections.
+當你想連接兩個設備時，一個設備必須通過保持一個打開的BluetoothServerSocket來扮演伺服器端角色。伺服器端Socket的目的是監聽接入的連接請求，當連接被接受時，將會給用戶端返回一個連接成功的BluetoothSocket。當連接成功時，如果你不想接受更多的用戶端連接的時候，伺服器端的BluetoothServerSocket就可以丟棄了。
+About UUID
+A Universally Unique Identifier (UUID) is a standardized 128-bit format for a string ID used to uniquely identify information. The point of a UUID is that it』s big enough that you can select any random and it won』t clash. In this case, it』s used to uniquely identify your application』s Bluetooth service. To get a UUID to use with your application, you can use one of the many random UUID generators on the web, then initialize a UUID with fromString(String).
+全球唯一標示(UUID)是一個標準的128位格式的字串，用來作為設備唯一標示。UUID的目的是保證設備的唯一性。在這裡，UUID是用來標示你的藍牙服務應用的唯一性。需要在你的應用中獲得UUID，可以使用很多網上隨機生成的UUID，然後使用UUID的fromString方法初始化。
+
+Here's the basic procedure to set up a server socket and accept a connection:
+下面是一個配置伺服器端socket和接受連接的基本過程：
+Get a BluetoothServerSocket by calling the listenUsingRfcommWithServiceRecord(String, UUID).
+調用listenUsingRfcommWithServiceRecord(String, UUID)函數獲得一個BluetoothServerSocket。
+The string is an identifiable name of your service, which the system will automatically write to a new Service Discovery Protocol (SDP) database entry on the device (the name is arbitrary and can simply be your application name). The UUID is also included in the SDP entry and will be the basis for the connection agreement with the client device. That is, when the client attempts to connect with this device, it will carry a UUID that uniquely identifies the service with which it wants to connect. These UUIDs must match in order for the connection to be accepted (in the next step).
+第一個參數String是一個你的服務的標示名稱，系統會自動寫到一個新的服務發現協定(SDP)數據庫中（名稱可以是任意的或者直接設置為您應用的名稱）。UUID也包含在SDP中，他將會成為同用戶端設備的連接的基礎資訊。
+Start listening for connection requests by calling accept().
+調用函數accept,開始監聽連接。
+This is a blocking call. It will return when either a connection has been accepted or an exception has occurred. A connection is accepted only when a remote device has sent a connection request with a UUID matching the one registered with this listening server socket. When successful, accept() will return a connected BluetoothSocket.
+這是一個阻塞的調用。他會返回一個接受成功的連接或者異常。當連接成功的時候，accept函數會返回一個連接成功的BluetoothSocket。
+Unless you want to accept additional connections, call close().
+如果你想接受其他的連接，調用close。
+This releases the server socket and all its resources, but does not close the connected BluetoothSocket that』s been returned by accept(). Unlike TCP/IP, RFCOMM only allows one connected client per channel at a time, so in most cases it makes sense to call close() on the BluetoothServerSocket immediately after accepting a connected socket.
+這將會釋放伺服器的socket對像和所有他的資源，但不會關閉已經連接的BluetoothSocket。這根TCP/IP不同，RFCOMM每個通道僅允許一個連接用戶端，因此大部分情況會在接受一個連接的socket後在BluetoothServerSocket對像上調用close函數。
+The accept() call should not be executed in the main Activity UI thread because it is a blocking call and will prevent any other interaction with the application. It usually makes sense to do all work with a BluetoothServerSocket or BluetoothSocket in a new thread managed by your application. To abort a blocked call such as accept(), call close() on the BluetoothServerSocket (or BluetoothSocket) from another thread and the blocked call will immediately return. Note that all methods on a BluetoothServerSocket or BluetoothSocket are thread-safe.
+accept函數不能再主Activity的UI線程中執行，因為她是一個阻塞的操作，會阻塞本程式的其他交互操作。在程式中，一會會單獨啟動一個線程，使用BluetoothServerSocket 或者BluetoothSocket 來做所有的操作。我們可以在另外一個線程中，使用BluetoothServerSocket或者BluetoothSocket的close方法來終止如accept類似的阻塞操作。這時，阻塞操作會立即返回。
+說明：所有在BluetoothServerSocket或者BluetoothSocket的方法都是線程安全的。
+例子：
+private class AcceptThread extends Thread {
+    private final BluetoothServerSocket mmServerSocket;
+ 
+    public AcceptThread() {
+        // Use a temporary object that is later assigned to mmServerSocket,
+        // because mmServerSocket is final
+        BluetoothServerSocket tmp = null;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code
+            tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+        } catch (IOException e) { }
+        mmServerSocket = tmp;
+    }
+ 
+    public void run() {
+        BluetoothSocket socket = null;
+        // Keep listening until exception occurs or a socket is returned
+        while (true) {
+            try {
+                socket = mmServerSocket.accept();
+            } catch (IOException e) {
+                break;
+            }
+            // If a connection was accepted
+            if (socket != null) {
+                // Do work to manage the connection (in a separate thread)
+                manageConnectedSocket(socket);
+                mmServerSocket.close();
+                break;
+            }
+        }
+    }
+ 
+    /** Will cancel the listening socket, and cause the thread to finish */
+    public void cancel() {
+        try {
+            mmServerSocket.close();
+        } catch (IOException e) { }
+    }
+}
+In this example, only one incoming connection is desired, so as soon as a connection is accepted and the BluetoothSocket is acquired, the application sends the acquired BluetoothSocket to a separate thread, closes the BluetoothServerSocket and breaks the loop.
+在這個例子裡面，只允許一個連接進入。函數accept返回後，調用了mmServerSocket.close();當一個連接被接受了後，返回了BluetoothSocket對像，應用將得到的BluetoothSocket對像發送到一個獨立的線程，並關閉BluetoothServerSocket，然後跳出循環。
+Note that when accept() returns the BluetoothSocket, the socket is already connected, so you should not call connect() (as you do from the client-side).
+說明：當accept調用後，即返回BluetoothSocket，因此你不需要在調用connect(這同用戶端連接不一樣)。
+manageConnectedSocket() is a fictional method in the application that will initiate the thread for transferring data, which is discussed in the section about Managing a Connection.
+manageConnectedSocket是一個虛構的方法，會初始化線程，並傳輸數據。這會在後面關於如何管理連接的章節討論。
+You should usually close your BluetoothServerSocket as soon as you are done listening for incoming connections. In this example, close() is called as soon as the BluetoothSocket is acquired. You may also want to provide a public method in your thread that can close the private BluetoothSocket in the event that you need to stop listening on the server socket.
+一般情況下你需要在你已經接受到連接後關閉BluetoothServerSocket，這個例子裡面，當得到BluetoothSocket後，就調用了close方法。你也可以在線程裡面提供一個公有方法，這樣在線程的外部可以調用這個方法來停止監聽。
+
+Connecting as a client
+以用戶端方式建立連接
+In order to initiate a connection with a remote device (a device holding an open server socket), you must first obtain a BluetoothDevice object that represents the remote device. (Getting a BluetoothDevice is covered in the above section about Finding Devices.) You must then use the BluetoothDevice to acquire a BluetoothSocket and initiate the connection.
+為了跟遠端的設備初始化一個連接（遠端是一個伺服器端socket監聽模式的藍牙設備），你必須首先獲得一個代表遠端設備的BluetoothDevice對像（之前的章節裡面查找設備裡面講過了）。然後使用這個BluetoothDevice對像去啟動一個BluetoothSocket並初始化連接。
+Here's the basic procedure:
+下面是基本的流程：
+Using the BluetoothDevice, get a BluetoothSocket by calling createRfcommSocketToServiceRecord(UUID).
+使用BluetoothDevice，調用createRfcommSocketToServiceRecord(UUID)方法獲得BluetoothSocket。
+This initializes a BluetoothSocket that will connect to the BluetoothDevice. The UUID passed here must match the UUID used by the server device when it opened its BluetoothServerSocket (with listenUsingRfcommWithServiceRecord(String, UUID)). Using the same UUID is simply a matter of hard-coding the UUID string into your application and then referencing it from both the server and client code.
+初始化BluetoothSocket會連接到BluetoothDevice。參數UUID必須跟伺服器端的藍牙設備匹配（listenUsingRfcommWithServiceRecord(String, UUID)中的UUID）。
+Initiate the connection by calling connect().
+調用connect方法初始化連接。
+Upon this call, the system will perform an SDP lookup on the remote device in order to match the UUID. If the lookup is successful and the remote device accepts the connection, it will share the RFCOMM channel to use during the connection and connect() will return. This method is a blocking call. If, for any reason, the connection fails or the connect() method times out (after about 12 seconds), then it will throw an exception.
+當函數調用時，為了匹配UUID，系統會在遠端設備上處理SDP查找。如果查找成功，切遠端設備接受了這個連接，他會共享RFCOMM通道，connect會返回。connect是一個阻塞函數。如果，連接失敗或者超時（大約12秒），系統會拋出一個異常。
+Because connect() is a blocking call, this connection procedure should always be performed in a thread separate from the main Activity thread.
+連接函數是一個阻塞操作，所以也必須獨立於主Activity UI線程調用。
+Note: You should always ensure that the device is not performing device discovery when you call connect(). If discovery is in progress, then the connection attempt will be significantly slowed and is more likely to fail.
+說明：你需要注意調用connect的時候，沒有執行設備發現功能。如果發現功能正在執行，連接會變慢且更容易失敗。
+
+Example
+Here is a basic example of a thread that initiates a Bluetooth connection:
+
+private class ConnectThread extends Thread {
+    private final BluetoothSocket mmSocket;
+    private final BluetoothDevice mmDevice;
+ 
+    public ConnectThread(BluetoothDevice device) {
+        // Use a temporary object that is later assigned to mmSocket,
+        // because mmSocket is final
+        BluetoothSocket tmp = null;
+        mmDevice = device;
+ 
+        // Get a BluetoothSocket to connect with the given BluetoothDevice
+        try {
+            // MY_UUID is the app's UUID string, also used by the server code
+            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+        } catch (IOException e) { }
+        mmSocket = tmp;
+    }
+ 
+    public void run() {
+        // Cancel discovery because it will slow down the connection
+        mBluetoothAdapter.cancelDiscovery();
+ 
+        try {
+            // Connect the device through the socket. This will block
+            // until it succeeds or throws an exception
+            mmSocket.connect();
+        } catch (IOException connectException) {
+            // Unable to connect; close the socket and get out
+            try {
+                mmSocket.close();
+            } catch (IOException closeException) { }
+            return;
+        }
+ 
+        // Do work to manage the connection (in a separate thread)
+        manageConnectedSocket(mmSocket);
+    }
+ 
+    /** Will cancel an in-progress connection, and close the socket */
+    public void cancel() {
+        try {
+            mmSocket.close();
+        } catch (IOException e) { }
+    }
+}
+Notice that cancelDiscovery() is called before the connection is made. You should always do this before connecting and it is safe to call without actually checking whether it is running or not (but if you do want to check, call isDiscovering()).
+注意在建立連接之前調用cancelDiscovery方法。一般情況下在連接前你都需要調用cancelDiscovery。另外可以通過函數isDiscovering去檢測藍牙設備目前是否在執行發現功能。
+manageConnectedSocket() is a fictional method in the application that will initiate the thread for transferring data, which is discussed in the section about Managing a Connection.
+manageConnectedSocket是一個虛構的方法，將會在後面討論。
+When you're done with your BluetoothSocket, always call close() to clean up. Doing so will immediately close the connected socket and clean up all internal resources.
+如果你使用完了BluetoothSocket，調用close釋放資源。調用close函數會立即關閉已連接的socket，並清除內部資源。
+
+Managing a Connection
+管理連接
+When you have successfully connected two (or more) devices, each one will have a connected BluetoothSocket. This is where the fun begins because you can share data between devices. Using the BluetoothSocket, the general procedure to transfer arbitrary data is simple:
+當你成功連接了兩個或者更多設備，每個都會有一個連接成功的BluetoothSocket。然後在這個Socket上就可以執行數據傳輸操作了。
+Get the InputStream and OutputStream that handle transmissions through the socket, via getInputStream() and getOutputStream(), respectively.
+使用InputStream和OutputStream對像來處理藍牙socket上面的數據傳輸。通常通過getInputStream和getOutputStream函數。
+Read and write data to the streams with read(byte[]) and write(byte[]).
+讀寫數據到socket流調用read(byte[])和write(byte[])方法。
+That's it.
+There are, of course, implementation details to consider. First and foremost, you should use a dedicated thread for all stream reading and writing. This is important because both read(byte[]) and write(byte[]) methods are blocking calls. read(byte[]) will block until there is something to read from the stream. write(byte[]) does not usually block, but can block for flow control if the remote device is not calling read(byte[]) quickly enough and the intermediate buffers are full. So, your main loop in the thread should be dedicated to reading from the InputStream. A separate public method in the thread can be used to initiate writes to the OutputStream.
+這裡的操作跟windows以及其他系統上面的socket操作相似。對所有的流操作你都需要獨立線程來處理。因為read(byte[])和write(byte[])方法都是阻塞的。直到本地流中有數據可讀的時候，read(byte[])函數才會停止阻塞。一般情況下write(byte[])並不阻塞，但是如果遠端設備不調用read(byte[])的時候，本地緩衝區滿了的時候，write也將阻塞住。這個其他作業系統中的socket是一樣的原理。因此，線程主循環可以用來從InputStream中讀取數據。線程中單獨的一個公用方法用來寫數據到OutputStream中。
+
+Example
+Here's an example of how this might look:
+private class ConnectedThread extends Thread {
+    private final BluetoothSocket mmSocket;
+    private final InputStream mmInStream;
+    private final OutputStream mmOutStream;
+ 
+    public ConnectedThread(BluetoothSocket socket) {
+        mmSocket = socket;
+        InputStream tmpIn = null;
+        OutputStream tmpOut = null;
+ 
+        // Get the input and output streams, using temp objects because
+        // member streams are final
+        try {
+            tmpIn = socket.getInputStream();
+            tmpOut = socket.getOutputStream();
+        } catch (IOException e) { }
+ 
+        mmInStream = tmpIn;
+        mmOutStream = tmpOut;
+    }
+ 
+    public void run() {
+        byte[] buffer = new byte[1024];  // buffer store for the stream
+        int bytes; // bytes returned from read()
+ 
+        // Keep listening to the InputStream until an exception occurs
+        while (true) {
+            try {
+                // Read from the InputStream
+                bytes = mmInStream.read(buffer);
+                // Send the obtained bytes to the UI Activity
+                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                        .sendToTarget();
+            } catch (IOException e) {
+                break;
+            }
+        }
+    }
+ 
+    /* Call this from the main Activity to send data to the remote device */
+    public void write(byte[] bytes) {
+        try {
+            mmOutStream.write(bytes);
+        } catch (IOException e) { }
+    }
+ 
+    /* Call this from the main Activity to shutdown the connection */
+    public void cancel() {
+        try {
+            mmSocket.close();
+        } catch (IOException e) { }
+    }
+}
+The constructor acquires the necessary streams and once executed, the thread will wait for data to come through the InputStream. When read(byte[]) returns with bytes from the stream, the data is sent to the main Activity using a member Handler from the parent class. Then it goes back and waits for more bytes from the stream.
+構造函數得到輸入輸出流，線程會等待直到InputSteam有數據到。當read(byte[])從流中讀取到數據，通過使用父類的Handler將數據發送到主線程。然後返回繼續等待數據到來。
+Sending outgoing data is as simple as calling the thread』s write() method from the main Activity and passing in the bytes to be sent. This method then simply calls write(byte[]) to send the data to the remote device.
+在主Activity中調用線程中的write方法去發送數據。
+The thread』s cancel() method is important so that the connection can be terminated at any time by closing the BluetoothSocket. This should always be called when you』re done using the Bluetooth connection.
+線程中的cancle方法很重要。連接可以在任意時間關閉BluetoothSocket。在你使用完了藍牙設備必須調用。
+
+For a demonstration of using the Bluetooth APIs, see the Bluetooth Chat sample app.
+更多的使用藍牙API的演示，可以看例子中的Bluetooth Chat sample。
+
+Working with Profiles
+使用配置文件
+Starting in Android 3.0, the Bluetooth API includes support for working with Bluetooth profiles. A Bluetooth profile is a wireless interface specification for Bluetooth-based communication between devices. An example is the Hands-Free profile. For a mobile phone to connect to a wireless headset, both devices must support the Hands-Free profile.
+在Android3.0之後，藍牙API包含了藍牙配置文件。藍牙配置文件時一種設備間基於藍牙交互的無線介面。比如免提配置。
+You can implement the interface BluetoothProfile to write your own classes to support a particular Bluetooth profile. The Android Bluetooth API provides implementations for the following Bluetooth profiles:
+你可以實現BluetoothProfile 介面，寫支援特殊藍牙配置的類。Android藍牙API提供了下列藍牙配置的實現：
+Headset. 
+The Headset profile provides support for Bluetooth headsets to be used with mobile phones. Android provides the BluetoothHeadset class, which is a proxy for controlling the Bluetooth Headset Service via interprocess communication (IPC). This includes both Bluetooth Headset and Hands-Free (v1.5) profiles. The BluetoothHeadset class includes support for AT commands. For more discussion of this topic, see Vendor-specific AT commands
+耳機。耳機配置文件為移動電話的藍牙耳機提供支援。Android提供了BluetoothHeadset 類，這是一個通過IPC控制藍牙耳機設備的代理介面。這包含藍牙耳機和免提配置。藍牙耳機支援AT指令。更多的可以看後面的章節。
+A2DP. 
+The Advanced Audio Distribution Profile (A2DP) profile defines how high quality audio can be streamed from one device to another over a Bluetooth connection. Android provides the BluetoothA2dp class, which is a proxy for controlling the Bluetooth A2DP Service via IPC.
+A2DP。高級音頻傳輸模式配置定義了如何通過藍牙連接將高質量音頻從一台設備傳輸到另外一台設備。Android提供了BluetoothA2dp 類，通過IPC控制藍牙A2DP服務。
+
+Here are the basic steps for working with a profile:
+下面是使用配置基本的步驟：
+Get the default adapter, as described in Setting Up Bluetooth.
+得到默認的adapter,參考之前的章節
+Use getProfileProxy() to establish a connection to the profile proxy object associated with the profile. In the example below, the profile proxy object is an instance of BluetoothHeadset.
+使用getProfileProxy同配置代理對像建立一個連接。下面的粒子，配置代理對象是一個BluetoothHeadset的實例。
+Set up a BluetoothProfile.ServiceListener. This listener notifies BluetoothProfile IPC clients when they have been connected to or disconnected from the service.
+構造一個BluetoothProfile.ServiceListener。當他們建立連接或者斷開連接的時候，這個監聽器通知BluetoothProfile IPC用戶端。
+
+In onServiceConnected(), get a handle to the profile proxy object.
+在onServiceConnected函數中，得到配置代理對象的控制碼。
+Once you have the profile proxy object, you can use it to monitor the state of the connection and perform other operations that are relevant to that profile.
+當你得到配置代理對像，你可以使用它監聽連接的狀態，也可以執行其他的有關這個配置的操作。
+For example, this code snippet shows how to connect to a BluetoothHeadset proxy object so that you can control the Headset profile:
+下面的代碼片段展示了如何連接BluetoothHeadset 代理對像，然後你可以控制耳機配置：
+
+BluetoothHeadset mBluetoothHeadset;
+// Get the default adapter
+BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+// Establish connection to the proxy.
+mBluetoothAdapter.getProfileProxy(context, mProfileListener, BluetoothProfile.HEADSET);
+ 
+private BluetoothProfile.ServiceListener mProfileListener = new BluetoothProfile.ServiceListener() {
+    public void onServiceConnected(int profile, BluetoothProfile proxy) {
+        if (profile == BluetoothProfile.HEADSET) {
+            mBluetoothHeadset = (BluetoothHeadset) proxy;
+        }
+    }
+    public void onServiceDisconnected(int profile) {
+        if (profile == BluetoothProfile.HEADSET) {
+            mBluetoothHeadset = null;
+        }
+    }
+};
+ 
+// ... call functions on mBluetoothHeadset
+// Close proxy connection after use.
+mBluetoothAdapter.closeProfileProxy(mBluetoothHeadset);
+
+Vendor-specific AT commands
+供應商特定的AT指令
+Starting in Android 3.0, applications can register to receive system broadcasts of pre-defined vendor-specific AT commands sent by headsets (such as a Plantronics +XEVENT command). For example, an application could receive broadcasts that indicate a connected device』s battery level and could notify the user or take other action as needed. Create a broadcast receiver for the ACTION_VENDOR_SPECIFIC_HEADSET_EVENT intent to handle vendor-specific AT commands for the headset.
+在Android3.0以後，應用程式可以註冊接受供應商特定的AT指令的預定義系統廣播，指令由耳機發送。例如，一個應用程式可以接受廣播，廣播顯示連接設備的電池狀態，同時能夠通知用戶或者執行其他需要的操作。方法為創建一個廣播的接收者，Intent為ACTION_VENDOR_SPECIFIC_HEADSET_EVENT，處理耳機的供應商特定的AT指令。
+
+/******************************************************************************/
+/******************************************************************************/

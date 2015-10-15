@@ -1,0 +1,1461 @@
+
+/***************************************************************************/
+// linux shell 腳本入門
+/***************************************************************************/
+1. Linux 腳本編寫基礎
+1.1 語法基本介紹
+1.1.1 開頭
+程式必須以下面的行開始（必須方在文件的第一行）： 
+#!/bin/sh 
+符號#!用來告訴系統它後面的參數是用來執行該文件的程式。在這個例子中我們使用/bin/sh來執行程式。
+當編輯好腳本時，如果要執行該腳本，還必須使其可執行。要使腳本可執行：
+編譯 chmod +x filename 這樣才能用./filename 來運行
+1.1.2 註釋 
+在進行shell編程時，以#開頭的句子表示註釋，直到這一行的結束。我們真誠地建議您在程式中使用註釋。
+如果您使用了註釋，那麼即使相當長的時間內沒有使用該腳本，您也能在很短的時間內明白該腳本的作用及工作原理。
+1.1.3 變數 
+在其他編程語言中您必須使用變數。在shell編程中，所有的變數都由字串組成，並且您不需要對變數進行聲明。
+要賦值給一個變數，您可以這樣寫： 
+#!/bin/sh 
+#對變數賦值： 
+a="hello world" 
+# 現在列印變數a的內容： 
+echo "A is:" 
+echo $a 
+有時候變數名很容易與其他文字混淆，比如： 
+num=2 
+echo "this is the $numnd" 
+這並不會列印出"this is the 2nd"，而僅僅列印"this is the "，因為shell會去搜索變數numnd的值，但是這個變數時沒有值的。
+可以使用花括號來告訴shell我們要列印的是num變數： 
+num=2 
+echo "this is the ${num}nd" 
+這將列印： this is the 2nd
+1.1.4 環境變數
+由export關鍵字處理過的變數叫做環境變數。我們不對環境變數進行討論，因為通常情況下僅僅在登錄腳本中使用環境變數。
+1.1.5 Shell命令和流程序控制制
+在shell腳本中可以使用三類命令： 
+1)Unix 命令: 
+  雖然在shell腳本中可以使用任意的unix命令，但是還是由一些相對更常用的命令。這些命令通常是用來進行文件和文字操作的。
+  常用命令語法及功能
+  echo "some text": 將文字內容列印在螢幕上
+  ls: 文件列表
+  wc –l filewc -w filewc -c file: 計算文件行數計算文件中的單詞數計算文件中的字元數
+  cp sourcefile destfile: 文件拷貝
+  mv oldname newname : 重命名文件或移動文件
+  rm file: 刪除文件
+  grep 'pattern' file: 在文件內搜索字串比如：grep 'searchstring' file.txt
+  cut -b colnum file: 指定欲顯示的文件內容範圍，並將它們輸出到標準輸出設備
+          比如：輸出每行第5個到第9個字元cut -b5-9 file.txt千萬不要和cat命令混淆，這是兩個完全不同的命令
+  cat file.txt: 輸出文件內容到標準輸出設備（螢幕）上
+  file somefile: 得到文件類型
+  read var: 提示用戶輸入，並將輸入賦值給變數
+  sort file.txt: 對file.txt文件中的行進行排序
+  uniq: 刪除文本文件中出現的行列比如： sort file.txt | uniq
+  expr: 進行數學運算Example: add 2 and 3expr 2 "+" 3
+  find: 搜索文件比如：根據文件名搜索find . -name filename -print
+  tee: 將數據輸出到標準輸出設備(螢幕) 和文件比如：somecommand | tee outfile
+  basename file: 返回不包含路徑的文件名比如： basename /bin/tux將返回 tux
+  dirname file: 返回文件所在路徑比如：dirname /bin/tux將返回 /bin
+  head file: 列印文本文件開頭幾行
+  tail file : 列印文本文件末尾幾行
+  sed: Sed是一個基本的查找替換程式。可以從標準輸入（比如命令管道）讀入文本，並將結果輸出到標準輸出（螢幕）。
+  該命令採用正則表達式（見參考）進行搜索。不要和shell中的萬用字元相混淆。
+  比如：將linuxfocus 替換為 LinuxFocus ：cat text.file | sed 's/linuxfocus/LinuxFocus/' > newtext.file
+  awk: awk 用來從文本文件中提取字段。缺省地，字段分割符是空格，可以使用-F指定其他分割符。
+  cat file.txt | awk -F, '{print $1 "," $3 }'這裡我們使用，作為字段分割符，同時列印第一個和第三個字段。
+  如果該文件內容如下： Adam Bor, 34, IndiaKerry Miller, 22, USA
+  命令輸出結果為：Adam Bor, IndiaKerry Miller, USA
+2) 概念: 管道, 重定向和 backtick 這些不是系統命令，但是他們真的很重要。
+  管道 (|) 將一個命令的輸出作為另外一個命令的輸入。
+  grep "hello" file.txt | wc -l
+  在file.txt中搜索包含有」hello」的行並計算其行數。在這裡grep命令的輸出作為wc命令的輸入。當然您可以使用多個命令。
+  重定向：將命令的結果輸出到文件，而不是標準輸出（螢幕）。
+  > 寫入文件並覆蓋舊文件
+  >> 加到文件的尾部，保留舊文件內容。
+  反短斜線
+  使用反短斜線可以將一個命令的輸出作為另外一個命令的一個命令行參數。
+  命令：
+  find . -mtime -1 -type f -print
+  用來查找過去24小時（-mtime –2則表示過去48小時）內修改過的文件。如果您想將所有查找到的文件打一個包，則可以使用以下腳本：
+  #!/bin/sh
+  # The ticks are backticks (`) not normal quotes ('):
+  tar -zcvf lastmod.tar.gz `find . -mtime -1 -type f -print`
+3) 流程序控制制 
+  1.if
+  "if" 表達式 如果條件為真則執行then後面的部分：
+  if ....; then
+  ....
+  elif ....; then
+  ....
+  else
+  ....
+  fi
+  大多數情況下，可以使用測試命令來對條件進行測試。比如可以比較字串、判斷文件是否存在及是否可讀等等…
+  通常用" [ ] "來表示條件測試。注意這裡的空格很重要。要確保方括號的空格。
+  [ -f "somefile" ] ：判斷是否是一個文件
+  [ -x "/bin/ls" ] ：判斷/bin/ls是否存在並有可執行權限
+  [ -n "$var" ] ：判斷$var變數是否有值
+  [ "$a" = "$b" ] ：判斷$a和$b是否相等
+  執行man test可以查看所有測試表達式可以比較和判斷的類型。
+  直接執行以下腳本：
+  #!/bin/sh
+  if [ "$SHELL" = "/bin/bash" ]; then
+  echo "your login shell is the bash (bourne again shell)"
+  else
+  echo "your login shell is not bash but $SHELL"
+  fi
+  變數$SHELL包含了登錄shell的名稱，我們和/bin/bash進行了比較。
+  快捷操作符
+  熟悉C語言的朋友可能會很喜歡下面的表達式：
+  [ -f "/etc/shadow" ] && echo "This computer uses shadow passwors"
+  這裡 && 就是一個快捷操作符，如果左邊的表達式為真則執行右邊的語句。您也可以認為是邏輯運算中的與操作。
+  上例中表示如果/etc/shadow文件存在則列印」 This computer uses shadow passwors」。
+  同樣或操作(||)在shell編程中也是可用的。這裡有個例子：
+  #!/bin/sh
+  mailfolder=/var/spool/mail/james
+  [ -r "$mailfolder" ]' '{ echo "Can not read $mailfolder" ; exit 1; }
+  echo "$mailfolder has mail from:"
+  grep "^From " $mailfolder
+
+  該腳本首先判斷mailfolder是否可讀。如果可讀則列印該文件中的"From" 一行。如果不可讀則或操作生效，列印錯誤資訊後腳本退出。
+  這裡有個問題，那就是我們必須有兩個命令：
+  -列印錯誤資訊
+  -退出程式
+  我們使用花括號以匿名函數的形式將兩個命令放到一起作為一個命令使用。一般函數將在下文提及。
+  不用與和或操作符，我們也可以用if表達式作任何事情，但是使用與或操作符會更便利很多。
+
+  2.case
+  case :表達式可以用來匹配一個給定的字串，而不是數字。
+  case ... in
+  ...) do something here ;;
+  esac
+  讓我們看一個例子。 file命令可以辨別出一個給定文件的文件類型，比如：
+  file lf.gz
+  這將返回：
+  lf.gz: gzip compressed data, deflated, original filename,
+  last modified: Mon Aug 27 23:09:18 2001, os: Unix
+  我們利用這一點寫了一個叫做smartzip的腳本，該腳本可以自動解壓bzip2, gzip 和zip 類型的壓縮文件：
+  #!/bin/sh
+  ftype=`file "$1"`
+  case "$ftype" in
+  "$1: Zip archive"*)
+  unzip "$1" ;;
+  "$1: gzip compressed"*)
+  gunzip "$1" ;;
+  "$1: bzip2 compressed"*)
+  bunzip2 "$1" ;;
+  *) echo "File $1 can not be uncompressed with smartzip";;
+  esac
+  您可能注意到我們在這裡使用了一個特殊的變數$1。該變數包含了傳遞給該程式的第一個參數值。
+  也就是說，當我們運行：
+  smartzip articles.zip
+  $1 就是字串 articles.zip
+
+  3. selsect
+  select 表達式是一種bash的擴展應用，尤其擅長於交互式使用。用戶可以從一組不同的值中進行選擇。
+  select var in ... ; do
+  break
+  done
+  .... now $var can be used ....
+  下面是一個例子：
+  #!/bin/sh
+  echo "What is your favourite OS?"
+  select var in "Linux" "Gnu Hurd" "Free BSD" "Other"; do
+  break
+  done
+  echo "You have selected $var"
+  下面是該腳本運行的結果：
+  What is your favourite OS?
+  1) Linux
+  2) Gnu Hurd
+  3) Free BSD
+  4) Other
+  #? 1
+  You have selected Linux
+
+  4.loop
+
+  loop表達式：
+  while ...; do
+  ....
+  done
+  while-loop 將運行直到表達式測試為真。will run while the expression that we test for is true.
+  關鍵字"break" 用來跳出循環。而關鍵字」continue」用來不執行餘下的部分而直接跳到下一個循環。
+
+  for-loop表達式查看一個字串列表 (字串用空格分隔) 然後將其賦給一個變數：
+  for var in ....; do
+  ....
+  done
+  在下面的例子中，將分別列印ABC到螢幕上：
+  #!/bin/sh
+  for var in A B C ; do
+  echo "var is $var"
+  done
+  下面是一個更為有用的腳本showrpm，其功能是列印一些RPM包的統計資訊：
+  #!/bin/sh
+  # list a content summary of a number of RPM packages
+  # USAGE: showrpm rpmfile1 rpmfile2 ...
+  # EXAMPLE: showrpm /cdrom/RedHat/RPMS/*.rpm
+  for rpmpackage in $*; do
+  if [ -r "$rpmpackage" ];then
+  echo "=============== $rpmpackage =============="
+  rpm -qi -p $rpmpackage
+  else
+  echo "ERROR: cannot read file $rpmpackage"
+  fi
+  done
+  這裡出現了第二個特殊的變數$*，該變數包含了所有輸入的命令行參數值。
+  如果您運行showrpm openssh.rpm w3m.rpm webgrep.rpm
+  此時 $* 包含了 3 個字串，即openssh.rpm, w3m.rpm and webgrep.rpm.
+
+  5. 引號
+  在向程式傳遞任何參數之前，程式會擴展萬用字元和變數。這裡所謂擴展的意思是程式會把萬用字元
+  （比如*）替換成合適的文件名，它變數替換成變數值。為了防 止程式作這種替換，您可以使用
+  引號：讓我們來看一個例子，假設在當前目錄下有一些文件，兩個jpg文件， mail.jpg 和tux.jpg。
+ 
+1.2 編譯SHELL腳本 
+#ch#!/bin/sh mod +x filename 
+echo *.jpg ∪緩螅□□梢醞□□淙耄?./filename 來執行您的腳本。 
+這將列印出"mail.jpg tux.jpg"的結果。 
+引號 (單引號和雙引號) 將防止這種萬用字元擴展： 
+#!/bin/sh 
+echo "*.jpg" 
+echo '*.jpg' 
+這將列印"*.jpg" 兩次。 
+單引號更嚴格一些。它可以防止任何變數擴展。雙引號可以防止萬用字元擴展但允許變數擴展。 
+#!/bin/sh 
+echo $SHELL 
+echo "$SHELL" 
+echo '$SHELL' 
+運行結果為： 
+/bin/bash 
+/bin/bash 
+$SHELL 
+最後，還有一種防止這種擴展的方法，那就是使用轉義字元——反斜桿： 
+echo *.jpg 
+echo $SHELL 
+這將輸出： 
+*.jpg 
+$SHELL
+
+6. Here documents
+當要將幾行文字傳遞給一個命令時，here documents（譯者註：目前還沒有見到過對該詞適合的翻譯）
+一種不錯的方法。對每個腳本寫一段幫助性的文字是很有用的，此時如果我們四有那個 here documents
+就不必用echo函數一行行輸出。 一個 "Here document" 以 << 開頭，後面接上一個字串，這個字串
+還必須出現在here document的末尾。下面是一個例子，在該例子中，我們對多個文件進行重命名，並且
+使用here documents列印幫助： 
+#!/bin/sh 
+# we have less than 3 arguments. Print the help text: 
+if [ $# -lt 3 ] ; then 
+cat < 
+ren -- renames a number of files using sed regular expressions 
+USAGE: ren 'regexp' 'replacement' files... 
+EXAMPLE: rename all *.HTM files in *.html: 
+ren 'HTM$' 'html' *.HTM 
+HELP 
+exit 0 
+fi 
+OLD="$1" 
+NEW="$2" 
+# The shift command removes one argument from the list of 
+# command line arguments. 
+shift 
+shift 
+# $* contains now all the files: 
+for file in $*; do 
+if [ -f "$file" ] ; then 
+newfile=`echo "$file" | sed "s/${OLD}/${NEW}/g"` 
+if [ -f "$newfile" ]; then 
+echo "ERROR: $newfile exists already" 
+else 
+echo "renaming $file to $newfile ..." 
+mv "$file" "$newfile" 
+fi 
+fi 
+done 
+這是一個複雜一些的例子。讓我們詳細討論一下。第一個if表達式判斷輸入命令行參數是
+否小於3個 (特殊變數$# 表示包含參數的個數) 。如果輸入參數小於3個，則將幫助文字傳遞
+給cat命令，然後由cat命令將其列印在螢幕上。列印幫助文字後程式退出。 如果輸入參數等
+於或大於3個，我們就將第一個參數賦值給變數OLD，第二個參數賦值給變數NEW。下一步，我
+們使用shift命令將第一個和第二個參數從 參數列表中刪除，這樣原來的第三個參數就成為參
+數列表$*的第一個參數。然後我們開始循環，命令行參數列表被一個接一個地被賦值給變數$file。
+接著我 們判斷該文件是否存在，如果存在則通過sed命令搜索和替換來產生新的文件名。然後
+將反短斜線內命令結果賦值給newfile。這樣我們就達到了我們的目 的：得到了舊文件名和新
+文件名。然後使用mv命令進行重命名。 
+4)函數
+如果您寫了一些稍微複雜一些的程式，您就會發現在程式中可能在幾個地方使用了相同的代碼，
+並且您也會發現，如果我們使用了函數，會方便很多。一個函數是這個樣子的： 
+functionname() 
+{ 
+# inside the body $1 is the first argument given to the function 
+# $2 the second ... 
+body 
+} 
+您需要在每個程式的開始對函數進行聲明。
+
+下面是一個叫做xtitlebar的腳本，使用這個腳本您可以改變終端窗口的名稱。
+這裡使用了一個叫做help的函數。正如您可以看到的那樣，這個定義的函數被使用了兩次。 
+#!/bin/sh 
+# vim: set sw=4 ts=4 et: 
+help() 
+{ 
+cat < 
+xtitlebar -- change the name of an xterm, gnome-terminal or kde konsole 
+USAGE: xtitlebar [-h] "string_for_titelbar" 
+OPTIONS: -h help text 
+EXAMPLE: xtitlebar "cvs" 
+HELP 
+exit 0 
+} 
+# in case of error or if -h is given we call the function help: 
+[ -z "$1" ] && help 
+[ "$1" = "-h" ] && help 
+# send the escape sequence to change the xterm titelbar: 
+echo -e "33]0;$107" 
+#
+
+在腳本中提供幫助是一種很好的編程習慣，這樣方便其他用戶（和您）使用和理解腳本。 
+命令行參數 
+我們已經見過$* 和 $1, $2 ... $9 等特殊變數，這些特殊變數包含了用戶從命令
+行輸入的參數。迄今為止，我們僅僅瞭解了一些簡單的命令行語法（比如一些強制性的
+參數和查看幫助的-h選項）。 但是在編寫更複雜的程式時，您可能會發現您需要更多的
+自定義的選項。通常的慣例是在所有可選的參數之前加一個減號，後面再加上參數值 (
+比如文件名)。 
+有好多方法可以實現對輸入參數的分析，但是下面的使用case表達式的例子無遺是一個不錯的方法。 
+#!/bin/sh 
+help() 
+{ 
+cat < 
+This is a generic command line parser demo. 
+USAGE EXAMPLE: cmdparser -l hello -f -- -somefile1 somefile2 
+HELP 
+exit 0 
+} 
+while [ -n "$1" ]; do 
+case $1 in 
+-h) help;shift 1;; # function help is called 
+-f) opt_f=1;shift 1;; # variable opt_f is set 
+-l) opt_l=$2;shift 2;; # -l takes an argument -> shift by 2 
+--) shift;break;; # end of options 
+-*) echo "error: no such option $1. -h for help";exit 1;; 
+*) break;; 
+esac 
+done
+
+echo "opt_f is $opt_f" 
+echo "opt_l is $opt_l" 
+echo "first arg is $1" 
+echo "2nd arg is $2" 
+您可以這樣運行該腳本： 
+cmdparser -l hello -f -- -somefile1 somefile2 
+返回的結果是： 
+opt_f is 1 
+opt_l is hello 
+first arg is -somefile1 
+2nd arg is somefile2 
+這個腳本是如何工作的呢？腳本首先在所有輸入命令行參數中進行循環，將輸入參數
+與case表達式進行比較，如果匹配則設置一個變數並且移除該參數。根據unix系統的慣例，
+首先輸入的應該是包含減號的參數.
+第2部分 實例
+現在我們來討論編寫一個腳本的一般步驟。任何優秀的腳本都應該具有幫助和輸入參數。並且寫一個偽腳本（framework.sh），該腳本包含了大多數腳本都需要的框架結構，是一個非常不錯的主意。這時候，在寫一個新的腳本時我們只需要執行一下copy命令： 
+cp framework.sh myscript 
+然後再插入自己的函數。 
+讓我們再看兩個例子： 
+二進位到十進位的轉換 
+腳本 b2d 將二進位數 (比如 1101) 轉換為相應的十進位數。這也是一個用expr命令進行數學運算的例子： 
+#!/bin/sh 
+# vim: set sw=4 ts=4 et: 
+help() 
+{ 
+cat < 
+b2h -- convert binary to decimal 
+USAGE: b2h [-h] binarynum 
+OPTIONS: -h help text 
+EXAMPLE: b2h 111010 
+will return 58 
+HELP 
+exit 0 
+} 
+error() 
+{ 
+# print an error and exit 
+echo "$1" 
+exit 1 
+} 
+lastchar() 
+{ 
+# return the last character of a string in $rval 
+if [ -z "$1" ]; then 
+# empty string 
+rval="" 
+return 
+fi 
+# wc puts some space behind the output this is why we need sed: 
+numofchar=`echo -n "$1" | wc -c | sed 's/ //g' ` 
+# now cut out the last char 
+rval=`echo -n "$1" | cut -b $numofchar` 
+}
+
+chop() 
+{ 
+# remove the last character in string and return it in $rval 
+if [ -z "$1" ]; then 
+# empty string 
+rval="" 
+return 
+fi 
+# wc puts some space behind the output this is why we need sed: 
+numofchar=`echo -n "$1" | wc -c | sed 's/ //g' ` 
+if [ "$numofchar" = "1" ]; then 
+# only one char in string 
+rval="" 
+return 
+fi 
+numofcharminus1=`expr $numofchar "-" 1` 
+# now cut all but the last char: 
+rval=`echo -n "$1" | cut -b 0-${numofcharminus1}` 
+} 
+while [ -n "$1" ]; do 
+case $1 in 
+-h) help;shift 1;; # function help is called 
+--) shift;break;; # end of options 
+-*) error "error: no such option $1. -h for help";; 
+*) break;; 
+esac 
+done 
+# The main program 
+sum=0 
+weight=1 
+# one arg must be given: 
+[ -z "$1" ] && help 
+binnum="$1" 
+binnumorig="$1"
+
+while [ -n "$binnum" ]; do 
+lastchar "$binnum" 
+if [ "$rval" = "1" ]; then 
+sum=`expr "$weight" "+" "$sum"` 
+fi 
+# remove the last position in $binnum 
+chop "$binnum" 
+binnum="$rval" 
+weight=`expr "$weight" "*" 2` 
+done 
+echo "binary $binnumorig is decimal $sum" 
+該腳本使用的算法是利用十進位和二進位數權值 (1,2,4,8,16,..)，比如二進位"10"可
+以這樣轉換成十進位： 
+0 * 1 + 1 * 2 = 2 
+為了得到單個的二進位數我們是用了lastchar 函數。該函數使用wc –c計算字元個數，
+然後使用cut命令取出末尾一個字元。Chop函數的功能則是移除最後一個字元。
+
+文件循環程式 
+或許您是想將所有發出的郵件保存到一個文件中的人們中的一員，但是在過了幾個月
+以後，這個文件可能會變得很大以至於使對該文件的訪問速度變慢。下面的 腳本rotatefile
+可以解決這個問題。這個腳本可以重命名郵件保存文件（假設為outmail）為outmail.1，
+而對於outmail.1就變成了outmail.2 等等等等... 
+#!/bin/sh 
+# vim: set sw=4 ts=4 et: 
+ver="0.1" 
+help() 
+{ 
+cat < 
+rotatefile -- rotate the file name
+
+USAGE: rotatefile [-h] filename
+
+OPTIONS: -h help text 
+EXAMPLE: rotatefile out 
+This will e.g rename out.2 to out.3, out.1 to out.2, out to out.1 
+and create an empty out-file 
+The max number is 10 
+version $ver 
+HELP 
+exit 0 
+}
+
+error() 
+{ 
+echo "$1" 
+exit 1 
+} 
+while [ -n "$1" ]; do 
+case $1 in 
+-h) help;shift 1;; 
+--) break;; 
+-*) echo "error: no such option $1. -h for help";exit 1;; 
+*) break;; 
+esac 
+done 
+# input check: 
+if [ -z "$1" ] ; then 
+error "ERROR: you must specify a file, use -h for help" 
+fi 
+filen="$1" 
+# rename any .1 , .2 etc file: 
+for n in 9 8 7 6 5 4 3 2 1; do 
+if [ -f "$filen.$n" ]; then 
+p=`expr $n + 1` 
+echo "mv $filen.$n $filen.$p" 
+mv $filen.$n $filen.$p 
+fi 
+done 
+# rename the original file: 
+if [ -f "$filen" ]; then 
+echo "mv $filen $filen.1" 
+mv $filen $filen.1 
+fi 
+echo touch $filen 
+touch $filen 
+這個腳本是如何工作的呢？在檢測用戶提供了一個文件名以後，我們進行一個9到1的循環。文件9被命名為10，文件8重命名為9等等。
+循環完成之後，我們將原始文件命名為文件1同時建立一個與原始文件同名的空文件。 
+調試 //---------------------------------------　
+//--------------------------------------- 
+最簡單的調試命令當然是使用echo命令。您可以使用echo在任何懷疑出錯的地方列印任何變數值。
+這也是絕大多數的shell程式員要花費80%的時間來調試程式的原因。Shell程式的好處在於不需要重新編譯，插入一個echo命令也不需要多少時間。 
+shell也有一個真實的調試模式。如果在腳本"strangescript" 中有錯誤，您可以這樣來進行調試： 
+sh -x strangescript 
+這將執行該腳本並顯示所有變數的值。 
+shell還有一個不需要執行腳本只是檢查語法的模式。可以這樣使用： 
+sh -n your_script 
+這將返回所有語法錯誤。 
+
+
+
+/***************************************************************************/
+Shell Script            ref: http://www.twbsd.org/cht/book/ch24.htm
+/***************************************************************************/
+身為 UNIX 系統管理者除了要熟悉 UNIX 指令外，我們最好學會幾種 scripts 語言，例如 shell script 或 perl。學會 script 語言後，我們就可以將日常的系統管理工作寫成一支執行檔，如此一來，在管理系統時就可以更加靈活。
+Shell script 是最基本的 script 語言，它是一堆 UNIX 指令的集合。本章將介紹 Shell script 的基本功能及語法，期望讀者可以經由學習 Shell scripts 讓使用 UNIX 系統時可以更加得心應手。
+
+24.1 概論
+Shell Script 是一個類似 MS Windows 中 .bat 檔的東西，簡單的說，Shell Script 就是將一堆 shell 中的指令放在一個文字檔中來執行。因此，為了能寫出一個 shell Script，你必須先對 UNIX 指令有初步的認識。身為一個 UNIX 系統的管理者，一定要會使用 shell script 來使管理工作更加容易。
+一般我們會將 Shell Script 的副檔名命名為 .sh，但並非一定要這麼做，這樣做只是為了要讓我們更容易管理這些檔案。在介紹如何 Shell Script 的內容之前，我們先來看如何寫出一個 Shell Script 並執行它。假設我們要寫一個名為 test.sh 的 Shell Script，首先用你習慣使用的文字編輯軟體來開一個檔案名為 test.sh 內容如下：
+#!/bin/sh
+echo Hello world!!
+第一行是必需的，用來定義你要使用的 shell。這裡我們定義要使用的是 Bourne Shell，其所在路徑是 /bin/sh。在 UNIX 系統中有許多不同的 Shell 可以使用，而每個 Shell 的特性及用法都有些許的不同。因此，在寫 Shell Script 時，我們會針對 Bourne Shell (sh) 來寫，因為 sh 是所有 UNIX 系統中都會有的 Shell。就算你執行 Shell Script 時的環境不是使用 sh，只要加上第一行 #!/bin/sh 就可以在執行此 Shell Script 時使用 sh。而第二行的 echo 代表列出一個字串，我們常使用它來輸出資訊。將 test.sh 存檔後，我們就可以用下列其中一種方式執行它：
+1. 轉向輸入
+$ sh < test.sh
+2. 如果要輸入參數的話，第一種方式便不適用，可以改用這種方法。<arguments> 就是我們要輸入的參數，在上面的 test.sh 中並不需要輸入參數：
+$ sh test.sh <arguments>
+3.你也可以改變 test.sh 的權限，將它變成可以獨立執行的檔案，這樣就可以只打 test.sh 來執行它：
+$ chmod a+x test.sh
+$ ./test.sh
+在 Shell Script 中，你們可以使用 # 為註解，在 # 後面的字串都將被視為註解而被式忽略。而分號 ; 則代表新的一行，例如打 ls;ls -d 代表二個指令。另外，我們可以使用變數、流程序控制制、甚至是副函式來使程式更加靈活。以下的各章節我們會詳細加以說明。
+
+24.2 變數的使用
+24.2.1 變數的使用
+我們知道 Shell Script 是使用一堆指令拼湊而成，為了方便說明及練習起見，我們不使用編輯檔案的方式來執行，而改以在命令列中打我們要的指令。首先，先打 sh 來進入 Bourne Shell。
+% sh
+$
+在打了 sh 之後，會進入 Bourne Shell，其一般使用者的提示字元為 $。以下各指令開頭的 $ 表示提示字元，而 $ 之後的粗體字才是我們輸入的字串。
+在 Shell Script 中，所有的變數都視為字串，因此並不需要在定義變數前先定義變數類型。在 Shell 中定義和使用變數時有些許的差異。例如，我們定義一個變數 color 並令它的值為 red，接著使用 echo 來印出變數 color 的值：
+
+$ color=red
+$ echo $color
+red
+在這裡，以 color=red 來定義變數 color 的值為 red，並以 echo $color 來印出 color 這一個變數。
+在定義變數時，不必加 $，但是在使用它時，必須加上 $。請注意，在等號的二邊不可以有空白，否則將出現錯誤 ，系統會誤以為你要執行一個指令。
+我們再介紹一個範例：
+$ docpath=/home/td/src/doc
+$ echo $docpath
+/home/td/src/doc
+$ ls $docpath
+abc.txt abc2.txt semmt.doc
+$ ls $docpaht/*.txt
+abc.txt abc2.txt
+這裡我們定義了變數 docpath 的值為 /home/td/src/doc，並印出它。接著我們使用 ls 這個指令來印出變數 docpath 目錄中所有檔案。 再以 ls $docpath/*.txt 來印出 /home/td/src/doc/ 目錄下所有副檔名為 .txt 的檔案。
+我們再來看一個例子，說明如何使用變數來定義變數：
+$ tmppath=/tmp
+$ tmpfile=$tmppath/abc.txt
+$ echo $tmpfile
+/tmp/abc.txt
+另外，我們也可以使用指令輸出成為變數，請注意這裡使用的二個 ` 是位於鍵盤左上角的 ` ，在 shell script 中，使用 ` 包起來的代表執行該指令：
+$ now=`date`
+$ echo $now
+Mon Jan 14 09:30:14 CST 2002
+如果在變數之後有其他字串時，要使用下列方式來使用變數：
+$ light=dark
+$ echo ${light}blue
+darkblue
+$ echo "$light"blue
+darkblue
+這裡雙引號中的字將會被程式解讀，如果是使用單引號將直接印出 $light 而非 dark。
+
+經由上面幾個簡單的例子，相信您對變數的使用已有初步的認識。另外有一些我們必須注意的事情：
+$ color=blue
+$ echo $color
+blue
+$ echo "$color"
+blue
+$ echo '$color'
+$color
+$ echo \$color
+$color
+$ echo one two three
+one two three
+$ echo "one two three"
+one two three
+我們可以看到上面各個執行結果不大相同。在 Shell Script 中，雙引號 " 內容中的特殊字元不會被忽略，而單引號中的所有特殊字元將被忽略。另外，\ 之後的一個字元將被視為普通字串。
+
+如果您希望使用者能在程式執行到一半時輸入一個變數的值，您可以使用 read 這個指令。請看以下的範例：
+#!/bin/sh
+printf "Please input your name:"
+read Name
+echo "Your name is $Name"
+由於 echo 指令內定會自動換行，所以我們使用 printf 這個指令來輸出字串。我們將上述內容存成檔案 input.sh，接著使用下列指令來執行：
+
+$ sh input.sh
+Please input your name:Alex
+Your name is Alex
+您可以看到變數 Name 已被設為您所輸入的字串了。
+
+24.2.2 程式會自動定義的變數
+在執行 Shell Script 時，程式會自動產生一些變數：
+變數名稱        說明
+$?              表示上一個指令的離開狀況，一般指令正常離開會傳回 0。不正常離開則會傳回 1、2 等數值。
+$$              這一個 shell 的 process ID number
+$!              最後一個在背景執行的程式的 process number
+$-              這個參數包含了傳遞給 shell 旗標 (flag)。
+$1              代表第一個參數，$2 則為第二個參數，依此類推。而 $0 為這個 shell script 的檔名。
+$#              執行時，給這個 Shell Script 參數的個數
+$*              包含所有輸入的參數，$@ 即代表 $1, $2,....直到所有參數結束。$* 將所有參數無間隔的連在一起，存成一個單一的參數。也就是說 $* 代表了 "$1 $2 $3..."。
+$@              包含所有輸入的參數，$@ 即代表 $1, $2,....直到所有參數結束。$@ 用將所有參數以空白為間隔，存在 $@ 中。也就是說 $@ 代表了 "$1" "$2" "$3"....。
+
+以下我們舉幾個例子來說明：
+$ ls -d /home
+/home
+$ echo $?
+0
+$ ls /home/aaa/bb/ccc
+/home/aaa/bb/cc: No such file or directory
+$ echo $?
+2
+$ echo $?
+0
+上面例子中的第一行是 ls，我們可以看到存在一個目錄 /home，接者 echo $? 時，出現 0 表示上一次的命令正常結束。接著我們 ls 一個不存在的目錄，再看 $? 這個變數變成 2，表示上一次執行離開的結果不正常。最後一個 echo $? 所得到的結果是 0，因為上一次執行 echo 正常顯示 2。
+
+如果寫一個檔案名為 abc.sh，內容如下：
+#!/bin/sh
+echo $#: $1 $2 $3 $4 $5 $6 $7 $8 $9
+echo $@
+接著以下列指令來執行該檔案：
+
+$ chmod a+x abc.sh
+$ ./abc.sh a "b c d" e f
+4:a b c d e f
+a b c d e f
+上面最後二行即為執行結果。我們可以看到 $# 即為參數的個數，而 $1, $2, $3...分別代表了輸入的參數 "a", "b c d", "e", "f"，而最後的 $@ 則是所有參數。
+
+24.2.3 系統內定的標準變數
+你可以使用 set 這個指令來看目前系統中內定了哪些參數。一般而言會有 $HOME, $SHELL, $USER, $PATH 等。
+$ echo $HOME
+/home/jack
+$ echo $PATH
+/usr/bin:/usr/sbin:/bin
+
+24.2.4 空變數的處理
+如果程式執行時，有一個變數的值尚未被給定，你可以利用下列方式來設定對於這種情形提出警告：
+$ echo $number one
+one
+$ set -u
+$ echo $number one
+sh: ERROR: number: Parameter not set
+在 set -u 之後，如果變數尚未設定，則會提出警告。你也可以利用下列的方式來處理一些空變數及變數的代換：
+
+運算式          說明
+${var:-word}    如果變數 var 尚未設定或是 null，則將使用 word 這個值，但不改變 var 變數的內容。
+${var:=word}    如果變數 var 尚未設定或是 null，則變數 var 的內容將等於 word 這個字串，並使用這個新的值。
+${var:?word}    如果變數 var 已經設定了，而且不是 null，則將使用變數 var。否則則印出 word 這個字串，並強制離開程式。我們可以設定一個字串 "Parameter null or not set" 來在變數未設定時印出，並終止程式。
+${var:+word}    如果變數 var 已經設定了，而且不是 null，則以 word 這個字串取代它，否則就不取代。
+
+我們以下面的例子來說明：
+$ echo $name Wang
+Wang
+$ echo ${name:-Jack} Wang
+Jack Wang
+$ echo $name Wang
+Wang
+上面的例子中，變數 $name 並未被取代，而下面的例子中，$name 將被取代：
+
+$ echo $name Wang
+Wang
+$ echo ${name:=Jack} Wang
+Jack Wang
+$ echo $name Wang
+Jack Wang
+24.3 運算符號
+
+24.3.1 四則運算
+在 shell 中的四則運算必須使用 expr 這個指令來輔助。因為這是一個指令，所以如果要將結果指定給變數，必須使用 ` 包起來。請注意，在 + - * / 的二邊都有空白，如果沒有空白將產生錯誤：
+$ expr 5 -2
+3
+$ sum=`expr 5 + 10`
+$ echo $sum
+15
+$ sum=`expr $sum / 3`
+$ echo $sum
+5
+還有一個要特別注意的是乘號 * 在用 expr 運算時，不可只寫 *。因為 * 有其他意義，所以要使用 \* 來代表。另外，也可以用 % 來求餘數。
+
+$ count=`expr 5 \* 3`
+$ echo $count
+$ echo `expr $count % 3`
+5
+我們再列出更多使用 expr 指令的方式，下列表中為可以放在指令 expr 之後的表達式。有的符號有特殊意義，必須以 \ 將它的特殊意義去除，例如 \*，否則必須用單引號將它括起來，如 '*'：
+
+類別            語法            說明
+條件判斷        expr1 \| expr2  如果 expr1 不是零或 null 則傳回 expr1，否則傳回 expr2。
+                expr1 \& expr2  如果 expr1 及 expr2 都不為零或 null，則傳回 expr1，否則傳回 0。
+四則運算        expr1 + expr2   傳回 expr1 加 expr2 後的值。
+                expr1 - expr2   傳回 expr1 減 expr2 後的值。
+                expr1\* expr2   傳回 expr1 乘 expr2 後的值。
+                expr1 / expr2   傳回 expr1 除 expr2 後的值。
+                expr1 % expr2   傳回 expr1 除 expr2 的餘數。
+大小判斷        expr1 \> expr2  如果 expr1 大於 expr2 則傳回 1，否則傳回 0。如果 expr1 及 expr2 都是數字，則是以數字大小判斷，否則是以文字判斷。以下皆同。
+                expr1 \< expr2  如果 expr1 小於 expr2 則傳回 1，否則傳回 0。
+                expr1 = expr2   如果 expr1 等於 expr2 則傳回 1，否則傳回 0。
+                expr1 != expr2  如果 expr1 不等於 expr2 則傳回 1，否則傳回 0。
+                expr1 \>= expr2 如果 expr1 大於或等於 expr2 則傳回 1，否則傳回 0。
+                expr1 \<= expr2 如果 expr1 小於或等於 expr2 則傳回 1，否則傳回 0。
+文字處理        expr1 : expr2   比較一固定字串，即 regular expression。可以使用下列字元來輔助：
+                                . 匹配一個字元。
+                                $ 找字串的結尾。
+                                [list] 找符合 list 中的任何字串。
+                                * 找尋 0 個或一個以上在 * 之前的字。
+                                \( \) 傳回括號中所匹配的字串。
+
+我們針對比較複雜的文字處理部份再加以舉例：
+$ tty
+ttyp0
+$ expr `tty` : ".*\(..\)\$"
+p0
+$ expr `tty` : '.*\(..\)$'
+p0
+上面執行 tty 的結果是 ttyp0，而在 expr 中，在 : 右側的運算式中，先找 .* 表示0個或一個以上任何字元，傳回之後在結尾 ($) 時的二個字元 \(..\)。在第一個 expr 的式子中，因為使用雙引號，所以在 $ 之前要用一個 \ 來去除 $ 的特殊意義，而第二個 expr 是使用單引號，在單引號內的字都失去了特殊意義，所以在 $ 之前不必加 \。
+除了使用 expr 外，我們還可以使用下列這種特殊語法：
+
+$ a=10
+$ b=5
+$ c=$((${a}+${b}))
+$ echo $c
+15
+$ c=$((${a}*${b}))
+$ echo $c
+50
+我們可以使用 $(()) 將運算式放在括號中，即可達到運算的功能。
+
+24.3.2 簡單的條件判斷
+最簡單的條件判斷是以 && 及 || 這二個符號來表示。
+$ ls /home && echo found
+found
+$ ls /dev/aaaa && echo found
+ls: /dev/aaaa: No such file or directory
+$ ls -d /home || echo not found
+/home
+$ ls /dev/aaaa && echo not found
+ls: /dev/aaaa: No such file or directory
+條件式          說明
+a && b          如果 a 是真，則執行 b。如果 a 是假，則不執行 b。
+a || b          如果 a 是假，則執行 b。如果 a 是真，則不執行 b。
+
+24.3.3 以 test 來比較字串及數字
+我們說過 Shell Script 是一堆指令的組合，所以在比較字串及數字時一樣是經由系統指令來達成。這裡我們使用 test 及 [ 來做運算，運算所傳回的結果是真 (true) 或假 ( false)。我們可以將它應用在條件判斷上。test 和 [ 都是一個指令，我們可以使用 test 並在其後加上下表中的參數來判斷真假。或者也可以使用 [ 表達式 ] 來替代 test，要注意的是 [ ] 中的空白間隔。
+表達式          說明
+-n str1         如果字串 str1 的長度大於 0 則傳回 true。
+-z str1         如果字串 str1 的長度等於 0 則傳回 true。
+str1            如果字串 str1 不是 null 則傳回 true。
+str1 = str2     如果 str1 等於 str2 則傳回 true。等號二邊有空白。
+str1 != str2    如果 str1 不等於 str2 則傳回 true。!= 的二邊有空白。
+a -eq b         Equal，等於。a 等於 b 則傳回真 (true)。
+a -ne b         Not equal，不等於。a 不等於 b 則傳回真 (true)。
+a -gt b         Grwater than，大於。a 大於 b 則傳回真 (true)。
+a -lt b         Less Than，小於。a 小於 b 則傳回真 (true)。
+a -ge b         Greater or equal，大於或等於。a 大於或等於 b 則傳回真 (true)。
+a -le b         Less or equal，小於或等於。a 小於或等於 b 則傳回真 (true)。
+我們舉例來說明：
+$ test 5 -eq 5 && echo true
+true
+$ test abc!=cde && echo true
+ture
+$ [ 6 -lt 10 ] && echo true
+ture
+
+$ pwd
+/home
+$ echo $HOME
+/home/jack
+$ [ $HOME = `pwd` ] || echo Not home now
+Not home now
+24.3.4 以 test 來處理檔案
+
+我們也可以使用 test 及 [ 來判斷一個檔案的類型。下表中為其參數：
+用法            說明
+-d file         如果 file 為目錄則傳回真(true)。
+-f file         如果 file 是一般的檔案則傳回真(true)。
+-L file         如果 file 是連結檔則傳回真(true)。
+-b file         如果 file 是區塊特別檔則傳回真(true)。
+-c file         如果 file 是字元特別檔則傳回真(true)。
+-u file         如果file 的 SUID 己設定則傳回真(true)。
+-g file         如果file 的 SGID 己設定則傳回真(true)。
+-k file         如果file 的 sticky bit 己設定則傳回真(true)。
+-s file         如果 file 的檔案長度大於 0 則傳回真(true)。
+-r file         如果 file 可以讀則傳回真(true)。
+-w file         如果 file 可以寫則傳回真(true)。
+-x file         如果 file 可以執行則傳回真(true)。
+
+我們舉例來說明：
+$ [ -d /bin ] && echo /bin is a directory
+/bin is a directory
+$ test -r /etc/motd && echo /etc/motd is readable
+/etc/motd is readable
+第一個指令測試 /bin 是否存在，而且是一個目錄，如果是則執行 echo 傳回一個字串。第二個指令是測試 /etc/motd 是否可以被讀取，如果是則執行 echo 傳回一個字串。
+
+24.4 內建指令
+在 Shell 中有一些內建的指令，這些內建的指令如流程序控制制及 cd 等指令是 Shell 中的必備元素。
+另外還有一些為了提高執行效率的指令，如 test、echo 等。有的內建指令在系統中也有同樣名稱不同版本的相同指令，
+但是如 test、echo 等在執行時會偽裝成是在 /bin 中的指令。
+在寫 shell script 時，要注意指令是否存在。下列即為常見的內建指令：
+指令                    說明
+exit                    離開程式，如果在 exit 之後有加上數字，表示傳回值，如：exit 0。在 UNIX 系統下，當程式正常結束，會傳回一個值 0，如果不正常結束則會傳回一個非 0 的數字。
+. file                  dot 指令，在 shell 中可以使用 "." 來呼叫一個外部檔案，例如 . /etc/rc.conf 或 . .profile。注意 . 和其後的指令中間有空白。
+echo                    印出一個字串。如果要使用非 shell 內建的 echo 則打 /bin/echo 來使用。
+pwd                     顯示目前所在目錄。
+read var ...            從標準輸入 (通常是鍵盤) 讀入一行，然後將第一個字指派給跟在 read 之後的第一個參數，第二個字給第二個參數，依此類推，直到最後將所有字給最後一個參數。如果只有一個參數則將整行都給第一個參數。
+readonly [var..]        readonly 這個指令如果沒有加參數則顯示目前唯讀的變數。如果有加變數的話，則將該變數設定為唯讀。
+return [n]              離開所在函式，如果在其後有加數字的話，則傳回該數字。和 exit 一樣，這個指令可以傳回該函式的執行結果，0 表示正常結束。
+set                     將 $1 到 $n 設定為其參數的字。例如：
+                        $ date
+                        Mon Jan 21 11:19 CST 2002
+                        $ set `date`
+                        $ echo $4
+                        11:19
+wait [n]                等待在執行程式 (PID) 為 n 的背景程式結束，如果沒有加參數 n 則等待所有背景程式結束。
+exec command            執行一個外部程式，通常用於要改變到另一個 shell 或是執行不同的使用者者介面，如：
+                        exec /usr/local/bin/startkde
+export [var]            設定環境變數，如果沒有參數則印出新的環境變數。
+eval command            把參數當成 shell 命令來執行，如：
+                        $ a=c; b=m; c=d; cmd=date
+                        $ eval $`echo $a$b$c`
+                        Mon Jan 21 11:19 CST 2002
+
+24.5 流程序控制制
+24.5.1 if 的條件判斷
+基本語法：
+if condition-list
+      then list
+elif condition-list
+      then list
+else list
+fi
+範例一：
+#!/bin/sh
+if test -r /etc/motd
+      then cat /etc/motd
+else  echo "There is not motd or file is not readable"
+fi
+說明：上面這一個程式是檢查 /etc/motd 這個檔案是否可以讀，如果可以則印出該檔案，否則印出檔案不可讀。
+
+範例二：
+$ ee test.sh
+#!/bin/sh
+if [ $1 -gt 5 ]
+      then echo " $1 is bigger then 5"
+elif [ $1 -ge 0 ]
+      then echo " $1 is between 5 and 0. "
+else echo "$1 is less then 0."
+fi
+$ chmod a+x test.sh
+$ ./test.sh 3
+3 is between 5 and 0.
+說明：這裡我們建立一個檔名為 test.sh 的檔案，以指令 cat test.sh 來看它的內容。接著執行 ./test.sh 3，表示輸入一個參數 3。test.sh 檔案的內容表示依輸入的參數判斷參數大於 5 或介於 5 和 0 的中間，或者是小於 0。
+
+24.5.2 while 及 until 迴圈
+基本語法：
+while condition-list
+   do list
+   done
+
+until condition-list
+   do list
+   done
+範例一：
+
+#!/bin/sh
+i=1
+while [ $i -le 5 ]
+   do
+       echo $i
+       i=`expr $i + 1`
+   done
+說明：首先令變數 i=1，接著在迴圈中當 i 小於等於 5 時就印出 i 的值，每印一次 i 就加 1。直到 i 大於 5 才停止。
+
+範例二：
+#!/bin/sh
+i=1
+until [ $i -gt 5 ]
+   do
+       echo $i
+       i=`expr $i + 1`
+   done
+說明：首先令變數 i=1，接著迴圈會判斷，一直執行到 i 大於 5 才停止。每跑一次迴圈就印出 i 的值，每印一次 i 就加 1。注意 while 和 until 的判斷式中，一個是 -le ，一個是 -gt。
+
+24.5.3 for 迴圈
+基本語法：
+for name in word1 word2 …
+   do do-list
+   done
+
+for name
+   do do-list
+   done
+範例一：
+
+$ ee color1.sh
+#!/bin/sh
+for color in blue red green
+    do
+       echo $color
+    done
+$ chmod a+x color1.sh
+$ ./color1.sh
+blue
+red
+green
+說明：這個檔案 color1.sh 中，會在每一次迴圈中將關鍵字 in 後面的字串分配給變數 color，然後印出變數 color。關鍵字 in 讓我們可以依序設定一些值並指派給變數，然而，我們也可以不使用關鍵字 in。如果沒有關鍵字 in ，程式會自動讀取輸入的參數，並依序指派給 for 之後的變數。請看範例二。
+
+範例二：
+$ ee color2.sh
+#!/bin/sh
+for color
+    do
+       echo $color
+    done
+$ chmod a+x color2.sh
+$ ./color2.sh black green yellow
+black
+green
+yellow
+說明：在 color2.sh 這個檔中，for 迴圈沒有使用 in 這個關鍵字。但我們在執行它時輸入三個參數，迴圈會自動將輸入的參數指派給 for 之後的變數 color，並印出它。
+
+24.5.4 case 判斷
+基本語法：
+case word in
+    pattern1) list1 ;;
+    pattern2) list2 ;;
+    …
+esac
+範例：
+$ ee num.sh
+for num
+do
+   case $num in
+       0|1|2|3)       echo $num is between 0~3;;
+       4|5|6|7)       echo $num is between 4~7;;
+       8|9)           echo $num is 8 or 9;;
+       *)             echo $num is not on my list;;
+    esac
+done
+$ chmod a+x num.sh
+$ ./num.sh 3 8 a
+3 is between 0~3
+8 is 8 or 9
+a is not on my list
+說明：這個程式是用來判斷輸入的參數大小。for 迴圈會將每一個輸入的參數指定給變數 num，而在 case 中，判斷變數 num 的內容符合哪一個條件，同一個條件中的每個字用 | 分開。如果未符上面的條件則一定會符合最後一個條件 * 。每一個要執行的 list 是以 ;; 做結尾，如果有多行 list，只要在最後一行加上一個 ;; 即可。
+
+24.6 函式的運用
+在 Shell Script 中也可以使用函式 (function) 來使用程式模組化。
+基本語法：
+name ( )
+{
+    statement
+}
+函式有幾個要注意的地方：
+在使用函式之前一定要先定義它，也就是在一個 Shell Script 中，一定要先寫函式的內容，在檔案最後再寫會呼叫函式的程式部份。
+在 Shell Script 中的變數全部都是全域變數 (Global)，所以在函式中的變數也會影響函式外的其他部份。
+命令列輸入的參數在 Shell Script 中是以 $1, $2....來讀取，但是這些參數並不會在函式中出現。所以必須使用傳遞參數的方式來將要在函式中使用的變數傳給該函式。傳遞的方法和在命令列中使用 Shell Script 的方式一樣，例如：name arg1 arg2..。傳進函式的變數會以 $1,$2... 來儲存，這和命令列傳給 Shell Script 的參數名稱一樣但內容不同。
+範例：
+$ ee test.sh
+#! /bin/sh
+ERRLOG=$1
+ok ( )
+{
+      read ans
+      case $ans in
+           [yY]*) return 0;;
+           *) return 1;;
+      esac
+}
+errexit ( )
+{
+      echo $1
+      date >> $ERRLOG
+      echo $1 >> $ERRLOG
+      exit
+}
+echo -n  "Test errexit function [y/n] "
+ok && errexit "Testing the errexit function"
+echo Normal termination
+$ chmod a+x test.sh
+$ ./test.sh err.log
+說明：
+這個程式中有二個函式：errexit 及 ok。第一行定義要將 log 檔存在傳給這個 Shell Script 的第一個參數。接著是二個函式，之後印出一行字，echo -n 表示印出字後游標不換行。然後再執行 ok 這個函式，如果 ok 函式執行成功則再執行 errexit 函式，並傳給 errexit 函式一個字串，最後再印出一個字串。
+在 ok 函式中，使用 read 指令來讀入一個參數並指派給變數 ans。接著判斷使用者輸入的值是否為 Y 或 y，如果是則傳回 1 代表沒有成功執行，如果不是則傳回 0 代表成功執行函式 ok。
+如果 ok 函式傳回 1 便不會執行 errexit 函式。如果是 0 則在 errexit 函式中，會先印出要傳給 errexit 的參數 " Testing the errexit function"，並記錄在指定的檔案中。
+ 
+
+/***************************************************************************/
+// Linux Shell 中的 「.」和source，export
+/***************************************************************************/
+之前寫了個shell腳本，並export的環境變數，在竟然看不到。
+為什麼在shell腳本裡面用export設置環境變數之後，當shell執行完了，用set命令看不到呢？但是你如果直接在終端裡export 環境變數用set是看到的。 
+
+這裡要說一下shell的執行方法了，舉個例子來講： 
+一個shell腳本test.sh的內容為： 
+#!/bin/bash 
+echo "-- Add PATH-------------"
+export PATH=/home/pathto/usr/bin:$PATH
+
+當我們執行test.sh的時候，是在當前的終端所在的shell fork出一個子shell然後執行test.sh的，執行完了再返回終端所在的shell。
+因此在test.sh設置了環境變數，它只在fork出來的這個子shell中生效，子shell只能繼承父shell的環境變數，而不能修改父shell的環境變數，所以test.sh結束後，父進程的環境就覆蓋回去。
+所以在test.sh之後完之後，我們用set命令是看不了這個環境變數的值的。 
+
+那如何讓腳本的環境變數在腳本執行之後仍然對當前終端存在呢？
+用sorcue 或者.(dot)。明確告訴shell不要fork執行腳本，而是在當前的shell執行，這樣環境變數就可以保存下來了。 
+source命令用法： 
+source Filename （通常用「.」來代替） 
+source test.sh 與 .test.sh是相同的。 
+
+
+/******************************************************************************/
+// Linux shell的for迴圈寫法
+/******************************************************************************/
+# vim loop_sh.sh
+for((i=0; i<5; i++))
+do
+    echo "loop num i is $i"
+done
+
+也可寫成：
+for((i=0; i<5; i++)); do echo "num is j $j"; done
+
+# ./loop_sh.sh
+loop num i is 0
+loop num i is 1
+loop num i is 2
+loop num i is 3
+loop num i is 4
+loop num j is 0
+loop num j is 1
+loop num j is 2
+loop num j is 3
+loop num j is 4
+
+
+/******************************************************************************/
+Linux Shell Script
+/******************************************************************************/
+1. 條件式判斷(if..else..)
+if [條件一]; then
+     執行一
+elif [條件二]; then
+    執行二
+else
+    執行三
+fi
+
+多個條件在 if 裡的條件式裡，同一個判斷行可以有很多的條件，可以使用邏輯運算符號來表示：
+&& 且,
+|| 或,
+== 等於
+Ex:
+if [ "$TEST1" == "1234" ] && [ "$TEST2" == "45678" ]; then
+當變數 $TEST1 等於 1234 且 變數 $TEST2 等於 45678 的時候才做動作，否則跳到下一個條件式。
+if [ "$TEST1" == "1234" ] || [ "$TEST2" == "45678" ]; then
+當變數 $TEST1 等於 1234 或 變數 $TEST2 等於 45678 的時候就做動作，否則跳到下一個條件式
+
+檔案判斷
+以下是常用的檔案判斷檔案、目錄的類型判斷
+-f：檢查檔案是否存在
+-d：檢查目錄是否存在
+-e：檢查檔案或目錄是否存在
+Ex:
+if [ -f /etc/fstab ]; then
+if [ -d /etc ]; then
+if [ -e /etc ]; then
+
+檔案、目錄的權限判斷
+-r：檢查該檔案、目錄是否可讀
+-w：檢查該檔案、目錄是否可寫
+-x：檢查該檔案、目錄是否可執行
+Ex:
+if [ -r /etc/fstab ]; then
+    echo "You can read this file."
+fi
+if [ -w /etc/fstab ]; then
+    echo "You have the \"write\" permission for this file."
+fi
+if [ -x /etc/fstab ]; then
+    echo "You have the \"execute\" permission for this file."
+fi
+逐一簡查 /etc/fstab 這個檔案是否可以讀取、寫入和執行，如果符合就顯示相關訊息。
+如果您是以 root 身份來執行的話，那麼結果應該會顯示
+You can read this file.
+You have the "write" permission for this file.
+
+
+2. 選擇式判斷(case)
+case 值 in
+參考值一)
+    執行一
+    ;;
+參考值二)
+     執行二
+    ;;
+參考值三)
+    執行三
+    ;;
+*)
+執行預設動作
+    exit 1
+esac
+case 可以讀取所給的值，然後再依序尋找相符的條件，如果符合就執行動作，若都沒有找到符合的，就執行預設動作。
+
+範列
+test=1
+case $test in
+1)
+    echo "Value 1"
+    ;;
+2)
+    echo "Value 2"
+    ;;
+3)
+    echo "Value 3"
+    ;;
+*)
+    echo "Can not find the value."
+    exit 1
+esac
+首先先設定一個變數 test，然後在使用 case 讀到 test 的變數值，再依續判斷是否有符合條件的，如果有就執行動作，若沒有就執行預設動作。
+在本例中，會顯示 
+Value 1
+
+3. 迴圈式判斷(for..do..)
+for 變數 in 已宣告的變數集值
+do
+    要重覆的動作
+done
+Ex:
+NAME="Steven Tom Lisa Sandy"
+for i in $NAME
+do
+    echo $i
+done
+先設定 NAME 的字串集合，然後在 for 裡建立一個變數 i 去讀取 NAME 的變數值，再依續顯示出來。
+在本列中，會顯示
+Steven
+Tom
+Lisa
+Sandy
+
+
+/******************************************************************************/
+shell while循環輸出
+/******************************************************************************/
+功能就是從1輸出到10：
+
+#!/bin/sh
+#while
+COUNT=0
+while [ $COUNT -lt 10 ]
+do
+    COUNT=`expr $COUNT + 1`
+    echo $COUNT
+done
+
+
+/******************************************************************************/
+Shell 利用 test 指令的測試功能
+/******************************************************************************/
+檢測系統上面某些檔案或者是相關的屬性時，利用 test 這個指令來工作，舉例來說，我要檢查 /dmtsai 是否存在時，使用：
+[root@www ~]# test -e /filename
+執行結果並不會顯示任何訊息，但最後我們可以透過 $? 或 && 及 || 來展現整個結果呢！ 
+例如我們在將上面的例子改寫成這樣：
+[root@www ~]# test -e /filename && echo "exist" || echo "Not exist"
+Not exist  <==結果顯示不存在啊！
+最終的結果可以告知我們是"exist"還是"Not exist"呢！那我知道 -e 是測試一個『東西』在不在，如果還想要測試一下該檔名是啥玩意兒時，還有哪些標誌可以來判斷的呢？
+
+測試的標誌      代表意義
+1. 關於某個檔名的『檔案類型』判斷，如 test -e filename 表示存在否
+-e              該『檔名』是否存在？(常用)
+-f              該『檔名』是否存在且為檔案(file)？(常用)
+-d              該『檔名』是否存在且為目錄(directory)？(常用)
+-b              該『檔名』是否存在且為一個 block device 裝置？
+-c              該『檔名』是否存在且為一個 character device 裝置？
+-S              該『檔名』是否存在且為一個 Socket 檔案？
+-p              該『檔名』是否存在且為一個 FIFO (pipe) 檔案？
+-L              該『檔名』是否存在且為一個連結檔？
+2. 關於檔案的權限偵測，如 test -r filename 表示可讀否 (但 root 權限常有例外)
+-r             偵測該檔名是否存在且具有『可讀』的權限？
+-w             偵測該檔名是否存在且具有『可寫』的權限？
+-x             偵測該檔名是否存在且具有『可執行』的權限？
+-u             偵測該檔名是否存在且具有『SUID』的屬性？
+-g             偵測該檔名是否存在且具有『SGID』的屬性？
+-k             偵測該檔名是否存在且具有『Sticky bit』的屬性？
+-s             偵測該檔名是否存在且為『非空白檔案』？
+3. 兩個檔案之間的比較，如： test file1 -nt file2
+-nt            (newer than)判斷 file1 是否比 file2 新
+-ot            (older than)判斷 file1 是否比 file2 舊
+-ef            判斷 file1 與 file2 是否為同一檔案，可用在判斷 hard link 的判定上。 主要意義在判定，兩個檔案是否均指向同一個 inode 哩！
+4. 關於兩個整數之間的判定，例如 test n1 -eq n2
+-eq            兩數值相等 (equal)
+-ne            兩數值不等 (not equal)
+-gt            n1 大於 n2 (greater than)
+-lt            n1 小於 n2 (less than)
+-ge            n1 大於等於 n2 (greater than or equal)
+-le            n1 小於等於 n2 (less than or equal)
+5. 判定字串的資料
+test -z string  判定字串是否為 0 ？若 string 為空字串，則為 true
+test -n string  判定字串是否非為 0 ？若 string 為空字串，則為 false。
+註： -n 亦可省略
+test str1 = str2        判定 str1 是否等於 str2 ，若相等，則回傳 true
+test str1 != str2       判定 str1 是否不等於 str2 ，若相等，則回傳 false
+6. 多重條件判定，例如： test -r filename -a -x filename
+-a      (and)兩狀況同時成立！例如 test -r file -a -x file，則 file 同時具有 r 與 x 權限時，才回傳 true。
+-o      (or)兩狀況任何一個成立！例如 test -r file -o -x file，則 file 具有 r 或 x 權限時，就可回傳 true。
+!       反相狀態，如 test ! -x file ，當 file 不具有 x 時，回傳 true
+
+OK！現在我們就利用 test 來幫我們寫幾個簡單的例子。首先，判斷一下，讓使用者輸入一個檔名，我們判斷：
+這個檔案是否存在，若不存在則給予一個『Filename does not exist』的訊息，並中斷程式；
+若這個檔案存在，則判斷他是個檔案或目錄，結果輸出"Filename is regular file"或"Filename is directory"
+判斷一下，執行者的身份對這個檔案或目錄所擁有的權限，並輸出權限資料！
+你可以先自行創作看看，然後再跟底下的結果討論討論。注意利用 test 與 && 還有 || 等標誌！
+[root@www scripts]# vi sh05.sh
+#!/bin/bash
+# Program:
+#       User input a filename, program will check the flowing:
+#       1.) exist? 2.) file/directory? 3.) file permissions 
+# History:
+# 2005/08/25    VBird   First release
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+# 1. 讓使用者輸入檔名，並且判斷使用者是否真的有輸入字串？
+echo -e "Please input a filename, I will check the filename's type and permission. \n\n"
+read -p "Input a filename : " filename
+test -z $filename && echo "You MUST input a filename." && exit 0
+
+# 2. 判斷檔案是否存在？若不存在則顯示訊息並結束腳本
+test ! -e $filename && echo "The filename '$filename' DO NOT exist" && exit 0
+# 3. 開始判斷檔案類型與屬性
+test -f $filename && filetype="regulare file"
+test -d $filename && filetype="directory"
+test -r $filename && perm="readable"
+test -w $filename && perm="$perm writable"
+test -x $filename && perm="$perm executable"
+# 4. 開始輸出資訊！
+echo "The filename: $filename is a $filetype"
+echo "And the permissions are : $perm"
+如果你執行這個腳本後，他會依據你輸入的檔名來進行檢查喔！先看是否存在，再看為檔案或目錄類型，最後判斷權限。 但是你必須要注意的是，由於 root 在很多權限的限制上面都是無效的，所以使用 root 執行這個腳本時， 常常會發現與 ls -l 觀察到的結果並不相同！所以，建議使用一般使用者來執行這個腳本試看看。 不過你必須要使用 root 的身份先將這個腳本搬移給使用者就是了，不然一般使用者無法進入 /root 目錄的。 很有趣的例子吧！你可以自行再以其他的案例來撰寫一下可用的功能呢！
+
+
+/***************************************************************************/
+shell 基本常識
+/***************************************************************************/
+1.建立和運行shell程式
+什麼是shell程式呢? 簡單的說shell程式就是一個包含若干行shell或者linux命令的文件.
+像編寫高級語言的程式一樣,編寫一個shell程式需要一個文本編輯器.如VI等.
+在文本編輯環境下,依據shell的語法規則,輸入一些shell/linux命令行,形成一個完整的程式文件.
+執行shell程式文件有三種方法
+(1)# chmod +x file(在/etc/profile中,加入export PATH=${PATH}:~/yourpath,就可以在命令行下直接運行,像執行普通命令一樣)
+(2)# sh file
+(3)# ./file
+(4)# source file
+在編寫shell時,第一行一定要指明系統需要那種shell解釋你的shell程式,如:#! /bin/bash,
+ #! /bin/csh,/bin/tcsh,還是#! /bin/pdksh .
+
+2.shell中的變數
+(1)常用系統變數
+$ #        :保存程式命令行參數的數目
+$ ?        :保存前一個命令的返回碼
+$ 0        :保存程式名
+$ *        :以("$1 $2...")的形式保存所有輸入的命令行參數
+$ @        :以("$1""$2"...)的形式保存所有輸入的命令行參數
+(2)定義變數
+shell語言是非類型的解釋型語言,不像用C++/JAVA語言編程時需要事先聲明變數.給一個變數賦值,實際上就是定義了變數.
+在linux支援的所有shell中,都可以用賦值符號(=)為變數賦值.
+如: 
+abc=9  (bash/pdksh不能在等號兩側留下空格 )
+set abc = 9 (tcsh/csh)
+由於shell程式的變數是無類型的,所以用戶可以使用同一個變數時而存放字元時而存放整數.
+如:
+name=abc  (bash/pdksh)
+set name = abc (tcsh)
+在變數賦值之後,只需在變數前面加一個$去引用.
+如:
+echo $abc
+(3)位置變數
+當運行一個支援多個命令行參數的shell程式時,這些變數的值將分別存放在位置變數裡.
+其中第一個參數存放在位置變數1,第二個參數存放在位置變數2,依次類推...,shell保留這些變數,不允許用戶以令外的方式定義他們.同別的變數,用$符號引用他們.
+
+3.shell中引號的使用方法
+shell使用引號(單引號/雙引號)和反斜線("\")用於向shell解釋器屏蔽一些特殊字元.
+反引號(")對shell則有特殊意義.
+如:
+abc="how are you"  (bash/pdksh)
+set abc = "how are you"  (tcsh)
+這個命令行把三個單詞組成的字串how are you作為一個整體賦值給變數abc.
+  abc1='@LOGNAME,how are you!' (bash/pdksh)
+  set abc1='$LOGNAME,how are you!' (tcsh)
+  abc2="$LOGNAME,how are you!" (bash/pdksh)
+  set abc2="$LOGNAME,how are you!" (tcsh)
+LOGNAME變數是保存當前用戶名的shell變數,假設他的當前值是:wang.執行完兩條命令後,abc1的內容是:$LOGNAME, how are you!.而abc2的內容是;wang, how are you!.
+象單引號一樣,反斜線也能屏蔽所有特殊字元.但是他一次只能屏蔽一個字元.而不能屏蔽一組字元.
+反引號的功能不同於以上的三種符號.他不具有屏蔽特殊字元的功能.但是可以通過他將一個命令的運行結果傳遞給另外一個命令.
+如:
+  contents=`ls` (bash/pdksh)
+  set contents = `ls` (tcsh)
+
+4.shell程式中的test命令
+在bash/pdksh中,命令test用於計算一個條件表達式的值.他們經常在條件語句和循環語句中被用來判斷某些條件是否滿足.
+test命令的語法格式:
+  test expression
+  或者
+  [expression]
+
+在test命令中,可以使用很多shell的內部操作符.這些操作符介紹如下:
+(1)字串操作符  用於計算字串表達式
+  test命令    |    含義
+  -----------------------------------------
+  Str1 = str2 | 當str1與str2相同時,返回True
+  Str1! = str2| 當str1與str2不同時,返回True
+     Str      | 當str不是空字元時,返回True
+    -n str    | 當str的長度大於0時,返回True
+    -z str    | 當str的長度是0時,返回True
+  -----------------------------------------
+  (2)整數操作符具有和字元操作符類似的功能.只是他們的操作是針對整數
+  test表達式   |    含義
+  ---------------------------------------------
+  Int1 -eq int2|當int1等於int2時,返回True
+  Int1 -ge int2|當int1大於/等於int2時,返回True
+  Int1 -le int2|當int1小於/等於int2時,返回True
+  Int1 -gt int2|當int1大於int2時,返回True
+  Int1 -ne int2|當int1不等於int2時,返回True
+  -----------------------------------------
+  (3)用於文件操作的操作符,他們能檢查:文件是否存在,文件類型等
+  test表達式   |    含義
+  ------------------------------------------------
+  -d file      |當file是一個目錄時,返回 True
+  -f file      |當file是一個普通文件時,返回 True
+  -r file      |當file是一個刻讀文件時,返回 True
+  -s file      |當file文件長度大於0時,返回 True
+  -w file      |當file是一個可寫文件時,返回 True
+  -x file      |當file是一個可執行文件時,返回 True
+  ------------------------------------------------
+(4)shell的邏輯操作符用於修飾/連接包含整數,字串,文件操作符的表達式
+  test表達式    |    含義
+  ----------------------------------------------------------
+  ! expr        |當expr的值是False時,返回True
+  Expr1 -a expr2|當expr1,expr2值同為True時,返回True
+  Expr1 -o expr2|當expr1,expr2的值至少有一個為True時,返回True
+  -----------------------------------------------------------
+注意:
+tcsh shell 不使用test命令,但是tcsh中的表達式同樣能承擔相同的功能.tcsh
+支援的表達式於C中的表達式相同.通常使用在if和while命令中.
+  tcsh表達式    |    含義
+  -------------------------------------------------------
+  Int1 <= int2  |當int1小於/等於int2時,返回True
+  Int1 >= int2  |當int1大於/等於int2時,返回True
+  Int1 < int2   |當int1小於int2時,返回True
+  Int1 > int2   |當int1大於int2時,返回True
+  Str1 == str2  |當str1與str2相同時,返回True
+  Str1 != str2  |當str1與str2不同時,返回True
+  -r file       |當file是一個可讀文件時,返回True
+  -w file       |當file是一個可寫文件時,返回True
+  -x file       |當file是一個可執行文件時,返回True
+  -e file       |當file存在時,返回True
+  -o file       |當file文件的所有者是當前用戶時,返回True
+  -z file       |當file長度為0時,返回True
+  -f file       |當file是一個普通文件時,返回True
+  -d file       |當file是一個目錄時,返回True
+  Exp1 || exp2  |當exp1和exp2的值至少一個為True時,返回True
+  Exp1 && exp2  |當exp1和exp2的值同為True時,返回True
+  ! exp         |當exp的值為False時,返回True 
+
+
+/***************************************************************************/
+linux shell grammer check
+Linux Shell語法速查表           https://sites.google.com/site/yunluliussite/linux-shell/linux-shell-grammer-check
+/***************************************************************************/
+雖然學過Linux Shell編程，但由於編寫Shell腳本的機會實在是比較少(通常在項目初期搭建開發環境時編寫得比較多一些)，所以一些語法久而久之就會忘了，一個簡單的語
+法去翻書效率實在是慢，所以就個人整理了一個表格，由於我用的編程語言是C/C++，所以在編程的時候往往腦海裡面首先浮現的是用C語言怎麼去編寫它，所以我乾脆拿C語言
+的語法來和Shell編程的語法作個對比表，這樣查起來就方便了：
+
+要實現的功能                    C語言編程                                                       Linux Shell腳本編程
+程式/腳本的參數傳遞             int main(int argc, char** argv)                                 #!/bin/sh
+                                {                                                               if [ $# -lt 3 ]; then
+                                    if (argv != 4) {                                                echo "Usage: `basename $0` arg1 arg2 arg3" >&2
+                                                                                                    exit 1
+                                        printf( 「Usage: %s arg1 arg2 arg3」, argv[0] );        fi
+                                                                                                echo "arg1: $1"
+                                        return 1;                                               echo "arg2: $2"
+                                                                                                echo "arg3: $3"
+                                    }                                                           exit 0
+                                    printf(「arg1:%s\n」,argv[1]);
+                                    printf(「arg2:%s\n」,argv[2]);
+                                    printf(「arg3:%s\n」,argv[3]);
+                                    return 0;
+                                }
+
+
+/***************************************************************************/
+[Linux] 檢查檔案目錄是否存在
+/***************************************************************************/
+#檢查檔案是否存在
+FILE=abc
+if [ -f $FILE ]
+then
+  echo "$FILE EXIST"
+else
+  echo "$FILE NOT EXIST"
+fi
+
+#檢查目錄是否存在
+FOLDER=abc
+if [ -x $FOLDER ]
+then
+  echo "$FOLDER EXIST"
+else
+  echo "$FOLDER NOT EXIST"
+fi
+
+
+/***************************************************************************/
+[Linux] Shell Script 檔案載入變數之方法
+/***************************************************************************/
+config.ini
+#!/bin/sh
+TEST1=y
+
+
+test.sh
+#!/bin/sh
+source config.ini
+if [ "$TEST1" == "y" ]; then
+    echo "TEST1!!"
+fi
+
+
+
+/***************************************************************************/
+/***************************************************************************/
+
+
+
+
+
+
+
+
+
+

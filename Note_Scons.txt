@@ -1,0 +1,1356 @@
+
+/******************************************************************************/
+scons用戶指南 - 第一章：編譯和安裝SCons
+/******************************************************************************/
+1、安裝Python
+因為SCons是用Python編寫的，所以你必須在使用SCons之前安裝好Python。你在安裝Python之前，應該注意查看Python是否在你的系統裡已經可用了（在系統的命令行中運行python -V或python --version）。
+$python -V
+Python 2.5.1
+在一個Windows系統裡，
+C:\>python -V
+Python 2.5.1
+如果Python沒有安裝，你會看到一條錯誤消息比如「command not found」(在UNIX或Linux裡)或"python is not recognized as an internal or external command, operable program or batch file"(在Windows裡)。在這種情況下，在你安裝SCons之前需要先安裝Python。
+有關下載和安裝Python的資訊可以從得到。
+
+2、從預編譯包中安裝SCons
+2.1、在Red Hat(或者基於RPM)Linux系統裡安裝SCons
+在使用RPM(Red Hat Package Manager)的Red Hat Linux，Fedora或者任何其他Linux發行版裡，SCons是預編譯好的RPM格式，準備被安裝的。你的發行版可能已經包含了一個預編譯好的SCons RPM。
+如果你的發行版支援yum安裝，你可以運行如下命令安裝SCons：
+#yum install scons
+如果你的Linux發行版沒有包含一個特定的SCons RPM文件，你可以下載SCons項目提供的通用的RPM來安裝。這會安裝SCons腳本到/usr/bin目錄，安裝SCons庫模組(library modules)到/usr/lib/scons。
+從命令行安裝，下載合適的.rpm文件，然後運行：
+#rpm -Uvh scons-2.1.0-1.noarch.rpm
+2.2、在Debian Linux系統裡安裝SCons
+如果你的系統已經連上了因特網，你可以運行如下命令來安裝最新的官方Debian包：
+#apt-get install scons
+2.3、在Windows系統裡安裝SCons
+SCons提供了一個Windows installer，使得安裝變得非常容易。從下載scons-2.1.0.win32.exe。然後你需要做的就是執行這個文件。
+
+3、在任何系統裡編譯和安裝SCons
+如果你的系統裡沒有一個預編譯的SCons包，你可以使用本地python distutils包很容易地編譯和安裝SCons。
+第一步就是下載scons-2.1.0.tar.gz或scons-2.1.0.zip，地址。
+解壓下載的文件，會創建一個叫scons-2.1.0的目錄，進入這個目錄執行如下命令安裝SCons：
+#cd scons-2.1.0
+#python setup.py install
+這將會編譯SCons，安裝scons腳本到python目錄（/usr/local/bin或C:\Python25\Scripts），同時會安裝SCons編譯引擎到python使用的庫目錄（/usr/local/lib/scons或C:\Python25\scons）。因為這些都是系統目錄，你可能需要root或管理員權限去安裝SCons。
+3.1、編譯和安裝多個版本的SCons
+SCons的setup.py腳本有一些擴展，這些擴展支援安裝多個版本的SCons到不同的位置。這讓下載和體驗不同版本的SCons變得很容易。
+安裝SCons到指定版本的位置，調用setup.py的時候增加--version-lib選項：
+#python setup.py install --version-lib
+這將會安裝SCons編譯引擎到/usr/lib/scons-2.1.0或C:\Python25\scons-2.1.0目錄。
+3.2、安裝SCons到其他的位置
+你可以安裝SCons到其他的位置，而不是默認的位置，指定--prefix=選項：
+#python setup.py install --prefix=/opt/scons
+這將會安裝scons腳本到/opt/scons/bin，安裝編譯引擎到/opt/scons/lib/scons。
+你可以同時指定--prefix和--version-lib，這個時候setup.py將會安裝編譯引擎到相對於指定prefix的特定版本的目錄，在剛才的例子上加上--version-lib，將會安裝編譯引擎到/opt/scons/lib/scons-2.1.0。
+3.3、沒有管理員權限的情況下編譯和安裝SCons
+如果你沒有權限安裝SCons到系統目錄，使用--prefix選項安裝到你選擇的其他的位置。例如，安裝SCons到相對於用戶$HOME目錄的合適的位置，scons腳本安裝到$HOME/bin，編譯引擎安裝到$HOME/lib/scons，使用如下命令：
+#python setup.py install --prefix=$HOME
+
+
+1、編譯簡單的C/C++程式
+這是一個用C語言編寫的著名的"Hello,World!"程式：
+int main()
+{
+    printf("Hello, World!\n");
+}
+用SCons編譯它，需要在一個名為SConstruct的文件中輸入如下命令：
+Program('hello.c')
+這個短小的配置文件給了SCons兩條資訊：你想編譯什麼（一個可執行程式），你編譯的輸入文件（hello.c）。Program是一個編譯器方法（builder_method），一個Python調用告訴SCons，你想編譯一個可執行程式。
+
+　　現在運行scons命令編譯這個程式。在Linux或Unix系統上，你會看到如下輸出：
+% scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+scons: done building targets.
+
+　　在一個帶有微軟Visual C++編譯器的Windows系統上，你會看到如下輸出：
+C:\>scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+cl /Fohello.obj /c hello.c /nologo
+link /nologo /OUT:hello.exe hello.obj
+embedManifestExeCheck(target,source,env)
+scons: done building targets.
+
+　　首先，你僅僅需要指定源文件，SCons會正確地推斷出目標文件和可執行文件的名字。
+其次，同樣的SConstruct文件，在Linux和Windows上都產生了正確的輸出文件：在POSIX系統上是hello.o和hello，在Windows系統上是hello.obj和hello.exe。這是一個簡單的例子，說明了SCons使得編寫程式編譯腳本變得很容易了。
+2、編譯目標程式
+　Program編譯方法是SCons提供的許多編譯方法中一個。另一個是Object編譯方法，告訴SCons從指定的源文件編譯出一個目標文件：
+Object('hello.c')
+　　現在運行scons命令編譯，在POSIX系統裡它僅僅編譯出hello.o目標文件：
+% scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+cc -o hello.o -c hello.c
+scons: done building targets.
+
+　　在Windows系統裡編譯出hello.obj目標文件：
+C:\>scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+cl /Fohello.obj /c hello.c /nologo
+scons: done building targets.
+
+3、簡單的JAVA編譯
+　　SCons同樣使得編譯Java也很容易了。不像Program和Object兩個編譯方法，Java編譯方法需要你指定一個目錄，這個目錄是用來存放編譯後的class文件的，以及一個存放.java源文件的目錄：
+Java('classes', 'src')
+　　如果src目錄僅僅包含一個hello.java文件，那麼運行scons命令的輸出會如下所示（在POSIX系統裡）:
+% scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+javac -d classes -sourcepath src src/hello.java
+scons: done building targets.
+
+4、編譯之後清除
+　　使用SCons，編譯之後想要清除不需要增加特殊的命令或目標名。你調用SCons的時候，使用-c或--clean選項，SCons就會刪除合適的編譯產生的文件。
+% scons -c
+
+5、SConstruct文件
+　　如果你使用過Make編譯系統，你應該可以推斷出SConstruct文件就相當於Make系統中的Makefile。SCons讀取SConstruct文件來控制程式的編譯。
+　　5.1、SConstruct文件是Python腳本
+SConstruct文件實際上就是一個Python腳本。你可以在你的SConstruct文件中使用Python的註釋：
+# Arrange to build the "hello" program.
+Program('hello.c')            #"hello.c" is the source file.
+　　5.2、SCons的函數是順序無關的
+重要的一點是SConstruct文件並不完全像一個正常的Python腳本那樣工作，其工作方式更像一個Makefile，那就是在SConstruct文件中SCons函數被調用的順序並不影響SCons你實際想編譯程式和目標文件的順序。換句話說，當你調用Program方法，你並不是告訴SCons在調用這個方法的同時馬上就編譯這個程式，而是告訴SCons你想編譯這個程式，例如，一個程式由一個hello.c文件編譯而來，這是由SCons決定在必要的時候編譯這個程式的。
+SCons通過列印輸出狀態消息來顯示它何時在讀取SConstruct文件，何時在實際編譯目標文件，進而來區分是在調用一個類似Program的編譯方法還是在實際地編譯這個程式。
+　　看下面這個例子：
+print "Calling Program('hello.c')"
+Program('hello.c')
+print "Calling Program('goodbye.c')"
+Program('goodbye.c')
+print "Finished calling Program()"
+　　執行SCons，我們看到print語句的輸出是在讀取Sconstruct文件消息之間，說明了那才是Python語句執行的時候：
+% scons
+scons: Reading Sconscript files...
+Calling Program('hello.c')
+Calling Program('goodbye.c')
+Finished Calling Program()
+scons: done reading SConscript files...
+scons: Building targets...
+cc -o goodbye.o -c goodbye.c
+cc -o goodbye goodbye.o
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+scons: done building targets.
+
+6、使Scons輸出更簡潔
+　　你已經看到過SCons編譯的時候會列印一些消息，那些消息圍繞著實際用來編譯程式的命令：
+C:\scons
+scons: Reading SConscript files...
+scons: done reading SConscript files.
+scons: Building targets...
+cl /Fohello.obj /c hello.c /nologo
+link /nologo /OUT:hello.exe hello.obj
+embedManifestExeCheck(target, source, env)
+scons: done building targets.
+這些消息反映了SCons工作時候的順序。
+
+一個缺點就是，這些消息使得輸出看起來很混亂。當調用SCons的時候使用-Q選項，可以屏蔽掉那些與實際編譯程式命令無關的消息：
+C:\>scons -Q
+cl /Fohello.obj /c hello.c /nologo
+link /nologo /OUT:hello.exe hello.obj
+embedManifestExeCheck(target, source, env)
+
+1、指定目標文件的名字 
+當你調用Program編譯方法的的時候，它編譯出來的程式名字是和源文件名是一樣的。下面的從hello.c源文件編譯一個可執行程式的調用將會在POSIX系統裡編譯出一個名為hello的可執行程式，在windows系統裡會編譯出一個名為hello.exe的可執行程式。
+Program('hello.c')
+如果你想編譯出來的程式的名字與源文件名字不一樣，你只需要在源文件名的左邊聲明一個目標文件的名字就可以了：
+Program('new_hello','hello.c')
+現在在POSIX系統裡運行scons，將會編譯出一個名為new_hello的可執行程式：
+% scons -Q
+cc -o hello.o -c hello.c
+cc -o new_hello hello.o
+
+2、編譯多個源文件
+通常情況下，你需要使用多個輸入源文件編譯一個程式。在SCons裡，只需要就多個源文件放到一個Python列表中就行了，如下所示：
+Program(['prog.c','file1.c','file2.c'])
+運行scons編譯：
+% scons -Q
+cc -o file1.o -c file1.c
+cc -o file2.o -c file2.c
+cc -o prog.o -c prog.c
+cc -o prog prog.o file1.o file2.o
+注意到SCons根據源文件列表中的第一個源文件來決定輸出程式的名字。如果你想指定一個不同的程式名稱，你可以在源文件列表的右邊指定程式名，如下所示指定輸出程式名為program：
+Program('program',['prog.c','file1.c','file2.c'])
+
+3、使用Glob指定文件列表
+你可以使用Glob函數，定義一個匹配規則來指定源文件列表，比如*,?以及[abc]等標準的shell模式。如下所示：
+Program('program', Glob('*.c'))
+
+4、指定單個文件以及文件列表
+有兩種方式為一個程式指定源文件，一個是文件列表：
+Program('hello', ['file1.c', 'file2.c'])
+一個是單個文件：
+Program('hello', 'hello.c')
+也可以把單個文件放到一個列表中，
+Program('hello', ['hello.c'])
+對於單個文件，SCons函數支援兩種方式。實際上，在內部，SCons把所有的輸入都是看成列表的，只是在單個文件的時候，允許我們省略方括號。
+
+5、使文件列表更易讀
+為了更容易處理文件名長列表，SCons提供了一個Split函數，這個Split函數可以將一個用引號引起來，並且以空格或其他空白字元分隔開的字串分割成一個文件名列表，示例如下：
+Program('program', Split('main.c  file1.c  file2.c'))
+或者
+src_files=Split('main.c  file1.c  file2.c')
+Program('program', src_files)
+同時，Split允許我們創建一個文件列表跨躍多行，示例如下：
+src_files=Split("""main.c
+                        file1c
+                        file2.c""")
+Program('program', src_files)
+
+6、關鍵字參數
+SCons允許使用Python關鍵字參數來標識輸出文件和輸入文件。輸出文件是target，輸入文件是source，示例如下：
+src_files=Split('main.c  file1.c  file2.c')
+Program(target='program', source=src_files)
+或者
+src_files=Split('main.c  file1.c  file2.c')
+Program(source=src_files, target='program')
+
+7、編譯多個程式
+如果需要用同一個SConstruct文件編譯多個文件，只需要調用Program方法多次：
+Program('foo.c')
+Program('bar', ['bar1.c', 'bar2.c'])
+
+8、在多個程式之間共享源文件
+在多個程式之間共享源文件是很常見的代碼重用方法。一種方式就是利用公共的源文件創建一個庫文件，然後其他的程式可以鏈接這個庫文件。
+另一個更直接，但是不夠便利的方式就是在每個程式的源文件列表中包含公共的文件，示例如下：
+Program(Split('foo.c  common1.c  common2.c'))
+Program('bar', Split('bar1.c  bar2.c  common1.c  common2.c'))
+如果程式之間共享的源文件過多，可以簡化：
+common=['common1.c', 'common2.c']
+foo_files=['foo.c'] + common
+bar_files=['bar1.c', 'bar2.c'] + common
+Program('foo', foo_files)
+Program('bar', bar_files)
+
+1、編譯庫文件 
+你可以使用Library方法來編譯庫文件：
+Library('foo', ['f1.c', 'f2.c', 'f3.c'])
+SCons會根據你的系統使用合適的庫前綴和後綴。所以在POSIX系統裡，上面的例子會如下編譯：
+% scons -Q
+cc -o f1.o -c f1.c
+cc -o f2.o -c f2.c
+cc -o f3.o -c f3.c
+ar rc libfoo.a f1.o f2.o f3.o
+ranlib libfoo.a
+如果你不顯示指定目標庫的名字，SCons會使用第一個源文件的名字。
+1.1、使用源代碼或目標文件編譯庫文件
+除了使用源文件外，Library也可以使用目標文件，如下所示：
+Library('foo', ['f1.c', 'f2.o', 'f3.c', 'f4.o'])
+1.2、使用StaticLibrary顯示編譯靜態庫
+Library函數是用來編譯靜態庫的。如果你想顯示指定需要編譯靜態庫，可以使用StaticLibrary替代Library：
+StaticLibrary('foo', ['f1.c', 'f2.c', 'f3.c'])
+1.3、使用SharedLibrary編譯動態庫
+如果想編譯動態庫（在POSIX系統裡）或DLL文件（Windows系統），可以使用SharedLibrary：
+SharedLibrary('foo', ['f1.c', 'f2.c', 'f3.c'])
+在POSIX裡運行scons編譯：
+% scons -Q
+cc -o f1.os -c f1.c
+cc -o f2.os -c f2.c
+cc -o f3.os -c f3.c
+cc -o libfoo.so -shared f1.os f2.os f3.os
+
+2、鏈接庫文件
+鏈接庫文件的時候，使用$LIBS變數指定庫文件，使用$LIBPATH指定存放庫文件的目錄：
+Library('foo', ['f1.c', 'f2.c', 'f3.c'])
+Program('prog.c', LIBS=['foo', 'bar'], LIBPATH='.')
+注意到，你不需要指定庫文件的前綴（比如lib）或後綴（比如.a或.lib），SCons會自動匹配。
+% scons -Q
+cc -o f1.os -c f1.c
+cc -o f2.os -c f2.c
+cc -o f3.os -c f3.c
+ar rc libfoo.a f1.o f2.o f3.o
+ranlib libfoo.a
+cc -o prog.o -c prog.c
+cc -o prog prog.o -L. -lfoo -lbar
+
+3、$LIBPATH告訴去哪裡找庫
+默認情況下，鏈接器只會在系統默認的庫目錄中尋找庫文件。SCons也會去$LIBPATH指定的目錄中去尋找庫文件。$LIBPATH由一個目錄列表組成，如下所示：
+Program('prog.c', LIBS='m', LIBPATH=['/usr/lib', '/usr/local/lib'])
+使用Python列表的好處是可以跨平台。另一種可選方式是，把庫目錄用系統特定的路徑分隔符號連接成一個字串：
+在POSIX系統裡：
+LIBPATH='/usr/lib:/usr/local/lib'
+在Windows裡：
+LIBPATH='C:\\lib;D:\\lib'
+當鏈接器執行的時候，SCons會創建合適的flags，使得鏈接器到指定的庫目錄尋找庫文件。上面的例子在POSIX系統裡編譯：
+% scons -Q
+cc -o prog.o -c prog.c
+cc -o prog prog.o -L/usr/lib -L/usr/local/lib -lm
+
+1、編譯方法返回目標節點列表 
+所有編譯方法會返回一個節點對像列表，這些節點對像標識了那些將要被編譯的目標文件。這些返回出來的節點可以作為參數傳遞給其他的編譯方法。
+例如，假設我們想編譯兩個目標文件，這兩個目標有不同的編譯選項，並且最終組成一個完整的程式。這意味著對每一個目標文件調用Object編譯方法，如下所示：
+Object('hello.c', CCFLAGS='-DHELLO')
+Object('goodbye.c', CCFLAGS='-DGOODBYE')
+Program(['hello.o', 'goodbye.o'])
+這樣指定字串名字的問題就是我們的SConstruct文件不再是跨平台的了。因為在Windows裡，目標文件成為了hello.obj和goodbye.obj。
+一個更好的解決方案就是將Object編譯方法返回的目標列表賦值給變數，這些變數然後傳遞給Program編譯方法：
+hello_list = Object('hello.c', CCFLAGS='-DHELLO')
+goodbye_list = Object('goodbye.c', CCFLAGS='-DGOODBYE')
+Program(hello_list + goodbye_list)
+這樣就使得SConstruct文件是跨平台的了。
+
+2、顯示創建文件和目錄節點
+在SCons裡，表示文件的節點和表示目錄的節點是有清晰區分的。SCons的File和Dir函數分別返回一個文件和目錄節點：
+hello_c=File('hello.c')
+Program(hello_c)
+classes=Dir('classes')
+Java(classes, 'src')
+通常情況下，你不需要直接調用File或Dir，因為調用一個編譯方法的時候，SCons會自動將字串作為文件或目錄的名字，以及將它們轉換為節點對象。只有當你需要顯示構造節點類型傳遞給編譯方法或其他函數的時候，你才需要手動調用File和Dir函數。
+有時候，你需要引用文件系統中一個條目，同時你又不知道它是一個文件或一個目錄，你可以調用Entry函數，它返回一個節點可以表示一個文件或一個目錄：
+xyzzy=Entry('xyzzy')
+
+3、列印節點文件名
+你可能需要經常做的就是使用一個節點來列印輸出這個節點表示的文件名。因為一個編譯方法調用返回的對象是一個節點列表，你必須使用Python腳本從列表中獲得單個節點。例如，如下的SConstruct文件：
+hello_c=File('hello.c')
+Program(hello_c)
+classes=Dir('classes')
+Java(classes, 'src')
+object_list=Object('hello.c')
+program_list=Program(object_list)
+print "The object file is:", object_list[0]
+print "The program file is:", program_list[0]
+
+4、將一個節點的文件名當作一個字串
+如果你不是想列印文件名，而是做一些其他的事情，你可以使用內置的Python的str函數。例如，你想使用Python的os.path.exists判斷一個文件是否存在：
+import os.path
+program_list=Program('hello.c')
+program_name=str(program_list[0])
+if not os.path.exists(program_name):
+    print program_name, "does not exist!"
+在POSIX系統裡執行scons：
+% scons -Q
+hello does not exist!
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+
+5、GetBuildPath：從一個節點或字串中獲得路徑
+env.GetBuildPath(file_or_list)返回一個節點或一個字串表示的路徑。它也可以接受一個節點或字串列表，返回路徑列表。如果傳遞單個節點，結果就和調用str(node)一樣。路徑可以是文件或目錄，不需要一定存在：
+env=Environment(VAR="value")
+n=File("foo.c")
+print env.GetBuildPath([n, "sub/dir/$VAR"])
+將會列印輸出如下：
+% scons -Q
+['foo.c', 'sub/dir/value']
+scons: . is up to date.
+有一個函數版本的GetBuildPath，不需要被一個Environment調用，它是基於SCons默認的Environment來使用的。
+
+到目錄為止，我們已經看到了SCons是如何一次性編譯的。但是SCons這樣的編譯工具的一個主要的功能就是當源文件改變的時候，只需要重新編譯那些修改的文件，而不會浪費時間去重新編譯那些不需要重新編譯的東西。如下所示： 
+% scons -Q
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+% scons -Q
+scons: '.' is up to date.
+第二次執行的時候，SCons根據當前的hello.c源文件判斷出hello程式是最新的，避免了重新編譯。
+
+1、決定一個輸入文件何時發生了改變：Decider函數
+默認情況下，SCons通過每個文件內容的MD5簽名，或者校驗和來判斷文件是否是最新的，當然你也可以配置SCons使用文件的修改時間來判斷。你甚至可以指定你自己的Python函數來決定一個輸入文件是否發生了改變。
+1.1、使用MD5簽名來決定一個文件是否改變
+默認情況下，SCons根據文件內容的MD5校驗和而不是文件的修改時間來決定文件是否改變。如果你想更新文件的修改時間，來使得SCons重新編譯，那麼會失望的。如下所示：
+% scons -Q hello
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+% touch hello.c
+% scons -Q hello
+scons: `hello' is up to date.
+上面的例子中即使文件的修改時間變了，SCons認為文件的內容沒有改變，所以不需要重新編譯。但是如果文件的內容改變了，SCons會偵測到並且重新編譯的：
+% scons -Q hello
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+% edit hello.c
+    [CHANGE THE CONTENTS OF hello.c]
+% scons -Q hello
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+你也可以顯示指定使用MD5簽名，使用Decider函數：
+Program('hello.c')
+Decider('MD5')
+1.1.1、使用MD5簽名的衍生
+使用Md5簽名去決定一個輸入文件是否改變，有一個好處：如果一個源文件已經改變了，但是由它重新編譯出來的目標文件的內容和由它修改前編譯出來的目標文件一樣，那麼那些依賴這個重新編譯的但是內容沒變的目標文件的其他目標文件是不需要重新編譯的。
+例如，一個用戶僅僅改變了hello.c文件中的註釋，那麼重新編譯出來的hello.o文件肯定是不變的。SCons將不會重新編譯hello程式：
+% scons -Q hello
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+% edit hello.c
+    [CHANGE A COMMENT IN hello.c]
+% scons -Q hello
+cc -o hello.o -c hello.c
+scons: `hello' is up to date.
+1.2、使用時間戳（Time Stamps）來決定一個文件是否改變
+SCons允許使用兩種方式使用時間戳來決定一個輸入文件是否已經改變。
+最熟悉的方式就是Make使用時間戳的方式：如果一個源文件的修改時間比目標文件新，SCons認為這個目標文件應該重新編譯。調用Decider函數如下：
+Object('hello.c')
+Decider('timestamp-newer')
+並且因為這個行為和Make的一樣，你調用Decider函數的時候可以用make替代timestamp-newer：
+Object('hello.c')
+Decider('make')
+使用和Make一樣時間戳的一個缺點就是如果一個輸入文件的修改時間突然變得比一個目標文件舊，這個目標文件將不會被重新編譯。例如，如果一個源文件的一個舊的拷貝從一個備份中恢復出來，恢復出來的文件的內容可能不同，但是目標文件將不會重新編譯因為恢復出來的源文件的修改時間不比目標文件文件新。
+因為SCons實際上存儲了源文件的時間戳資訊，它可以處理這種情況，通過檢查源文件時間戳的精確匹配，而不是僅僅判斷源文件是否比目標文件新。示例如下：
+Object('hello.c')
+Decider('timestamp-match')
+1.3、同時使用MD5簽名和時間戳來判斷一個文件是否改變
+SCons提供了一種方式，使用文件內容的MD5校驗和，但是僅僅當文件的時間戳改變的時候去讀文件的內容：
+Program('hello.c')
+Decider('MD5-timestamp')
+使用Decider('MD5-timestamp')的唯一缺點就是SCons將不會重新編譯一個目標文件，如果SCons編譯這個文件後的一秒以內源文件被修改了。
+1.4、編寫你自己的Decider函數
+我們傳遞給Decider函數的不同的字串實際上是告訴SCons去選擇內部已經實現的決定文件是否改變的函數。我們也可以提供自己的函數來決定一個依賴是否已經改變。
+例如，假設我們有一個輸入文件，其包含了很多數據，有特定的格式，這個文件被用來重新編譯許多不同的目標文件，但是每個目標文件僅僅依賴這個輸入文件的一個特定的區域。我們希望每個目標文件僅僅依賴自己在輸入文件中的區域。但是，因為這個輸入文件可能包含了很多數據，我們想僅僅在時間戳改變的時候才打開這個文件。這個可以通過自定義的Decider函數實現：
+Program('hello.c')
+def decide_if_changed(dependency,target,prev_ni):
+    if self.get_timestamp()!=prev_ni.timestamp:
+          dep=str(dependency)
+          tgt=str(target)
+          if specific_part_of_file_has_changed(dep,tgt):
+              return True
+    return False
+Decider(decide_if_changed)
+在函數定義中，depandency（輸入文件）是第一個參數，然後是target。它們都是作為SCons節點對像傳遞給函數的，所以我們需要使用str()轉換成字串。
+第三個參數，prev_ni，是一個對像，這個對象記錄了目標文件上次編譯時所依賴的簽名和時間戳資訊。prev_ni對象可以記錄不同的資訊，取決於dependency參數所表示的東西的類型。對於普通的文件，prev_ni對像有以下的屬性:
+.csig：target上次編譯時依賴的dependency文件內容的內容簽名或MD5校驗和
+.size：dependency文件的位元組大小
+.timestamp：dependency文件的修改時間
+注意如果Decider函數中的一些參數沒有影響到你決定dependency文件是否改變，你忽略掉這些參數是很正常的事情。
+以上的三個屬性在第一次運行的時候，可能不會出現。如果沒有編譯過，沒有target創建過也沒有.sconsign DB文件存在過。所以，最好總是檢查prev_ni的屬性是否可用。
+以下是一個基於csig的decider函數的例子，注意在每次函數調用的時候，dependency文件的簽名資訊是怎麼樣通過get_csig初始化的：
+
+　　env = Environment()
+        def config_file_decider(dependency, target, prev_ni):
+            import os.path
+      
+            # We always have to init the .csig value...
+            dep_csig = dependency.get_csig()
+            # .csig may not exist, because no target was built yet...
+            if 'csig' not in dir(prev_ni):
+                return True
+            # Target file may not exist yet
+            if not os.path.exists(str(target.abspath)):
+                return True
+            if dep_csig != prev_ni.csig:
+                # Some change on source file => update installed one
+                return True
+            return False
+      
+        def update_file():
+            f = open("test.txt","a")
+            f.write("some line\n")
+            f.close()
+          
+        update_file()
+      
+        # Activate our own decider function
+        env.Decider(config_file_decider)
+      
+        env.Install("install","test.txt")
+
+1.5、混合使用不同的方式來決定一個文件是否改變
+有些時候，你想為不同的目標程式配置不同的選項。你可以使用env.Decider方法影響在指定construction環境下編譯的目標程式。
+例如，如果我們想使用MD5校驗和編譯一個程式，另一個使用文件的修改時間:
+env1=Environment(CPPPATH=['.'])
+env2=env1.Clone()
+env2.Decider('timestamp-match')
+env1.Program('prog-MD5','program1.c')
+env2.Program('prog-timestamp','program2.c')
+
+2、決定一個輸入文件是否改變的舊函數
+SCons2.0之前的兩個函數SourceSignatures和TargetSignatures，現在不建議使用了。
+
+3、隱式依賴：$CPPPATH Construction變數
+現在假設"Hello,World!"程式有一個#include行需要包含hello.h頭文件：
+#include <hello.h>
+int main()
+{
+    printf("Hello, %s!\n",string);
+}
+並且，hello.h文件如下：
+#define string "world"
+在這種情況下，我們希望SCons能夠認識到，如果hello.h文件的內容發生改變，那麼hello程式必須重新編譯。我們需要修改SConstruct文件如下：
+Program('hello.c', CPPPATH='.')
+$CPPPATH告訴SCons去當前目錄('.')查看那些被C源文件（.c或.h文件）包含的文件。
+      % scons -Q hello
+      cc -o hello.o -c -I. hello.c
+      cc -o hello hello.o
+      % scons -Q hello
+      scons: `hello' is up to date.
+      % edit hello.h
+          [CHANGE THE CONTENTS OF hello.h]
+      % scons -Q hello
+      cc -o hello.o -c -I. hello.c
+      cc -o hello hello.o
+首先注意到，SCons根據$CPPPATH變數增加了-I.參數，使得編譯器在當前目錄查找hello.h文件。
+其次，SCons知道hello程式需要重新編譯，因為它掃瞄了hello.c文件的內容，知道hello.h文件被包含。SCons將這些記錄為目標文件的隱式依賴，當hello.h文件改變的時候，SCons就會重新編譯hello程式。
+就像$LIBPATH變數，$CPPPATH也可能是一個目錄列表，或者一個被系統特定路徑分隔符號分隔的字串。
+Program('hello.c', CPPPATH=['include', '/home/project/inc'])
+
+4、緩存隱式依賴
+掃瞄每個文件的#include行會消耗額外的處理時間。
+SCons讓你可以緩存它掃瞄找到的隱式依賴，在以後的編譯中可直接使用。這需要在命令行中指定--implicit-cache選項：
+% scons -Q --implicit-cache hello
+如果你不想每次在命令行中指定--implicit-cache選項，你可以在SConscript文件中設置implicit-cache選項使其成為默認的行為：
+SetOption('implicit-cache', 1)
+SCons默認情況下不緩存隱式依賴，因為--implicit-cache使得SCons在最後運行的時候，只是簡單的使用已經存儲的隱式依賴，而不會檢查那些依賴還是不是仍然正確。在如下的情況中，--implicit-cache可能使得SCons的重新編譯不正確：
+1>當--implicit-cache被使用，SCons將會忽略$CPPPATH或$LIBPATH中發生的一些變化。如果$CPPPATH的一個改變，使得不同目錄下的內容不相同但文件名相同的文件被使用，SCons也不會重新編譯。
+2>當--implicit-cache被使用，如果一個同名文件被添加到一個目錄，這個目錄在搜索路徑中的位置在同名文件上次被找到所在的目錄之前，SCons將偵測不到。
+4.1、--implicit-deps-changed選項
+當使用緩存隱式依賴的時候，有些時候你想讓SCons重新掃瞄它之前緩存的依賴。你可以運行--implicit-deps-changed選項：
+% scons -Q --implicit-deps-changed hello
+4.2、--implicit-deps-unchanged選項
+默認情況下在使用緩存隱式依賴的時候，SCons會注意到當一個文件已經被修改的時候，就會重新掃瞄文件更新隱式依賴資訊。有些時候，你可能想即使源文件改變了，但仍然讓SCons使用緩存的隱式依賴。你可以使用--implicit-deps-unchanged選項：
+% scons -Q --implicit-deps-unchanged hello
+5、顯示依賴：Depends函數
+有些時候一個文件依賴另一個文件，是不會被SCons掃瞄器偵測到的。對於這種情況，SCons允許你顯示指定一個文件依賴另一個文件，並且無論何時被依賴文件改變的時候，需要重新編譯。這個需要使用Depends方法：
+hello=Program("hello.c")
+Depends(hello,'other_file')
+注意Depends方法的第二個參數也可以是一個節點對像列表：
+hello=Program('hello.c')
+goodbye=Program('goodbye.c')
+Depends(hello,goodbye)
+在這種情況下，被依賴的對象會在目標對像之前編譯：
+% scons -Q hello
+cc -c goodbye.c -o goodbye.o
+cc -o goodbye goodbye.o
+cc -c hello.c -o hello.o
+cc -o hello hello.o
+
+6、來自外部文件的依賴：ParseDepends函數
+SCons針對許多語言，有內置的掃瞄器。有些時候，由於掃瞄器實現的缺陷，掃瞄器不能提取出某些隱式依賴。
+下面的例子說明了內置的C掃瞄器不能提取一個頭文件的隱式依賴：
+#define FOO_HEADER <foo.h>
+#include FOO_HEADER
+int main()
+{
+    return FOO;
+}
+% scons -Q
+cc -o hello.o -c hello.c
+cc -o hello hello.o
+% edit foo.h
+% scons -Q
+scons: '.' is up to date.
+顯然，掃瞄器沒有發現頭文件的依賴。這個掃瞄器不是一個完備的C預處理器，沒有擴展宏。
+在這種情況下，你可能想使用編譯器提取隱式依賴。ParseDepends可以解析編譯器輸出的內容，然後顯示建立所有的依賴。
+下面的例子使用ParseDepends處理一個編譯器產生的依賴文件，這個依賴文件是在編譯目標文件的時候作為副作用產生的：
+obj=Object('hello.c', CCFLAGS='-MD -MF hello.d', CPPPATH='.')
+SideEffect('hello.d',obj)
+ParseDepends('hello.d')
+Program('hello', obj)
+% scons -Q
+cc -o hello.o -c -MD -MF hello.d -I. hello.c
+cc -o hello hello.o
+% edit foo.h
+% scons -Q
+cc -o hello.o -c -MD -MF hello.d -I. hello.c
+從一個編譯器產生的.d文件解析依賴有一個先有雞還是先有蛋的問題，會引發不必要的重新編譯：
+      % scons -Q
+      cc -o hello.o -c -MD -MF hello.d -I. hello.c
+      cc -o hello hello.o
+      % scons -Q --debug=explain
+      scons: rebuilding `hello.o' because `foo.h' is a new dependency
+      cc -o hello.o -c -MD -MF hello.d -I. hello.c
+      % scons -Q
+      scons: `.' is up to date.
+第一次運行的時候，在編譯目標文件的時候，依賴文件產生了。在那個時候，SCons不知道foo.h的依賴。第二次運行的時候，目標文件被重新生成因為foo.h被發現是一個新的依賴。
+ParseDepends在調用的時候立即讀取指定的文件，如果文件不存在馬上返回。在編譯過程中產生的依賴文件不會被再次自動解析。因此，在同樣的編譯過程中，編譯器提取的依賴不會被存儲到簽名數據庫中。這個ParseDepends的缺陷導致不必要的重新編譯。因此，僅僅在掃瞄器對於某種語言不可用或針對特定的任務不夠強大的情況下，才使用ParseDepends。
+
+7、忽略依賴：Ignore函數
+有些時候，即使一個依賴的文件改變了，也不想要重新編譯。在這種情況下，你需要告訴SCons忽略依賴，如下所示：
+      hello_obj=Object('hello.c')
+      hello = Program(hello_obj)
+      Ignore(hello_obj, 'hello.h')
+
+　　% scons -Q hello
+      cc -c -o hello.o hello.c
+      cc -o hello hello.o
+      % scons -Q hello
+      scons: `hello' is up to date.
+      % edit hello.h
+        [CHANGE THE CONTENTS OF hello.h]
+      % scons -Q hello
+      scons: `hello' is up to date.
+上面的例子是人為做作的，因為在真實情況下，如果hello.h文件改變了，你不可能不想重新編譯hello程式。一個更真實的例子可能是，如果hello程式在一個目錄下被編譯，這個目錄在多個系統中共享，多個系統有不同的stdio.h的拷貝。在這種情況下，SCons將會注意到不同系統的stdio.h拷貝的不同，當你每次改變系統的時候，重新編譯hello。你可以避免這些重新編譯，如下所示：
+hello=Program('hello.c', CPPPATH=['/usr/include'])
+Ignore(hello, '/usr/include/stdio.h')
+Ignore也可以用來阻止在默認編譯情況下文件的產生。這是因為目錄依賴它們的內容。所以為了忽略默認編譯時產生的文件，你指定這個目錄忽略產生的文件。注意到如果用戶在scons命令行中請求目標程式，或者這個文件是默認編譯情況下另一個文件的依賴，那麼這個文件仍然會被編譯。
+      hello_obj=Object('hello.c')
+      hello = Program(hello_obj)
+      Ignore('.',[hello,hello_obj])
+ 
+　　% scons -Q
+      scons: `.' is up to date.
+      % scons -Q hello
+      cc -o hello.o -c hello.c
+      cc -o hello hello.o
+      % scons -Q hello
+      scons: `hello' is up to date.
+
+8、順序依賴：Requires函數
+有時候，需要指定某一個文件或目錄必須在某些目標程式被編譯之前被編譯或創建，但是那個文件或目錄如果發生了改變，那個目標程式不需要重新編譯。這樣一種關係叫做順序依賴（order-only dependency）因為它僅僅影響事物編譯的順序，它不是一種嚴格意義上的依賴關係，因為目標程式不需要隨著依賴文件的改變而改變。
+例如，你想在每次編譯的時候創建一個文件用來標識編譯執行的時間，版本號等等資訊。這個版本文件的內容在每次編譯的時候都會改變。如果你指定一個正常的依賴關係，那麼每個依賴這個文件的程式在你每次運行SCons的時候都會重新編譯。例如，我們可以使用一些Python代碼在SConstruct文件中創建一個新的version.c文件，version.c文件會記錄我們每次運行SCons的當前日期，然後鏈接到一個程式：
+import time
+version_c_text="""
+char *date="%s"
+""" % time.ctime(time.time())
+open('version.c', 'w').write(version_c_text)
+hello=Program(['hello.c', 'version.c'])
+如果我們將version.c作為一個實際的源文件，那麼version.o文件在我們每次運行SCons的時候都會重新編譯，並且hello可執行程式每次會重新鏈接。
+      % scons -Q hello
+      cc -o hello.o -c hello.c
+      cc -o version.o -c version.c
+      cc -o hello hello.o version.o
+      % sleep 1
+      % scons -Q hello
+      cc -o version.o -c version.c
+      cc -o hello hello.o version.o
+      % sleep 1
+      % scons -Q hello
+      cc -o version.o -c version.c
+      cc -o hello hello.o version.o
+我們的解決方案是使用Requires函數指定version.o在鏈接之前必須重新編譯，但是version.o的改變不需要引發hello可執行程式重新鏈接：
+      import time
+
+　　version_c_text = """
+      char *date = "%s";
+      """ % time.ctime(time.time())
+      open('version.c', 'w').write(version_c_text)
+
+　　version_obj = Object('version.c')
+
+　　hello = Program('hello.c',
+                      LINKFLAGS = str(version_obj[0]))
+
+　　Requires(hello, version_obj)
+注意到因為我們不再將version.c作為hello程式的源文件，我們必須找到其他的方式使其可以鏈接。在這個例子中，我們將對像文件名放到$LINKFLAGS變數中，因為$LINKFLAGS已經包含在$LINKCOM命令行中了。
+通過這些改變，當hello.c改變的時候，hello可執行程式才重新鏈接：
+      % scons -Q hello
+      cc -o version.o -c version.c
+      cc -o hello.o -c hello.c
+      cc -o hello version.o hello.o
+      % sleep 1
+      % scons -Q hello
+      cc -o version.o -c version.c
+      scons: `hello' is up to date.
+      % sleep 1
+      % edit hello.c
+          [CHANGE THE CONTENTS OF hello.c]
+      % scons -Q hello
+      cc -o version.o -c version.c
+      cc -o hello.o -c hello.c
+      cc -o hello version.o hello.o
+      % sleep 1
+      % scons -Q hello
+      cc -o version.o -c version.c
+      scons: `hello' is up to date.
+
+9、AlwaysBuild函數
+當一個文件傳遞給AlwaysBuild方法時，
+hello=Program('hello.c')
+AlwaysBuild(hello)
+那麼指定的目標文件將總是被認為是過時的，並且被重新編譯：
+      % scons -Q
+      cc -o hello.o -c hello.c
+      cc -o hello hello.o
+      % scons -Q
+      cc -o hello hello.o
+AlwaysBuild函數並不意味著每次SCons被調用的時候，目標文件會被重新編譯。在命令行中指定某個其他的目標，這個目標自身不依賴AlwaysBuild的目標程式，這個目標程式僅僅當它的依賴改變的時候才會重新編譯：
+      % scons -Q
+      cc -o hello.o -c hello.c
+      cc -o hello hello.o
+      % scons -Q hello.o
+      scons: `hello.o' is up to date.
+
+　　一個環境就是能夠影響一個程式如何執行的值的集合。SCons裡面有三種不同類型的環境：
+
+　　External Environment（外部環境）：
+外部環境指的是在用戶運行SCons的時候，用戶環境中的變數的集合。這些變數在SConscript文件中通過Python的os.environ字典可以獲得。
+
+　　Construction Environment（構造環境）：
+一個構造環境是在一個SConscript文件中創建的一個唯一的對象，這個對象包含了一些值可以影響SCons編譯一個目標的時候做什麼動作，以及決定從那一個源中編譯出目標文件。SCons一個強大的功能就是可以創建多個構造環境，包括從一個存在的構造環境中克隆一個新的自定義的構造環境。
+
+　　Execution Environment（執行環境）：
+一個執行環境是SCons在執行一個外部命令編譯一個或多個目標文件時設置的一些值。這和外部環境是不同的。
+與Make不同，SCons不會自動在不同的環境之間拷貝或導入值。這是一個刻意的設計選擇，保證了不管用戶外部環境的值是怎麼樣的，編譯總是可以重複的。這會避免編譯中的一些問題，比如因為一個自定義的設置使得使用了一個不同的編譯器或編譯選項，開發者的本地代碼編譯成功，但是checked-in後編譯不成功，因為使用了不同的環境變數設置。
+
+　　7.1、使用來自外部環境的值
+當執行SCons的時候，外部環境的值通過os.environ字典獲得。這就以為著在任何一個你想使用外部環境的SConscript文件需要增加一個import os語句：
+import os
+
+　　7.2、構造環境
+在一個大型複雜的系統中，所有的軟體都按照同樣的方式編譯是比較少見的。例如，不同的源文件可能需要不同的編譯選項，或者不同的可執行程式需要鏈接不同的庫。SCons允許你創建和配置多個構造環境來控制和滿足不同的編譯需求。
+
+　　7.2.1、創建一個構造環境：Environment函數
+一個構造環境由Environment方法創建：
+env=Environment()
+默認情況下，SCons基於你系統中工具的一個變數集合來初始化每一個新的構造環境。
+當你初始化一個構造環境時，你可以設置環境的構造變數來控制一個是如何編譯的。例如：
+import os
+    env=Environment(CC='gcc', CCFLAGS='-O2')
+    env.Program('foo.c')
+
+　　7.2.2、從一個構造環境中獲取值
+你可以使用訪問Python字典的方法獲取單個的構造變數：
+    env=Environment()
+    print "CC is:", env['CC']
+一個構造環境實際上是一個擁有方法的對象。如果你想直接訪問構造變數的字典，你可以使用Dictionary方法：
+    env=Environment(FOO='foo', BAR='bar')
+    dict=env.Dictionary()
+    for key in ['OBJSUFFIX', 'LIBSUFFIX', 'PROGSUFFIX']:
+          print "key=%s, value=%s"  %  (key,dict[key])
+如果你想循環並列印出構造環境中的所有變數：
+    env=Environment()
+    for item in sorted(env.Dictionary(ems()):
+          print "construction variable = '%s', value = '%s'"  %  item
+
+　　7.2.3、從一個構造環境中擴展值：subst方法
+另一種從構造環境中獲取資訊的方式是使用subst方法。例如：
+    env=Environment()
+    print "CC is:", env.subst('$CC')
+使用subst展開字串的優勢是結果中的構造變數會重新展開直到不能擴展為止。比如獲取$CCCOM：
+    env=Environment(CCFLAGS='-DFOO')
+    print "CCCOM is:", env['CCCOM']
+將會列印出沒有擴展開的$CCCOM：
+    % scons -Q
+    CCCOM is: $CC $CCFLAGS $CPPFLAGS $_CPPDEFFLAGS $_CPPINCFLAGS -c -o $TARGET $SOURCES
+    scons: '.' is up to date.
+調用subst方法來獲取$CCCOM：
+    env=Environment(CCFLAGS='-DFOO')
+    print "CCCOM is:", env.subst('$CCCOM')
+將會遞歸地擴展所有的構造變數：
+    % scons -Q
+    CCCOM is: gcc -DFOO -c -o
+    scons: '.' is up to date.
+
+　　7.2.4、處理值擴展的問題
+如果擴展一個構造變數的時候，發生了問題，默認情況下會擴展成''空字串，不會引起scons失敗。
+    env=Environment()
+    print "value is:", env.subst('->$MISSING<-')
+
+　　% scons -Q
+    value is: -><-
+    scons: '.' is up to date.
+使用AllowSubstException函數會改變默認的行為。當值擴展的時候發生了異常，AllowSubstExceptions控制了哪一個異常是致命的，哪一個允許安全地發生。默認情況下，NameError和IndexError這兩個異常允許發生。如果需要所有的構造變數名字存在，調用AllowSubstExceptions：
+    AllowSubstExceptions()
+    env=Environment()
+    print "value is:", env.subst('->$MISSING<-')
+
+　　% scons -Q
+    value is:
+    scons: *** NameError `MISSING' trying to evaluate `$MISSING'
+    File "/home/my/project/SConstruct", line 3, in <module> 
+也可以用來允許其他的異常發生，使用${...}構造變數語法。例如，下面的代碼允許除零發生：
+    AllowSubstExceptions(IndexError, NameError, ZeroDivisionError)
+    env = Environment()
+    print "value is:", env.subst( '->${1 / 0}<-' )
+    
+    % scons -Q
+    value is: -><-
+    scons: `.' is up to date.
+
+　　7.2.5、控制默認的構造環境：DefaultEnvironment函數
+我們已經介紹過的所有的Builder，比如Program和Library，實際上使用一個默認的構造環境。
+你可以控制默認構造環境的設置，使用DefaultEnvironment函數：
+    DefaultEnvironment(CC='/usr/local/bin/gcc')
+這樣配置以後，所有Program或者Object的調用都將使用/usr/local/bin/gcc編譯目標文件。
+注意到DefaultEnvironment返回初始化了的默認構造環境對像，這個對象可以像其他構造環境一樣被操作。所以如下的代碼和上面的例子是等價的：
+    env=DefaultEnvironment()
+    env['CC']='/usr/local/bin/gcc'
+DefaultEnvironment函數常用的一點就是用來加速SCons的初始化。為了使得大多數默認的配置能夠工作，SCons將會搜索本地系統已經安裝的編譯器和其他工具。這個搜索過程會花費時間。如果你知道哪一個編譯器或工具你想配置，你可以控制SCons執行的搜索過程通過指定一些特定的工具模組來初始化默認的構造環境：
+    env=DefaultEnvironment(tools=['gcc','gnulink'], CC='/usr/local/bin/gcc')
+上面的例子告訴SCons顯示配置默認的環境使用GNU編譯器和GNU鏈接器設置，使用/usr/local/bin/gcc編譯器。
+
+　　7.2.6、多個構造環境
+構造環境的真正優勢是你可以創建你所需要的許多不同的構造環境，每一個構造環境對應了一種不同的方式去編譯軟體的一部分或其他文件。比如，如果我們需要用-O2編譯一個程式，編譯另一個用-g，我們可以如下做：
+    opt=Environment(CCFLAGS='-O2')
+    dbg=Environment(CCFLAGS='-g')
+    opt.Program('foo','foo.c')
+    dbg.Program('bar','bar.c')
+
+　　% scons -Q
+    cc -o bar.o -c -g bar.c
+    cc -o bar bar.o
+    cc -o foo.o -c -O2 foo.c
+    cc -o foo foo.o
+我們甚至可以使用多個構造環境去編譯一個程式的多個版本：
+    opt=Environment(CCFLAGS='-O2')
+    dbg=Environment(CCFLAGS='-g')
+    opt.Program('foo','foo.c')
+    dbg.Program('foo','foo.c')
+這個時候SCons會發生錯誤：
+    % scons -Q
+    scons: *** Two environments with different actions were specified for the same target: foo.o
+    File "/home/my/project/SConstruct", line 6, in <module> 
+這是因為這兩個Program調用都隱式地告訴SCons產生一個叫做foo.o的目標文件。SCons無法決定它們的優先級，所以報錯了。為了解決這個問題，我們應該顯示指定每個環境將foo.c編譯成不同名字的目標文件：
+    opt=Environment(CCFLAGS='-O2')
+    dbg=Environment(CCFLAGS='-g')
+    o=opt.Object('foo-opt','foo.c')
+    opt.Program(o)
+    d=dbg.Object('foo-dbg','foo.c')
+    dbg.Program(d)
+
+　　7.2.7、拷貝構造環境：Clone方法
+有時候你想多於一個構造環境對於一個或多個變數共享相同的值。當你創建每一個構造環境的時候，不是重複設置所有共用的變數，你可以使用Clone方法創建一個構造環境的拷貝。
+Environment調用創建一個構造環境，Clone方法通過構造變數賦值，重載拷貝構造環境的值。例如，假設我們想使用gcc創建一個程式的三個版本，一個優化版，一個調試版，一個其他版本。我們可以創建一個基礎構造環境設置$CC為gcc，然後創建兩個拷貝：
+    env=Environment(CC='gcc')
+    opt=env.Clone(CCFLAGS='-O2')
+    dbg=env.Clone(CCFLAGS='-g')
+    env.Program('foo','foo.c')
+    o=opt.Object('foo-opt','foo.c')
+    opt.Program(o)
+    d=dbg.Object('foo-dbg','foo.c')
+    dbg.Program(d)
+
+　　7.2.8、替換值：Replace方法
+你可以使用Replace方法替換已經存在的構造變數：
+    env=Environment(CCFLAGS='-DDEFINE1');
+    env.Replace(CCFLAGS='-DDEFINE2');
+    env.Program('foo.c')
+你可以安全地針對那些不存在的構造變數調用Replace方法：
+    env=Environment()
+    env.Replace(NEW_VARIABLE='xyzzy')
+    print "NEW_VARIABLE = ", env['NEW_VARIABLE']
+在這個例子中，構造變數被添加到構造環境中去了：
+    %scons -Q
+    NEW_VARIABLE = xyzzy
+    scons: '.' is up to date.
+變數不會被擴展知道構造環境真正被用來編譯目標文件的時候，同時SCons函數和方法的調用是沒有順序的，最後的替換可能被用來編譯所有的目標文件，而不管Replace方法的調用是在編譯方法的前後：
+    env=Environment(CCFLAGS='-DDEFINE1')
+    print "CCFLAGS = ", env['CCFLAGS']
+    env.Program("foo.c")
+    env.Replace(CCFLAGS='-DDEFIN2')
+    print "CCFLAGS = ", env['CCFLAGS']
+    env.Program("bar.c")
+    
+          % scons
+        scons: Reading SConscript files ...
+        CCFLAGS = -DDEFINE1
+        CCFLAGS = -DDEFINE2
+        scons: done reading SConscript files.
+        scons: Building targets ...
+        cc -o bar.o -c -DDEFINE2 bar.c
+        cc -o bar bar.o
+        cc -o foo.o -c -DDEFINE2 foo.c
+        cc -o foo foo.o
+        scons: done building targets. 
+因為替換發生在讀取SConscript文件的時候，foo.o編譯的時候$CCFLAGS變數已經被設置為-DDEFINE2，即使Relapce方法是在SConscript文件後面被調用的。
+
+　　7.2.9、在沒有定義的時候設置值：SetDefault方法
+有時候一個構造變數應該被設置為一個值僅僅在構造環境沒有定義這個變數的情況下。你可以使用SetDefault方法，這有點類似於Python字典的set_default方法：
+    env.SetDefault(SPECIAL_FLAG='-extra-option')
+當你編寫你自己的Tool模組將變數應用到構造環境中的時候非常有用。
+
+　　7.2.10、追加到值的末尾：Append方法
+你可以追加一個值到一個已經存在的構造變數，使用Append方法：
+    env=Environment(CCFLAGS=['-DMY_VALUE'])
+    env.Append(CCFLAGS=['-DLAST'])
+    env.Program('foo.c')
+Scons編譯目標文件的時候會應用-DMY_VALUE和-DLAST兩個標誌：
+    % scons -Q
+    cc -o foo.o -c -DMY_VALUE -DLAST foo.c
+    cc -o foo foo.o
+如果構造變數不存在，Append方法將會創建它。
+
+　　7.2.11、追加唯一的值：AppendUnique方法
+有時候僅僅只有在已經存在的構造變數沒有包含某個值的時候，才會增加這個新值。可以使用AppendUnique方法：
+    env.AppendUnique(CCFLAGS=['-g'])
+上面的例子，僅僅只有在$CCFLAGS沒有包含-g值得時候才會增加-g。
+
+　　7.2.12、在值的開始位置追加值：Prepend方法
+對於一個存在的構造變數，你可以使用Prepend方法追加一個值到它的值的開始位置。
+    env=Environment(CCFLAGS=['-DMY_VALUE'])
+    env.Prepend(CCFLAGS=['-DFIRST'])
+    env.Program('foo.c')
+
+　　% scons -Q
+    cc -o foo.o -c -DFIRST -DMY_VALUE foo.c
+    cc -o foo foo.o
+如果構造變數不存在，Prepend方法會創建它。
+
+　　7.2.13、在前面追加唯一值：PrependUnique方法
+僅僅在一個構造變數存在的值中沒有包含將要增加的值的時候，這個值才被追加到前面，可以使用PrependUnique方法;
+    env.PrependUnique(CCFLAGS=['-g'])
+
+　　7.3、控制命令的執行環境
+當SCons編譯一個目標文件的時候，它不會使用你用來執行SCons的同樣的外部環境來執行一些命令。它會使用$ENV構造變數作為外部環境來執行命令。
+這個行為最重要的體現就是PATH環境變數，它決定了作業系統將去哪裡查找命令和工具，與你調用SCons使用的外部環境的不一樣。這就意味著SCons將不能找到你在命令行裡執行的所有工具。
+PATH環境變數的預設值是/usr/local/bin:/bin:/usr/bin。如果你想執行任何命令不在這些默認地方，你需要在你的構造環境中的$ENV字典中設置PATH。
+最簡單的方式就是當你創建構造環境的時候初始化這些值：
+    path=['/usr/local/bin', '/usr/bin']
+    env=Environment(ENV={'PATH':PATH})
+以這種方式將一個字典賦值給$ENV構造變數完全重置了外部環境，所以當外部命令執行的時候，設置的變數僅僅是PATH的值。如果你想使用$ENV中其餘的值，僅僅只是設置PATH的值，你可以這樣做：
+    env['ENV']['PATH']=['/usr/local/bin','/bin','/usr/bin']
+注意SCons允許你用一個字串定義PATH中的目錄，路徑用路徑分隔符號分隔：
+    env['ENV']['PATH']='/usr/local/bin:/bin:/usr/bin'
+
+　　7.3.1、從外部環境獲得PATH值
+你可能想獲得外部的PATH來作為命令的執行環境。你可以使用來自os.environ的PATH值來初始化PATH變數：
+    import os
+    env=Environment(ENV={'PATH':os.environ['PATH']})
+你設置可以設置整個的外部環境：
+    import os
+    env=Environment(ENV=os.environ)
+
+　　7.3.2、在執行環境裡增加PATH的值
+常見的一個需求就是增加一個或多個自定義的目錄到PATH變數中。
+    env=Environment(ENV=os.environ)
+    env.PrependENVPath('PATH','/usr/local/bin')
+    env.AppendENVPath('LIB','/usr/local/lib')
+
+　　1、將選項合併到環境中：MergeFlags函數
+　　SCons的construction環境有一個MergeFlags方法，此方法將一個值的字典合併到construction環境中。MergeFlags將字典中的每個值看做一個選項列表。如果一個選項已經在construction環境變數中存在了，MergeFlags將不會重複設置這個選項。
+　　當合併選項到任何一個名字在PATH中的變數的時候，MergeFlags保持選項在最左端出現，應為目錄路徑列表中，第一個出現占主要地位。當合併選項到任何其他變數名的時候，MergeFlags保持選項在右端出現，因為在命令行選項列表中，最後出現的占主要地位。
+　　env = Environment()
+　　env.Append(CCFLAGS = '-option -O3 -O1')
+　　flags = { 'CCFLAGS' : '-whatever -O3' }
+　　env.MergeFlags(flags)
+　　print env['CCFLAGS']
+　　% scons -Q
+　　['-option', '-O1', '-whatever', '-O3']
+　　scons: `.' is up to date.
+　　上面例子中$CCFLAGS的預設值是一個內部SCons對像，會自動將我們指定的選項轉換成一個字串加入到列表中。
+　　env = Environment()
+　　env.Append(CPPPATH = ['/include', '/usr/local/include', '/usr/include'])
+　　flags = { 'CPPPATH' : ['/usr/opt/include', '/usr/local/include'] }
+　　env.MergeFlags(flags)
+　　print env['CPPPATH']
+　　% scons -Q
+　　['/include', '/usr/local/include', '/usr/include', '/usr/opt/include']
+　　scons: `.' is up to date.
+　　上面例子中$CPPPATH的預設值是一個Python列表，所以我們必須在傳遞給MergeFlags函數的字典中將值指定為一個列表。
+　　如果不是傳遞一個字典而是其他的東西，會調用ParseFlags方法將其轉換為一個字典：
+　　env = Environment()
+　　env.Append(CCFLAGS = '-option -O3 -O1')
+　　env.Append(CPPPATH = ['/include', '/usr/local/include', '/usr/include'])
+　　env.MergeFlags('-whatever -I/usr/opt/include -O3 -I/usr/local/include')
+　　print env['CCFLAGS']
+　　print env['CPPPATH']
+　　% scons -Q
+　　['-option', '-O1', '-whatever', '-O3']
+　　['/include', '/usr/local/include', '/usr/include', '/usr/opt/include']
+　　scons: `.' is up to date.
+　　在上面的例子中，ParseFlags方法已經將選項排序賦值給相對應的變數，然後返回一個字典給MergeFlags方法。
+
+　　2、將編譯參數分離成變數：ParseFlags函數
+　　當編譯程式的時候，對於不同類型的選項，SCons有一個令人迷惑的construction變數數組。對於一個特殊的選項，有時候你可能不知道該使用哪一個變數。
+　　SCons construction環境有一個ParseFlags方法，該方法接受一個命令行選項集合，然後將他們分發給合適的construction變數。
+　　ParseFlags返回一個包含了construction變數和值的字典。正常情況下，這個字典將會傳遞給MergeFlags方法，將選項合併到construction環境中去，但是如果想要提供額外的功能，這個字典可以被編輯。
+　　env = Environment()
+　　d = env.ParseFlags("-I/opt/include -L/opt/lib -lfoo")
+　　for k,v in sorted(ems()):
+　　if v:
+　　print k, v
+　　env.MergeFlags(d)
+　　env.Program('f1.c')
+　　% scons -Q
+　　CPPPATH ['/opt/include']
+　　LIBPATH ['/opt/lib']
+　　LIBS ['foo']
+　　cc -o f1.o -c -I/opt/include f1.c
+　　cc -o f1 f1.o -L/opt/lib -lfoo
+　　因為假設flags是用於GCC的，那麼不認別的flags會被放置到$CCFLAGS中，用於編譯C和C++：
+　　env = Environment()
+　　d = env.ParseFlags("-whatever")
+　　for k,v in sorted(ems()):
+　　if v:
+　　print k, v
+　　env.MergeFlags(d)
+　　env.Program('f1.c')
+　　% scons -Q
+　　CCFLAGS -whatever
+　　cc -o f1.o -c -whatever f1.c
+　　cc -o f1 f1.o
+　　ParseFlags也接受一個字串列表作為輸入：
+　　env = Environment()
+　　d = env.ParseFlags(["-I/opt/include", ["-L/opt/lib", "-lfoo"]])
+　　for k,v in sorted(ems()):
+　　if v:
+　　print k, v
+　　env.MergeFlags(d)
+　　env.Program('f1.c')
+　　% scons -Q
+　　CPPPATH ['/opt/include']
+　　LIBPATH ['/opt/lib']
+　　LIBS ['foo']
+　　cc -o f1.o -c -I/opt/include f1.c
+　　cc -o f1 f1.o -L/opt/lib -lfoo
+　　如果一個字串以!開始，這個字串將被傳遞給shell執行。命令的輸出然後被解析:
+　　env = Environment()
+　　d = env.ParseFlags(["!echo -I/opt/include", "!echo -L/opt/lib", "-lfoo"])
+　　for k,v in sorted(ems()):
+　　if v:
+　　print k, v
+　　env.MergeFlags(d)
+　　env.Program('f1.c')
+　　% scons -Q
+　　CPPPATH ['/opt/include']
+　　LIBPATH ['/opt/lib']
+　　LIBS ['foo']
+　　cc -o f1.o -c -I/opt/include f1.c
+　　cc -o f1 f1.o -L/opt/lib -lfoo
+　　ParseFlags會定期更新新的選項。
+
+　　3、查找已經安裝的庫資訊：ParseConfig函數
+　　配置正確的選項來編譯引用了其他庫的程式，尤其引用的是共享庫，是非常複雜的。為了幫助解決這種情況，許多名字以config結尾的工具返回需要使用這些庫的命令行選項；例如，使用一個名字為lib的庫的命令行選項將會被叫做lib-config的工具找到。
+　　最近的一個慣例是這些選項通過通用的pkg-config工具是可用的，此程式有通用的框架，錯誤處理，所以所有的包創建者需要做的就是為它的特殊的包提供字串集合。
+　　SCons construction環境有一個ParseConfig方法，此方法會執行*config工具並且基於特定命令返回的命令行選項配置合適的construction變數。
+　　env = Environment()
+　　env['CPPPATH'] = ['/lib/compat']
+　　env.ParseConfig("pkg-config x11 --cflags --libs")
+　　print env['CPPPATH']
+　　SCons將會執行特定的命令字串，解析結果flags，然後將flags增加到合適的環境變數：
+　　% scons -Q
+　　['/lib/compat', '/usr/X11/include']
+　　scons: `.' is up to date.
+　　上面的例子中，SCons增加include目錄到CPPPATH。
+　　注意到，使用MergeFlags方法將選項同存在的選項合併，每一個選項在construction變數中僅僅出現一次：
+　　env = Environment()
+　　env.ParseConfig("pkg-config x11 --cflags --libs")
+　　env.ParseConfig("pkg-config x11 --cflags --libs")
+　　print env['CPPPATH']
+　　% scons -Q
+　　['/usr/X11/include']
+　　scons: `.' is up to date. 
+
+
+/******************************************************************************/
+SCONS 與 MAKEFILE
+/******************************************************************************/
+Scons 是一個可以用來取代  Makefile 的編譯工具。
+
+例如要編一個簡單的 .c 檔的話，只需要做
+建立一個 SConstruct 檔 ( 預設檔名是 SConstruct、Sconstruct 或 sconstruct )，然後輸入下列：
+env = Environment() # Initialize the environment   # 初始化環境
+env.Program(target = 'helloworld', source = ["helloworld.c"])   # 把 helloworld.c 編成 helloworld
+
+然後
+$ scons 
+這樣就編好一個 helloworld 的執行檔，並安裝在當下的目錄中。移除的話
+$ scons -c
+更多指令 scons -h 查看。
+Ref :
+    http://fourdollars.blogspot.com/2009/06/scons.html
+    http://www.scons.org/wiki/SconsTutorial1
+
+
+/******************************************************************************/
+scons取代makefile編譯C/C++工程
+/******************************************************************************/
+介紹，scons用的是python語法。需要安裝python和scons後才能運行，能夠跨平台。
+比較automake自動生成makefile文件，scons可以認為直接是make的功能，因為只需要執行scons命令就等於執行了make的功能。
+
+現在有一個hello.c的文件。
+新建一個SConstruct文件，是一個python腳本文件。
+Program('hello.c')   編譯hello.c並生成.o文件和可執行文件
+Object('hello.c')    編譯hello.c但只生成生成.o文件
+這兩個方法都是python的method。
+如果想執行clean操作，我們不需要再像makefile那樣指名make clean語句，而是直接執行scons -c 或者scons -clean就可以。程式會根據SConstruct文件內容自動清除。
+SConstruct的讀取和執行順序是彼此獨立的，直接看以下例子。
+SConstruct文件內容：
+       print "Calling Program('hello.c')"     
+       Program('hello.c')
+       print "Calling Program('goodbye.c')"     
+       Program('goodbye.c')
+       print "Finished calling Program()"
+執行結果：
+ % scons
+       scons: Reading SConscript files ...
+       Calling Program('hello.c')    （1）
+       Calling Program('goodbye.c')   （2）
+       Finished calling Program()
+       scons: done reading SConscript files.
+       scons: Building targets ...
+       cc -o goodbye.o -c goodbye.c    （2）
+       cc -o goodbye goodbye.o          （1）
+       cc -o hello.o -c hello.c
+       cc -o hello hello.o
+       scons: done building targets.
+
+由於在執行scons時一些輸出資訊反而會混淆我們，所以可以加參數  -Q來關閉一些輸出提示。
+Program('new_hello', 'hello.c') #第一個參數可以指定目標文件名字，默認為hello，第二個參數就是source files。
+多源文件編譯指定：
+Program('program', ['prog.c', 'file1.c', 'file2.c']) #如果沒有第一個參數，則以第二個參數（這是一個python list，用【】表示）的第一個元素為program的名字。
+如果你覺得列表裡面每個文件都需要帶一個引號太麻煩，可以利用
+Program('program', Split('main.c file1.c file2.c')) #這裡的split函數是返回一個列表
+也可以這麼用來提高可讀性
+src_files = Split('main.c file1.c file2.c')    #中間多少個空格無所謂
+Program('program', src_files)
+也可利用Glob函數獲得名字列表，Golb('*.c')返回規則匹配的string列表，就是類似上面的'prog.c', 'file1.c', 'file2.c'。
+Program('program', Glob('*.c'))
+ 
+
+兩個關鍵字可以直接指明target和source，所以在Program
+
+src_files = Split('main.c file1.c file2.c')
+Program(target = 'program', source = src_files)
+   
+src_files = Split('main.c file1.c file2.c')
+Program(source = src_files, target = 'program') #可以調換參數順序
+ 
+多工程共享source files的話：
+       common = ['common1.c', 'common2.c'] #把共同的文件列表單獨提取出來，以便維護
+       foo_files = ['foo.c'] + common
+       bar_files = ['bar1.c', 'bar2.c'] + common
+       Program('foo', foo_files)
+       Program('bar', bar_files)
+building library：
+Library('foo', ['f1.c', 'f2.c', 'f3.c'])    #文件列表   #靜態庫
+Library('foo', ['f1.c', 'f2.o', 'f3.c', 'f4.o']) #文件列表喝object文件
+StaticLibrary('foo', ['f1.c', 'f2.c', 'f3.c'])  #靜態library，其實跟Library調用沒區別，只是顯示強調是靜態庫
+SharedLibrary('foo', ['f1.c', 'f2.c', 'f3.c'])  #共享庫，類似dll
+The output on POSIX:
+
+        % scons -Q
+        cc -o f1.os -c f1.c
+        cc -o f2.os -c f2.c
+        cc -o f3.os -c f3.c
+        cc -o libfoo.so -shared f1.os f2.os f3.os
+ 
+link library：
+     Library('foo', ['f1.c', 'f2.c', 'f3.c'])
+     Program('prog.c', LIBS=['foo', 'bar'], LIBPATH='.')  #指定庫，指定庫的路徑。
+注意-l,-L,-i,-I的用法。
+LIBPATH變數：
+LIBPATH = '/usr/lib:/usr/local/lib'  #unix用：分開
+ LIBPATH = 'C:\\lib;D:\\lib'   #windows用；分開
+CPPPATH變數：類似 -I指定，指定編譯目錄     #聲明了這個選項是用於隱式依賴，比如某些cpp文件包含了h文件，當這些h文件更改時，就會重編這些cpp對應的對象。每次編譯的時候，會去搜索這些隱式依賴，所以會消耗一些時間
+Program('hello.c', CPPPATH = '.')  #這裡會讓編譯器同時關注hello.c裡面include的h文件
+ 
+Program('hello.c', CPPPATH = ['include', '/home/project/inc'])
+編譯結果：
+% scons -Q hello
+  cc -o hello.o -c -Iinclude -I/home/project/inc hello.c
+  cc -o hello hello.o
+--implicit-cache參數可讓scons高速緩存哪些隱式依賴關係，這樣能減少搜索隱私依賴的時間。如：
+% scons -Q --implicit-cache hello
+       cc -o hello.o -c hello.c
+       cc -o hello hello.o
+       % scons -Q hello
+       scons: `hello' is up to date.
+當你不想每次都輸入這個參數時，可以在SConstruct文件中加入這個語句：SetOption('implicit_cache', 1)
+有時scons掃瞄器檢查不出一些文件的依賴性，可以利用Depends函數顯示地的指明依賴性：
+       hello = Program('hello.c')
+       Depends(hello, 'other_file')
+如果想讓某個依賴文件改變時不重編，可以用Ignore函數設置忽略這些依賴性：
+      hello_obj=Object('hello.c')
+      hello = Program(hello_obj)
+      Ignore(hello_obj, 'hello.h')
+每次都想重編一個目標，可用AlwaysBuild函數設置：
+      hello = Program('hello.c')
+      AlwaysBuild(hello)
+環境變數：有三種，外部環境變數（外部環境資訊），scons環境變數（控制scons行為的變數），執行環境變數。變數是很多變數的集合，包括變數名和變數值。
+env = Environment()   #創建默認的環境變數，默認scons會按編譯器的默認選項來進行編譯
+import os
+
+         env = Environment(CC = 'gcc',CCFLAGS = '-O2') #創建並設置環境 變數
+
+         env.Program('foo.c')
+ % scons -Q
+         gcc -o foo.o -c -O2 foo.c
+         gcc -o foo foo.o
+環境變數訪問：env = Environment()
+            print "CC is:", env['CC']
+另一種訪問環境變數的方法，試用環境變數的subst方法，而且它還對下面的變數不斷展開直到無法繼續展開，例如下面兩個例子：
+env = Environment(CCFLAGS = '-DFOO')
+       print "CCCOM is:", env['CCCOM']          #輸出 CCCOM is: $CC $CCFLAGS $CPPFLAGS $_CPPDEFFLAGS $_CPPINC                                                   FLAGS -c -o $TARGET $SOURCES
+       print "CCCOM is:", env.subst('$CCCOM')  #輸出  CCCOM is: gcc -DFOO -c -o  #這裡將上面的變數值展開了
+默認環境DefaultEnvironment（）； 試用方法跟上面的環境變數一樣，不過控制範圍是默認的所有配置。在默認環境中設置好一些變數，可以提高編譯速度，比如在默認環境變數中制定了編譯器的位置，這樣的話可以省去搜索 默認編譯器位置的 消耗。如：
+env = DefaultEnvironment(tools = ['gcc', 'gnulink'], CC = '/usr/local/bin/gcc') #顯式指定編譯器位置
+多環境變數：  opt = Environment(CCFLAGS = '-O2')
+           dbg = Environment(CCFLAGS = '-g')
+
+           opt.Program('foo', 'foo.c')
+
+           dbg.Program('bar', 'bar.c')
+複製環境變數：env = Environment(CC = 'gcc')
+         opt = env.Clone(CCFLAGS = '-O2')
+         dbg = env.Clone(CCFLAGS = '-g')
+
+         env.Program('foo', 'foo.c')
+
+         o = opt.Object('foo-opt', 'foo.c')
+         opt.Program(o)
+
+         d = dbg.Object('foo-dbg', 'foo.c')
+         dbg.Program(d)
+替換環境變數值：env = Environment(CCFLAGS = '-DDEFINE1')
+            env.Replace(CCFLAGS = '-DDEFINE2')
+            env.Program('foo.c')
+替換注意事項： env = Environment(CCFLAGS = '-DDEFINE1')   #-DDEFINE1
+         print "CCFLAGS =", env['CCFLAGS']    
+         env.Program('foo.c')
+
+         env.Replace(CCFLAGS = '-DDEFINE2')    #-DDEFINE2
+         print "CCFLAGS =", env['CCFLAGS']
+         env.Program('bar.c')
+           #上面設置了兩次，但當程式開始編譯的時候，只會以最後一次配置的值為準，所以請看下面的結果：
+ % scons
+         scons: Reading SConscript files ...
+         CCFLAGS = -DDEFINE1
+         CCFLAGS = -DDEFINE2
+         scons: done reading SConscript files.
+         scons: Building targets ...
+         cc -o bar.o -c -DDEFINE2 bar.c
+         cc -o bar bar.o
+         cc -o foo.o -c -DDEFINE2 foo.c
+         cc -o foo foo.o
+         scons: done building targets.
+env.SetDefault(SPECIAL_FLAG = '-extra-option')  #默認變數不存在時設置
+  添加新的變數：  env = Environment()
+               env.Append(NEW_VARIABLE = 'added')  #不存在時自動創建並賦值；存在時變數的值是append上去而不是assign的
+               env.AppendUnique(CCFLAGS=['-g'])    #該變數不存在時才添加
+              env.Prepend(CCFLAGS = ['-DFIRST'])  #在變數值前面插入，不存在則自動創建並賦值，跟append相似
+              env.PrependUnique(CCFLAGS=['-g'])       #該變數不存在才前插
+
+
+/******************************************************************************/
+構建工具scons讓一切變得簡單
+/******************************************************************************/
+from : http://fanli7.net/a/bianchengyuyan/C__/20120801/196614.html
+
+你曾經為繁瑣的makefile語法糾結過嗎？你有想要擺脫VS的束縛，自己構建工程卻又苦於無從下手嗎？
+你有為同一個工程要在不同作業系統或不同平台下構建編譯環境而苦惱過嗎? 本文有我的選擇，你的答案。
+
+最近小試了一把用scons來構建編譯環境，感覺很不錯，跟大家分享一下。
+先說明下什麼是scons，scons是一個Python寫的自動化構建工具，就比如老牌的cmake，或者如果經常跟google
+一些開源項目打交道的話，那肯定知道新近開始流行的gyp（google內部用的構建工具），scons實現跟它們有
+類似的功能。而scons又有區別於其他構建工具的特點，不得不承認，這些特點讓我喜歡上了這個工具。
+先簡單總結下吸引我的幾點：
+1. 自動依賴分析
+2. 工具本身由python實現，跨平台
+3. 基於MD5識別構建文件的改變，並且可以自定義和擴展
+4. 構建文件邏輯用python來寫，功能強大，擴展性超強，跨平台
+5. 簡單易用（半小時內可以學會如何構建中小規模編譯環境）
+6. 官方提供的文檔詳細易理解（如果看過google的gyp的文檔，那叫一個坑爹）
+
+好了，進入正題，就讓我們來循序漸進的來領略下scons的魅力吧。
+首先是安裝環境，
+第一步當然是要保證系統中安裝了python，貌似2.6和2.7下scons都沒有問題，其他的自己嘗試下吧。
+第二步，安裝scons。windows環境的話直接去官網下載exe直接安裝即可。linux Debian系統下則更方便，可以
+直接用如下命令來安裝：sudo apt-get install scons
+安裝完成後，在命令行驗證一下，輸入scons -v， 如果沒有提示scons命令不存在則說明安裝成功。不幸的是
+，windows下還真提示不存在了，怎麼辦？其實在python安裝路徑C:\Python27\Scripts下（我的python安裝在
+C:\Python27）有個scons.bat，以後運行這個命令就可以（/scons.bat -v），為了方便可以把該路徑追加到環
+境變數PATH中。
+ok，環境搞定。
+
+接著，一起來細細品味下scons吧。
+1. 假設有如下【helloScons.c】文件：
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char* argv[])
+{
+        printf("Hello, SCons!\n");
+        return 0;
+} 
+用scons怎麼編譯它呢？首先在helloScons.c相同路徑下新建【SConstruct】文件，內容如下：
+Program('helloScons.c')
+
+命令行，進入該文件相同路徑，運行"scons"（windows下運行scons.bat）。可以看到如下運行結果：
+scons: Reading SConscript files ...
+scons: done reading SConscript files.
+scons: Building targets ...
+gcc -o helloScons.o -c helloScons.c
+gcc -o helloScons helloScons.o
+scons: done building targets.
+編譯完成，得到helloScons可執行文件。
+如果我們希望生成其他名字的可執行文件呢？很簡單，把【SConstruct】改成如下內容就可：
+Program('newName', 'helloScons.c')
+ 
+2. 我們稍微改動下，比如相同路徑下再新建個文件extScons.c， extScons.h：
+【extScons.h】
+int add(int x, int y);
+
+【extScons.c】
+int add(int x, int y)
+{
+     return x + y;
+}
+
+然後修改下【helloScons.c】：
+#include <stdio.h> 
+#include <stdlib.h>
+#include 「extScons.h」
+int main(int argc, char* argv[]) 
+{ 
+        printf("Hello, SCons %d!\n", add(1, 2)); 
+        return 0; 
+} 
+
+【SConstruct】文件怎麼改呢？
+Program(['helloScons.c', 'extScons.c'])
+那如果你整個工程中有上百個.c，難道都要在SConstruct中一個一個寫出來嗎？當然不需要，下面這樣也能達
+到跟上面一樣的功能：
+Program(Glob('*.c'))
+
+3. 假設我們再變化一下，在當前路徑下創建ext文件夾，把extScons.h和extScons.c移到ext文件夾裏，
+【SConstruct】怎麼寫：
+Program(['helloScons.c', 'ext/extScons.c'])
+類似如果希望設置為文件夾下所有文件，也可以寫成：
+Program([Glob('*.c'), Glob('ext/*.c')])
+
+4. 那麼如果要把extScons.c編譯成動態鏈接庫.so，怎麼做？
+【SConstruct】文件如下：
+SharedLibrary('ext/extScons.c')
+Program(['helloScons.c'], LIBS=['extScons'], LIBPATH='./ext')
+解釋一下，SharedLibrary()指定把ext/extScons.c編譯成動態鏈接庫，如果想編譯為靜態鏈接庫則使用
+StaticLibrary()。Program方法中，LIBS指定的是主程式helloScons.c需要使用的動態鏈接庫libextScons.so
+，LIBPATH則指定的是libextScons.so的路徑。
+運行scons後，可以看到ext文件夾下生成了libextScons.so，主文件夾下生成了可執行程式helloScons。
+
+5. 如果要把編譯和鏈接兩個步驟分開呢？沒問題，scons提供了Object方法來編譯生成.o(windows下為.obj)文件。
+【SConstruct】文件如下：
+import os
+Object('ext/extScons.c')
+Library('ext/extScons.o')
+Object('helloScons.c')
+Program(['helloScons.o'], LIBS=['extScons'], LIBPATH='./ext')
+Object方法用來編譯生成.o文件，Library和Program則用來鏈接.o生成靜態鏈接庫和可執行文件。
+
+還可以再改善下如上構建代碼：
+import os
+ext = Object('ext/extScons.c')
+Library(ext)
+main = Object('helloScons.c')
+Program(main, LIBS=['extScons'], LIBPATH='./ext')
+Object會返回編譯產生的.o文件列表，可以直接把這個返回值傳給Library和Program方法。
+在需要編譯許多代碼文件時，這點還是很有用的。
+
+6. 如果需要在不同作業系統下編譯鏈接不同的代碼文件呢？scons可以很簡單就實現。
+我們再創建一個文件【helloSconsForWin.c】，作為windows環境下使用的主程式：
+#include <stdio.h>
+#include <stdlib.h>
+#include "ext/extScons.h"
+int main(int argc, char* argv[])
+{
+        printf("Hello, SCons in Windows %d!\n", add(1, 2));
+        return 0;
+}
+
+同時，假設我們又希望在Linux下以動態鏈接的形式，而在windows下以靜態鏈接的形式使用extScons。
+【SConstruct】文件如下：
+import os
+if os.name == "posix":
+     SharedLibrary('ext/extScons.c')
+     Program(['helloScons.c'], LIBS=['extScons'], LIBPATH='./ext')
+elif os.name == "nt":
+     StaticLibrary('ext/extScons.c')
+     Program(['helloSconsForWin.c'], LIBS=['extScons'], LIBPATH='./ext')
+純粹的python語法，使用了os模組，如果你熟悉python的話，編譯和鏈接的邏輯你可以隨心所欲的寫。
+其實這一點是最吸引我的，因為我算是個python的fan，呵呵。
+
+http://go.renren.it/www.scons.org/doc/production/HTML/scons-user/index.html
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+

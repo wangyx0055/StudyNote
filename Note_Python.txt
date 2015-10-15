@@ -1,0 +1,2023 @@
+
+/******************************************************************************/
+/******************************************************************************/
+http://www.java2s.com/Tutorial/Python/CatalogPython.htm
+http://www.java2s.com/Code/Python/CatalogPython.htm
+ 
+
+/******************************************************************************/
+Contents
+/******************************************************************************/
+1   Linux、指令稿與 Python
+2   Python 指令稿的格式
+3   字串處理
+3.1   轉換字元編碼
+4   檔案系統與目錄
+4.1   檔案系統操作
+4.2   路徑的處理
+5   外部程式呼叫
+5.1   管線
+6   網際網路通訊
+7   結語
+1   Linux、指令稿與 Python
+
+對 Linux 來說，指令稿 (script) 是至為重要的部分。在主要的 Linux distribution 中間，從系統的啟動到運作，都離不開 shell 指令稿撰寫。
+在我的主機上面執行一下：
+$ ls /usr/bin/* /bin/* | wc -l
+2585
+$ file /usr/bin/* /bin/* | grep "shell script" | wc -l
+267
+看，可以找到 267 個 shell 指令稿程式，超過 /usr/bin 和 /usr 目錄下所有 (程式) 檔案的十分之一。這還只是 shell 指令稿的部分而已。
+在一個像 Linux 這樣以檔案為操作導向的作業系統上面，script 的活躍是理所當然的事情。絕大部分的系統設定都以字串的形式寫在組態檔裡面，而作業系統的執行期資訊
+也存在檔案系統之中 (/proc)；直接處理這些字串就能管理系統，用指令稿語言來進行自動化是非常合適的。
+像 Python 這種指令稿語言因為開發快速的關係，能夠很快地製作出我們想要的系統管理功能出來。除了開發快速之外，Python 也具有容易維護的特性。
+相比之下，Perl 程式雖然可以寫得更短，但也更不容易看懂；shell 指令稿則不是完整的開發環境。Python 是撰寫系統管理指令稿的理想工具。
+
+2   Python 指令稿的格式
+Python 指令稿與其它語言的指令稿的基本格式完全一樣，本身都是純文字檔，而在檔頭要以 #! 指定直譯程式的位置：
+#!/usr/bin/python
+print "Hello, world!"
+這是我們上一期寫過的 hello.py 程式，不要忘記 chmod a+x hello.py，如此便可以在指令行下執行這個指令稿：
+$ ./hello.py
+Hello, world
+我們習慣上會給 Python 程式取個副檔名 .py，但 Linux 的指令稿並不需要綴上副檔名；把 hello.py 改成 hello，程式一樣會正常執行。
+.py 副檔名對 Python 仍有特別的意義，但只在撰寫 Python 模組的時候才有用處。
+對於指定 Python 直譯器標頭，我們一般有兩種作法。像以上的 hello.py 這種寫為絕對路徑的方式其實並非必要，我們可以改用相對路徑的方式來指定：
+#!/usr/bin/env python
+於是會以 /usr/bin/env 程式來叫用 python 直譯器，處理 Python 程式檔案。
+這麼作的好處是當系統中安裝有許多個不同的 Python 直譯器時，會採用路徑在最前面的那一個。
+如此一來，若使用者另外安裝了一版 Python (例如裝在自己的家目錄)，又把自己的 Python 放到路徑設定 (PATH 環境變數) 的最前面，即會採用使用者自己安裝的 Python。
+每一版 Python 除了有 python 這個執行檔之外，還會附有內容完全相同的 pythonX.Y 這個執行檔，X.Y 是該版 Python 的 major version 和 minor version。
+譬如 Python 2.3 就會有 python 和 python2.3 這兩個直譯器，用起來是完全一樣的。如果我們寫的指令稿程式必須要使用某一個版本的 Python，可以偷偷在指令稿標頭上
+動手腳來進行限制；以 Python 2.3 為例，就把標頭寫成：
+#!/usr/bin/env python2.3
+
+Note
+Python 提供了一套正統的方法來檢查所使用 Python 及所有相關環境的資訊。在指令稿標頭上動手腳雖然方便，但不是保險的正統作法；
+只是，若程式本身就沒多長 (譬如說二三十行)，的確不必浪費時間去寫一串檢查程式。
+當指令稿只使用了主流版號的標準程式庫時 (這是一般的狀況)，通常就不必指定 Python 的版本。
+
+若寫成 hello.py 裡那種絕對路徑的標頭，就會限定使用安裝在某一個位置的 Python。
+通常我們都會指定在 /usr/bin/python 或 /usr/bin/pythonX.Y (看要指定哪一版)，即系統所安裝的 Python；寫成這樣的話，使用者就不好改用自己安裝的版本了。
+Python 直譯器還會讀取另一組格式為 # -*- setting -*- 的標頭 (通常接在第一行以後)，其中常用的是：
+# -*- coding: UTF-8 -*-
+用途是指定「指令稿檔案內純文字的字元編碼 (為 UTF-8)」。
+如果你想要寫中文註解，這就非常重要；Python 自己有一套字元編碼轉換的機制，實作在 codecs 模組裡面，但直到 Python 2.4 之前，繁體中文常用的 Big5 編碼並未進入
+標準的 codecs 模組。如果指令稿檔案使用了 Python 看不懂的字元編碼 (就是指華文世界用的 Big5 和 GB)，程式雖然仍可執行，但 Python 直譯器會送出警告。如果想用
+中文撰寫註解，最好把指令稿檔案轉為 UTF-8 Unicode，並如上指定編碼。
+上一期已經提過了，Python 也是以 # 當作單行註解符號的 (和 shell script 一樣)；所有在這個符號之後的文字都是註解。順帶一提，如果你習慣以 VIM 編輯 Python 指
+令稿，可以在檔尾加上 VIM 的設定字串：
+# vim:set nu et ts=4 sw=4 cino=>4:
+設定顯示行號 (nu)、展開跳格鍵 (et，對 Python 程式來說，跳格鍵 Tab 是最要不得的東西)，指定跳格字元為 4 (ts=4)、偏移字元寬為 4 (sw=4)、
+C 式縮排為 >4 (cino=>4)；然後再打開語法標示 (syntax highlighting，這個在 .vimrc 裡設定比較合適)。使用這樣的編輯環境，對撰寫 Python 程式來說會很方便。
+Python 直譯器會依出現順序來執行程式碼檔案裡的指令。如果我們想撰寫比較具組織性的指令稿，可以把平舖直述的：
+print "some operations"
+改成這樣的程式碼結構：
+def main():
+    print "some operations"
+
+if __name__ == '__main__':
+    main()
+亦即自行製作一個「進入點」 main() 函式。當指令稿比較長 (超過一百行以上)，以及將來在擴充指令稿的時候，就會比較方便。
+總結來說，一個 Python 指令稿的常見格式應為：
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+def main():
+    print "Hello, world"
+
+if __name__ == '__main__':
+    main()
+
+# vim:set nu et ts=4 sw=4 cino=>4:
+3   字串處理
+在管理 Linux 系統時，(純文字) 設定檔案以及其中的字串處理是至為核心的部分；讓我們來看看 Python 如何進行這些工作。
+因為我們在上一期已經用 Python 處理過字串和檔案了，所以在這裡，我們應該對字串處理作深入一點的介紹。
+首先我們要知道的是，字串在 Python 裡面是一種物件。打開 Python 互動式環境 (到 shell 去執行 python 即可進入)，執行以下動作：
+>>> print type( "" )
+<type 'str'>
+>>> if type( "I am a string" ) is str: print True
+...
+True
+>>> if type( "Another string" ) is str(): print True
+...
+type() 是 Python 的內建函式，用來取得變數的型態。我們可以從這三個指令看出來，字串 "", "I am a string" 都是 str 類別的物件。查看 Python 的線上文件，會發現有兩組關於字串處理的程式庫；一組是 string 模組裡的函式，另一組則是字串物件專用的方法 (String Methods)。兩者雖有一些差別，但功能的重覆性相當高；我們討論的重點在字串方法。
+我們常常會需要分析檔案中的字串：把字串拆解開來，依照給定的邏輯來判斷字串資料的意義。因此，最常用的字串方法就是我們上一期有用到的 split()。split() 傳回的是列表 (list)，可以用索引值 (以 0 起始) 來存取列表中的各個項目。再來示範一下：
+>>> tokens = "This is a sample string used to demo split()".split()
+>>> len(tokens)
+9
+>>> print tokens
+['This', 'is', 'a', 'sample', 'string', 'used', 'to', 'demo', 'split()']
+>>> print tokens[0], tokens[2]
+This a
+>>> print tokens[-1], tokens[-2]
+split() demo
+>>> print tokens[2:5]
+['a', 'sample', 'string']
+第一個指令把我們的字串切成了 9 個字串，存在 tokens 這個列表裡。len() 是個內建函式，用來量測像列表這種可以存放其它東西的物件的長度 (傳回所包含的項目個數)。列表只要是整數就可以了，但最大不能到項目個數；可以給入負值，表示從列表尾端開始計算。索引值 -1 即為列表的最後一個項目。
+有辦法切開字串進行判斷了之後，我們常常還需要把分析結果給輸出出來，那麼就得接合字串；以字串的格式化操作 (string format operations) 就能完成這件工作。我們可以寫出以下的表示式：
+>>> "%d %f %s" % (1, 1.2, "string")
+'1 1.200000 string'
+這就是字串格式化操作。以帶有特別轉換字元 (conversion character) 的格式化字串，後接 % 運算子，再接一個 tuple 作為參數，就能把 tuple 裡的資料填進格式化字串裡去。常用的 %d 代表有號整數、%f 代表浮點數、%s 代表字串，完整的轉換字元表請參考 Python 的線上文件。
+
+Note
+Python 的 tuple 也是一種可以包含其它物件的資料結構，以整數索引存取其中的物件，但其行為與列表不盡相同。在語法上，tuple 用 (1, 2, 3) 來宣告，而列表用 [1, 2, 3] 來宣告。如果 tuple 中只有一個物件，則要寫成 (1,)，不要忘記右括號前的逗號。在字串格式化操作時，若轉換字元只有一個，% 運算元後的 tuple 也可以用單一變數來代替。
+字串物件另有一個叫作 join() 的方法可以用來結合字串，用法如下：
+>>> "".join([ "a", "b", "c" ])
+'abc'
+>>> "-".join([ "a", "b", "c" ])
+'a-b-c'
+在處理字串時，最後要注意的是，Python 的字串不可變。也就是說，想變更字串中的某一個字元，不能直接設：
+>>> a = "write"
+>>> a[2] = "o"
+Traceback (most recent call last):
+  File "<stdin>", line 1, in ?
+TypeError: object doesn't support item assignment
+那是不合法的。那該怎麼辦呢？可以這樣作：
+>>> print a[:2]+"o"+a[3:]
+wrote
+字串的內容雖然不能變更，但字串本身可以加起來 (串接)。a[:2] 表示取出 a 字串到索引 2 為止的部分；a[3:] 表示取出 a 字串從索引 3 開始到結尾的部分；然後在中間接入 "o"。最後我們還是可以得到 wrote 字串。這種操作索引的技巧，也可以用在一般的列表上。
+Python 同樣具有常規表示式 (regular expression) 的操作能力，實作在 re 模組裡面。用來執行字串取代是非常方便的。
+3.1   轉換字元編碼
+Python 有一套處理字元編碼的 codecs 模組；我們以之即可自由地將字元轉換為各種不同的編碼，這是我們在處理多國語言資料時常需處理的問題。然而，字串物件本身就提供有 encode() 與 decode() 方法，我們不必匯入 codecs 模組就可以使用這兩個方法為我們提供的 codecs 能力。
+此處我們得要注意一個事實，那就是 Python 擁有兩種字串物件。其一是我們剛剛一直在處理的 str 字串，而另一種呢，就是對多國語言處理非常重要的 unicode 字串。一般我們用引號或雙引號表示的都是普通的字串 (str)，而用 u"string" 表示的呢，就是 unicode 字串。decode() 能把普通字串解碼成 unicode 物件，而 encode() 則能把 unicode 物件編碼成各種支援的字元集。
+在處理中文編碼之前，我們要為 Python 2.3 安裝相關的外加套件：cjkcodecs 與 iconvcodecs；前者是中日韓專用的 codecs 物件，而後者允許 Python 直接使用 GNU iconv 工具所提供的編碼，作為 codecs 物件。假設我們得把原本是 Big5 的編碼重編為 UTF-8，那麼可以這樣作：
+>>> f = open( "file.big5" )
+>>> s = f.read()
+>>> f.close()
+>>> sp = s.decode('Big5').encode('UTF-8')
+你可以在電腦上找一個內容是 Big5 編碼的檔案，把 locale 改成 UTF-8，然後在 Python 互動式環境下執行以上的指令 (該改的地方請改一下)。最後再用 print s, sp 比較一下轉換前後的字串。
+
+4   檔案系統與目錄
+在 Linux 系統中複製、搬移、刪除檔案與目錄也是管理時常見的動作。
+Python 提供的 os 模組能處理作業系統所支援的大部分檔案系統操作，另外還有 shutil 模組，提供更高階的操作。
+4.1   檔案系統操作
+檔案系統與檔案內容是不一樣的議題。我們在進行檔案系統操作時，處理的是搬移 (更名)、複製與刪除，比較沒有機會直接新增檔案。
+這些動作在 os 與 shutil 模組裡幾乎都有提供；我們應該先匯入這兩個模組。
+若要複製檔案，我們可以這樣作：
+>>> shutil.copy('data.txt', 'data.new.txt')
+刪除檔案則用 os.unlink()：
+>>> os.unlink('data.new.txt')
+搬移 (更名) 有兩種方法：
+>>> os.rename('data.txt', 'data.alter.txt')
+>>> shutil.move('data.alter.txt', 'data.txt')
+第一種方法，若來源檔 (第一個參數) 與目的檔不在同一個檔案系統內 (分割區)，此動作可能會失效 (不同的 Unix 有不同的處理方法)。第二種方法比較高階，無論來源檔與目的檔是否在相同的檔案系統內，都可以使用。
+4.2   路徑的處理
+管理系統的時候多半不會只處理當前目錄內的檔案，所以常要對路徑字串進行處理。os.path 模組提供了處理路徑的函式，常用的有：
+abspath()：接受一個路徑字串，傳回該路徑所代表的絕對路徑。
+realpath()：接受一個路徑字串，計算該路徑中包含的符號連結 (symbolic link)，傳回所代表的真正路徑。
+split(), dirname(), basename()：split() 接受一個路徑字串，從最後一個路徑項目前切開，分成包含該項目的目錄與該項目名本身，以 tuple 傳回。dirname() 是 split() 傳回值的第一個元素；basename() 是第二個元素。
+join()：接受一個路徑列表，把該列表中的每個元素接成一個完整路徑字串後傳回。
+splitext()：接受一個路徑字串，分開其副檔名，將主檔名與副檔名用一個 tuple 傳回。
+exists()：測試傳入的路徑字串是否存在，傳回布林值。
+isfile(), isdir(), islink(), isabs()：分別用來測試所傳入的路徑字串是否為檔案、目錄、符號連結或絕對路徑；傳回布林值。
+實際要使用的時候，大概會像是這樣子：
+>>> os.path.split( "a/b/c" )
+('a/b', 'c')
+>>> os.path.join( "a", "b", "c" )
+'a/b/c'
+>>> os.path.splitext( "dir/file.ext" )
+('dir/file', '.ext')
+你可以在你的目錄結構裡，用真正的路徑來試試看！
+
+5   外部程式呼叫
+許多在 shell 指令稿中要靠呼叫外部程式才能完成的作業，都能用 Python 的內建模組來完成，例如上面提到的字串處理、檔案處理、目錄處理等等。而若遇到 Python 不足的地方，或是有非常特別的操作，當然也可以呼叫外部的程式。
+os 模組有一個 system() 函式可以用來呼叫外部程式：
+>>> os.system( 'ls' )
+weekly20051204.doc
+weekly20051211.doc
+0
+>>>
+最後顯示出來的 0 不是 ls 程式的輸出，而是其傳回值。
+os.system() 函式能進行最簡單的外部程式呼叫，不能對該程式的輸出入資料進一步處理；如果我們只想簡單執行程式，os.system() 函式將是最佳的選擇。
+5.1   管線
+當我們也需要對外部程式的輸出入資料進行處理的時候，os.system() 就不夠用了。Python 另外有 popen2 模組，可以讓我們管理外部程式子行程的輸出入管線 (pipe)。在 popen2 模組裡有 popen2(), popen3() 和 popen4() 三個工具函式，分別會重導向子行程的標準輸出入、標準輸出入及錯誤輸出、標準輸出合併錯誤輸出及標準輸入。
+簡單用範例來說明最常用的 popen2() (別忘了先 import popen2 喔)：
+>>> stdout, stdin = popen2.popen2("ls")
+>>> ostr = stdout.read()
+>>> print ostr
+weekly20051204.doc
+weekly20051211.doc
+>>>
+popen2.popen2() 會傳回連結到 ls 程式輸出入的兩個檔案物件，我們取名為 stdout 與 stdin。呼叫了 popen2.popen2() 之後，外部程式馬上就會執行，然後我們就能從 stdout 檔案物件裡讀出該外部程式的標準輸出資料了。如此一來，該程式的執行結果就不會直接顯示在終端機上，我們可以在 Python 裡面先處理過以後，再決定該怎麼辦。
+如果我們想呼叫的程式也會進行錯誤輸出 (stderr)，而我們想要處理的話，就改用 popen3() 或 popen4() 函式。popen3() 的錯誤輸出會連接至一個獨立的檔案物件，而 popen4() 則會把錯誤輸出一起放到標準輸出所連結的檔案物件裡；你可以視需要使用。
+Note
+在 Python 2.4 裡有一個新的 subprocess 模組，可以執行所有的外部程式呼叫功能。所以在 Python 2.4 裡不再需要 os 與 popen2 模組裡的相關函式了；當然，舊模組不會消失，所以在 Python 2.4 裡還是可以用 popen2，我們的舊程式不會出問題。
+
+6   網際網路通訊
+Python 內建的程式庫裡就具備相當方便的網際網路通訊功能，不必呼叫外部程式。
+網際網路通訊是個大範圍，其中最常用到的大概數全球資訊網了；我們舉 Zope 應用程式伺服器來作例子。Zope 使用 ZODB 物件資料庫來儲存資料，這個系統會把存取動作紀錄下來，當使用者刪除其中的資料時，資料不會實際刪除，要等到手動壓縮 (pack) 資料庫的時候，才會真正把資料刪除。這個壓縮功能的動作選項是放在 web-based 的 ZMI 裡面，沒有指令行介面；如果我們不想手動連進 ZMI 來執行壓縮，就得寫一個能進行 HTTP 操作的指令稿。
+
+我們要寫的程式應該具有以下的命令列介面：
+
+packzope.py -u<URL of Zope server> -d<day> -U<username> -P<password>
+這個 packzope.py 程式要負責用 HTTP 和伺服器溝通，把從命令列取得的使用者名稱和密碼提供給 Zope 伺服器，並且用 GET 方法把要壓縮的天數 (捨棄指定天數前的資料) 告訴 Zope 伺服器。以下是寫好的程式：
+
+#!/usr/bin/env python
+
+import sys
+import urllib
+
+class parameters:
+  def __init__(self):
+    from optparse import OptionParser, OptionGroup
+    op = OptionParser(
+        usage = "usage: %prog -u URL -d DAYS -U USERNAME -P PASSWORD",
+        version = "%prog, " + "%s" % __revision__
+        )
+    op.add_option("-u", action="store", type="string", \
+        dest="url", \
+        help="URL of site to open"
+        )
+    op.add_option("-d", action="store", type="int", \
+        dest="days", default=1, \
+        help="erase days before"
+        )
+    op.add_option("-U", action="store", type="string", \
+        dest="username", \
+        help="username"
+        )
+    op.add_option("-P", action="store", type="string", \
+        dest="password", \
+        help="password"
+        )
+    self.op = op
+    (self.options, self.args) = self.op.parse_args()
+params = parameters()
+
+if not params.options.url or \
+   not params.options.username or \
+   not params.options.password :
+  params.op.print_help()
+  sys.exit(1)
+
+url = "%s/Control_Panel/Database/manage_pack?days:float=%d" % \
+     (params.options.url, params.options.days)
+
+class MyOpener(urllib.FancyURLopener):
+  def get_user_passwd(self, host, realm, clear_cache = 0):
+    return params.options.username, params.options.password
+
+def main():
+  try:
+    f = MyOpener().open(url).read()
+    print "Successfully packed ZODB on host %s" % params.options.url
+  except:
+    print "Cannot open URL %s, aborted" % url
+    raise
+
+if __name__ == '__main__':
+  main()
+程式前半段在處理命令行參數 (class parameters)，而在 main() 函式裡實際進行連線動作。
+packzope.py 利用 urllib 模組來連結 Zope 伺服器，並利用 subclassing urllib.FancyURLopener 類別來自訂使用者名稱與密碼的輸入。
+壓縮完畢之後，程式會輸出以下的字樣：
+
+Successfully packed ZODB on host http://someplace:port
+我們可以把 packzope.py 放到 crontab 裡定期執行。這就是一種自動化網路操作。
+
+7   結語
+
+本文藉由討論以 Python 進行 Linux 操作自動化的技巧，對 Python 的應用作了進一步的介紹。當然，在進行任何種類的 Python 程式開發時，都可以參考 Python 的線上說明文件。Dive into Python 是一本容易上手的自由 Python 書籍，你也可以在網路上找到中文譯本。
+
+
+
+/******************************************************************************/
+使用pySerial in Python 基礎控制篇
+/******************************************************************************/
+如何使用PYTHON來控制serial port (RS232)，
+1. 首先要到SourceForge.net 去下載Python for Windows extensions ,請選擇及安裝適合的Python版本
+
+http://sourceforge.net/project/showfiles.php?group_id=78018&package_id=79063&release_id=449591
+
+Python for Windows extensions有許多好用且常用的API for Python，要在windows 下寫Python是必備的package
+
+2. 再來，一樣在SourceForge.net內有一個Python Serial Port Extension,這個是我們要用的serial port 的package，下載網址如下，
+
+http://sourceforge.net/project/showfiles.php?group_id=46487&package_id=39324&release_id=346093
+
+這裡面也有pyparallel packet 用來控制LPT(parallel port)有需要的人可以在這下載，
+http://sourceforge.net/project/showfiles.php?group_id=46487&package_id=77441 
+第一個windows extensions一定要安裝，因為pyserial是使用這個package的API所製作出來的!!!我一開始就只有裝pyserial package，結果就跟說我compiler error找不到module,
+
+下面這個網址是pySerial的使用手冊
+http://pyserial.sourceforge.net/
+
+在網站裏的Short introduction有一些example說明要如何使用pySerial，很簡單明瞭!!!
+
+
+/******************************************************************************/
+簡易Python入門
+/******************************************************************************/
+import 載入模組
+_ + X #_可以保留最後一次的計算結果
+
+註解
+#單行
+'''aa'''多行
+"""aa"""多行
+
+強制縮排
+print("A","B",sep="|") => A|B
+print(1+int("1")) => 轉型
+
+執行方式在CMD
+C:\>python name.py
+Linux
+#!/usr/bin/python 不用管副檔名
+
+宣告路徑和編碼
+#!c:\python26\python
+#coding=utf-8
+
+變數宣告-#有區分大小寫
+x = "apple"
+x=x[:4]+"y" => apply #改最後一個字
+d = none #空值
+i,j=1,2
+del x #刪除變數也能刪除物件的屬性和方法 del o.fun()
+
+global x #全域變數
+
+運算子
++-*/
+x//y #求商數
+x%y #求餘數
+X**3 #x的3次方
+
+True False
+== or and not
+!= <>
+is , is not #比較物件型態與值
+
+python的三元運算
+z = x > y and 1 or 2
+
+流程序控制制
+if X > 2:
+else:
+elif #其實是else if
+
+for i in range(1,10): #也可直接range(10) 建議用xrange()比較不消耗記憶體
+while X>10:
+
+無限迴圈
+while True or 1:
+while False or 0:
+while not 1==1:
+
+Python 的 DO WHILE
+while True:
+if :
+break #一樣有break和continue
+
+擷取字串
+i = 1234567
+str(i)[1:5] = > 2345
+
+
+方法
+def sun(x,y):
+return x+y
+
+def sun(x=1,y=2):
+
+呼叫方法
+sun(5,6)
+sun()
+
+陣列
+c = [1,2,3]
+c * 2 => 123123
+c[1] = c[3] = 0
+
+類別
+
+class aaa:
+用法
+o = aaa() #等於宣告物件
+
+類別方法
+class ss:
+count = 100
+def fun(self,gg)
+return "hi",gg
+用法
+o = ss()
+ss.fun("jack") => hi jack
+
+建構子
+class init:
+def __init__(self,x=none):
+self.x=x #前面+self是表示宣告全域變數 也可以用類別名稱 init.x來用
+self.total=100
+
+繼承
+class child(father繼承物件名稱): #python也支援多承繼承 所以可以 class child(father1,father2):
+#要注意的是多承繼承如果遇到同名稱的屬性和方法會以繼承順序來決定
+
+#在子類別使用父類別的屬性和方法
+father.x
+father.fun(self)
+
+呼叫物件中的多個類別
+class group:
+
+class a:
+def funA(self):
+class b:
+def funB(self):
+用法
+group = group()
+group.a().funA()
+group.b().funB()
+
+#另外子類別可以複寫父類別的屬性和方法
+
+限定繼承
+
+class gg:
+__num = 5
+def ff(self):
+self.__tt = 10 #加上__等於私有,子類別無法繼承
+
+#但是還是能呼叫私有變數
+obj = gg()
+obj._gg__num
+
+
+#python也理所當然支援多載
+
+例外處理
+try:
+
+except Exception:
+
+try:
+
+finally: #無條件進入
+
+完整版用法
+try:
+
+except:
+pass #略過 可以這樣用
+else:
+
+finally:
+
+
+
+/******************************************************************************/
+附個鍵位碼表：
+/******************************************************************************/
+字母和數字鍵    數字小鍵盤的鍵  功能鍵          其它鍵
+鍵      鍵碼    鍵      鍵碼    鍵      鍵碼    鍵              鍵碼
+A       65      0       96      F1      112     Backspace       8
+B       66      1       97      F2      113     Tab             9
+C       67      2       98      F3      114     Clear           12
+D       68      3       99      F4      115     Enter           13
+E       69      4       100     F5      116     Shift           16
+F       70      5       101     F6      117     Control         17
+G       71      6       102     F7      118     Alt             18
+H       72      7       103     F8      119     Caps Lock       20
+I       73      8       104     F9      120     Esc             27
+J       74      9       105     F10     121     Spacebar        32
+K       75      *       106     F11     122     Page Up         33
+L       76      +       107     F12     123     Page Down       34
+M       77      Enter   108     --      --      End             35
+N       78      -       109     --      --      Home            36
+O       79      .       110     --      --      Left Arrow      37
+P       80      /       111     --      --      Up Arrow        38
+Q       81      --       --     --      --      Right Arrow     39
+R       82      --       --     --      --      Down Arrow      40
+S       83      --       --     --      --      Insert          45
+T       84      --       --     --      --      Delete          46
+U       85      --       --     --      --      Help            47
+V       86      --       --     --      --      Num Lock        144
+
+其他未列出的字母和數字鍵盤為：ord(c)
+
+/******************************************************************************/
+Python模擬鍵盤輸入和滑鼠操作
+/******************************************************************************/
+一、Python鍵盤輸入模擬：
+import win32api
+import win32con
+win32api.keybd_event(17,0,0,0)  #ctrl鍵位碼是17
+win32api.keybd_event(86,0,0,0)  #v鍵位碼是86
+win32api.keybd_event(86,0,win32con.KEYEVENTF_KEYUP,0) #釋放按鍵
+win32api.keybd_event(17,0,win32con.KEYEVENTF_KEYUP,0)
+附個鍵位碼表：
+字母和數字鍵    數字小鍵盤的鍵  功能鍵          其它鍵
+鍵      鍵碼    鍵      鍵碼    鍵      鍵碼    鍵              鍵碼
+A       65      0       96      F1      112     Backspace       8
+B       66      1       97      F2      113     Tab             9
+C       67      2       98      F3      114     Clear           12
+D       68      3       99      F4      115     Enter           13
+E       69      4       100     F5      116     Shift           16
+F       70      5       101     F6      117     Control         17
+G       71      6       102     F7      118     Alt             18
+H       72      7       103     F8      119     Caps Lock       20
+I       73      8       104     F9      120     Esc             27
+J       74      9       105     F10     121     Spacebar        32
+K       75      *       106     F11     122     Page Up         33
+L       76      +       107     F12     123     Page Down       34
+M       77      Enter   108     --      --      End             35
+N       78      -       109     --      --      Home            36
+O       79      .       110     --      --      Left Arrow      37
+P       80      /       111     --      --      Up Arrow        38
+Q       81      --       --     --      --      Right Arrow     39
+R       82      --       --     --      --      Down Arrow      40
+S       83      --       --     --      --      Insert          45
+T       84      --       --     --      --      Delete          46
+U       85      --       --     --      --      Help            47
+V       86      --       --     --      --      Num Lock        144
+其他未列出的字母和數字鍵盤為：ord(c)
+
+二、 使用windll.user32實現滑鼠模擬：
+from ctypes import *
+windll.user32.SetCursorPos(100, 100)
+
+三. 使用AutoItX實現滑鼠模擬：
+#將AutoItX3.dll 文件複製到 window目錄然後註冊一下
+regsvr32.exe AutoItX3.dll
+from win32com.client import Dispatch
+def enter_game():
+     AutoItX = Dispatch( "AutoItX3.Control" )
+    # Block All Input
+    AutoItX.BlockInput( 1 )
+    AutoItX.Sleep( 20000 )
+    if AutoItX.WinActivate( GAME_WINDOW_TITLE, '' ):
+        pass
+    else:
+        if AutoItX.WinWaitActive( GAME_WINDOW_TITLE, '', 8 ):
+            pass
+        else:
+            # Unblock input
+            AutoItX.BlockInput( 0 )
+            return False
+    AutoItX.WinSetTitle( GAME_WINDOW_TITLE, '', _pre_title )
+    AutoItX.WinSetState( _pre_title, '', AutoItX.SW_MAXIMIZE )
+    AutoItX.Sleep( 5000 )
+    AutoItX.MouseMove( 462, 396, 10 )
+    AutoItX.MouseClick( "left" )
+    AutoItX.Sleep( 1000 )
+    AutoItX.Send( GAME_ACCT_NAME )
+    AutoItX.Sleep( 1000 )
+    AutoItX.MouseMove ( 462, 472, 10 )
+    AutoItX.MouseClick( "left" )
+    AutoItX.Sleep( 1000 )
+    AutoItX.Send( GAME_ACCT_PASS )
+    AutoItX.Send( "{ENTER}" )
+    AutoItX.Sleep( 10000 )
+    # Unblock input
+    AutoItX.BlockInput( 0 )
+    return True
+
+四. 使用跨平台的autopy實現
+ 
+五、使用autohook監控鍵盤操作：
+
+
+/******************************************************************************/
+python根據鍵盤輸入進行相應操作
+/******************************************************************************/
+上篇文章介紹了如何利用pyhook模組監聽滑鼠鍵盤的事件，接下來如果需要通過監聽的事件內容，來做對應的操作，需要對event的內容進行相應的判斷。
+如果僅僅通過event.key來進行判斷，可以寫成str(evnet.key) == 'F12'等，如果需要退出，則添加一句win32api.PostQuitMessage()即可，
+在此注意，需要import win32api
+但是由於目前需求，不僅僅只是在獲取到特定的鍵值之後退出，而需要在某些其他的鍵值進行相應的操作，所以對應的，有想到用下面的代碼：
+def onKeyboardEvent(event):
+    if str(event.Key)=='F12':
+        DELAY = 1
+    elif str(event.Key)=='F11':
+        INDEX = 1
+        win32api.PostQuitMessage()
+    return True
+ 嘗試之後會報錯，但是如果判斷條件中有win32api.PostQuitMessage()，那麼就不會報錯，錯誤的原因應該是第一個if語句中沒有這麼一句，經過單獨嘗試，
+ 如果沒有win32api.PostQuitMessage()這一句，確實是無法執行的，在網上搜索了之後，也找不到對應的答案，最終決定採用另外一種方法：
+
+def onKeyboardEvent(event):
+    if str(event.KeyID)=='122':
+        global DELAY
+        DELAY = 1
+    if str(event.KeyID)=='123':
+        global INDEX
+        INDEX = 1
+        win32api.PostQuitMessage()
+    return True
+採用event.KeyID就可以實現需求，進行多次判斷，目前還未確定不能使用event.Key的原因，但上述方法需要進行KeyID的獲取，
+此段代碼的意圖為F11鍵的時候，進行DELAY = 1的賦值操作，為F12時退出。
+
+
+/******************************************************************************/
+[Python] Threading Sample - 執行緒範例
+/******************************************************************************/
+每一秒加一個Thread
+每一個Thread Sleep 10 seconds
+Source Code:
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+ 
+"""
+Threading Example
+ 
+@author: Hank Wang <drapho@gmail.com>
+@version: 20101230
+"""
+import time
+from threading import Thread
+ 
+def myfunc(i):
+    print("sleeping 10 sec from thread %d" % i)
+    time.sleep(10)
+    print("finished sleeping from thread %d" % i)
+ 
+def main():
+    for i in range(10):
+        t = Thread(target=myfunc, args=(i,))
+        time.sleep(1)
+        t.start()
+ 
+if __name__ == '__main__':
+    main()
+
+
+Result:
+sleeping 10 sec from thread 0
+sleeping 10 sec from thread 1
+sleeping 10 sec from thread 2
+sleeping 10 sec from thread 3
+sleeping 10 sec from thread 4
+sleeping 10 sec from thread 5
+sleeping 10 sec from thread 6
+sleeping 10 sec from thread 7
+sleeping 10 sec from thread 8
+sleeping 10 sec from thread 9
+finished sleeping from thread 0
+finished sleeping from thread 1
+finished sleeping from thread 2
+finished sleeping from thread 3
+finished sleeping from thread 4
+finished sleeping from thread 5
+finished sleeping from thread 6
+finished sleeping from thread 7
+finished sleeping from thread 8
+finished sleeping from thread 9
+
+
+/******************************************************************************/
+Python to EXE file  ref : http://www.py2exe.org/index.cgi/Tutorial
+/******************************************************************************/
+1. Create/test your program
+
+The first example we'll use here is our old friend...
+
+hello.py
+   1 print "Hello World!"
+
+We need to make sure it's working...
+
+C:\Tutorial>python hello.py
+Hello World!
+
+C:\Tutorial>
+
+2. Create your setup script (setup.py)
+
+C:\Tutorial>python setup.py install
+"py2exe" is a new Distutils command that is added when you import py2exe. 
+To use py2exe you need to create a setup.py file to tell Distutils and py2exe what you want to do. 
+Here's a setup.py whose simplicity is appropriate for our sample program...
+
+setup.py
+   1 from distutils.core import setup
+   2 import py2exe
+   3 
+   4 setup(console=['hello.py'])
+
+Notice that this is ordinary Python. Let's go through it line by line...
+When working with py2exe the only part of Distutils we'll typically need to reference directly is the setup function, so that's all we'll import.
+Once Distutils is loaded, we need to load py2exe so that it can add its command.
+Whitespace is good!
+Call setup and tell it that we want a single console application and the main entry point is "hello.py".
+
+3. Run your setup script
+The next step is to run your setup script. Make sure to give the py2exe command and expect to see lots and lots of output:
+C:\Tutorial>python setup.py py2exe
+
+running py2exe
+*** searching for required modules ***
+*** parsing results ***
+creating python loader for extension 'zlib'
+creating python loader for extension 'unicodedata'
+creating python loader for extension 'bz2'
+*** finding dlls needed ***
+*** create binaries ***
+*** byte compile python files ***
+byte-compiling C:\Tutorial\build\bdist.win32\winexe\temp\bz2.py to bz2.pyc
+byte-compiling C:\Tutorial\build\bdist.win32\winexe\temp\unicodedata.py to unicodedata.pyc
+byte-compiling C:\Tutorial\build\bdist.win32\winexe\temp\zlib.py to zlib.pyc
+skipping byte-compilation of c:\Python24\lib\StringIO.py to StringIO.pyc
+[skipping many lines for brevity]
+skipping byte-compilation of c:\Python24\lib\warnings.py to warnings.pyc
+*** copy extensions ***
+*** copy dlls ***
+copying c:\Python24\lib\site-packages\py2exe\run.exe -> C:\Tutorial\dist\hello.exe
+
+*** binary dependencies ***
+Your executable(s) also depend on these dlls which are not included,
+you may or may not need to distribute them.
+
+Make sure you have the license if you distribute any of them, and
+make sure you don't distribute files belonging to the operating system.
+
+   ADVAPI32.dll - C:\WINDOWS\system32\ADVAPI32.dll
+   USER32.dll - C:\WINDOWS\system32\USER32.dll
+   SHELL32.dll - C:\WINDOWS\system32\SHELL32.dll
+   KERNEL32.dll - C:\WINDOWS\system32\KERNEL32.dll
+
+C:\Tutorial>
+Two directories will be created when you run your setup script, build and dist. The build directory is used as working space while your application is being packaged. It is safe to delete the build directory after your setup script has finished running. The files in the dist directory are the ones needed to run your application.
+
+4. Test your executable
+Now that the package has been created it is ready to test:
+C:\Tutorial>cd dist
+C:\Tutorial\dist>hello.exe
+Hello World
+
+Excellent, it works!!!
+
+
+/******************************************************************************/
+一個簡單的python socket編程
+/******************************************************************************/
+第一步是創建socket對象。調用socket構造函數。如：
+
+socket = socket.socket( family, type )
+
+family參數代表地址家族，可為AF_INET或AF_UNIX。AF_INET家族包括Internet地址，AF_UNIX家族用於同一台機器上的進程間通信。
+type參數代表套接字類型，可為SOCK_STREAM(流套接字)和SOCK_DGRAM(數據報套接字)。
+第二步是將socket綁定到指定地址。這是通過socket對象的bind方法來實現的：
+
+socket.bind( address ) 
+
+
+
+由AF_INET所創建的套接字，address地址必須是一個雙元素元組，格式是(host,port)。host代表主機，port代表連接埠號。如果連接埠號正在使用、主機名不正確或連接埠已被保留，bind方法將引發socket.error異常。
+第三步是使用socket套接字的listen方法接收連接請求。
+socket.listen( backlog )
+backlog指定最多允許多少個客戶連接到伺服器。它的值至少為1。收到連接請求後，這些請求需要排隊，如果隊列滿，就拒絕請求。
+第四步是伺服器套接字通過socket的accept方法等待客戶請求一個連接。
+
+connection, address = socket.accept()
+
+調 用accept方法時，socket會時入「waiting」狀態。客戶請求連接時，方法建立連接並返回伺服器。accept方法返回一個含有兩個元素的 元組(connection,address)。第一個元素connection是新的socket對像，伺服器必須通過它與客戶通信；第二個元素 address是客戶的Internet地址。
+第五步是處理階段，伺服器和用戶端通過send和recv方法通信(傳輸 數據)。伺服器調用send，並採用字串形式向客戶發送資訊。send方法返回已發送的字元個數。伺服器使用recv方法從客戶接收資訊。調用recv 時，伺服器必須指定一個整數，它對應於可通過本次方法調用來接收的最大數據量。recv方法在接收數據時會進入「blocked」狀態，最後返回一個字元 串，用它表示收到的數據。如果發送的數據量超過了recv所允許的，數據會被截短。多餘的數據將緩衝於接收端。以後調用recv時，多餘的數據會從緩衝區 刪除(以及自上次調用recv以來，客戶可能發送的其它任何數據)。
+傳輸結束，伺服器調用socket的close方法關閉連接。
+python編寫client的步驟：
+創建一個socket以連接伺服器：socket = socket.socket( family, type )
+使用socket的connect方法連接伺服器。對於AF_INET家族,連接格式如下：
+socket.connect( (host,port) )
+host代表伺服器主機名或IP，port代表伺服器進程所綁定的連接埠號。如連接成功，客戶就可通過套接字與伺服器通信，如果連接失敗，會引發socket.error異常。
+處理階段，客戶和伺服器將通過send方法和recv方法通信。
+傳輸結束，客戶通過調用socket的close方法關閉連接。
+下面給個簡單的例子：
+
+server.py 
+python 代碼
+ 
+if __name__ == '__main__':  
+    import socket  
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+    sock.bind(('localhost', 8001))  
+    sock.listen(5)  
+    while True:  
+        connection,address = sock.accept()  
+        try:  
+            connection.settimeout(5)  
+            buf = connection.recv(1024)  
+            if buf == '1':  
+                connection.send('welcome to server!')  
+            else:  
+                connection.send('please go out!')  
+        except socket.timeout:  
+            print 'time out'  
+        connection.close()  
+
+client.py
+python 代碼
+ 
+if __name__ == '__main__':  
+    import socket  
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+    sock.connect(('localhost', 8001))  
+    import time  
+    time.sleep(2)  
+    sock.send('1')  
+    print sock.recv(1024)  
+    sock.close()  
+
+在終端運行server.py，然後運行clien.py，會在終端列印「welcome to server!"。如果更改client.py的sock.send('1')為其它值在終端會列印」please go out!「，更改time.sleep(2)為大於5的數值， 伺服器將會超時。
+
+/******************************************************************************/
+Python在線聊天   ref : http://hnylj.iteye.com/blog/732126
+/******************************************************************************/
+發佈一個用Python實現的一個在線聊天，主要功能是實現用戶端與伺服器端的雙向通信，這個小東西用到的主要知識點：
+1.Python Socket；
+2.Python Tkinter庫。
+ 
+當然也應該瞭解如下的基礎知識：
+1.Python基本語法；
+2.Python基本語句；
+3.Python函數；
+4.Python模組；
+5.Python異常處理；
+6.Python面向對像；
+7.Python線程等相關知識。
+ 
+另外：我使用的是Python2.5這個版本，如果你使用的Python3.0，可能不相容。 推薦使用穩定的2.5版，linux系統默認安裝的也是2.5這個版本，許多第三方庫也是使用2.5這個版本。
+ 
+下面是這個小東西的一個截圖：
+
+ 
+ 
+下面是伺服器端代碼：
+Python代碼  收藏代碼
+# _*_ coding:utf-8 _*_  
+# Filename:ServerUI.py  
+# Python在線聊天伺服器端  
+  
+import Tkinter  
+import tkFont  
+import socket  
+import thread  
+import time  
+import sys  
+  
+class ServerUI():  
+      
+    title = 'Python在線聊天-伺服器端V1.0'  
+    local = '127.0.0.1'  
+    port = 8808  
+    global serverSock;  
+    flag = False  
+      
+    #初始化類的相關屬性，類似於Java的構造方法  
+    def __init__(self):  
+        self.root = Tkinter.Tk()  
+        self.root.title(self.title)  
+          
+        #窗口面板,用4個frame面板佈局  
+        self.frame = [Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame()]  
+  
+        #顯示消息Text右邊的滾動條  
+        self.chatTextScrollBar = Tkinter.Scrollbar(self.frame[0])  
+        self.chatTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)  
+          
+        #顯示消息Text，並綁定上面的滾動條  
+        ft = tkFont.Font(family='Fixdsys',size=11)  
+        self.chatText = Tkinter.Listbox(self.frame[0],width=70,height=18,font=ft)  
+        self.chatText['yscrollcommand'] = self.chatTextScrollBar.set  
+        self.chatText.pack(expand=1,fill=Tkinter.BOTH)  
+        self.chatTextScrollBar['command'] = self.chatText.yview()  
+        self.frame[0].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #標籤，分開消息顯示Text和消息輸入Text  
+        label = Tkinter.Label(self.frame[1],height=2)  
+        label.pack(fill=Tkinter.BOTH)  
+        self.frame[1].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #輸入消息Text的滾動條  
+        self.inputTextScrollBar = Tkinter.Scrollbar(self.frame[2])  
+        self.inputTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)  
+          
+        #輸入消息Text，並與滾動條綁定  
+        ft = tkFont.Font(family='Fixdsys',size=11)  
+        self.inputText = Tkinter.Text(self.frame[2],width=70,height=8,font=ft)  
+        self.inputText['yscrollcommand'] = self.inputTextScrollBar.set  
+        self.inputText.pack(expand=1,fill=Tkinter.BOTH)  
+        self.inputTextScrollBar['command'] = self.chatText.yview()  
+        self.frame[2].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #發送消息按鈕  
+        self.sendButton=Tkinter.Button(self.frame[3],text=' 發 送 ',width=10,command=self.sendMessage)  
+        self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=25,pady=5)  
+  
+        #關閉按鈕  
+        self.closeButton=Tkinter.Button(self.frame[3],text=' 關 閉 ',width=10,command=self.close)  
+        self.closeButton.pack(expand=1,side=Tkinter.RIGHT,padx=25,pady=5)  
+        self.frame[3].pack(expand=1,fill=Tkinter.BOTH)  
+          
+    #接收消息  
+    def receiveMessage(self):  
+        #建立Socket連接  
+        self.serverSock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)  
+        self.serverSock.bind((self.local,self.port))  
+        self.serverSock.listen(15)  
+        self.buffer = 1024  
+        self.chatText.insert(Tkinter.END,'伺服器已經就緒......')  
+        #循環接受用戶端的連接請求  
+        while True:  
+            self.connection,self.address = self.serverSock.accept()  
+            self.flag = True  
+            while True:  
+                #接收用戶端發送的消息  
+                self.cientMsg = self.connection.recv(self.buffer)  
+                if not self.cientMsg:  
+                    continue  
+                elif self.cientMsg == 'Y':  
+                    self.chatText.insert(Tkinter.END,'伺服器端已經與用戶端建立連接......')  
+                    self.connection.send('Y')  
+                elif self.cientMsg == 'N':  
+                    self.chatText.insert(Tkinter.END,'伺服器端與用戶端建立連接失敗......')  
+                    self.connection.send('N')  
+                else:  
+                    theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())  
+                    self.chatText.insert(Tkinter.END, '用戶端 ' + theTime +' 說：\n')  
+                    self.chatText.insert(Tkinter.END, '  ' + self.cientMsg)  
+      
+    #發送消息  
+    def sendMessage(self):  
+        #得到用戶在Text中輸入的消息  
+        message = self.inputText.get('1.0',Tkinter.END)  
+        #格式化當前的時間  
+        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())  
+        self.chatText.insert(Tkinter.END, '伺服器 ' + theTime +' 說：\n')  
+        self.chatText.insert(Tkinter.END,'  ' + message + '\n')  
+        if self.flag == True:  
+            #將消息發送到用戶端  
+            self.connection.send(message)  
+        else:  
+            #Socket連接沒有建立，提示用戶  
+            self.chatText.insert(Tkinter.END,'您還未與用戶端建立連接，用戶端無法收到您的消息\n')  
+        #清空用戶在Text中輸入的消息  
+        self.inputText.delete(0.0,message.__len__()-1.0)  
+      
+    #關閉消息窗口並退出  
+    def close(self):  
+        sys.exit()  
+      
+    #啟動線程接收用戶端的消息  
+    def startNewThread(self):  
+        #啟動一個新線程來接收用戶端的消息  
+        #thread.start_new_thread(function,args[,kwargs])函數原型，  
+        #其中function參數是將要調用的線程函數，args是傳遞給線程函數的參數，它必須是個元組類型，而kwargs是可選的參數  
+        #receiveMessage函數不需要參數，就傳一個空元組  
+        thread.start_new_thread(self.receiveMessage,())  
+      
+def main():  
+    server = ServerUI()  
+    server.startNewThread()  
+    server.root.mainloop()  
+      
+if __name__=='__main__':  
+    main()  
+ 
+ 
+下面是用戶端代碼：
+Python代碼  收藏代碼
+# _*_ coding:utf-8 _*_  
+# Filename:ClientUI.py  
+# Python在線聊天用戶端  
+  
+import Tkinter  
+import tkFont  
+import socket  
+import thread  
+import time  
+import sys  
+  
+class ClientUI():  
+      
+    title = 'Python在線聊天-用戶端V1.0'  
+    local = '127.0.0.1'  
+    port = 8808  
+    global clientSock;  
+    flag = False  
+      
+    #初始化類的相關屬性，類似於Java的構造方法  
+    def __init__(self):  
+        self.root = Tkinter.Tk()  
+        self.root.title(self.title)  
+          
+        #窗口面板,用4個面板佈局  
+        self.frame = [Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame(),Tkinter.Frame()]  
+  
+        #顯示消息Text右邊的滾動條  
+        self.chatTextScrollBar = Tkinter.Scrollbar(self.frame[0])  
+        self.chatTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)  
+          
+        #顯示消息Text，並綁定上面的滾動條  
+        ft = tkFont.Font(family='Fixdsys',size=11)  
+        self.chatText = Tkinter.Listbox(self.frame[0],width=70,height=18,font=ft)  
+        self.chatText['yscrollcommand'] = self.chatTextScrollBar.set  
+        self.chatText.pack(expand=1,fill=Tkinter.BOTH)  
+        self.chatTextScrollBar['command'] = self.chatText.yview()  
+        self.frame[0].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #標籤，分開消息顯示Text和消息輸入Text  
+        label = Tkinter.Label(self.frame[1],height=2)  
+        label.pack(fill=Tkinter.BOTH)  
+        self.frame[1].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #輸入消息Text的滾動條  
+        self.inputTextScrollBar = Tkinter.Scrollbar(self.frame[2])  
+        self.inputTextScrollBar.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)  
+          
+        #輸入消息Text，並與滾動條綁定  
+        ft = tkFont.Font(family='Fixdsys',size=11)  
+        self.inputText = Tkinter.Text(self.frame[2],width=70,height=8,font=ft)  
+        self.inputText['yscrollcommand'] = self.inputTextScrollBar.set  
+        self.inputText.pack(expand=1,fill=Tkinter.BOTH)  
+        self.inputTextScrollBar['command'] = self.chatText.yview()  
+        self.frame[2].pack(expand=1,fill=Tkinter.BOTH)  
+          
+        #發送消息按鈕  
+        self.sendButton=Tkinter.Button(self.frame[3],text=' 發 送 ',width=10,command=self.sendMessage)  
+        self.sendButton.pack(expand=1,side=Tkinter.BOTTOM and Tkinter.RIGHT,padx=15,pady=8)  
+  
+        #關閉按鈕  
+        self.closeButton=Tkinter.Button(self.frame[3],text=' 關 閉 ',width=10,command=self.close)  
+        self.closeButton.pack(expand=1,side=Tkinter.RIGHT,padx=15,pady=8)  
+        self.frame[3].pack(expand=1,fill=Tkinter.BOTH)  
+          
+    #接收消息  
+    def receiveMessage(self):  
+        try:  
+            #建立Socket連接  
+            self.clientSock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)  
+            self.clientSock.connect((self.local, self.port))  
+            self.flag = True  
+        except:  
+            self.flag = False  
+            self.chatText.insert(Tkinter.END,'您還未與伺服器端建立連接，請檢查伺服器端是否已經啟動')  
+            return  
+              
+        self.buffer = 1024  
+        self.clientSock.send('Y')  
+        while True:  
+            try:  
+                if self.flag == True:  
+                    #連接建立，接收伺服器端消息  
+                    self.serverMsg = self.clientSock.recv(self.buffer)  
+                    if self.serverMsg == 'Y':  
+                        self.chatText.insert(Tkinter.END,'用戶端已經與伺服器端建立連接......')  
+                    elif self.serverMsg == 'N':  
+                        self.chatText.insert(Tkinter.END,'用戶端與伺服器端建立連接失敗......')  
+                    elif not self.serverMsg:  
+                        continue  
+                    else:  
+                        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())  
+                        self.chatText.insert(Tkinter.END, '伺服器端 ' + theTime +' 說：\n')  
+                        self.chatText.insert(Tkinter.END, '  ' + self.serverMsg)  
+                else:  
+                    break  
+            except EOFError, msg:  
+                raise msg  
+                self.clientSock.close()  
+                break  
+                    
+    #發送消息  
+    def sendMessage(self):  
+        #得到用戶在Text中輸入的消息  
+        message = self.inputText.get('1.0',Tkinter.END)  
+        #格式化當前的時間  
+        theTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())  
+        self.chatText.insert(Tkinter.END, '用戶端器 ' + theTime +' 說：\n')  
+        self.chatText.insert(Tkinter.END,'  ' + message + '\n')  
+        if self.flag == True:  
+            #將消息發送到伺服器端  
+            self.clientSock.send(message);  
+        else:  
+            #Socket連接沒有建立，提示用戶  
+            self.chatText.insert(Tkinter.END,'您還未與伺服器端建立連接，伺服器端無法收到您的消息\n')  
+        #清空用戶在Text中輸入的消息  
+        self.inputText.delete(0.0,message.__len__()-1.0)  
+      
+    #關閉消息窗口並退出  
+    def close(self):  
+        sys.exit()  
+      
+    #啟動線程接收伺服器端的消息  
+    def startNewThread(self):  
+        #啟動一個新線程來接收伺服器端的消息  
+        #thread.start_new_thread(function,args[,kwargs])函數原型，  
+        #其中function參數是將要調用的線程函數，args是傳遞給線程函數的參數，它必須是個元組類型，而kwargs是可選的參數  
+        #receiveMessage函數不需要參數，就傳一個空元組  
+        thread.start_new_thread(self.receiveMessage,())  
+  
+def main():  
+    client = ClientUI()  
+    client.startNewThread()  
+    client.root.mainloop()  
+      
+if __name__=='__main__':  
+    main()  
+ 
+上面的代碼基本上都是有註釋的，是容易閱讀的，這個程式比較簡陋，但記住動手寫才是非常重要的。 
+另外直接拷貝上面的代碼，有可能需要你排版一下格式，因為Python語言都是用縮進來區分語句塊的。
+ 
+Python這種語言簡單並且功能強大，第三方支援的類庫也很豐富，開發起來效率確實很高，據說使用Python web框架Django能用一星期開發出一個網站，感覺真是比較神奇呀。
+ 
+
+
+/******************************************************************************/
+構建工具scons讓一切變得簡單     ref: http://rritw.com/a/bianchengyuyan/C__/20120801/196614.html
+/******************************************************************************/
+你曾經為繁瑣的makefile語法糾結過嗎？你有想要擺脫VS的束縛，自己構建工程卻又苦於無從下手嗎？你有為同一個工程要在不同作業系統或不同平台下構建編譯環境而苦惱過嗎? 本文有我的選擇，你的答案。
+
+最近小試了一把用scons來構建編譯環境，感覺很不錯，跟大家分享一下。
+先說明下什麼是scons，scons是一個Python寫的自動化構建工具，就比如老牌的cmake，或者如果經常跟google一些開源項目打交道的話，那肯定知道新近開始流行的gyp（google內部用的構建工具），scons實現跟它們有類似的功能。而scons又有區別於其他構建工具的特點，不得不承認，這些特點讓我喜歡上了這個工具。
+先簡單總結下吸引我的幾點：
+1. 自動依賴分析
+2. 工具本身由python實現，跨平台
+3. 基於MD5識別構建文件的改變，並且可以自定義和擴展
+4. 構建文件邏輯用python來寫，功能強大，擴展性超強，跨平台
+5. 簡單易用（半小時內可以學會如何構建中小規模編譯環境）
+6. 官方提供的文檔詳細易理解（如果看過google的gyp的文檔，那叫一個坑爹）
+
+好了，進入正題，就讓我們來循序漸進的來領略下scons的魅力吧。
+首先是安裝環境，
+第一步當然是要保證系統中安裝了python，貌似2.6和2.7下scons都沒有問題，其他的自己嘗試下吧。
+第二步，安裝scons。windows環境的話直接去官網下載exe直接安裝即可。linux Debian系統下則更方便，可以直接用如下命令來安裝：sudo apt-get install scons
+安裝完成後，在命令行驗證一下，輸入scons -v， 如果沒有提示scons命令不存在則說明安裝成功。
+不幸的是，windows下還真提示不存在了，怎麼辦？其實在python安裝路徑C:\Python27\Scripts下（我的python安裝在C:\Python27）有個scons.bat，以後運行這個命令就
+可以（/scons.bat -v），為了方便可以把該路徑追加到環境變數PATH中。
+ok，環境搞定。
+
+接著，一起來細細品味下scons吧。
+1. 假設有如下【helloScons.c】文件：
+#include <stdio.h>
+#include <stdlib.h>
+int main(int argc, char* argv[])
+{
+        printf("Hello, SCons!\n");
+        return 0;
+} 
+用scons怎麼編譯它呢？首先在helloScons.c相同路徑下新建【SConstruct】文件，內容如下：
+Program('helloScons.c')
+
+命令行，進入該文件相同路徑，運行『scons』（windows下運行scons.bat）。可以看到如下運行結果：
+scons: Reading SConscript files ...
+scons: done reading SConscript files.
+scons: Building targets ...
+gcc -o helloScons.o -c helloScons.c
+gcc -o helloScons helloScons.o
+scons: done building targets.
+編譯完成，得到helloScons可執行文件。
+如果我們希望生成其他名字的可執行文件呢？很簡單，把【SConstruct】改成如下內容就可：
+Program('newName', 'helloScons.c')
+ 
+2. 我們稍微改動下，比如相同路徑下再新建個文件extScons.c， extScons.h：
+【extScons.h】
+int add(int x, int y);
+
+【extScons.c】
+int add(int x, int y)
+{
+     return x + y;
+}
+
+然後修改下【helloScons.c】：
+#include <stdio.h> 
+#include <stdlib.h>
+#include 「extScons.h」
+int main(int argc, char* argv[]) 
+{ 
+        printf("Hello, SCons %d!\n", add(1, 2)); 
+        return 0; 
+} 
+
+【SConstruct】文件怎麼改呢？
+Program(['helloScons.c', 'extScons.c'])
+那如果你整個工程中有上百個.c，難道都要在SConstruct中一個一個寫出來嗎？當然不需要，下面這樣也能達到跟上面一樣的功能：
+Program(Glob('*.c'))
+
+3. 假設我們再變化一下，在當前路徑下創建ext文件夾，把extScons.h和extScons.c移到ext文件夾裏，【SConstruct】怎麼寫：
+Program(['helloScons.c', 'ext/extScons.c'])
+類似如果希望設置為文件夾下所有文件，也可以寫成：
+Program([Glob('*.c'), Glob('ext/*.c')])
+
+4. 那麼如果要把extScons.c編譯成動態鏈接庫.so，怎麼做？
+【SConstruct】文件如下：
+SharedLibrary('ext/extScons.c')
+Program(['helloScons.c'], LIBS=['extScons'], LIBPATH='./ext')
+解釋一下，SharedLibrary()指定把ext/extScons.c編譯成動態鏈接庫，如果想編譯為靜態鏈接庫則使用StaticLibrary()。
+Program方法中，LIBS指定的是主程式helloScons.c需要使用的動態鏈接庫libextScons.so，LIBPATH則指定的是libextScons.so的路徑。
+運行scons後，可以看到ext文件夾下生成了libextScons.so，主文件夾下生成了可執行程式helloScons。
+
+5. 如果要把編譯和鏈接兩個步驟分開呢？沒問題，scons提供了Object方法來編譯生成.o(windows下為.obj)文件。
+【SConstruct】文件如下：
+import os
+Object('ext/extScons.c')
+Library('ext/extScons.o')
+Object('helloScons.c')
+Program(['helloScons.o'], LIBS=['extScons'], LIBPATH='./ext')
+Object方法用來編譯生成.o文件，Library和Program則用來鏈接.o生成靜態鏈接庫和可執行文件。
+還可以再改善下如上構建代碼：
+import os
+ext = Object('ext/extScons.c')
+Library(ext)
+main = Object('helloScons.c')
+Program(main, LIBS=['extScons'], LIBPATH='./ext')
+Object會返回編譯產生的.o文件列表，可以直接把這個返回值傳給Library和Program方法。在需要編譯許多代碼文件時，這點還是很有用的。
+
+6. 如果需要在不同作業系統下編譯鏈接不同的代碼文件呢？scons可以很簡單就實現。
+我們再創建一個文件【helloSconsForWin.c】，作為windows環境下使用的主程式：
+#include <stdio.h>
+#include <stdlib.h>
+#include "ext/extScons.h"
+int main(int argc, char* argv[])
+{
+        printf("Hello, SCons in Windows %d!\n", add(1, 2));
+        return 0;
+}
+
+同時，假設我們又希望在Linux下以動態鏈接的形式，而在windows下以靜態鏈接的形式使用extScons。【SConstruct】文件如下：
+import os
+if os.name == "posix":
+     SharedLibrary('ext/extScons.c')
+     Program(['helloScons.c'], LIBS=['extScons'], LIBPATH='./ext')
+elif os.name == "nt":
+     StaticLibrary('ext/extScons.c')
+     Program(['helloSconsForWin.c'], LIBS=['extScons'], LIBPATH='./ext')
+純粹的python語法，使用了os模組，如果你熟悉python的話，編譯和鏈接的邏輯你可以隨心所欲的寫。其實這一點是最吸引我的，因為我算是個python的fan，呵呵。
+
+本文其實只是一些關於scons的最基本的說明，在這裏我也只是拋磚引玉，scons還有很多很好的特性，大家可以參考官方的文檔，如果有什麼新體會新發現，也別忘了留言分享下吧。
+
+
+/******************************************************************************/
+python和shell變數互相傳遞的幾種方法
+/******************************************************************************/
+作者： 字體：[增加 減小] 類型：轉載
+這篇文章主要介紹了python和shell變數互相傳遞方法，使用了環境變數、管道等方法
+python -> shell：
+1.環境變數
+import os  
+var=123或var='123'
+os.environ['var']=str(var)  #environ的鍵值必須是字串   
+os.system('echo $var')  
+
+2.字串連接
+import os  
+path='/root/a.txt'
+var=[1]  
+var='bash'
+os.system('echo ' + path)                  #注意echo後有空格   
+os.system('echo ' + str(var[0]))  
+os.system('echo ' + var + ' /root/c.sh') #注意echo後和/root前有空格   
+
+3.通過管道
+import os  
+var='123'
+os.popen('wc -c', 'w').write(var)  
+
+4.通過文件
+output = open('/tmp/mytxt', 'w')  
+output.write(S)      #把字串S寫入文件  
+output.writelines(L) #將列表L中所有的行字串寫到文件中  
+output.close()  
+
+5.通過重定向標準備輸出
+buf = open('/root/a.txt', 'w')  
+print >> buf, '123\n', 'abc'
+或
+print >> open('/root/a.txt', 'w'), '123\n', 'abc' #寫入或生成文件  
+print >> open('/root/a.txt', 'a'), '123\n', 'abc' #追加  
+
+shell -> python：
+1.管道
+import os  
+var=os.popen('echo -n 123').read( )  
+print var  
+
+2.
+import commands  
+var=commands.getoutput('echo abc')       #輸出結果  
+var=commands.getstatusoutput('echo abc') #退出狀態和輸出結果  
+
+3.文件
+input = open('/tmp/mytxt', 'r')  
+S = input.read( )      #把整個文件讀到一個字串中  
+S = input.readline( )  #讀下一行（越過行結束標誌）  
+L = input.readlines( ) #讀取整個文件到一個行字串的列表中  
+
+/******************************************************************************/
+基本 I/O
+/******************************************************************************/
+接下來看看有關基本 I/O 的部份，你可以使用 open 函式來開啟檔案，開啟時指定存取模式，'r' 表示讀取，'w' 表示寫入，open 函式會傳
+回 file 實例，使用 read 方法可以讀取檔案內容，以 str 型態傳回，如先前談到，傳回的 str 實際上代表著位元組序列。
+
+以下是個實際的讀取程式範例：
+import sys
+file = open(sys.argv[1], 'r')
+content = file.read()
+print content
+file.close()
+
+程式第一行匯入（import）了 sys 模組，sys.argv 是個 list，其中儲存了執行程式時的命令列引數（Command line arguments），索引
+ 0 固定都是執行時的模組名稱，而後是跟隨著的引數，例如執行 python hello.py one two three 時，sys.argv[0] 就會是 'hello.py'
+ ，其餘索引則是 'one'、'two'、'three'。print 在 Python 2.x 中是個陳述句，用來顯示指定的資料，不使用檔案時，記得使用 close 
+ 關閉檔案。
+類似地，一個寫入檔案的程式範例如下，write 方法會將文字的位元組序列寫入至檔案中：
+import sys
+file = open(sys.argv[1], 'w')
+file.write('test')
+file.close()
+
+如果要逐行讀取檔案呢？可以使用 file 的 readline 方法，例如逐行讀取一個文字檔案的所有內容，可以在 while 迴圈中進行：
+import sys
+file = open(sys.argv[1], 'r')
+while True:
+    line = file.readline()
+    if not line: break
+    print line
+file.close()
+
+如果讀不到東西了，那 readline 會傳回 ''，在 if 判斷式中，'' 會被視為 False。
+while 後加上 : 表示區塊開始，Python 中使用縮排來決定區塊範圍。注意！你可以自行決定縮排字元，但是 Python 中縮排要一致，如果縮排想
+使用 Tab 字元，那所有原始碼就都要使用 Tab 字元縮排，如果要使用四個空白字元，那所有原始碼就得是四個空白字元來縮排，強制統一縮排，
+是 Python 的特色，也是 Python 的文化。
+可以使用 file 的 readlines 方法一次讀取所有檔案內容，這會傳回 list，每個索引處代表一行內容，一個程式範例是這樣的：
+import sys
+file = open(sys.argv[1], 'r')
+for line in file.readlines():
+    print line
+file.close()
+
+for in 語法可作用在 list 上，逐一取出 list 中的元素並指定給變數，對於 for line in file.readlines() 是這樣閱讀的：對於 
+file.readlines() 傳回的 list 中每個元素，將之指定給 line。
+實際上對於 Python 來說，讀取檔案最好的方式，就是不要去 read 它，這是什麼意思？是這樣的…
+import sys
+for line in open(sys.argv[1], 'r'):
+    print line
+這是 Python 的風格，也是 Python 的文化，這樣的寫法好處就是增加了可讀性，你不用自行使用 close 關閉檔案，在 file 實例被回收後，檔案
+就會關閉，for line in open(sys.argv[1], 'r') 是這樣閱讀的：對於開啟檔案的每一行。除了可讀性外，這個語法還能讓讀取更有效率，不過現
+階段你不用管這些事，只要當這語法背後施了些魔法就好。
+
+
+/******************************************************************************/
+python對文件進行讀寫操作
+/******************************************************************************/
+python進行文件讀寫的函數是open或file
+file_handler = open(filename,,mode）
+Table mode
+模式    描述
+r       以讀方式打開文件，可讀取文件資訊。
+w       以寫方式打開文件，可向文件寫入資訊。如文件存在，則清空該文件，再寫入新內容
+a       以追加模式打開文件（即一打開文件，文件指針自動移到文件末尾），如果文件不存在則創建
+r+      以讀寫方式打開文件，可對文件進行讀和寫操作。
+w+      消除文件內容，然後以讀寫方式打開文件。
+a+      以讀寫方式打開文件，並把文件指針移到文件尾。
+b       以二進位模式打開文件，而不是以文本模式。該模式只對Windows或Dos有效，類Unix的文件是用二進位模式進行操作的。
+ 
+Table 文件對像方法
+方法            描述
+f.close()       關閉文件，記住用open()打開文件後一定要記得關閉它，否則會佔用系統的可打開文件控制碼數。
+f.fileno()      獲得文件描述符，是一個數字
+f.flush()       刷新輸出緩存
+f.isatty()      如果文件是一個交互終端，則返回True，否則返回False。
+f.read([count]) 讀出文件，如果有count，則讀出count個位元組。
+f.readline()    讀出一行資訊。
+f.readlines()   讀出所有行，也就是讀出整個文件的資訊。
+f.seek(offset[,where]) 把文件指針移動到相對於where的offset位置。where為0表示文件開始處，這是預設值 ；1表示當前位置；2表示文件結尾。
+f.tell()        獲得文件指針位置。
+f.truncate([size])      截取文件，使文件的大小為size。
+f.write(string) 把string字串寫入文件。
+f.writelines(list)      把list中的字串一行一行地寫入文件，是連續寫入文件，沒有換行。
+
+例子如下：
+讀文件
+read = open(result)  
+       line=read.readline()
+       while line:
+             print line
+             line=read.readline()#如果沒有這行會造成死循環
+       read.close
+
+寫文件
+read = file(result,'a+')  
+       read.write("\r\n")  
+       read.write("thank you")  
+       read.close  
+其它
+#-*- encoding:UTF-8 -*-  
+filehandler = open('c:\\111.txt','r')    #以讀方式打開文件，rb為二進位方式(如圖片或可執行文件等)  
+  
+print 'read() function:'              #讀取整個文件  
+print filehandler.read()  
+  
+print 'readline() function:'          #返回文件頭，讀取一行  
+filehandler.seek(0)  
+print filehandler.readline()  
+  
+print 'readlines() function:'         #返回文件頭，返回所有行的列表  
+filehandler.seek(0)  
+print filehandler.readlines()  
+  
+print 'list all lines'                #返回文件頭，顯示所有行  
+filehandler.seek(0)  
+textlist = filehandler.readlines()  
+for line in textlist:  
+    print line,  
+print   
+print  
+  
+print 'seek(15) function'               #移位到第15個字元，從16個字元開始顯示餘下內容  
+filehandler.seek(15)  
+print 'tell() function'  
+print filehandler.tell()              #顯示當前位置  
+print filehandler.read()  
+  
+filehandler.close()                   #關閉文件控制碼  
+
+/******************************************************************************/
+MySQL Python tutorial   from: http://zetcode.com/db/mysqlpython/
+/******************************************************************************/
+This is a Python programming tutorial for the MySQL database. It covers the basics of MySQL programming 
+with Python. It uses the MySQLdb module. The examples were created and tested on Ubuntu Linux.
+There is a similar PostgreSQL Python tutorial, MySQL Visual Basic tutorial, or MySQL PHP tutorial on 
+ZetCode. If you need to refresh your knowledge of the Python language, there is a full Python tutorial. 
+You may also consider to look at the MySQL tutorial, too.
+
+About MySQL database
+MySQL is a leading open source database management system. It is a multi user, multithreaded database 
+management system. MySQL is especially popular on the web. It is one part of the very popular LAMP 
+platform which consists of Linux, Apache, MySQL, and PHP. Currently MySQL is owned by Oracle. MySQL 
+database is available on most important OS platforms. It runs on BSD Unix, Linux, Windows, or Mac OS. 
+Wikipedia and YouTube use MySQL. These sites manage millions of queries each day. MySQL comes in two 
+versions: MySQL server system and MySQL embedded system.
+
+Before we start
+We need to install several packages to execute the examples in this tutorial.
+
+If you do not already have MySQL installed, we must install it.
+$ sudo apt-get install mysql-server
+This command installs the MySQL server and various other packages. While installing the package, we are 
+prompted to enter a password for the MySQL root account.
+
+$ apt-cache search MySQLdb
+python-mysqldb - A Python interface to MySQL
+python-mysqldb-dbg - A Python interface to MySQL (debug extension)
+bibus - bibliographic database
+eikazo - graphical frontend for SANE designed for mass-scanning
+We don not know the package name for the MySQLdb module. We use the apt-cache command to figure it out.
+
+$ sudo apt-get install python-mysqldb
+Here we install the Python interface to the MySQL database. Both _mysql and MySQL modules.
+
+Next, we are going to create a new database user and a new database. We use the mysql client.
+
+$ mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 30
+Server version: 5.0.67-0ubuntu6 (Ubuntu)
+
+Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema | 
+| mysql              | 
++--------------------+
+2 rows in set (0.00 sec)
+We connect to the database using the root account. We show all available databases with the SHOW 
+DATABASES statement.
+
+mysql> CREATE DATABASE testdb;
+Query OK, 1 row affected (0.02 sec)
+We create a new testdb database. We will use this database throughout the tutorial.
+
+mysql> CREATE USER 'testuser'@'localhost' IDENTIFIED BY 'test623';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> USE testdb;
+Database changed
+
+mysql> GRANT ALL ON testdb.* TO 'testuser'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> quit;
+Bye
+We create a new database user. We grant all privileges to this user for all tables of the testdb database.
+
+_mysql module
+The _mysql module implements the MySQL C API directly. It is not compatible with the Python DB API 
+interface. Generally, the programmers prefer the object oriented MySQLdb module. We will concern ourself with the latter module. Here we present only one small example with the _mysql module.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import _mysql
+import sys
+
+try:
+    con = _mysql.connect('localhost', 'testuser', 'test623', 'testdb')
+        
+    con.query("SELECT VERSION()")
+    result = con.use_result()
+    
+    print "MySQL version: %s" % \
+        result.fetch_row()[0]
+    
+except _mysql.Error, e:
+  
+    print "Error %d: %s" % (e.args[0], e.args[1])
+    sys.exit(1)
+
+finally:
+    
+    if con:
+        con.close()
+The example will get and print the version of the MySQL database. For this, we use the SELECT VERSION() SQL statement.
+
+MySQLdb module
+
+MySQLdb is a thin Python wrapper around _mysql. It is compatible with the Python DB API, which makes the code more portable. Using this model is the preferred way of working with the MySQL.
+
+First example
+
+In the first example, we will get the version of the MySQL database.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+import sys
+
+try:
+    con = mdb.connect('localhost', 'testuser', 'test623', 'testdb');
+
+    cur = con.cursor()
+    cur.execute("SELECT VERSION()")
+
+    ver = cur.fetchone()
+    
+    print "Database version : %s " % ver
+    
+except mdb.Error, e:
+  
+    print "Error %d: %s" % (e.args[0],e.args[1])
+    sys.exit(1)
+    
+finally:    
+        
+    if con:    
+        con.close()
+In this script, we connect to the testdb database and execute the SELECT VERSION() statement. This will return the current version of the MySQL database. We print it to the console.
+
+import MySQLdb as mdb
+We import the MySQLdb module.
+
+con = mdb.connect('localhost', 'testuser', 
+    'test623', 'testdb');
+We connect to the database. The connect() method has four parameters. The first parameter is the host, where the MySQL database is located. In our case it is a localhost, e.g. our computer. The second parameter is the database user name. It is followed by the user's account password. The final parameter is the database name.
+
+cur = con.cursor()
+cur.execute("SELECT VERSION()")
+From the connection, we get the cursor object. The cursor is used to traverse the records from the result set. We call the execute() method of the cursor and execute the SQL statement.
+
+ver = cur.fetchone()
+We fetch the data. Since we retrieve only one record, we call the fetchone() method.
+
+print "Database version : %s " % ver
+We print the data that we have retrieved to the console.
+
+except mdb.Error, e:
+  
+    print "Error %d: %s" % (e.args[0],e.args[1])
+    sys.exit(1)
+We check for errors. This is important, since working with databases is error prone.
+
+finally:    
+        
+    if con:    
+        con.close()
+In the final step, we release the resources.
+
+$ ./version.py
+Database version : 5.5.9 
+The output might look like the above.
+
+Creating and populating a table
+
+We create a table and populate it with some data.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb');
+
+with con:
+    
+    cur = con.cursor()
+    cur.execute("DROP TABLE IF EXISTS Writers")
+    cur.execute("CREATE TABLE Writers(Id INT PRIMARY KEY AUTO_INCREMENT, \
+                 Name VARCHAR(25))")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Jack London')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Honore de Balzac')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Lion Feuchtwanger')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Emile Zola')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Truman Capote')")
+We create a Writers table and add five authors to it.
+
+with con:
+With the with keyword, the Python interpreter automatically releases the resources. It also provides error handling.
+
+cur.execute("CREATE TABLE Writers(Id INT PRIMARY KEY AUTO_INCREMENT, \
+                Name VARCHAR(25))")
+This SQL statement creates a new database table called Writers. It has two columns: Id and Name.
+
+cur.execute("INSERT INTO Writers(Name) VALUES('Jack London')")
+cur.execute("INSERT INTO Writers(Name) VALUES('Honore de Balzac')")
+...
+We use the INSERT statement to insert authors to the table. Here we add two rows.
+
+mysql> SELECT * FROM Writers;
++----+-------------------+
+| Id | Name              |
++----+-------------------+
+|  1 | Jack London       |
+|  2 | Honore de Balzac  |
+|  3 | Lion Feuchtwanger |
+|  4 | Emile Zola        |
+|  5 | Truman Capote     |
++----+-------------------+
+5 rows in set (0.00 sec)
+After executing the script, we use the mysql client tool to select all data from the Writers table.
+
+Retrieving data
+
+Now that we have inserted some data into the database, we want to get it back.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb');
+
+with con: 
+
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Writers")
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        print row
+In this example, we retrieve all data from the Writers table.
+
+cur.execute("SELECT * FROM Writers")
+This SQL statement selects all data from the Writers table.
+
+rows = cur.fetchall()
+The fetchall() method gets all records. It returns a result set. Technically, it is a tuple of tuples. Each of the inner tuples represent a row in the table.
+
+for row in rows:
+    print row
+We print the data to the console, row by row.
+
+$ ./retrieve.py
+(1L, 'Jack London')
+(2L, 'Honore de Balzac')
+(3L, 'Lion Feuchtwanger')
+(4L, 'Emile Zola')
+(5L, 'Truman Capote')
+This is the output of the example.
+
+Returning all data at a time may not be feasible. We can fetch rows one by one.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb');
+
+with con:
+
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Writers")
+
+    for i in range(cur.rowcount):
+        
+        row = cur.fetchone()
+        print row[0], row[1]
+We again print the data from the Writers table to the console. This time, we fetch the rows one by one.
+
+for i in range(cur.rowcount):
+    
+    row = cur.fetchone()
+    print row[0], row[1]
+We fetch the rows one by one using the fetchone() method. The rowcount property gives the number of rows returned by the SQL statement.
+
+$ ./retrieve2.py
+1 Jack London
+2 Honore de Balzac
+3 Lion Feuchtwanger
+4 Emile Zola
+5 Truman Capote
+Output of the example.
+
+The dictionary cursor
+
+There are multiple cursor types in the MySQLdb module. The default cursor returns the data in a tuple of tuples. When we use a dictionary cursor, the data is sent in a form of Python dictionaries. This way we can refer to the data by their column names.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+
+with con:
+
+    cur = con.cursor(mdb.cursors.DictCursor)
+    cur.execute("SELECT * FROM Writers LIMIT 4")
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        print row["Id"], row["Name"]
+In this example, we get the first four rows of the Writers table using the dictionary cursor.
+
+cur = con.cursor(mdb.cursors.DictCursor)
+We use the DictCursor dictionary cursor.
+
+cur.execute("SELECT * FROM Writers LIMIT 4")
+We fetch four rows from the Writers table.
+
+for row in rows:
+    print row["Id"], row["Name"]
+We refer to the data by column names of the Writers table.
+
+$ ./dictcur.py
+1 Jack London
+2 Honore de Balzac
+3 Lion Feuchtwanger
+4 Emile Zola
+Example output.
+
+Column headers
+
+Next we will show, how to print column headers with the data from the database table.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+
+with con:
+
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Writers LIMIT 5")
+
+    rows = cur.fetchall()
+
+    desc = cur.description
+
+    print "%s %3s" % (desc[0][0], desc[1][0])
+
+    for row in rows:    
+        print "%2s %3s" % row
+Again, we print the contents of the Writers table to the console. Now, we include the names of the columns too. The column names are considered to be the 'meta data'. It is obtained from the cursor object.
+
+desc = cur.description
+A description attribute of the cursor returns information about each of the result columns of a query.
+
+print "%s %3s" % (desc[0][0], desc[1][0])
+Here we print and format the table column names.
+
+for row in rows:    
+    print "%2s %3s" % row
+And here, we traverse and print the data.
+
+$ ./columnheaders.py
+Id Name
+ 1 Jack London
+ 2 Honore de Balzac
+ 3 Lion Feuchtwanger
+ 4 Emile Zola
+ 5 Truman Capote
+Ouput of the script.
+
+Prepared statements
+
+Now we will concern ourselves with prepared statements. When we write prepared statements, we use placeholders instead of directly writing the values into the statements. Prepared statements increase security and performance. The Python DB API specification suggests 5 different ways how to build prepared statements. The MySQLdb module supports one of them, the ANSI printf format codes.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+    
+with con:    
+
+    cur = con.cursor()
+        
+    cur.execute("UPDATE Writers SET Name = %s WHERE Id = %s", 
+        ("Guy de Maupasant", "4"))        
+    
+    print "Number of rows updated:",  cur.rowcount
+We change the name of an author on the fourth row.
+
+cur.execute("UPDATE Writers SET Name = %s WHERE Id = %s", 
+    ("Guy de Maupasant", "4"))   
+We use the two placeholders identified by the %s markers. Before the SQL statement is executed, the values are bound to their placeholders.
+
+$ ./prepared.py
+Number of rows updated: 1
+We have updated one row.
+
+mysql> SELECT Name FROM Writers WHERE Id=4;
++------------------+
+| Name             |
++------------------+
+| Guy de Maupasant |
++------------------+
+1 row in set (0.00 sec)
+The author on the fourth row was successfully changed.
+
+Inserting images
+
+People often look for ways to insert images into databases. We will show how it can be done in SQLite and Python. Note that some people do not recommend to put images into databases. Images are binary data. MySQL database has a special data type to store binary data called BLOB (Binary Large Object). TINYBLOB, BLOB, MEDIUMBLOB and LONGBLOB are variants of the binary object type.
+
+mysql> CREATE TABLE Images(Id INT PRIMARY KEY, Data MEDIUMBLOB);
+Query OK, 0 rows affected (0.08 sec)
+For this example, we create a new table called Images.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+
+def read_image():
+    
+    fin = open("woman.jpg")    
+    img = fin.read()
+    
+    return img
+    
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+ 
+with con:
+    
+    cur = con.cursor()
+    data = read_image()
+    cur.execute("INSERT INTO Images VALUES(1, %s)", (data, ))
+In the above script, we read a JPG image from the disk and insert it into the Images table.
+
+def read_image():
+    
+    fin = open("woman.jpg")    
+    img = fin.read()
+    
+    return img
+The read_image() method reads binary data from the JPG file, located in the current working directory.
+
+cur.execute("INSERT INTO Images VALUES(1, %s)", (data, ))
+We insert the image data into the Images table.
+
+Reading images
+
+In the previous example, we have inserted an image into the database table. Now we are going to read the image back from the table.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb 
+
+def writeImage(data):
+    
+    fout = open('woman2.jpg', 'wb')
+    
+    with fout:
+        
+        fout.write(data)
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+
+with con:
+
+    cur = con.cursor()
+
+    cur.execute("SELECT Data FROM Images WHERE Id=1")
+    data = cur.fetchone()[0]
+    writeImage(data)    
+We read one image from the Images table.
+
+cur.execute("SELECT Data FROM Images WHERE Id=1")
+We select one record from the table.
+
+fout = open('woman2.jpg', 'wb')
+We open a writable binary file.
+
+fout.write(data)
+We write the data to the disk.
+
+Now we should have an image called woman2.jpg in our current directory. We can check if it is the same image that we have inserted into the table.
+
+Transaction support
+
+A transaction is an atomic unit of database operations against the data in one or more databases. The effects of all the SQL statements in a transaction can be either all committed to the database or all rolled back.
+
+For databases that support transactions, the Python interface silently starts a transaction when the cursor is created. The commit() method commits the updates made using that cursor, and the rollback() method discards them. Each method starts a new transaction.
+
+The MySQL database has different types of storage engines. The most common are the MyISAM and the InnoDB engines. Since MySQL 5.5, InnoDB becomes the default storage engine. There is a trade-off between data security and database speed. The MyISAM tables are faster to process and they do not support transactions. The commit() and rollback() methods are not implemented. They do nothing. On the other hand, the InnoDB tables are more safe against the data loss. They support transactions. They are slower to process.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+import sys
+
+
+try:
+    con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+
+    cur = con.cursor()
+    cur.execute("DROP TABLE IF EXISTS Writers")
+    cur.execute("CREATE TABLE Writers(Id INT PRIMARY KEY AUTO_INCREMENT, \
+                 Name VARCHAR(25)) ENGINE=INNODB")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Jack London')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Honore de Balzac')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Lion Feuchtwanger')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Emile Zola')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Truman Capote')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Terry Pratchett')")
+    
+    con.commit()
+
+    
+except mdb.Error, e:
+  
+    if con:
+        con.rollback()
+        
+    print "Error %d: %s" % (e.args[0],e.args[1])
+    sys.exit(1)
+    
+finally:    
+            
+    if con:    
+        con.close()
+We recreate the Writers table. We explicitly work with transactions.
+
+cur = con.cursor()
+In Python DB API, we do not call the BEGIN statement to start a transaction. A transaction is started when the cursor is created.
+
+cur.execute("CREATE TABLE Writers(Id INT PRIMARY KEY AUTO_INCREMENT, \
+                Name VARCHAR(25)) ENGINE=INNODB")
+We are dealing with a InnoDB table type. For older MySQL versions (<5.5), we need to specify the engine type with the ENGINE=INNODB option.
+
+con.commit()
+We must end a transaction with either a commit() or a rollback() method. If we comment this line, the table is created but the data is not written to the table.
+
+In this tutorial, we have been working with transactions without explicitly stating it. We used context managers. The context manager handles the entry and the exit from the desired runtime context for the execution of the block of code. Context managers are normally invoked using the with statement.
+
+Connection objects in MySQLdb module can be used as context managers. They automatically commit or rollback transactions. Connection context managers clean up code by factoring out try, except, and finally statements.
+
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import MySQLdb as mdb
+
+con = mdb.connect('localhost', 'testuser', 'test623', 'testdb')
+
+with con:
+    
+    cur = con.cursor()
+    cur.execute("DROP TABLE IF EXISTS Writers")
+    cur.execute("CREATE TABLE Writers(Id INT PRIMARY KEY AUTO_INCREMENT, \
+                 Name VARCHAR(25))")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Jack London')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Honore de Balzac')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Lion Feuchtwanger')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Emile Zola')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Truman Capote')")
+    cur.execute("INSERT INTO Writers(Name) VALUES('Terry Pratchett')")
+In our code example, the context manager deals with all the work necessary for error handling. It automatically commits or rolls back a transaction.
+
+    
+This was MySQL Python tutorial. ZetCode has a complete e-book for SQLite Python:
+SQLite Python e-book.
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
