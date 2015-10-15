@@ -661,6 +661,136 @@ git remote # ·|¦C¥X¨Óremote¦Cªí¡CÁ`¤§´N¬Ogit remote add new_remote ssh://... ¡C·
 
 
 /******************************************************************************/
+[Coding] repo & git ªº¨Ï¥Î¤èªk
+/******************************************************************************/
+¤°»ò¬ORepo©MGit¡H
+Git¬O©Ò¿×ªº¤À´²¦¡ª©¥»±±ºÞ¨t²Î¡Aºô¸ô¤W¥i¥H¬d¨ì«Ü¦h¬ÛÃö¸ê®Æ¡A½Ðµ½¥ÎGoogle¡A¦b¦¹´N¥u¶K¤Wºû°ò¦Ê¬ìªº»¡©ú¡C
+­n¥ýª¾¹D¡AAndroid¥»¨­¬O¤@­Ó¤jªºwork space¡A¸Ì­±¥]§t«D±`¦hªºgit repository¡C
+¬°¤F¤è«KºÞ²z³o¨Çgit repository¡ARepo´N¬O­I­tµÛ³o­Ó³d¥ô©Òµo©ú¥X¨Óªº¡C
+Repo¬O¥ÑGoogle¥ÎPython script©Ò¼g¥X¨Ó¡A±Mªù¥Î¨Ó¨Ï¥ÎGitªº¤@®Mscript¡A¥D­n¬O¥Î¨Ó¤U¸ü¡BºÞ²zAndroid¤U©Ò¦³ªºgit repository¡C
+Repo: 
+¨Ï¥ÎRepo´N¤j³¡¤À«ö·Ó¥H¤Uªº®æ¦¡
+repo COMMAND OPTIONS
+
+1¡BÀò¨ú¬ÛÃöÀ°§U¡G
+repo help COMMAND
+¨Ò¦p¡Grepo help init¡A´N¥i¥H¨ú±orepo initªº¨ä¥L¥Îªk
+
+2¡Brepo init -u URL
+¥Î¨Ó¦b¥Ø«e¥Ø¿ý¦w¸Ë¤U¸ü¾ã­ÓAndroid repository¡A·|¤U«Ø¥ß¤@­Ó".repo"ªº¥Ø¿ý¡C
+-u°Ñ¼Æ¥Î¨Ó«ü©w¤@­ÓURL¡A±q³o­ÓURL¤¤Àò¨úrepositoryªºmanifest¤å¥ó¡C
+¨Ò¦p¡Grepo init -u git://android.git.kernel.org/platform/manifest.git¡AÀò¨úªºmanifest¤å¥ó©ñ¦b.repo¥Ø¿ý¤¤¡A©R¦W¬°manifest.xml¡C
+³o­Ó¤å¥óªº¤º®e¨ä¹ê´N¬OAndroid work space¤U©Ò¦³³QgitºÞ²zªºgit repositoryªº¦Cªí¡I
+¦pªG§A¦³¥J²Ó¬Ý¡A¥i¥Hµo²{¨ì.repo/manifests¬O­Ó³QgitºÞ²zªºrepository¡A¸Ì­±©ñµÛ©Ò¦³ªºmanifest¤å¥ó (*.xml)¡C¦Ó³z¹L°Ñ¼Æªº³]©w¡A«h¥i¥H«ü©w­n¨Ï¥Î­þ­Ómanifest¤å¥ó¡A¬Æ¦Ü¬O¸Ó¤å¥óªº¤£¦Pbranch¡C
+-m¡G¥Î¨Ó¿ï¾ÜÀò¨ú repository ¤¤ªº¬Y¤@­Ó¯S©wªº manifest ¤å¥ó¡C¦pªG¤£¨ãÅé«ü©w¡A¨º»òªí¥Ü¬°¹w³]ªº manifest ¤å¥ó (default.xml)
+repo init -u git://android.git.kernel.org/platform/manifest.git -m dalvik-plus.xml
+-b¡G¥Î¨Ó«ü©w¬Y­Ómanifest ¤À¤ä¡C
+repo init -u git://android.git.kernel.org/platform/manifest.git -b release-1.0
+
+3¡Brepo sync [PROJECT_LIST]
+¤U¸ü³Ì·s¤å¥ó¡A§ó·s¦¨¥\«á¡A¤å¥ó·|©M»·ºÝserver¤¤ªº¥N½X¬O¤@¼Ëªº¡C ¥i¥H«ü©w»Ý­n§ó·sªºproject ¡A ¦pªG¤£«ü©w¥ô¦ó°Ñ¼Æ¡A«h·|¦P¨B¾ã­Ó©Ò¦³ªºproject¡C
+
+4¡Brepo upload [PROJECT_LIST]
+¤W¶Ç­×§ïªº¥N½X ¡A¦pªG§Aªº¥N½X¦³©Ò­×§ï¡A¨º»ò¦b¹B¦æ repo sync ªº®É­Ô¡A·|´£¥Ü§A¤W¶Ç­×§ïªº¥N½X¡C©Ò¦³­×§ïªº¥N½X¤À¤ä·|¤W¶Ç¨ì Gerrit¡AGerrit ¦¬¨ì¤W¶Çªº¥N½X¡A·|Âà´«¬°¤@­Ó§ï°Ê¡A±q¦Ó¥i¥HÅý¤H­Ì¨Óreview ­×§ïªº¥N½X¡C
+
+5¡Brepo diff [PROJECT_LIST]
+Åã¥Ü©|¥¼commitªº§ï°Ê®t²§
+
+6¡Brepo download target revision
+¤U¸ü«ü©wªº­×§ïª©¥»¡A ¨Ò¦p:  repo download platform/frameworks/base 1241 ¡A´N¬O¤U¸ü­×§ïª©¥»¬° 1241 ªº¥N½X¡C
+
+7¡Brepo start new_branch_name [PROJECT_LIST]
+¦b«ü©wªºproject¤¤«Ø¥ß·sªºbranch¡A¨Ã¥B¤Á´«¨ì¸Óbranch¤W¡C
+
+--all¡G¥Nªí«ü©w©Ò¦³ªºgit projects
+
+8¡Brepo prune [PROJECT_LIST]
+§R°£¤w¸gmerge¦nªºproject¡C
+
+9¡Brepo forall [PROJECT_LIST] -c COMMAND
+°w¹ï«ü©wªºproject°õ¦æ©Ò±a¤Jªºgit command¡A¨Ò¦p¡Grepo forall -c git reset --hard HEAD ´N·|±N©Ò¦³project¤¤ªº§ï°Ê¥þ³¡³£²M±¼¡C
+
+10¡Brepo status
+Åã¥Ü©Ò¦³projectªºª¬ºA
+
+Git:
+1. §â»·ºÝªºgit project§ì¤U¨Ó©ñ¦blocal
+git clone [REMOTE_PROJECT_URL]
+
+2. ¤§«e¦³´£¨ìªº¡A¥ô¦óªº§ï°Ê³£»Ý­n«Ø¥ß¦bbranch¤§¤W¡A©Ò¥H´N±o«Ø¥ßlocal branch
+git branch [BRANCH_NAME]
+
+¦pªGlocal branch»Ý­ntrack»·ºÝªºbranch¡A¨º´N¦b«á­±¥[¤Wremote branch
+git branch [BRANCH_NAME] [REMOTE_BRANCH]
+
+­nª¾¹D¦³­þ¨Çremote branch¡A¥i¥H³z¹Lgit branch -a¡A·|¦C¥X©Ò¦³(local©Mremote)ªºbranch¡C
+git branch -a
+Á|¨Ò¨Ó»¡¡G
+$ git branch -a
+
+* local_branch
+
+  remotes/arm7/master
+
+$ git branch local_branch_test remotes/arm7/master
+
+3. ¤Á´«local branch
+git checkout [BRANCH_NAME]
+
+4. ¦C¥X©Ò¦³ªº§ï°Ê
+git status
+
+5. §â§ï°ÊªºÀÉ®×¥ý©ñ¤Wmodified list
+git add [FILE_NAME]
+
+ or 
+
+git add [DIR_NAME]
+
+6. §âmodified list¤¤ªºÀÉ®×¡A°h±¼§ï°Ê
+git checkout [FILE_NAME]
+
+ or
+
+git checkout [DIR_NAME]
+
+7. §â©Ò¦³project¤¤ªº©Ò¦³§ï°Ê³£°h±¼
+git reset --hard HEAD
+
+8. ±Nmodified list¤¤ªº§ï°Ê¤@°_commit¨ìlocal branch
+git commit
+
+9. ±Nlocal branch¤W¤w¸gcommitªº§ï°Ê°h±¼ (§ï°ÊÁÙ¯dµÛ)
+git reset --soft HEAD^
+
+10. §âcommitªº§ï°Ê¡A©ñ¨ìremote branch
+git push [REMOTE_PROJECT_URL] HEAD:refs/to/[REMOTE_BRANCH_NAME]
+
+­n«ç»òª¾¹Dremote branch name©O¡H
+¥i¥H³z¹Lgit remote show [REMOTE]¡A¨Ò¦p¤U­±ªº¨Ò¤l¤¤ªºbranch name´N¬Omaster¡G
+$ git remote
+
+mips
+
+$ git remote show mips
+
+* remote mips
+
+  Fetch URL: [REMOTE_PROJECT_URL]
+
+  Push  URL: [REMOTE_PROJECT_URL]
+
+  HEAD branch: master
+
+  Remote branch:
+
+    master tracked
+
+  Local branch configured for 'git pull':
+
+    local_branch merges with remote master
+
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
