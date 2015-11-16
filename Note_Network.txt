@@ -480,6 +480,211 @@ ping«ü¥Oªº¨ä¥L§Þ¥©¡G¦b¤@¯ë±¡ªp¤UÁÙ¥i¥H³z¹Lping¹ï¤èÅý¹ï¤èªð¦^µ¹§AªºTTL­È¤j¤p¡A²Ê²
 64----40
 32----20
 
+
+/******************************************************************************/
+linux curl ©R¥O¸Ô¸Ñ¡A¥H¤Î¹ê¨Ò
+/******************************************************************************/
+linux curl¬O¤@­Ó§Q¥ÎURL³W«h¦b©R¥O¦æ¤U¤u§@ªº¤å¥ó¶Ç¿é¤u¨ã¡C¥¦¤ä´©¤å¥óªº¤W¶Ç©M¤U¸ü¡A©Ò¥H¬Oºî¦X¶Ç¿é¤u¨ã¡A¦ý«ö¶Ç²Î¡A²ßºDºÙurl¬°¤U¸ü¤u¨ã¡C
+¤@¡Acurl©R¥O°Ñ¼Æ¡A¦³¦n¦h§Ú¨S¦³¥Î¹L¡A¤]¤£ª¾¹DÂ½Ä¶ªº¹ï¤£¹ï¡A¦pªG¦³»~ªº¦a¤è¡AÁÙ½Ð«ü¥¿¡C
+¬d¬Ý½Æ»s¦C¦L?
+-a/--append ¤W¶Ç¤å¥ó®É¡Aªþ¥[¨ì¥Ø¼Ð¤å¥ó  
+ -A/--user-agent <string>  ³]¸m¥Î¤á¥N²zµo°eµ¹¦øªA¾¹  
+ - anyauth   ¥i¥H¨Ï¥Î¡u¥ô¦ó¡v¨­¥÷ÅçÃÒ¤èªk  
+ -b/--cookie <name=string/file> cookie¦r¦ê©Î¤å¥óÅª¨ú¦ì¸m  
+ - basic ¨Ï¥ÎHTTP°ò¥»ÅçÃÒ  
+ -B/--use-ascii ¨Ï¥ÎASCII /¤å¥»¶Ç¿é  
+ -c/--cookie-jar <file> ¾Þ§@µ²§ô«á§âcookie¼g¤J¨ì³o­Ó¤å¥ó¤¤  
+ -C/--continue-at <offset>  Â_ÂIÄòÂà  
+ -d/--data <data>   HTTP POST¤è¦¡¶Ç°e¼Æ¾Ú  
+ --data-ascii <data>  ¥Hasciiªº¤è¦¡post¼Æ¾Ú  
+ --data-binary <data> ¥H¤G¶i¦ìªº¤è¦¡post¼Æ¾Ú  
+ --negotiate     ¨Ï¥ÎHTTP¨­¥÷ÅçÃÒ  
+ --digest        ¨Ï¥Î¼Æ¦r¨­¥÷ÅçÃÒ  
+ --disable-eprt  ¸T¤î¨Ï¥ÎEPRT©ÎLPRT  
+ --disable-epsv  ¸T¤î¨Ï¥ÎEPSV  
+ -D/--dump-header <file> §âheader¸ê°T¼g¤J¨ì¸Ó¤å¥ó¤¤  
+ --egd-file <file> ¬°ÀH¾÷¼Æ¾Ú(SSL)³]¸mEGD socket¸ô®|  
+ --tcp-nodelay   ¨Ï¥ÎTCP_NODELAY¿ï¶µ  
+ -e/--referer ¨Ó·½ºô§}  
+ -E/--cert <cert[:passwd]> ¥Î¤áºÝÃÒ®Ñ¤å¥ó©M±K½X (SSL)  
+ --cert-type <type> ÃÒ®Ñ¤å¥óÃþ«¬ (DER/PEM/ENG) (SSL)  
+ --key <key>     ¨pÆ_¤å¥ó¦W (SSL)  
+ --key-type <type> ¨pÆ_¤å¥óÃþ«¬ (DER/PEM/ENG) (SSL)  
+ --pass  <pass>  ¨pÆ_±K½X (SSL)  
+ --engine <eng>  ¥[±K¤ÞÀº¨Ï¥Î (SSL). "--engine list" for list  
+ --cacert <file> CAÃÒ®Ñ (SSL)  
+ --capath <directory> CA¥Ø¿ý (made using c_rehash) to verify peer against (SSL)  
+ --ciphers <list>  SSL±K½X  
+ --compressed    ­n¨Dªð¦^¬OÀ£ÁYªº§Î¶Õ (using deflate or gzip)  
+ --connect-timeout <seconds> ³]¸m³Ì¤j½Ð¨D®É¶¡  
+ --create-dirs   «Ø¥ß¥»¦a¥Ø¿ýªº¥Ø¿ý¼h¦¸µ²ºc  
+ --crlf          ¤W¶Ç¬O§âLFÂàÅÜ¦¨CRLF  
+ -f/--fail          ³s±µ¥¢±Ñ®É¤£Åã¥Ühttp¿ù»~  
+ --ftp-create-dirs ¦pªG»·ºÝ¥Ø¿ý¤£¦s¦b¡A³Ð«Ø»·ºÝ¥Ø¿ý  
+ --ftp-method [multicwd/nocwd/singlecwd] ±±¨îCWDªº¨Ï¥Î  
+ --ftp-pasv      ¨Ï¥Î PASV/EPSV ¥N´À³s±µ°ð  
+ --ftp-skip-pasv-ip ¨Ï¥ÎPASVªº®É­Ô,©¿²¤¸ÓIP¦a§}  
+ --ftp-ssl       ¹Á¸Õ¥Î SSL/TLS ¨Ó¶i¦æftp¼Æ¾Ú¶Ç¿é  
+ --ftp-ssl-reqd  ­n¨D¥Î SSL/TLS ¨Ó¶i¦æftp¼Æ¾Ú¶Ç¿é  
+ -F/--form <name=content> ¼ÒÀÀhttpªí³æ´£¥æ¼Æ¾Ú  
+ -form-string <name=string> ¼ÒÀÀhttpªí³æ´£¥æ¼Æ¾Ú  
+ -g/--globoff ¸T¥Îºô§}§Ç¦C©M½d³ò¨Ï¥Î{}©M[]  
+ -G/--get ¥Hgetªº¤è¦¡¨Óµo°e¼Æ¾Ú  
+ -h/--help À°§U  
+ -H/--header <line>¦Û©w¸qÀY¸ê°T¶Ç»¼µ¹¦øªA¾¹  
+ --ignore-content-length  ©¿²¤ªºHTTPÀY¸ê°Tªºªø«×  
+ -i/--include ¿é¥X®É¥]¬AprotocolÀY¸ê°T  
+ -I/--head  ¥uÅã¥Ü¤åÀÉ¸ê°T  
+ ±q¤å¥ó¤¤Åª¨ú-j/--junk-session-cookies©¿²¤·|¸ÜCookie  
+ - ¬É­±<interface>«ü©wºô¸ô¤¶­±/¦a§}¨Ï¥Î  
+ - krb4 <¯Å§O>±Ò¥Î»P«ü©wªº¦w¥þ¯Å§Okrb4  
+ -j/--junk-session-cookies Åª¨ú¤å¥ó¶i©¿²¤session cookie  
+ --interface <interface> ¨Ï¥Î«ü©wºô¸ô¤¶­±/¦a§}  
+ --krb4 <level>  ¨Ï¥Î«ü©w¦w¥þ¯Å§Oªºkrb4  
+ -k/--insecure ¤¹³\¤£¨Ï¥ÎÃÒ®Ñ¨ìSSL¯¸¥x  
+ -K/--config  «ü©wªº°t¸m¤å¥óÅª¨ú  
+ -l/--list-only ¦C¥Xftp¥Ø¿ý¤Uªº¤å¥ó¦WºÙ  
+ --limit-rate <rate> ³]¸m¶Ç¿é³t«×  
+ --local-port<NUM> ±j¨î¨Ï¥Î¥»¦a³s±µ°ð¸¹  
+ -m/--max-time <seconds> ³]¸m³Ì¤j¶Ç¿é®É¶¡  
+ --max-redirs <num> ³]¸m³Ì¤jÅª¨úªº¥Ø¿ý¼Æ  
+ --max-filesize <bytes> ³]¸m³Ì¤j¤U¸üªº¤å¥óÁ`¶q  
+ -M/--manual  Åã¥Ü¥þ¤â°Ê  
+ -n/--netrc ±qnetrc¤å¥ó¤¤Åª¨ú¥Î¤á¦W©M±K½X  
+ --netrc-optional ¨Ï¥Î .netrc ©ÎªÌ URL¨ÓÂÐ»\-n  
+ --ntlm          ¨Ï¥Î HTTP NTLM ¨­¥÷ÅçÃÒ  
+ -N/--no-buffer ¸T¥Î½w½Ä¿é¥X  
+ -o/--output §â¿é¥X¼g¨ì¸Ó¤å¥ó¤¤  
+ -O/--remote-name §â¿é¥X¼g¨ì¸Ó¤å¥ó¤¤¡A«O¯d»·ºÝ¤å¥óªº¤å¥ó¦W  
+ -p/--proxytunnel   ¨Ï¥ÎHTTP¥N²z  
+ --proxy-anyauth ¿ï¾Ü¥ô¤@¥N²z¨­¥÷ÅçÃÒ¤èªk  
+ --proxy-basic   ¦b¥N²z¤W¨Ï¥Î°ò¥»¨­¥÷ÅçÃÒ  
+ --proxy-digest  ¦b¥N²z¤W¨Ï¥Î¼Æ¦r¨­¥÷ÅçÃÒ  
+ --proxy-ntlm    ¦b¥N²z¤W¨Ï¥Întlm¨­¥÷ÅçÃÒ  
+ -P/--ftp-port <address> ¨Ï¥Î³s±µ°ð¦a§}¡A¦Ó¤£¬O¨Ï¥ÎPASV  
+ -Q/--quote <cmd>¤å¥ó¶Ç¿é«e¡Aµo°e©R¥O¨ì¦øªA¾¹  
+ -r/--range <range>ÀË¯Á¨Ó¦ÛHTTP/1.1©ÎFTP¦øªA¾¹¦ì¤¸²Õ½d³ò  
+ --range-file Åª¨ú¡]SSL¡^ªºÀH¾÷¤å¥ó  
+ -R/--remote-time   ¦b¥»¦a¥Í¦¨¤å¥ó®É¡A«O¯d»·ºÝ¤å¥ó®É¶¡  
+ --retry <num>   ¶Ç¿é¥X²{°ÝÃD®É¡A­«¸Õªº¦¸¼Æ  
+ --retry-delay <seconds>  ¶Ç¿é¥X²{°ÝÃD®É¡A³]¸m­«¸Õ¶¡¹j®É¶¡  
+ --retry-max-time <seconds> ¶Ç¿é¥X²{°ÝÃD®É¡A³]¸m³Ì¤j­«¸Õ®É¶¡  
+ -s/--silentÀR­µ¼Ò¦¡¡C¤£¿é¥X¥ô¦óªF¦è  
+ -S/--show-error   Åã¥Ü¿ù»~  
+ --socks4 <host[:port]> ¥Îsocks4¥N²zµ¹©w¥D¾÷©M³s±µ°ð  
+ --socks5 <host[:port]> ¥Îsocks5¥N²zµ¹©w¥D¾÷©M³s±µ°ð  
+ --stderr <file>  
+ -t/--telnet-option <OPT=val> Telnet¿ï¶µ³]¸m  
+ --trace <file>  ¹ï«ü©w¤å¥ó¶i¦ædebug  
+ --trace-ascii <file> Like --¸òÂÜ¦ý¨S¦³hex¿é¥X  
+ --trace-time    ¸òÂÜ/¸Ô²Ó¿é¥X®É¡A²K¥[®É¶¡ÂW  
+ -T/--upload-file <file> ¤W¶Ç¤å¥ó  
+ --url <URL>     Spet URL to work with  
+ -u/--user <user[:password]>³]¸m¦øªA¾¹ªº¥Î¤á©M±K½X  
+ -U/--proxy-user <user[:password]>³]¸m¥N²z¥Î¤á¦W©M±K½X  
+ -v/--verbose  
+ -V/--version Åã¥Üª©¥»¸ê°T  
+ -w/--write-out [format]¤°»ò¿é¥X§¹¦¨«á  
+ -x/--proxy <host[:port]>¦bµ¹©wªº³s±µ°ð¤W¨Ï¥ÎHTTP¥N²z  
+ -X/--request <command>«ü©w¤°»ò©R¥O  
+ -y/--speed-time ©ñ±ó­­³t©Ò­nªº®É¶¡¡CÀq»{¬°30  
+ -Y/--speed-limit °±¤î¶Ç¿é³t«×ªº­­¨î¡A³t«×®É¶¡'¬í  
+ -z/--time-cond  ¶Ç°e®É¶¡³]¸m  
+ -0/--http1.0  ¨Ï¥ÎHTTP 1.0  
+ -1/--tlsv1  ¨Ï¥ÎTLSv1¡]SSL¡^  
+ -2/--sslv2 ¨Ï¥ÎSSLv2ªº¡]SSL¡^  
+ -3/--sslv3         ¨Ï¥ÎªºSSLv3¡]SSL¡^  
+ --3p-quote      like -Q for the source URL for 3rd party transfer  
+ --3p-url        ¨Ï¥Îurl¡A¶i¦æ²Ä¤T¤è¶Ç°e  
+ --3p-user       ¨Ï¥Î¥Î¤á¦W©M±K½X¡A¶i¦æ²Ä¤T¤è¶Ç°e  
+ -4/--ipv4   ¨Ï¥ÎIP4  
+ -6/--ipv6   ¨Ï¥ÎIP6  
+ -#/--progress-bar ¥Î¶i«×±øÅã¥Ü·í«eªº¶Ç°eª¬ºA  
+¤G¡A±`¥Îcurl¹ê¨Ò
+1¡A§ì¨ú­¶­±¤º®e¨ì¤@­Ó¤å¥ó¤¤
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -o home.html  http://blog.51yip.com  
+2¡A¥Î-O¡]¤j¼gªº¡^¡A«á­±ªºurl­n¨ãÅé¨ì¬Y­Ó¤å¥ó¡A¤£µM§ì¤£¤U¨Ó¡C§Ú­ÌÁÙ¥i¥H¥Î¥¿«h¨Ó§ì¨úªF¦è
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -O http://blog.51yip.com/wp-content/uploads/2010/09/compare_varnish.jpg  
+[root@krlcgcms01 mytest]# curl -O http://blog.51yip.com/wp-content/uploads/2010/[0-9][0-9]/aaaaa.jpg  
+3¡A¼ÒÀÀªí³æ¸ê°T¡A¼ÒÀÀµn¿ý¡A«O¦scookie¸ê°T
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -c ./cookie_c.txt -F log=aaaa -F pwd=****** http://blog.51yip.com/wp-login.php  
+4¡A¼ÒÀÀªí³æ¸ê°T¡A¼ÒÀÀµn¿ý¡A«O¦sÀY¸ê°T
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -D ./cookie_D.txt -F log=aaaa -F pwd=****** http://blog.51yip.com/wp-login.php  
+-c(¤p¼g)²£¥Íªºcookie©M-D¸Ì­±ªºcookie¬O¤£¤@¼Ëªº¡C
+5¡A¨Ï¥Îcookie¤å¥ó
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -b ./cookie_c.txt  http://blog.51yip.com/wp-admin  
+6¡AÂ_ÂIÄò¶Ç¡A-C(¤j¼gªº)
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -C -O http://blog.51yip.com/wp-content/uploads/2010/09/compare_varnish.jpg  
+7¡A¶Ç°e¼Æ¾Ú,³Ì¦n¥Îµn¿ý­¶­±´ú¸Õ¡A¦]¬°§A¶Ç­È¹L¥h«á¡Acurl¦^§ì¼Æ¾Ú¡A§A¥i¥H¬Ý¨ì§A¶Ç­È¦³¨S¦³¦¨¥\
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -d log=aaaa  http://blog.51yip.com/wp-login.php  
+8¡AÅã¥Ü§ì¨ú¿ù»~¡A¤U­±³o­Ó¨Ò¤l¡A«Ü²M·¡ªºªí©ú¤F¡C
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -f http://blog.51yip.com/asdf  
+curl: (22) The requested URL returned error: 404  
+[root@krlcgcms01 mytest]# curl http://blog.51yip.com/asdf  
+  
+<HTML><HEAD><TITLE>404,not found</TITLE>  
+¡C¡C¡C¡C¡C¡C¡C¡C¡C¡C¡C¡C  
+9¡A°°³y¨Ó·½¦a§}¡A¦³ªººô¯¸·|§PÂ_¡A½Ð¨D¨Ó·½¦a§}¡C
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -e http://localhost http://blog.51yip.com/wp-login.php  
+10¡A·í§Ú­Ì¸g±`¥Îcurl¥h·d¤H®aªF¦èªº®É­Ô¡A¤H®a·|§â§AªºIPµ¹«Ì½ª±¼ªº,³o­Ó®É­Ô,§Ú­Ì¥i¥H¥Î¥N²z
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -x 24.10.28.84:32779 -o home.html http://blog.51yip.com  
+11¡A¤ñ¸û¤jªºªF¦è¡A§Ú­Ì¥i¥H¤À¬q¤U¸ü
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -r 0-100 -o img.part1 http://blog.51yip.com/wp-  
+  
+content/uploads/2010/09/compare_varnish.jpg  
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current  
+ Dload  Upload   Total   Spent    Left  Speed  
+100   101  100   101    0     0    105      0 --:--:-- --:--:-- --:--:--     0  
+[root@krlcgcms01 mytest]# curl -r 100-200 -o img.part2 http://blog.51yip.com/wp-  
+  
+content/uploads/2010/09/compare_varnish.jpg  
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current  
+ Dload  Upload   Total   Spent    Left  Speed  
+100   101  100   101    0     0     57      0  0:00:01  0:00:01 --:--:--     0  
+[root@krlcgcms01 mytest]# curl -r 200- -o img.part3 http://blog.51yip.com/wp-  
+  
+content/uploads/2010/09/compare_varnish.jpg  
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current  
+ Dload  Upload   Total   Spent    Left  Speed  
+100  104k  100  104k    0     0  52793      0  0:00:02  0:00:02 --:--:-- 88961  
+[root@krlcgcms01 mytest]# ls |grep part | xargs du -sh  
+4.0K    one.part1  
+112K    three.part3  
+4.0K    two.part2  
+¥Îªº®É­Ô¡A§â¥L­Ìcat¤@¤U´NOK¤F,cat img.part* >img.jpg
+12¡A¤£·|Åã¥Ü¤U¸ü¶i«×¸ê°T
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -s -o aaa.jpg  http://blog.51yip.com/wp-content/uploads/2010/09/compare_varnish.jpg  
+13¡AÅã¥Ü¤U¸ü¶i«×±ø
+¬d¬Ý½Æ»s¦C¦L?
+[root@krlcgcms01 mytest]# curl -# -O  http://blog.51yip.com/wp-content/uploads/2010/09/compare_varnish.jpg  
+######################################################################## 100.0%  
+14,³q¹Lftp¤U¸ü¤å¥ó
+¬d¬Ý½Æ»s¦C¦L?
+[zhangy@BlackGhost ~]$ curl -u ¥Î¤á¦W:±K½X -O http://blog.51yip.com/demo/curtain/bbstudy_files/style.css  
+ % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current  
+ Dload  Upload   Total   Spent    Left  Speed  
+101  1934  101  1934    0     0   3184      0 --:--:-- --:--:-- --:--:--  7136  
+©ÎªÌ¥Î¤U­±ªº¤è¦¡
+¬d¬Ý½Æ»s¦C¦L?
+[zhangy@BlackGhost ~]$ curl -O ftp://¥Î¤á¦W:±K½X@ip:port/demo/curtain/bbstudy_files/style.css  
+15¡A³q¹Lftp¤W¶Ç
+¬d¬Ý½Æ»s¦C¦L?
+[zhangy@BlackGhost ~]$ curl -T test.sql ftp://¥Î¤á¦W:±K½X@ip:port/demo/curtain/bbstudy_files/  
+6
+
+/******************************************************************************/
 /******************************************************************************/
 
 /******************************************************************************/

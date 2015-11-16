@@ -2012,10 +2012,113 @@ In our code example, the context manager deals with all the work necessary for e
     
 This was MySQL Python tutorial. ZetCode has a complete e-book for SQLite Python:
 SQLite Python e-book.
+
+/******************************************************************************/
+用 Python 的 SimpleHTTPServer 模組快速建立一個臨時網頁伺服器（Web Server）
+/******************************************************************************/
+如果你需要一個簡單的 Web 伺服器做一些臨時性的工作，但又不想花很多時間去安裝像 Apache 這樣完整的網頁伺服器，
+那你可以試試看 Python 的 SimpleHTTPServer 模組，使用這個模組可以讓任何的目錄中的資料立即放上網路，而且不需要安裝其餘任何軟體，只需要 Python 就夠了。
+
+就實際的應用來說，這樣的方式可以讓你很方便的在區域網路（local network）中分享資料，而要使用這個迷你的網頁伺服器也非常簡單，只要一行指令就可以了。
+假設你的電腦 IP 位址為 192.168.0.1，而想要分享 /home/seal 中的資料，則先切換到該目錄中：
+cd /home/seal
+再啟動 Python 的網頁伺服器：
+python -m SimpleHTTPServer
+就這樣一行指令就完成了！非常方便。執行這行指令應該會看到這樣的輸出訊息：
+Serving HTTP on 0.0.0.0 port 8000 ...
+這個訊息是告訴你網頁伺服器所開啟的 port 是 8000，這時候你可以開啟瀏覽器測試一下，再瀏覽器上輸入以下的網址：
+http://192.168.0.1:8000/
+這樣就可以看到分享的網頁了。如果是在自己的電腦上要看自己的伺服器所分享的網頁，也可以輸入這樣的網址：
+http://127.0.0.1:8000
+如果被分享的目錄中有 index.html 這個網頁檔，則開啟這個目錄時，預設就會顯示這個網頁檔，而如果這個檔案不存在，則會自動顯示該目錄中的檔案列表。
+
+如果你想要更改伺服器所使用的 port，則可以直接在指令的最後面指定 port number：
+python -m SimpleHTTPServer 8080
+
+在預設的狀況下，伺服器會傾聽所有的網路位址，如果只想要傾聽本機的位址（localhost），就要自己撰寫指令稿（script）了：
+#/usr/bin/python
+import sys
+import BaseHTTPServer
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+
+HandlerClass = SimpleHTTPRequestHandler
+ServerClass  = BaseHTTPServer.HTTPServer
+Protocol     = "HTTP/1.0"
+
+if sys.argv[1:]:
+  port = int(sys.argv[1])
+else:
+  port = 8000
+server_address = ('127.0.0.1', port)
+
+HandlerClass.protocol_version = Protocol
+httpd = ServerClass(server_address, HandlerClass)
+
+sa = httpd.socket.getsockname()
+print "Serving HTTP on", sa[0], "port", sa[1], "..."
+httpd.serve_forever()
+
+因為 Python 是一種跨平台的語言，所以這個 Python 網頁伺服器也可以在 Windows 或 Cygwin 等環境下使用。
+
+
+/******************************************************************************/
+python sys.argv[]用法
+/******************************************************************************/
+常看到python中出現sys.argv[]這東西
+找了些資料總算理解了
+紀錄一下備忘
+
+sys.argv[]是python獲取命令列參數的方法
+譬如我們在terminal中會輸入的指令
+ls -a
+-a就是命令列參數
+sys.argv[0] 代表了文件的檔案名稱本身
+意思就是ls 
+sys.argv[1] 就代表了-a
+
+以下是參考網路的範例並修改成容易理解的方式
+# -*- coding: utf-8 -*-
+import sys
+
+#建立一個讀取檔案的function能將檔案內容print出來
+def readfile(filename): 
+	#'''read file and print'''
+	f = file(filename)
+	while True:
+		line = f.readline()
+		if len(line) == 0:
+			break
+	print line, 
+	f.close()
+	
+#開始對sys.argv下定義
+if len(sys.argv) < 2: #len小於2也就是不帶參數啦
+	print 'no argument'
+ 	sys.exit()
+if sys.argv[1].startswith('--'):
+ 	option = sys.argv[1][2:] # 取出sys.argv[1]的數值但是忽略掉'--'這兩個字元
+ 	if option == 'version': 
+  		print 'Version 1.2.3'
+ 	elif option == 'help':
+  		print 'help documention'
+ 	else:
+  		print 'only --version --help can be used'
+  	sys.exit()
+else:
+ 	for filename in sys.argv[1:]: #檔案名稱於參數位置時讀取檔案
+  		readfile(filename)
+"""
+此檔案名稱為readfile.py
+則可以用readfile.py --version來查詢版號
+readfile.py --help來查詢help文件
+readfile.py readme.txt 可以執行function
+"""
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/

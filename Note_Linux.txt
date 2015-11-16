@@ -155,6 +155,50 @@ PS: if want install TFTP Client
 
 
 /***************************************************************************/
+重新抓一隻記錄一下重灌都在做的事，免得很難查...
+/***************************************************************************/
+sudo passwd root
+讓root 有密可以登入
+
+ssh
+預設ubuntu 沒裝 先設定好proxy
+下載最新的source-list
+aptitude才有新套件可以選
+安裝openssh-server
+    apt-get install openssh-server
+
+vi 調整
+裝新版的vim
+參見http://blog.roodo.com/bejo/archives/7279917.html
+上色
+
+Search 上色
+修改/etc/vim/vimrc
+加上
+set hlsearch
+
+.bashrc 調整
+改alias，LANG=C
+
+StartUp-manager
+修改開機顯示
+
+安裝套件
+SVN: Subversion
+NFS : nfs-common nfs-kernel-server
+SAMBA: samba
+tftp: tftpd-hpa
+g++: 往gcc 上面幾格 (工作)
+zlib (工作 make)
+patchutils ( code pacth 指令 )
+ncurses (工作 make)
+bison (工作 DLNA)
+flex (工作 DLNA)
+scew (工作 xml) 用原始碼裝
+expat (工作 xml) 用原始碼裝
+gettext (GNU gettext)
+
+/***************************************************************************/
 // Linux 常用指令集
 /***************************************************************************/
 linux根目錄下的目錄說明：
@@ -1257,49 +1301,6 @@ Mapping the entire framebuffer to a given memory range. Port commands to set eac
 Mapping a memory range smaller than the framebuffer memory, then bank switching as necessary.
 
 
-/***************************************************************************/
-重新抓一隻記錄一下重灌都在做的事，免得很難查...
-/***************************************************************************/
-sudo passwd root
-讓root 有密可以登入
-
-ssh
-預設ubuntu 沒裝 先設定好proxy
-下載最新的source-list
-aptitude才有新套件可以選
-安裝openssh-server
-    apt-get install openssh-server
-
-vi 調整
-裝新版的vim
-參見http://blog.roodo.com/bejo/archives/7279917.html
-上色
-
-Search 上色
-修改/etc/vim/vimrc
-加上
-set hlsearch
-
-.bashrc 調整
-改alias，LANG=C
-
-StartUp-manager
-修改開機顯示
-
-安裝套件
-SVN: Subversion
-NFS : nfs-common nfs-kernel-server
-SAMBA: samba
-tftp: tftpd-hpa
-g++: 往gcc 上面幾格 (工作)
-zlib (工作 make)
-patchutils ( code pacth 指令 )
-ncurses (工作 make)
-bison (工作 DLNA)
-flex (工作 DLNA)
-scew (工作 xml) 用原始碼裝
-expat (工作 xml) 用原始碼裝
-gettext (GNU gettext)
 
 
 /***************************************************************************/
@@ -8618,25 +8619,25 @@ Let's switch to the most important part of this article — how to actually use p
 First run the program with mocp command. A window with your file system on the left should appear. The right side is reserved for the playlist. 
 Now you can:
 ENTER – switch to a folder, start playing the song, etc
-『o』 – play URL (for instance some Internet radio)
-『p』 or space bar – pause playing
-『s』 – stop playing
-『l』 – switch between one and two-column view
-『a』 – add current file to the playlist
-『A』 – add current folder (recursively) to the playlist
-『C』 – clear the playlist
-『q』 – turn the console interface off (MOC server is still running and you can come back by entering mocp again)
-『Q』 – hard power-off MOC
+"o" – play URL (for instance some Internet radio)
+"p" or space bar – pause playing
+"s" – stop playing
+"l" – switch between one and two-column view
+"a" – add current file to the playlist
+"A" – add current folder (recursively) to the playlist
+"C" – clear the playlist
+"q" – turn the console interface off (MOC server is still running and you can come back by entering mocp again)
+"Q" – hard power-off MOC
 MOC can be also manipulated when the console interface is switched off. Here are some commands that may be useful for that:
 
-『mocp -S』 – run the MOC server
-『mocp -p』 – start playing the playlist
-『mocp -f』 – switch to the next track on the playlist
-『mocp -r』 – switch to the previous track on the playlist
-『mocp -s』 – stop playing
-『mocp -P』 – pause playing
-『mocp -U』 – resume playing
-『mocp -x』 – kill the server
+"mocp -S" – run the MOC server
+"mocp -p" – start playing the playlist
+"mocp -f" – switch to the next track on the playlist
+"mocp -r" – switch to the previous track on the playlist
+"mocp -s" – stop playing
+"mocp -P" – pause playing
+"mocp -U" – resume playing
+"mocp -x" – kill the server
 More options can be obviously found in the MOC manual by entering man mocp.
 
 
@@ -11349,6 +11350,54 @@ Read more: http://www.arthurtoday.com/2009/11/ubuntu-910-mysql.html#ixzz3hFpJ2vC
 
 
 /******************************************************************************/
+解決 MYSQL 登入時，ERROR 1045 (28000) using password: NO 的方法
+/******************************************************************************/
+我的系統是 UBUNTU 11.04，安裝的MYSQL版本為14.14(注1)，安裝好並設定 root 密碼後，透過終端機輸入指令 mysql -u root ，卻出現 
+    ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO) 訊息。
+改輸入 mysql -u root -p 　強制輸入密碼，卻變成
+    ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+在網路上查詢了一下，發現問題似乎與　'root'@'localhost' ，帳號跟登入位置與密碼對應有關，也發現這問題十分氾濫，並似乎沒有個好的ＳＯＰ解決流程，於是試了幾種方法，整理成以下心得：
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+１．首先，停止MYSQL 服務：
+    #  /etc/init.d/mysql stop              or  #  stop mysql          or # service mysql stop
+２．接著跳過授權表訪問，命令如下：
+    # mysqld_safe --user=mysql --skip-grant-tables --skip-networking &
+３．登錄　MYSQL：
+    # mysql -uroot mysql
+    or
+    # mysql -uroot mysql -p
+    輸入 root 密碼，進入MYSQL。
+    這裡若依舊跳出　ERROR 1045 (28000)　訊息，則請跳至文末的 Ａ 步驟
+４．重新寫入 root 密碼：
+    mysql> UPDATE user SET Password=PASSWORD('輸入你 root 的新密碼') where USER='root';
+５． 把 所有資料庫(含其下的所有資料表)，授權給 root，從 localhost 上來，密碼為引號內數據  '*****'。 
+    mysql> GRANT all ON *.* TO root@'localhost' IDENTIFIED BY '輸入你 root 的密碼'; 
+６．更新權限！密碼若有更動，一定要執行此行指令。
+    mysql> FLUSH PRIVILEGES;
+７．離開　MYSQL
+    mysql> quit
+８．輸入密碼，正常進入 MYSQL。
+    # mysql -uroot -p
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+Ａ．直接使用　/etc/mysql/debian.cnf　文件中　[client]　提供的用戶名和密碼：
+    # mysql -udebian-sys-maint -p
+    輸入　[client]　中的密碼
+    mysql> UPDATE user SET Password=PASSWORD('輸入你 root 的新密碼') where USER='root';
+    // 重新寫入 root 密碼
+    mysql> GRANT all ON *.* TO root@'localhost' IDENTIFIED BY '輸入你 root 的密碼'; 
+    // 把 所有資料庫(含其下的所有資料表)，授權給 root，從 localhost 上來，密碼為引號內數據  '*****'。 
+    mysql> FLUSH PRIVILEGES;
+    // 更新權限！密碼若有更動，一定要執行此行指令。
+    mysql> quit
+    # mysql -uroot -p
+    輸入密碼，正常進入 MYSQL。
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+以上兩種狀況我都遇過，依以上方式我的問題都解決了。
+另外改好後，MYSQL 系統似乎需要一點時間更動，因為在終端機上MYSQL可進去了，網頁的 phpmyadmin 卻依舊進不去，SSH連也進不去，直到間隔了快 10 秒，才一切正常。
+
+
+/******************************************************************************/
 Python 連接 MySQL 
 /******************************************************************************/
 MySQL 是十分流行的開源資料庫系統，很多網站也是使用 MySQL 作為後台資料儲存，而 Python 要連接 MySQL 可以使用 MySQL 模組。
@@ -11525,51 +11574,1601 @@ I hope you find this guide useful and it takes away some of the headaches I've h
 
 
 /******************************************************************************/
-在Ubuntu(12.04)下安裝Redmine專案管理系統
+將 Redmine 安裝於 Debian、Ubuntu Linux
 /******************************************************************************/
-以下為在Ubuntu(12.04)下安裝redmine專案管理系統,做點整理:
-一.安裝Apache
-sudo apt-get install apache2 libapache2-mod-passenger
-說明：安裝玩後打上網址會出現預設畫面It works！！,表示安裝成功！
+ref : http://blog.longwin.com.tw/2011/03/redmine-debian-ubuntu-linux-2011/
 
-二.安裝mysql
-sudo apt-get install mysql-server mysql-client
-說明：之後會要求你輸入root密碼,輸入即可
+系統環境
+Debian wheezy / Ubuntu 10.10
+Apache2
+SQLite
+下述路徑皆為 Debian / Ubuntu Linux 預設路徑
 
-三.安裝Redmine
- sudo apt-get install redmine redmine-mysql
-說明:安裝Redmine過程會要求你輸入剛剛的mysql密碼,輸入即可
+Redmine 常用設定檔 與 資料庫存放位置
+Web 路徑: /usr/share/redmine/public/
+DB 設定檔: /etc/redmine/default/database.yml
+SQLite DB 檔案位置: /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default (資料庫存放位置)
 
-四.修改Apache設定檔
-a. 修改 /etc/apache2/mods-available/passenger.conf
-加上PassengerDefaultUser www-data
+Redmine 相關設定檔
+/etc/dbconfig-common/redmine/instances/default.conf
+/etc/redmine/default/database.yml
+/etc/redmine/default/session.yml
+/etc/javascript-common/javascript-common.conf
+
+Redmine 相關檔案位置 (Debian / Ubuntu 環境)
+/etc/redmine
+/usr/share/doc/redmine/examples/
+/var/cache/redmine
+/var/log/redmine
+/var/lib/redmine
+
+Redmine 安裝
+apt-get install redmine redmine-sqlite git-core subversion libapache2-mod-fcgid libapache2-mod-passenger     # redmine-mysql, redmine-pgsql 隨個人選擇
+安裝詢問, 挑選 sqlite # 若 MySQL 或 PostgreSQL 會需要另外設定帳號、密碼
+cp /usr/share/doc/redmine/examples/apache2-host.conf /etc/apache2/sites-enabled/redmine.conf # 其他設定檔範例: /usr/share/doc/redmine/examples/, ex: lighttpd, nginx 範例皆於此處
+vim /etc/apache2/sites-enabled/redmine.conf # 在 VirtualHost 內, 修改 8080 => 80
+<VirtualHost *:8080>
+改成
+<VirtualHost *:80>
+
+vim /etc/apache2/sites-enabled/redmine.conf # 在 VirtualHost 內, 增加下述
+ServerName example.com # 你的 redmine hostname
+CustomLog /var/log/apache2/redmine-access.log combined
+ErrorLog /var/log/apache2/redmine-error.log
+
+/etc/apache2/sites-enabled/redmine.conf 
+# 完整檔案如下:
+<VirtualHost *:80>
+    # FcgidInitialEnv for module mod_fcgid
+    FcgidInitialEnv RAILS_RELATIVE_URL_ROOT ""
+    FcgidInitialEnv X_DEBIAN_SITEID "default"
+
+    ServerName redmine.example.com
+    CustomLog /var/log/apache2/redmine-access.log combined
+    ErrorLog /var/log/apache2/redmine-error.log
+
+    # the mod_fcgid socket path # Ubuntu 會多此行, 註解掉即可
+    #SocketPath "/var/run/redmine/sockets/default" # Ubuntu 會多此行, 註解掉即可
+    Alias "/plugin_assets/" /var/cache/redmine/default/plugin_assets/
+    DocumentRoot /usr/share/redmine/public
+    <Directory "/usr/share/redmine/public">
+        Options +FollowSymLinks +ExecCGI
+        Order allow,deny
+        Allow from all
+        RewriteEngine On
+        RewriteRule ^$ index.html [QSA]
+        RewriteRule ^([^.]+)$ $1.html [QSA]
+        RewriteCond %{REQUEST_FILENAME} !-f [OR]
+        RewriteCond %{REQUEST_FILENAME} dispatch.fcgi$
+        RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
+    </Directory>
+</VirtualHost>
+
+sudo a2enmod fcgid # 啟用 FastCGI
+sudo a2enmod rewrite
+sudo /etc/init.d/apache2 restart
+在此就完成系統設定, 再來除了 Email 外, 都於 Web 介面設定即可. (到此已經可以連線 http://redmine.example.com)
+
+Web 介面 - 設定帳號
+點選頁面右上角的 "登入" (帳號: admin, 密碼: admin)
+點選右上角 "我的帳戶" (挑選語系: Traditional Chinese 繁體中文, 並設定 Email 等資料, 此區塊 右上角 "變更密碼" 去 修改密碼)
+點選右上角 "admin", 點選 此區塊 右上角 的 "編輯" (可以修改 帳號 admin -> tsung)
+
+Web 介面 - 新增專案
+點選左上角 "專案清單"
+點選 此區塊 右上角 "建立新專案" -> 內容填寫完 "儲存" 即可完成.
+
+Web 介面 - 設定專案 與 Git 整合
+點選左上角 "專案清單", 點選進入專案
+於 Tab 點選 "設定"
+於 設定的 Tab 點選 "版本控管" -> 挑選 Git, 路徑設定 /var/cache/git/project.git # 請依照自己的 Git 路徑設定
+於 Tab 點選 "認證"
+
+Web 介面 - 開啟帳號
+若 Redmine 只允許內部使用, 作法如下:
+點選左上角 "專案清單", 點選進入專案
+於 Tab 點選 "認證" -> 註冊選項 選擇: 手動啟用帳戶
+請要使用此系統的人去註冊帳號
+點選左上角 "網站管理", 點選進入專案
+Menu 點選 "用戶清單" -> 左邊 "篩選條件" 下拉挑選 "註冊完成", 在分別點選 "啟用" 即可.
+
+Web 介面 - 角色與權限
+點選左上角 "專案清單", 點選進入專案
+Menu 點選 "角色與權限" -> 可由此去 新增 / 修改設定 角色的權限
+註: 每個人在每個專案都可以分派不同得 "角色", 所以, 每個專案都要記得去新增加入此專案的"人員" 與 "角色"
+
+Web 介面 - 指派專案人員
+點選左上角 "專案清單", 點選進入專案
+於 Tab 點選 "設定" -> 於此區塊 Menu 點選 "成員" -> 於右邊勾選 "人員 / 帳號" 與 "角色" 在新增即可.
+
+Redmine 錯誤排除
+問題1: 出現下述錯誤:
+[Thu Mar 03 12:57:14 2011] [warn] [client 192.168.0.10] (104)Connection reset by peer: mod_fcgid: error reading data from [[FastCGI]] server
+[Thu Mar 03 12:57:14 2011] [error] [client 192.168.0.10] Premature end of script headers: dispatch.fcgi
+解法:
+apt-get install libapache2-mod-passenger
+
+問題2: 若 Ubuntu Linux 出現權限不足的錯誤
+解法:
+chmod 777 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/
+chmod 666 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default
+chmod 644 /etc/redmine/default/*
+
+問題3: 若 Redmine 上傳檔案, 出現權限不足 (/var/log/apache2/error.log)
+解法
+chmod 777 /var/lib/redmine/default/files/ # 請依照使用者權限設定, 不知道就先 777 試試看.
+
+問題4: 出現 Permission denied – /etc/redmine/default/session.yml 權限不足
+vi /etc/apache2/mods-available/passenger.conf # 增加下述
+<IfModule mod_passenger.c>
+# PassengerRoot /usr
+# PassengerRuby /usr/bin/ruby
+PassengerDefaultUser www-data
+</IfModule>
+可參考: HowTo Install Redmine using Debian package - Redmine
+
+Redmine 外掛
+Redmine - ThirdPartyTools - 外掛 Plugin
+AdamLantos/redmine_http_auth - HTTP Auth
+
+Redmine DB 備份
+Redmine DB 備份 (SQLite Dump backup)
+DB: sqlite3 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default .dump > ~/redmine.sql
+附加檔案: /var/lib/redmine/default/files
+設定檔: /etc/redmine/default/*
+Redmine - How to backup redmine?
+Redmine - Backing up Redmine
+
+
+/******************************************************************************/
+Redmine on Debian 6
+/******************************************************************************/
+Redmine 是一套 GPL 授權的專案管理系統，其底層架構為 Ruby on Rails，老實說凍仁自己也不是很瞭解，只知道 COSCUP 團隊近幾年來開始使用它管理碎髓的事務。
+原本以為 Debian 上 Redmine 的環境很難搞的凍仁，在 Zeroplex 心得分享後才得知 FreeBSD 的環境更麻煩，好險沒有跳 BSD 的坑啊。
+
+1. 安裝相關套件
+$ sudo aptitude install redmine redmine-mysql mysql libapache2-mod-passenger
+2. 環境設定
+2.1. 連結 Redmine 目錄至網頁目錄底下。
+$ sudo ln -s /usr/share/redmine/public /var/www/redmine
+2.2. 修改權限。
+$ sudo chown -R www-data:www-data /var/www/redmine
+2.3. 建立 Redmine 的 Apache 設定。
+$ sudo vi /etc/apache2/sites-available/redmine
+RailsBaseURI /redmine
+RailsEnv production
+PassengerDefaultUser www-data
+2.4. 啟用 Redmine 設定。
+$ sudo a2ensite redmine [Enter]
+2.5. 重開 Apache。
+$ sudo /etc/init.d/apache2 reload && sudo /etc/init.d/apache2 restart [Enter]
+2.6. 測試 http://localhost/redmine/。
+# 記得先修改 admin 密碼，預設為 admin。
+3. 解決 Redmine 中文亂碼
+最快的解法為先將 MySQL dump 出來，待手動將轉換成 utf8 再匯入回去 (感謝強者同事的心得分享)。
+3.1. dump.
+$ mysqldump --user=root -p redmine_default > redmine_default.sql [Enter]
+3.2. 使用 sed 手動將 latin1_swedish_ci 取代成 utf8_general_ci。
+$ sed -i 's/latin1_swedish_ci/utf8_general_ci/g' redmine_default.sql [Enter]
+3.3. 使用 sed 手動將 latin1 取代成 utf8。
+$ sed -i 's/latin1/utf8/g' redmine_default.sql [Enter]
+3.4. 匯入 utf-8 的 redmine_default.sql。
+$ mysql -uroot -p redmine_default < redmine_default.sql [Enter]
+3.5. 亂碼解決完畢！
+4. 設定 E-mail 的 smtp 伺服器
+4.1. 從範列中複製乙份設定檔。
+$ sudo cp /usr/share/doc/redmine/examples/email.yml.example /etc/redmine/default/email.yml [Enter]
+4.2. 設定 smtp 伺服器位址、電子信箱及密碼。
+[ jonny@squeeze ~ ]
+$ vi /etc/redmine/default/email.yml [Enter]
+ production:
+   delivery_method: :smtp
+   smtp_settings:
+     address: smtp.example.net
+     port: 25
+     domain: example.net
+     authentication: :login
+     user_name: "redmine@example.net"
+     password: "redmine"
+
+ development:
+   delivery_method: :smtp
+   smtp_settings:
+     address: 127.0.0.1
+     port: 25
+     domain: example.net
+     authentication: :login
+     user_name: "redmine@example.net"
+     password: "redmine"
+4.3. 接下來可以在 設定 → 電子郵件提醒選項 裡使用 寄送測試郵件 來測試是否可以正常運作，其測試信的主旨為「Redmine test」內容如下：
+This is a test email sent by Redmine.
+Redmine URL: http://localhost/redmine/
+---------------------------------------
+You have received this notification because you have either subscribed to it, or are involved in it.
+To change your notification preferences, please click here: http://hostname/my/account
+
+
+/******************************************************************************/
+架設redmine做專案管理
+/******************************************************************************/
+本篇主要說明如何在uBuntu安裝redmine，備份redmine資料庫，設定e-mail讓redmine可以發mail給使用者。
+版本：Redmine 1.4.4.stable，ruby 1.9.3p194 (2012–04–20 revision 35410)
+最後更新日期：2013/8/22
+
+安裝Apache, mod-passenger, and MySQL
+首先安裝apache和mod-passenger（ 主要是用來做Ruby應用程式的佈署，比如說Ruby on Raila的Framework）
+$ sudo apt-get install apache2 libapache2-mod-passenger  
+再來安裝MySQL
+$ sudo apt-get install mysql-server mysql-client 
+在完裝完MySQL後，會跳出一個window需要輸入DB的root登入密碼。然後在第2個畫面輸入密碼做確認。
+Package configuration
+
+  ┌──────────┤ Configuring mysql-server-5.5 ├──────────┐
+  │ While not mandatory, it is highly recommended that you set a password   │   
+  │ for the MySQL administrative "root" user.                               │   
+  │                                                                         │   
+  │ If this field is left blank, the password will not be changed.          │   
+  │                                                                         │   
+  │ New password for the MySQL "root" user:                                 │   
+  │                                                                         │   
+  │ _______________________________________________________________________ │   
+  │                                                                         │   
+  │                                 <Ok>                                    │   
+  │                                                                         │   
+  └─────────────────────────────────────┘
+  ┌───┤ Configuring mysql-server-5.5 ├───┐
+  │                                              │
+  │ Repeat password for the MySQL "root" user.   │
+  │                                              │
+  │                                              │
+  │ ____________________________________________ │
+  │                                              │
+  │                   <Ok>                       │
+  │                                              │
+  └───────────────────────┘
+
+安裝redmine package
+接下來開始安裝redmine
+$ sudo apt-get install redmine redmine-mysql
+安裝完成後會跳出一個畫面問說要不要去設定database。在這??我們選擇Yes
+ ┌───┤ Configuring redmine ├──────────────────────┐  
+ │                                                                           │  
+ │ The redmine/instances/default package must have a database installed and  │  
+ │ configured before it can be used.  This can be optionally handled with    │  
+ │ dbconfig-common.                                                          │  
+ │                                                                           │  
+ │ If you are an advanced database administrator and know that you want to   │  
+ │ perform this configuration manually, or if your database has already      │  
+ │ been installed and configured, you should refuse this option.  Details    │  
+ │ on what needs to be done should most likely be provided in                │  
+ │ /usr/share/doc/redmine/instances/default.                                 │  
+ │                                                                           │  
+ │ Otherwise, you should probably choose this option.                        │  
+ │                                                                           │  
+ │ Configure database for redmine/instances/default with dbconfig-common?    │  
+ │                                                                           │  
+ │                    <Yes>                       <No>                       │  
+ │                                                                           │  
+ └─────────────────────────────────────┘ 
+然後下一個畫面會問說要用哪一種database。因為我們安裝的是MySQL，所以常然選擇MySQL
+
+ ┌────┤ Configuring redmine ├─────────────────────┐  
+ │ The redmine/instances/default package can be configured to use one of     │  
+ │ several database types. Below, you will be presented with the available   │  
+ │ choices.                                                                  │  
+ │                                                                           │  
+ │ Database type to be used by redmine/instances/default:                    │  
+ │                                                                           │  
+ │                                  sqlite3                                  │  
+ │                                  pgsql                                    │  
+ │                                  mysql                                    │  
+ │                                                                           │  
+ │                                                                           │  
+ │                    <Ok>                        <Cancel>                   │  
+ │                                                                           │  
+ └─────────────────────────────────────┘ 
+下一個畫面需要輸入MyAQL DB的密碼，輸入剛剛安裝MySQL時輸入的root密碼
+
+ ┌──────┤ Configuring redmine ├───────────────────┐  
+ │ Please provide the password for hte administrative account with which     │  
+ │ this package should create its MySQL database and user.                   │  
+ │                                                                           │  
+ │ Password of the database's administrative user:                           │  
+ │                                                                           │  
+ │ ******__________________________________________________________________  │  
+ │                                                                           │  
+ │                   <Ok>                       <Cancel>                     │  
+ │                                                                           │  
+ └─────────────────────────────────────┘  
+下一個畫面要求輸入一個密碼來保護redmine的DB（與MySQL的root密碼不同）。輸入一個密碼給redmine DB。
+
+ ┌───────┤ Configuring redmine ├──────────────────┐  
+ │ Please provide a password for redmine/instances/default to register with  │  
+ │ the database server.  If left blank, a random password will be            │  
+ │ generated.                                                                │  
+ │                                                                           │  
+ │ MySQL application password for redmine/instances/default:                 │  
+ │                                                                           │  
+ │ *******__________________________________________________________________ │  
+ │                                                                           │  
+ │                    <Ok>                        <Cancel>                   │  
+ │                                                                           │  
+ └─────────────────────────────────────┘
+接下來會再要求確認一次redmine DB的密碼
+
+   ┌──┤ Configuring redmine ├─┐                       
+   │                                │                       
+   │                                │                       
+   │ Password confirmation:         │                       
+   │                                │                       
+   │ *******_______________________ │                       
+   │                                │                       
+   │     <Ok>         <Cancel>      │                       
+   │                                │                       
+   └────────────────┘   
+到這邊就算是將套件安裝完成，接下來就開始設定其他的項目。
+
+設定Apache
+需要設定2個檔案：
+/etc/apache2/mods-available/passenger.conf
+/etc/apache2/sites-available/default
+首先來修改passenger.conf
+$ sudo vi /etc/apache2/mods-available/passenger.conf
+修改內容如下：
 <IfModule mod_passenger.c>
   PassengerDefaultUser www-data
   PassengerRoot /usr
   PassengerRuby /usr/bin/ruby
 </IfModule>
 
-之後加上smblink:
+再來建立redmine的space到apache的www中：
 $ sudo ln -s /usr/share/redmine/public /var/www/redmine
-
-b.修改 /etc/apache2/sites-available/default
-#將DocumentRoot從/var/www改成/var/www/redmine
-在加入一下內容:
+下一步是設定/etc/apache2/sites-available/default
+之前我們已經將redmine的space做了symlink到/var/www/redmine，這??要建立一台redmine的server連結到/var/www/redine，修改內容如下：
+$ sudo vi /etc/apache2/sites-available/default  
 <Directory /var/www/redmine>
     RailsBaseURI /redmine
     PassengerResolveSymlinksInDocumentRoot on
 </Directory>
-最後重新開啟Apache
-sudo service apache restart
-然後打開網址,完成!!!
-參考文章:
-http://www.redmine.org/projects/redmine/wiki/HowTo_Install_Redmine_on_Ubuntu_step_by_step
+然後再重啟apache
+$ sudo service apache2 restart
+用本機測試redmine是否已經正確設定並正常的工作
+$ firefox http://127.0.0.1/redmine
+看到redmine首頁後，可以點選右上角的Sign In，並以admin登入，預設密碼為admin。
+Note: 這個密碼與安裝redmine DB時輸入的密碼不同。
+強烈建議登入後修改admin的密碼，以確保系統安全。
+
+設定e-mail
+使用G-Mail
+Note（2013/8/21)：新版本的redmine/ruby不可安裝action_mailer_optional_tls
+使用新版本的redmine/ruby時，已經不再使用email.yml，而是使用configuration.yml。
+先將configuration.yml.example拷貝一份到/etc/redmine/default
+$ cd /usr/share/redmine/config
+$ sudo cp ./configuration.yml.example /etc/redmine/default/configuration.yml
+接下來使用vim修改configuration.yml（在etc/redmine/default目錄下）
+$ cd /etc/redmine/default
+$ sudo vim configuration.yml
+將default區塊修改如下：（縮排的空格很重要，務必要照原本的example的格式，否則會有問題）
+
+default:
+  email_delivery:
+  delivery_method: :smtp
+  smtp_settings:
+    tls: true
+    enable_starttls_auto: true
+    address: "smtp.gmail.com"
+    port: 587
+    domain: "smtp.gmail.com" # 'your.domain.com' for GoogleApps
+    authentication: :plain
+    user_name: "your_email@gmail.com"
+    password: "your_password"
+修改完存檔後，需要修改這個檔案的owner及權限
+
+$ sudo chown root:www-data configuration.yml
+$ sudo chmod 0640 configuration.yml
+重新啟動apache
+
+$ sudo service apache2 restart
+FAQ
+
+為何已經將administration/Settings/Display的預設語言改為中文，但顯示界面還是英文？
+
+每個使用者可以設定自已的使用界面語言。到MyAccount，在Language選項改為中文即可。
+
+發生An error occurred while sending mail (Expected …/version.rb to define VERSION)，要如何處理？
+
+看這篇文章
+
+參考文章
+
+官方文件-安裝redmine in uBuntu
+
+英文版的安裝文件Step By Step，我的這一篇大部份也是參考這一份來做的。除了mail的設定部份，文件中所描述的大部份都是可行的。
+
+官方網站for mail configuration
+
+由官方所提供的Email configuration設置。建構中。
+
+Redmine+Apache+SVN+Postfix完整配置指南
+
+由葵中劍Blog發表，雖然是2010的文章，用的是較舊的版，還是可以用來參考。
+
+另一個安裝redmine的網站文件
+
+以question/answer的方式提供plug-in，svn，mail的設定方式，很有參考性。
+
+
+/******************************************************************************/
+INSTALLING REDMINE 3.0 ON CLEAN UBUNTU 14.04
+/******************************************************************************/
+In this tutorial we will install Redmine on a clean installation of Ubuntu server 14.04 with an Apache server and MySql. Redmine wil be reachable under the subdomain redmine.example.com.
+Here Redmine will be installed to  /var/www/vhosts/redmine . I use unzip  to unpack the archive. The placeholder for the username you』re logged into the system is  $sysUser$ .
+
+Step 1 – Installing required software
+First we need to update our packages. If you encounter any problems later on try to fix them by updating your packages again.
+sudo apt-get update && sudo apt-get -y upgrade
+Now install apache2 and mysql:
+sudo apt-get install apache2 mysql-server mysql-client
+While installing mysql-server you will be asked for a MySql root password to set.
+
+Step 2 – Database creation
+To create the database log in as root user with the password you set earlier.
+mysql -u root -p
+The following MySql queries create the database and the user to access this database. Be sure you have my_password replaced with an other password (not the root password) before executing.
+CREATE DATABASE redmine CHARACTER SET utf8;
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+To exit  mysql simply type  exit and execute.
+
+Step 3 – Downloading Redmine
+Now switch in your vhosts directory download Redmine and unzip it. If you want you can use the .tar.gz file with the tar command as well.
+cd /var/www/vhosts
+wget http://www.redmine.org/releases/redmine-3.0.1.zip
+unzip redmine-3.0.1.zip
+mv redmine-3.0.1 redmine
+
+Step 4 – Database configuration
+We need to alter the file /var/www/vhosts/redmine/config/database.yml.example  and save it as  database.yml . Replace my_password with the password set in the MySql query before.
+production:
+  adapter: mysql2
+  database: redmine
+  host: localhost
+  username: redmine
+  password: my_password
+If your MySql server is running on another Port (eg. 3344) you can use the following config:
+production:
+  adapter: mysql
+  database: redmine
+  host: localhost
+  port: 3344
+  username: redmine
+  password: my_password
+
+Step 5 – Installing ruby
+First we have to remove the old version of ruby.
+sudo apt-get remove ruby
+Execute the following command (not as root user) with the 『\』 at the beginning. It will install ruby at your system, usable for every user in the group rvm. The installation folder is  /usr/local/rvm .
+\curl -sSL https://get.rvm.io | sudo bash -s stable --rails
+In my case the first run failed because of a missing signature. The command to install this signature will be displayed in the error-message. In my case it was this:
+sudo gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+Then rerun the command to install ruby.
+After some time ruby is installed with rails. Now the users $sysUser$ and www-data  need to be added to the group  rvm .
+sudo usermod -aG rvm $sysUser$
+sudo usermod -aG rvm www-data
+After a relogin the change should be applyed. You have to switch folders back t your Redmine folder.
+gem install bundler
+bundle install --without development test rmagick
+If you encounter any problems with mysql during installation execute  sudo apt-get install libmysqlclient-dev.  Then execute the command again.
+
+Step 6 – Configuring Redmine with ruby
+Generate an secret cookie token:
+bundle exec rake generate_secret_token
+Create the database structure:
+RAILS_ENV=production bundle exec rake db:migrate
+Insert the default configuration:
+RAILS_ENV=production bundle exec rake redmine:load_default_data
+Start the webrick server to test if everything is ok. You can access the webrick server from localhost only, so its ok if it throws no errors while starting. Then shutdown the webrick server.
+bundle exec ruby bin/rails server webrick -e production
+
+Step 7 – Installing passenger
+Because the repository version of passenger will install the old ruby from the repository again, we have to install it via gem.
+gem install passenger
+Now we have to install some other packages, required for passenger integration in apache2:
+sudo apt-get install libcurl4-openssl-dev apache2-threaded-dev libapr1-dev libaprutil1-dev
+Then execute the following commands to install the passenger module to apache2.
+sudo -i
+passenger-install-apache2-module
+Alter the file /etc/apache2/mods-avaiable/passenger.load  to this:
+LoadModule passenger_module /usr/local/rvm/gems/ruby-2.2.0/gems/passenger-5.0.5/buildout/apache2/mod_passenger.so
+And the file /etc/apache2/mods-avaiable/passenger.conf  to this:
+<IfModule mod_passenger.c>
+        PassengerRoot /usr/local/rvm/gems/ruby-2.2.0/gems/passenger-5.0.5
+        PassengerDefaultRuby /usr/local/rvm/gems/ruby-2.2.0/wrappers/ruby
+</IfModule>
+Now enable the passenger mod:
+a2enmod passenger
+
+Step 8 – Configuring Apache
+To reach redmine under redmine.example.com we have to create a new file in /etc/apache2/sites-avaiable . I called the file redmine.example.com.conf .
+<VirtualHost *:80>
+        ServerName redmine.example.com
+        ServerAlias www.redmine.example.com
+ 
+        # !!! Be sure to point DocumentRoot to 'public'!
+        DocumentRoot /var/www/vhosts/redmine/public
+        <Directory /var/www/vhosts/redmine/public>
+                # This relaxes Apache security settings.
+                AllowOverride all
+                # MultiViews must be turned off.
+                Options -MultiViews
+                
+                Require all granted
+        </Directory>
+</VirtualHost>
+To activate the site execute  a2ensite redmine.example.com.conf and rename the file /var/www/vhosts/redmine/public/dispatch.fcgi.example  to dispatch.fcgi . 
+Now restart apache2  via  sudo service apache2 restart .
+Everything should be up an running. If you have any suggestions to improve the installation process comment below.
+ 
+
+/******************************************************************************/
+ubuntu清理系統垃圾與備份
+/******************************************************************************/
+雖然linux下不會有windows下的那麼多垃圾和磁片碎片!但還是會留下一些用不著的暫存檔案或是多次升級後的N個舊的內核!
+1，非常有用的清理命令：
+sudo apt-get autoclean
+sudo apt-get clean
+sudo apt-get autoremove
+這三個命令主要清理升級緩存以及無用包的。
+
+2，清理opera firefox的緩存檔：
+ls ~/.opera/cache4
+ls ~/.mozilla/firefox/*.default/Cache
+
+3，清理Linux下孤立的包：
+圖形介面下我們可以用：gtkorphan
+sudo apt-get install gtkorphan -y
+終端命令下我們可以用：deborphan
+sudo apt-get install deborphan -y
+
+4，卸載：tracker
+這個東西一般我只要安裝ubuntu就會第一刪掉tracker 他不僅會產生大量的cache檔而且還會影響開機速度。所以在新得利裏面刪掉就行。
+
+5，刪除多餘的內核：一定不要刪錯哦，切記！！
+打開終端敲命令：dpkg –get-selections|grep linux
+有image的就是內核檔
+刪除老的內核檔：
+sudo apt-get remove 內核檔案名 （例如：linux-image-2.6.27-2-generic）
+內核刪除，釋放空間了，應該能釋放130－140M空間。
+最後不要忘了看看當前內核：uname -a
+
+附錄： (包管理的暫存檔案目錄)
+包在: /var/cache/apt/archives
+
+沒有下載完的在: /var/cache/apt/archives/partial
+
+6. 備份系統, 打開終端，輸入以下命令：
+
+1) 成為根用戶：   sudo su
+
+2) 轉到根目錄：   cd /
+
+然後，下面就是我用來備份我的系統的完整的命令：
+tar -cvpzf /media/sda7/backup.tgz --exclude=/proc --exclude=/lost+found --exclude=/mnt --exclude=/sys --exclude=/media /
+
+接著，讓我們稍微解釋一下：
+tar 是用來備份的程式
+c - 新建一個備份文檔
+v - 詳細模式， tar程式將在螢幕上即時輸出所有資訊。
+p - 保存許可，並應用到所有檔。
+z - 採用『gzip』壓縮備份檔案，以減小備份檔案體積。
+f - 說明備份檔案存放的路徑， /media/sda7/backup.tgz 是本例子中備份檔案名。這個備份檔案備份的位置是其他分區，也就是原來的WIN分區中。因為我的根目錄的空間不足，所以只有備份在其他的地方了。
+來 看看我們想要包含的目錄。我們不想備份所有的東西，因為有些目錄是沒有多大用處的。確認你不想包含的檔，否則您會得到一個很奇怪的結果。您也不必備份 /mnt 目錄下的東西，除非您有其他分區掛在它下面或者你堅持要備份。您還必須確保沒有任何資源掛在 /media目錄下(比如，任何CD或者移動存儲介質).否則，剔除/media。
+* 最後一個參數是我們想要保存的目錄. 我們想要保存所有的東西，使用 / 作為根目錄。
+
+然後就是將來還原系統備份了：
+警告: 求您了，看在上帝的份上，千萬小心這兒。如果您不明白您正在幹什麼，那很有可能複蓋掉您重要的資料，所以請特別小心！
+好了，繼續我們前面所講的例子，我們在其他分區（sda7）目錄下創建了一個名為backup.tgz的備份檔案。
+Linux 中美妙的事情之一就是在系統正在運行的情況下可以進行還原操作，而不需要啟動光碟或者其他任何亂七八糟的東西。當然，如果您的系統已經崩潰，那您必須選擇 使用live CD，但是結果還是一樣。你甚至可以在Linux系統正在運行的時候，移除它裏面所有檔。可是我不告訴你那個命令！
+好了，言歸正傳。這是我要用的命令，如果你的備份不是在和我一樣的位置的位置的話，那請相應地修改/media/sda7這一點：
+tar -xvpzf /media/disk/backup.tgz -C /
+如果您使用的是bz2壓縮的：
+tar -xvpjf /media/disk/backup.tar.bz2 -C /
+
+/******************************************************************************/
+Ubuntu常用的命令 http://hi.baidu.com/ycerror/blog/item/41a9272d62a9ab3e359bf71a.html
+/******************************************************************************/
+刪除資料夾及它的子資料夾和檔案：sudo rm -rf /home/ubuntu
+查找軟體庫中的軟體：aptitude search 套裝軟體
+查看軟體xxx安裝內容：dpkg -L xxx
+查找文件屬於哪個包：dpkg -S filename
+清除已刪除包的殘餘配置檔：dpkg -l |grep ^rc|awk 『{print $2}』 |sudo xargs dpkg -P
+備份當前系統安裝的所有包的列表：dpkg –get-selections | grep -v deinstall > ~/somefile
+從備份的安裝包的列表檔恢復所有包：dpkg –set-selections < ~/somefile;sudo dselect
+系統升級：sudo apt-get update;sudo apt-get dist-upgrade
+查找軟體庫中的軟體：apt-cache search 正則運算式
+查找文件屬於哪個包：apt-file search filename
+查詢軟體xxx依賴哪些包：apt-cache depends xxx
+查詢軟體xxx被哪些包依賴：apt-cache rdepends xxx
+清理舊版本的軟體緩存：sudo apt-get autoclean
+清理所有軟體緩存：sudo apt-get clean
+刪除系統不再使用的孤立軟體：sudo apt-get autoremove
+查看包在伺服器上面的地址：apt-get -qq –print-uris install ssh | cut -d\』 -f2
+顯示系統安裝包的統計資訊：apt-cache stats
+顯示系統全部可用包的名稱：apt-cache pkgnames
+顯示包的資訊：apt-cache show k3b
+增加一個光碟源：sudo apt-cdrom add
+編譯時缺少h檔的自動處理：sudo auto-apt run ./configure
+查看安裝軟體時下載包的臨時存放目錄：ls /var/cache/apt/archives
+查看內核：uname -a
+查看Ubuntu版本：cat /etc/issue 或 lsb_release -a
+查看內核載入的模組：lsmod
+查看PCI設備：lspci
+查看USB設備：lsusb -v
+查看網卡狀態：sudo ethtool eth0
+查看CPU資訊：cat /proc/cpuinfo
+顯示當前硬體資訊：sudo lshw
+顯示系統運行時間：uptime
+查看硬碟的分區：sudo fdisk -l
+硬碟分區：sudo fdisk /dev/sda
+硬碟格式化：sudo mkfs.ext3 /dev/sda1
+硬碟檢查(請不要檢查已經掛載的分區，否則容易損壞資料)：sudo fsck /dev/sda1
+分區掛載：sudo mount -t 檔系統類型 (-o nls=utf8 或 -o iocharset=utf8) 設備路經 訪問路經
+分區卸載：sudo umount 目錄名或設備名
+查看IDE硬碟資訊：sudo hdparm -i /dev/hda
+查看STAT硬碟資訊 ：sudo hdparm -I /dev/sda 或 sudo blktool /dev/sda id
+查看硬碟剩餘空間：df
+查看目錄佔用空間：du -hs 目錄名
+優盤沒法卸載：sync;fuser -km /media/usbdisk
+查看硬碟當前讀寫情況：sudo iostat -x 2
+查看當前的記憶體使用情況：free
+動態顯示進程執行情況：top
+查看當前有哪些進程：ps -A
+查看當前進程樹：pstree
+中止一個進程：kill 進程號 或 killall 進程名
+強制中止一個進程：kill -9 進程號 或 killall -9 進程名
+圖形方式中止一個程式：xkill 出現骷髏標誌的滑鼠，點擊需要中止的程式即可
+查看進程打開的檔：lsof -p
+顯示開啟檔abc.txt的進程 ：lsof abc.txt
+顯示22埠現在運行什麼程式 ：lsof -i :22
+顯示nsd進程現在打開的檔 ：lsof -c nsd
+在後臺運行程式，退出登錄後，並不結束程式 ：nohup 程式 &
+詳細顯示程式的運行資訊 ：strace -f -F -o outfile
+增加系統最大打開檔個數：ulimit -n 4096 或 echo 4096 > /proc/sys/fs/file-max
+配置 ADSL ：sudo pppoeconf
+ADSL手工撥號：sudo pon dsl-provider
+啟動 ADSL：sudo /etc/ppp/pppoe_on_boot
+斷開 ADSL ：sudo poff
+查看撥號日誌：sudo plog
+如何設置動態功能變數名稱：w3m -no-cookie -dump "http://usere:pass@members.3322.org/dyndns/update?system=dyndns&hostname=yourdns.3322.org"
+根據IP查網卡位址 ：arping IP地址
+根據IP查電腦名 ：nmblookup -A IP地址
+查看當前IP地址 ：ifconfig eth0 |awk 『/inet/ {split($2,x,」:」);print x[2]}』
+查看當前外網的IP地址 ：w3m -no-cookie -dump www.123cha.com|grep -o 『[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}』
+查看當前監聽80埠的程式 ：lsof -i :80
+查看當前網卡的物理位址：arp -a | awk 『{print $4}』
+同一個網卡增加第二個IP位址 ：sudo ifconfig eth0:0 1.2.3.4 netmask 255.255.255.0
+立即讓網路支援nat ：echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward; sudo iptables -t nat -I POSTROUTING -j MASQUERADE
+查看路由資訊：netstat -rn 或 sudo route -n
+手工增加一條路由 ：sudo route add -net 192.168.0.0 netmask 255.255.255.0 gw 172.16.0.1
+手工刪除一條路由：sudo route del -net 192.168.0.0 netmask 255.255.255.0 gw 172.16.0.1
+修改網卡MAC位址的方法 ：sudo ifconfig eth0 hw ether 00:AA:BB:CC:DD:EE
+統計當前IP連接的個數 ：netstat -na|grep ESTABLISHED|awk 『{print $5}』|awk -F: 『{print $1}』|sort|uniq -c|sort -r -n
+遮罩IPV6 ：echo 『blacklist ipv6′ | sudo tee /etc/modprobe.d/blacklist-ipv6
+察看當前網路連接狀況以及程式 ：sudo netstat -atnp
+查看ADSL的當前流量：sudo ethstatus -i ppp0
+查看功能變數名稱的註冊備案情況：whois baidu.cn
+查看到某一個功能變數名稱的路由情況：tracepath baidu.cn
+重新從伺服器獲得IP地址 ：sudo dhclient
+下載網站文檔：wget -r -p -np -k http://www.xxx.com
+如何5個線程下載：axel -n 5 http://www.xxx.com/downloadfile.zip
+添加一個服務：sudo update-rc.d 服務名 defaults 99
+刪除一個服務 ：sudo update-rc.d 服務名 remove
+臨時重啟一個服務：/etc/init.d/服務名 restart
+臨時關閉一個服務：/etc/init.d/服務名 stop
+臨時啟動一個服務：/etc/init.d/服務名 start
+增加用戶：sudo adduser 用戶名
+刪除用戶：sudo deluser 用戶名
+修改當前用戶的密碼：passwd
+修改用戶密碼：sudo passwd 用戶名
+修改用戶資料：sudo chfn userid
+如何禁用某個帳戶：sudo usermod -L 用戶名 或 sudo passwd -l 用戶名
+如何啟用某個帳戶：sudo usermod -U 用戶名 或 sudo passwd -u 用戶名
+增加用戶到admin組：sudo usermod -G admin -a 用戶名
+配置默認Java使用哪個 ：sudo update-alternatives –config java
+終端設置代理 ：export http_proxy=http://xx.xx.xx.xx:xxx
+修改系統登錄資訊：sudo vim /etc/motd
+使用sun的java編譯器：sudo update-java-alternatives -s java-6-sun
+切換輸入法引擎：im-switch -c
+轉換檔案名由GBK為UTF8 ：convmv -r -f cp936 -t utf8 –notest –nosmart *
+轉換檔內容由GBK到UTF8 ：iconv -f gbk -t utf8 $i > newfile
+轉換 mp3 標籤編碼 ：sudo apt-get install python-mutagen;find . -iname '*.mp3' -execdir mid3iconv -e GBK {} \;
+控制臺下顯示中文 ：sudo apt-get install zhcon;zhcon –utf8 –drv=vga
+lftp 登錄遠端Windows中文FTP　：lftp :~>set ftp:charset GBK
+PDF 文件亂碼 ：sudo apt-get install xpdf-chinese-simplified xpdf-chinese-traditional poppler-data
+一屏查看檔內容 ：cat 檔案名
+分頁查看檔內容：more 檔案名
+可控分頁查看檔內容：less 檔案名
+根據字串匹配來查看檔部分內容：grep 字串 檔案名
+顯示包含字串的檔案名：grep -l -r 字串 路徑
+顯示不包含字串的檔案名：grep -L -r 字串 路徑
+快速查找某個檔：find 目錄 -name 檔案名
+創建兩個空文件：touch file1 file2
+遞迴式創建一些嵌套目錄：mkdir –p /tmp/xxs/dsd/efd
+遞迴式刪除嵌套目錄：rm –fr /tmp/xxs
+回當前用戶的宿主目錄：cd ~
+查看當前所在目錄的絕對路經：pwd
+列出當前目錄下的所有檔：ls -a
+移動路徑下的檔並改名：mv 路徑/檔 /新路徑/新檔案名
+複製檔或者目錄：cp -av 原文件或原目錄 新檔或新目錄
+查看文件類型：file filename
+對比兩個檔之間的差異：diff file1 file2
+顯示xxx檔倒數6行的內容 ：tail -n 6 xxx
+不停地顯示最新的內容 ：tail -n 10 -f /var/log/apache2/access.log
+查看檔第五行到第10行的內容 ：sed -n 『5,10p』 /var/log/apache2/access.log
+查找關於xxx的命令 ：apropos xxx 或 man -k xxx
+通過ssh傳輸檔 ：scp -rp /path/filename username@remoteIP:/path
+把所有檔的後輟由rm改為rmvb ：rename 』s/.rm$/.rmvb/』 *
+把所有檔案名中的大寫改為小寫：rename 『tr/A-Z/a-z/』 *
+刪除特殊檔案名 –help.txt 的文件：rm — –help.txt 或 rm ./–help.txt
+查看當前目錄的子目錄：ls -d */. 或 echo */.
+將最近30天訪問過的檔移動到上級back目錄 ：find . -type f -atime -30 -exec mv {} ../back \;
+顯示一小時以內的包含 xxxx 的檔：find . -type f -mmin -60|xargs -i grep -l xxxx 『{}』
+顯示最近2小時到8小時之內的檔：find . -mmin +120 -mmin -480 -exec more {} \;
+刪除修改時間在30天之前的檔 ：find . -type f -mtime +30 -mtime -3600 -exec rm {} \;
+刪除創建時間在30天之前的檔 ：find . -type f -ctime +30 -ctime -3600 -exec rm {} \;
+刪除掉guest的以avi或rm結尾的檔：find . -name 『*.avi』 -o -name 『*.rm』 -user 『guest』 -exec rm {} \;
+刪除掉不以java和xml結尾7天沒有使用的檔 ：find . ! -name *.java ! -name 『*.xml』 -atime +7 -exec rm {} \;
+刪除所有的 .svn 目錄 ：find . -name .svn -type d -exec rm -fr {} \;
+刪除所有以「~」結尾的暫存檔案 ：find . -name 『*~』 -exec rm {} \;
+統計當前文件個數：ls .|wc -w
+統計當前目錄個數：ls -l |grep ^d|wc -l
+顯示當前目錄下2006-01-01的檔案名 ：ls -l |grep 2006-01-01 |awk 『{print $8}』
+使用ssh方式同步遠端資料到本地目錄 ：rsync -Pa -I –size-only –delete –timeout=300 Remote_IP:/home/ubuntu /backup
+增加 7Z 壓縮軟體：sudo apt-get install p7zip p7zip-full p7zip-rar
+增加 rar 軟體壓縮和解壓縮支援 ：sudo apt-get install rar unrar
+解壓縮 xxx.tar.gz ：tar -zxvf xxx.tar.gz
+解壓縮 xxx.tar.bz2 ：tar -jxvf xxx.tar.bz2
+壓縮aaa bbb目錄為xxx.tar.gz ：tar -zcvf xxx.tar.gz aaa bbb
+壓縮aaa bbb目錄為xxx.tar.bz2 ：tar -jcvf xxx.tar.bz2 aaa bbb
+增加 lha 支援 ：sudo apt-get install lha
+增加解 cab 檔支援 ：sudo apt-get install cabextract
+顯示日曆：cal
+設置日期：date -s mm/dd/yy
+設置時間：date -s HH:MM
+將時間寫入CMOS ：hwclock –systohc
+查看CMOS時間 ：hwclock –show
+讀取CMOS時間 ：hwclock –hctosys
+從伺服器上同步時間 ：sudo ntpdate ntp.ubuntu.com
+設置電腦的時區為上海：sudo cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+關閉UTC，將當前時間寫入CMOS。：sudo sed -ie 』s/UTC=yes/UTC=no/g』 /etc/default/rcS;sudo hwclock –systohc
+修改mysql的root口令 ：sudo mysqladmin -u root -p password 『你的新密碼』
+如何使用命令關閉顯示器 ：xset dpms force off
+設置CPU的頻率 ：sudo apt-get install cpufrequtils;sudo cpufreq-info
+命令關機：sudo halt
+現在關機：sudo shutdown -h now
+晚上11點自動關機：sudo shutdown -h 23:00
+60分鐘後關機：sudo shutdown -h +60
+命令重啟電腦：sudo reboot
+現在重啟電腦：sudo shutdown -r now
+關閉筆記本的觸摸板 ：synclient touchpadoff=1
+開啟筆記本的觸摸板：synclient touchpadoff=0
+統計每個單詞的出現頻率並排序 ：awk 『{arr[$1]+=1 }END{for(i in arr){print arr[i]「\t」i}}』 FILE_NAME | sort -rn
+統計80埠的連接並排序 ：netstat -na|grep :80|awk 『{print $5}』|awk -F: 『{print $1}』|sort|uniq -c|sort -r -n
+把終端加到右鍵功能表：sudo apt-get install nautilus-open-terminal
+如何刪除Totem電影播放機的播放歷史記錄 ：rm ~/.recently-used
+vim 如何顯示彩色字元 ：sudo cp /usr/share/vim/vimcurrent/vimrc_example.vim /usr/share/vim/vimrc
+讓 vim 直接支援編輯 .gz 文件 ：sudo apt-get install vim-full
+vim 如何顯示行號：:set number
+查看在會話設置的啟動程式：ls ~/.config/autostart
+提高wine的反應速度 ：sudo sed -ie 『/GBK/,/^}/d』 /usr/share/X11/locale/zh_CN.UTF-8/XLC_LOCALE
+製作ISO文件：mkisofs -o test.iso -Jrv -V test_disk /home/carla/
+延遲10秒抓圖：gnome-screenshot -d 10
+延遲5秒抓當前啟動窗口：gnome-screenshot -w -d 5
+如何命令行刻錄：cdrecord -scanbus;cdrecord -v -eject speed=8 dev=1,1,0 test.iso
+回收站在哪裡：~/.local/share/Trash/
+默認打開方式的配置檔在哪裡：~/.local/share/applications/mimeapps.list
+如何查看HTTP頭：w3m -dump_head http://www.xxx.com
+連續監視記憶體使用情況：watch -d free
+如何切換到root帳號：sudo -Hs
+唯讀掛載ntfs分區：sudo mount -t ntfs -o nls=utf8,umask=0 /dev/sdb1 /mnt/c
+可寫掛載ntfs分區：sudo mount -t ntfs-3g -o locale=zh_CN.utf8,umask=0 /dev/sdb1 /mnt/c
+掛載fat32分區：sudo mount -t vfat -o iocharset=utf8,umask=0 /dev/sda1 /mnt/c
+掛載共用檔：sudo mount -t smbfs -o username=xxx,password=xxx,iocharset=utf8 //192.168.1.1/share /mnt/share
+掛載ISO文件：sudo mount -t iso9660 -o loop,utf8 xxx.iso /mnt/iso
+帶行號顯示檔的內容：nl 檔案名
+批量將rmvb轉為avi：for i in *; do mencoder -oac mp3lame -lameopts vbr=3 -ovcxvid -xvidencopts fixed_quant=4 -of avi $i -o `echo $i | sed -e』s/rmvb$/avi/』`; done
+批量將svg轉為png：for i in *; do inkscape $i –export-png=`echo $i | sed -e 』s/svg$/png/』`; done
+批量縮小圖片到30%：for i in *; do convert -resize 30%x30% $1 sm-$1; done
+批量轉換jpg到png：for i in *; do convert $i `echo $i | sed -e 』s/jpg$/png/』`; done
+獲取jpg的擴展資訊(Exif)：identify -verbose xxx.jpg
+查看當前系統所有的監聽埠：nc -zv localhost 1-65535
+去掉文件中的^M：cat filename | tr -d 「^M」 > newfile
+去掉文件中的^M：sed -e 「s/^M//g」 filename > newfile
+轉換bin/cue到iso檔：sudo apt-get install bchunk;bchunk image.bin image.cue image
+轉換目錄到iso檔：mkisofs dirname -o isofile.iso
+轉換CD到iso檔：dd if=/dev/cdrom of=isofile.iso
+ape 轉換為flac：sudo apt-get install flac shntool;shntool split -t「%n.%p-%t」 -f example_UTF-8.cue -o flac example.ape -d flacOutputDir
+ape轉換為 mp3：sudo apt-get install flac shntool lame;shntool split -t「%n.%p-%t」 -f example_UTF-8.cue -o 『cust ext=mp3 lame –r3mix -b 320–quiet – %f』 example.ape -d mp3OutputDir
+檢查本地是否存在安全隱患：sudo apt-get install rkhunter;rkhunter –checkall
+如何安裝殺毒軟體：sudo apt-get install clamav;clamscan -r ~/
+查看網路連接狀態：netstat -n | awk 『/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}』
+統計程式的記憶體耗用：ps -eo fname,rss|awk 『{arr[$1]+=$2} END {for (i in arr) {print i,arr[i]}}』|sort -k2 -nr
+顯示當前記憶體大小：free -m |grep 「Mem」 | awk 『{print $2}』
+按記憶體從大到小排列進程：ps -eo 「%C : %p : %z : %a」|sort -k5 -nr
+按cpu利用率從大到小排列進程：ps -eo 「%C : %p : %z : %a」|sort -nr
+統計當前目錄下所有jpg檔的尺寸：find . -name *.jpg -exec wc -c {} \;|awk 『{print $1}』|awk 『{a+=$1}END{print a}』
+清除僵死進程：ps -eal | awk 『{ if ($2 == 「Z」) {print $4}}』 | sudo kill -9
+CD 抓軌為 mp3 (有損)：sudo apt-get install abcde;abcde -o mp3 -b
+CD 抓軌為 Flac (無損)：sudo apt-get install abcde;abcde -o flac -b
+
+
+/******************************************************************************/
+安裝 Samba 伺服器 *
+/******************************************************************************/
+Samba 這個套件的功用，可以讓你把 Linux 伺服器變成 Windows 裡的「網路上的芳鄰」中的一台電腦，提供檔案伺服器的服務，
+即使在沒有網域管理(Domain)的區域網路環境中，也可以提供比 Windows 網路上的芳鄰更多的權限控管。
+
+本教學只介紹兩種常用的配置方式:
+開放式的設定
+需要身份驗證的設定
+安裝好 Samba 套件之後，就可以開始進行設定了。
+
+安裝 Samba
+使用 Apt 安裝 Samba 套件:
+sudo apt-get install samba
+啟用 Samba 服務:
+service smb start
+爾後如果有修改 Samba 的設定，只要輸入下列指令重新載入即可:
+service smb reload
+//-----------------------------------------------------------------
+開放式的設定
+//-----------------------------------------------------------------
+開放式的意思，就是不用任何身份驗證，就可以存取提供 Samba 服務的伺服器。以下的範例，是設定區域網路裡的任何用戶都可存取伺服器，並分享 [/tmp] 裡的檔案:
+編輯 /etc/samba/smb.conf，設定如下:
+[global]
+#欲加入的群組名稱
+workgroup = WORKGROUP
+#在「網路上的芳鄰」顯示的電腦名稱，如果不設定，就會以目前的 HostName 去掉網域名稱顯示。
+netbios name = FileServer
+#伺服器的註解
+server string = Samba 檔案伺服器
+#設定哪些電腦可以存取伺服器(以空白隔開)
+hosts allow = 192.168.1.0/255.255.255.0 127.0.0.1
+#顯示繁體中文
+client code page = 950
+#身份驗證的方式
+security = share
+
+#分享 [/tmp]
+[tmp]
+  path = /tmp
+  comment = 檔案暫存區
+  public = yes
+  writable = yes
+  create mode = 0666
+  directory mode = 0777
+重新啟動 Samba 服務:
+service smb restart
+
+//-----------------------------------------------------------------
+需要身份驗證的設定
+//-----------------------------------------------------------------
+如果你希望用戶要連到伺服器時，必須先輸入帳號、密碼才可以進入，並且可以存取自己的家目錄及 [/tmp]，請依照下列設定:
+編輯 /etc/samba/smb.conf，設定如下:
+[global]
+#欲加入的群組名稱
+workgroup = WORKGROUP
+#在「網路上的芳鄰」顯示的電腦名稱，如果不設定，就會以目前的 HostName 去掉網域名稱顯示。
+netbios name = FileServer
+#伺服器的註解
+server string = Samba 檔案伺服器
+#設定哪些電腦可以存取伺服器(以空白隔開)
+hosts allow = 192.168.1.0/255.255.255.0 127.0.0.1
+#顯示繁體中文
+client code page = 950
+#身份驗證的方式
+security = user
+#將密碼加密傳輸
+encrypt passwords = yes
+#指定密碼檔位置
+smb passwd file = /etc/samba/smbpasswd
+
+#讓用戶可以存取自己的家目錄
+[homes]
+  comment = 個人資料夾
+  public = no
+  browseable = no
+  valid users = %S
+  writable = yes
+  create mode = 0600
+  directory mode = 0700
+
+#分享 [/tmp]
+[tmp]
+  path = /tmp
+  comment = 檔案暫存區
+  public = no
+  writable = yes
+  create mode = 0666
+  directory mode = 0777
+建立 Samba 的密碼檔，並轉換用戶到這個密碼檔:
+cat /etc/passwd | mksmbpasswd.sh > /etc/samba/smbpasswd
+chmod 600 /etc/samba/smbpasswd
+chown root.root /etc/samba/smbpasswd
+重新啟動 Samba 服務:
+service smb restart
+你必須要再設定用戶的密碼才可以存取:
+smbpasswd UserName
+
+//-----------------------------------------------------------------
+其它有用的參數
+//-----------------------------------------------------------------
+以下介紹其它有用的參數，這些參數必須放在宣告的分享資源的區段下:
+public = yes|no
+設定針對 Guest 是否「顯示」該分享項目。
+browseable = yes|no
+設定是否「顯示」分享項目。
+valid users = 用戶列表
+允許「檢視」該分享項目的用戶，可輸入「用戶名稱」或「@群組名稱」，如有多個項目，請用「,」分隔。
+invalid users = 用戶列表
+不允許「檢視」該分享項目的用戶，可輸入「用戶名稱」或「@群組名稱」，如有多個項目，請用「,」分隔。
+read only = yes|no
+是否唯讀。
+writable = yes|no
+是否可以寫入。
+write list = 用戶列表
+允許「寫入」該分享項目的用戶，可輸入「用戶名稱」或「@群組名稱」，如有多個項目，請用「,」分隔。
+create mode = 權限
+建立檔案時預設的權限。
+directory mode = 權限
+建立目錄時預設的權限。
+force user = 用戶名稱
+建立檔案或目錄時預設的用戶。
+force group = 群組名稱
+建立檔案或目錄時預設的群組。
+Samba 的變數
+
+%S: 取代目前的「資源名稱」，所謂的「資源名稱」就是在 [ ] 裡面的內容。
+ex: valid users = %S
+%U: 代表目前登入的使用者的使用者名稱。
+%m: 代表 Client 端的 NetBIOS 名稱。
+%g: 代表登入的使用者的群組名稱。
+%M: 代表 Client 端的 Internet 主機名稱，就是 HOSTNAME。
+%L: 代表 SAMBA 主機的 NetBIOS 名稱。
+%h: 代表目前這部 SAMBA 主機的 HOSTNAME。
+%H: 代表使用者的家目錄。
+%I: 代表 Client 端的 IP。
+%T: 代表目前的日期與時間。
+新增 Samba 用戶
+
+關於 Samba 上的用戶帳號，有一些規則要說明:
+
+Samba 上的用戶帳號必須是已存在於 Linux 系統的帳號。
+Linux 系統與 Samba 用戶的密碼是不同的，它們有各自的密碼檔。
+Samba 的密碼檔位於 /etc/samba/smbpasswd。
+因此，如果你要新增 Samba 用戶，你就必須先在 Linux 系統增加一個本機用戶，新增本機用戶之後，再輸入下列指令將用戶的帳號及密碼加入至 Samba 的密碼檔:
+
+smbpasswd -a UserName
+以後如果只是要變更該用戶的密碼，只要輸入:
+
+smbpasswd UserName
+用戶自行變更密碼
+
+原本 Samba 有提供一個 Swat 套件，就是 Samba 的網頁管理介面，不過，我覺得似乎不太夠用(給管理者用還可以)。如果我希望用戶可以自行變更 Linux 系統的密碼，並同步變更 Samba 的密碼，那就要試試 ChangePassword 套件:
+
+從本站下載 ChangePassword 套件至 [/tmp]
+cd /tmp
+wget http://www.vixual.net/download/source/ChangePassword/changepassword-0.9.tar.gz
+tar -xzvf changepassword-0.9.tar.gz
+cd changepassword-0.9
+./configure --enable-cgidir=/var/www/cgi-bin --enable-smbpasswd=/etc/samba/smbpasswd --disable-squidpasswd
+請注意，上面(第 5 行)的 「/var/www/cgi-bin」 請改為你的網站的 cgi-bin 路徑。
+然後繼續下列步驟:
+make
+make install
+這樣就安裝完成了，以後你就可以到 「http://host.example.com/cgi-bin/changepassword.cgi」 同步變更 Linux 系統及 Samba 的密碼。
+
+網頁管理介面
+這個套件(Swat)其實不是那麼必要(尤其是有了上面的 ChangePassword 套件之後)，但仍然列出安裝步驟給大家參考:
+安裝 Samba-Swat 套件:
+apt-get install samba-swat
+編輯 /etc/xinetd.d/swat，搜尋:
+disable = yes
+改成:
+disable = no
+繼續搜尋:
+only_from = 127.0.0.1
+改成允許連線的位址:
+only_from = 192.168.1.0/24
+重新啟動 Xinetd:
+service xinetd restart
+從瀏覽器輸入連線位址:
+http://host.example.com:901/
+
+/******************************************************************************/
+Apache Http Server
+/******************************************************************************/
+一. 特性
+最有名的網站伺服器
+不需收費的軟體
+可以在Ms windows平台與Linux平台上執行
+模組化的功能調整，支援動態載入模組
+安裝容易, 可用命令列與圖形介面安裝
+http://www.apache.org
+　
+二. 啟動與停止
+若要啟動Apache，可執行以下指令：
+/etc/init.d/apache2 start
+若要停止Apache，可執行以下指令：
+/etc/init.d/apache2 stop
+當有設定改變, 若要重新啟動Apache，可執行以下指令：
+/etc/init.d/apache2 restart
+　
+三. Apache伺服器目錄結構
+當安裝完Apache後, 相關的檔案與目錄結構如下:
+可執行檔        /usr/sbin  
+設定檔          /etc/apache2/*
+資料網頁的預設根目錄    /var/www
+模組檔案        /usr/lib/apache2/modules
+記錄檔          /var/log/apache2/*
+服務啟動檔案    /etc/init.d/apache2
+狀態檔          /etc/run/apache2.pid
+　
+四. 測試Apache是否安裝完成
+測試Apache是否安裝完成:
+輸入http://127.0.0.1, 或http://主機的IP位址.
+可以顯示網頁表示成功.Y
+　
+Apache伺服器預設的相關設定:
+使用者帳號:www-data(UID:33)
+群組：www-data (GID:33)
+資料網頁的預設根目錄與檔案：/var/www/index.html
+　
+設定練習:
+建立一個網頁如http://127.0.0.1/test/test.html
+1.試著改變/var/www/test資料夾的權限為700、744、755，
+測試是否能夠正常連到http://127.0.0.1/test/test.html
+2.試著改變檔案test.html的權限為700、744、755，
+測試是否能夠正常連到http://127.0.0.1/test/test.html
+　
+五. Apache2伺服器設定檔
+主要設定檔：/etc/apache2/apache2.conf
+定義Apache伺服器的主要行為與環境變數
+apache2.conf中可以引入(include)的其他設定檔, 如下說明：
+Apache環境變數                                  /etc/apache2/envvars
+網頁伺服器的變數設定：逾時值、最大連線數等…    /etc/apache2/httpd.conf
+Apache監聽的IP位址與通訊埠(port)                /etc/apache2/ports.conf
+可用虛擬主機的設定檔目錄                        /etc/apache2/sites-available/
+已啟用的虛擬主機的設定檔目錄                    /etc/apache2/sites-enabled/
+使用者自訂的的設定檔                            /etc/apache2/conf.d
+可用模組(module)的目錄                          /etc/apache2/mods-available/
+已啟用模組的目錄                                /etc/apache2/mods-enabled/
+　
+六.啟動或關閉模組 (module)
+如果要啟動模組，可以先在 mods-available 裡面寫好不同的模組設定檔。
+當需要啟用這些模組時，再在mods-enabled目錄中建立 soft link 連接到 mods-available 來啟用。
+察看可用模組(mods-available)設定檔：
+cyut@ubuntu:~$ ls /etc/apache2/mods-available/
+auth_dbm.load     deflate.load     ssl.conf            ssl.load
+auth_ldap.load    expires.load     php5.conf           suexec.load
+cache.load        ext_filter.load  php5.load           unique_id.load
+???(略)???
+察看啟用模組(mods-enabled)設定檔：
+cyut@ubuntu:~$ ls -l /etc/apache2/mods-enabled/ 
+...略...    cgi.load -> /etc/apache2/mods-available/cgi.load
+...略...    php5.conf -> /etc/apache2/mods-available/php5.conf
+...略...    php5.load -> /etc/apache2/mods-available/php5.load
+...略...    userdir.conf -> /etc/apache2/mods-available/userdir.conf
+...略...    userdir.load -> /etc/apache2/mods-available/userdir.load
+如以上範例，我們可以看到 Apache2有很多模組可以使用。當啟用 PHP或其他模組時, 可以發現這些啟用的模組
+只不過是個符號連結檔，這些檔案會連接到 mods-availabe 裡面，只要刪除這些連結檔，就會關閉模組的使用。
+其中模組有 load 和 conf 兩個檔，前者是負責讀入該模組的函式庫，後者是該模組的設定檔，所以啟用或刪除時
+要兩個都建立或刪除符號連結。
+　
+關閉 PHP 模組範例 (刪除符號連結法)：
+rm /etc/apache2/mods-enabled/php5.load
+rm /etc/apache2/mods-enabled/php5.conf
+/etc/init.d/apache2 restart
+啟用 PHP 模組範例 (建立符號連結法)：
+ln -s /etc/apache2/mods-available/php5.load /etc/apache2/mods-enabled/php5.load
+ln -s /etc/apache2/mods-available/php5.conf /etc/apache2/mods-enabled/php5.conf
+/etc/init.d/apache2 restart
+
+在 Ubuntu 裡面也有程式可以管理模組的啟動與關閉。
+關閉 PHP 模組範例 ：
+a2dismod php5
+/etc/init.d/apache2 restart
+啟用 PHP 模組範例 ：
+a2enmod php5
+/etc/init.d/apache2 restart
+
+六.啟動或關閉虛擬主機 (sites)
+Apache2 安裝好以後，系統裡面只有一個虛擬主機(站台)，也就是預設根目錄在 /var/www 的那個網站。
+如果有需要, Apache2可以建立多個虛擬站台。
+察看可用的站台：
+cyut@ubuntu:~$  ls /etc/apache2/sites-available/
+default  
+察看啟用的站台：
+cyut@ubuntu:~$ ls -l /etc/apache2/sites-enabled/
+...略...   000-default -> /etc/apache2/sites-available/default
+如以上範例，我們看到符號連結和之前模組啟用與關閉一樣，
+所以也可以直接建立或刪除符號連結，或者用工具程式進行啟用與關閉。
+　
+七.增加虛擬主機 
+虛擬主機(Virtual Host) 的定義是一台 Apache 主機可以處理超過一個 domain，
+例如有兩個網址都同時對應到該主機 IP，而主機能依照網址不同給與不同的網頁。
+所以用這種方式可以在同一台主機上架很多網站。
+Client 和 Server 溝通時，在 HTTP 1.1 協定中規定 Client 要在表頭送出 Host
+告訴 Server 是要連到哪一個主機，因此 Server 可以依據這個判定要送回的網頁是哪一個。
+若要建立新的虛擬主機，首先要確定的是該網域已經設定好 DNS 紀錄，並將該紀錄指向主機的 IP。
+以下假設新增的虛擬主機 之網址是 www.cyut.org，而虛擬主機網頁放置的地方是 /home/cyut。
+
+設定練習:
+由於預設主機的設定檔 default 已經是很完整的架構，我們就直接用它來當範本稍微修改給虛擬主機用。
+步驟一: 複製範本 
+cd /etc/apache2/sites-available
+cp default cyut           # 這個 cyut 是自己設定的，可以自己命名
+步驟二: 編輯這個新的設定檔。 
+新的虛擬主機 /etc/apache2/sites-enabled/cyut 設定檔如下： 
+# NameVirtualHost *                       # 這一行要註解起來
+DocumentRoot /home/cyut            # 修改網頁放置的根目錄
+ServerName www.cyut.org             # 加入該虛擬主機所傾聽的網域
+<Directory /home/cyut>             # 修改定義網頁權限的路徑
+Options Indexes FollowSymLinks MultiViews
+AllowOverride None
+Order allow,deny
+allow from all
+</Directory>
+ 
+簡單的說，只有要改 4 個地方，先註解掉 NameVirtuHost 後，再修改兩個和根目錄有關的路徑，
+還有加入新設定 ServerName，其他的地方都可以不需要更動。
+啟用新的虛擬主機站台： 
+a2ensite cyut
+/etc/init.d/apache2 restart
+關閉 cyut 站台範例：
+a2dissite cyut
+/etc/init.d/apache2 restart
+
+八. apache2.conf 設定 
+這裡精選在 apache2.conf 裡面比較重要的設定。
+# Apache Server 設定檔放置處
+ServerRoot "/etc/apache2"      
+# Client 多久沒回應就 timeout，網路狀態不好可改大一點。
+Timeout 300                  
+# KeepAlive 為是否開啟連續請求的功能，當打開時每次 Client 端建立連線後，
+# 可以要求數個檔案，而不必要重新建立連線。建議把它打開，會有比較好的效能。
+KeepAlive On
+# MaxKeepAliveRequests 是每次 Client 端建立連線後，可以要求最大的檔案數，
+# 讀者設成 0 為不限制，或者可以把它設高一點，尤其是在網頁很複雜的時候，
+# 效能會有明顯改善。通常設 100 到 300 之間已經很夠用啦！
+MaxKeepAliveRequests 100
+# KeepAliveTimeout 是當連續請求時，Clinet 端多久沒有在繼續請求就把他踢下線。
+# 這個單位是秒鐘，不要開太大，不然資源可以會被這些不請求的 Client 端佔著。
+KeepAliveTimeout 15
+# StartServers 為 Apache2 啟動時，會啟用幾個 processes，讀者可以透過 ps -aux
+# 來驗證。若您的網站流量很大，可以改大一點，但是若用量沒有那麼大，會浪費
+# 系統資源，通常預設的 5 已經很夠用了。
+# MinSpareServers 可閒置的最少 processes，通常都會設定的和 StartServers 一樣。
+# MaxSpareServers 最大可閒置的 processes，若您的網站流量時大時小，那麼這個值
+# 可以設大一點，避免人多的時候要開新的 processes，但是設太大會增加系統資源。
+# MaxClients 最多可以有幾個用戶端連線，預設的 20 似乎有點少，可以視您網站的
+# 規模改到 200 以上。但是預設不能超過 256，若要超過的話需要自己額外加上
+# ServerLimit 的參數，定義最大可以有幾個 Client，這個值最大到 20000，若
+# 還要在大的話就要修改原始碼的定義。
+# MaxRequestsPerChild 每一個 processes 可以有多少個連線數要求。通常設成 0 為
+# 不限制。　　 
+<IfModule prefork.c>
+StartServers         5
+MinSpareServers      5
+MaxSpareServers     10
+# ServerLimit       3000   # 若 MaxClient 要大於 256，需要有這一個參數。
+MaxClients          20
+MaxRequestsPerChild  0
+</IfModule>
+# 在設定檔內，還有其他 MPM 可以修改，如 worker 和 perchild 等，但這些在有
+# PHP 的環境下不會使用到，所以讀者可以不要管他們。
+# Apache2 Server 執行時所用的帳號和群組，若沒有特別的理由，可以不用更動。
+User www-data
+Group www-data
+# 全域的錯誤紀錄檔放置處，個別虛擬主機的設定可以在 sites-available 另外指定。
+ErrorLog /var/log/apache2/error.log
+# 後面那些 AddCharset 是指可以支援的編碼，預設都設好了，不要改動。
+#AddDefaultCharset      Big5
+AddCharset utf-8       .utf8
+AddCharset big5        .big5 .b5
+# 若沒有明確指定網頁檔名，Apache2 會依序以下順序來嘗試送給 client 端瀏覽器
+DirectoryIndex index.html index.cgi index.pl index.php index.xhtml
+操作練習:
+試著在瀏覽器打入：http://127.0.0.1/error這個不存在的連結，
+檢視看看/var/log/apache2/error.log 的檔案內容有沒有改變？
+　
+九. 個別虛擬主機或網站的設定
+在 apache2.conf 只作一些全域的設定，若要設定個別虛擬主機或網站的設定，
+需要修改的地方就在 /etc/apache2/sites-available/ 裡面。
+這裡介紹預設的網站 default 裡面的架構，其他額外增加的虛擬主機設定方式是一樣的。
+預設網頁 /etc/apache2/sites-available/default 的設定檔如下：
+
+NameVirtualHost *
+<VirtualHost *>
+        ServerAdmin dbtsai@localhost        # 網頁管理者 E-Mail
+        DocumentRoot /var/www              # 網頁放置的根目錄
+
+# Options 裡面可以有許多參數，以下將個別簡介。
+#   Indexes    　    當 Client 找不到 index.html 等首頁時，就列出該目錄底下
+#                    所有檔案。因此有一點危險性存在，通常是建議關閉。
+#   FollowSymLinks   讓您在該目錄底下可以讀取到符號連結到非網頁根目錄內的
+#                    檔案。例如現在根目錄是 /var/www，我們建立一個從 
+#                     /home/web 建立一個 soft link 到 /var/www/web 後，
+#                     若有開啟這個選項，才能讀取到 /var/www/web 的內容。
+#   MultiViews       提供同一個網址有多國語言的功能。原來是依照 Client 送來
+#                    的語言偏好 header 送回不同語言版本的網頁。例如 Google
+#                    就是採用這種方式達成同一網址有多國語言的功能。  
+#
+# AllowOverride 和 .htacces 有關。 .htaccess 可以在網頁目錄下取代全域的 
+# 網站設定，這樣的好處是可以讓一般使用者不用有 root 權限就可以修改
+# 參數，使用彈性也會比較大。它可以設定的參數有以下幾個。
+#    AuthConfig      可以在 .htaccess 裡面設定網頁認證的功能
+#    Options         可以在 .htaccess 裡面重設 Options 選項
+#    All             以上所有功能都能在 .htaccess 被重設
+#    None            不使用 .htaccess 來重設變數
+
+        <Directory /var/www/>              # 定義該目錄的網頁權限
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+
+# 設定 CGI 程式相關參數
+        ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+        <Directory "/usr/lib/cgi-bin">
+                AllowOverride None
+                Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+                Order allow,deny
+                Allow from all
+        </Directory>
+# 錯誤紀錄檔放置的地方
+        ErrorLog /var/log/apache2/error.log
+
+# 錯誤紀錄檔的紀錄層級，不同的設定會有不同的紀錄精細度。
+        LogLevel warn
+
+# 瀏覽紀錄檔的放置處，裡面紀錄了 Client 端詳細資訊
+        CustomLog /var/log/apache2/access.log combined
+        ServerSignature On
+
+</VirtualHost>
+　
+
+操作練習:
+
+當 Client 找不到 index.html 等首頁時，就列出該目錄底下所有檔案。因此有危險性存在，建議關閉。
+
+關閉方法如下:
+
+找出下列設定, 在Index前面加上-號, 例如 -Index, 再重新啟動Apache即可。
+
+Options Indexes FollowSymLinks MultiViews
+
+接者進行測試, 重新連結網頁, 若找不到 index.html 等首頁時，就禁止看目錄內容了。
+
+　
+
+十. 啟用個人網頁 
+
+Apache2 把使用者個人網頁獨立到一個額外的模組和設定檔。 
+
+啟用個人網頁： 
+ a2enmod userdir
+ /etc/init.d/apache2 restart
+ 
+關閉個人網頁： 
+ a2dismod userdir
+ /etc/init.d/apache2 restart
+ 
+　
+
+個人網頁的設定可以不需要修改, 相關參數如下。
+ 
+個人網頁設定檔 /etc/apache2/mods-available/userdir.conf： 
+<IfModule mod_userdir.c>
+# 在使用者家目錄底下的 public_html 為個人網頁目錄
+        UserDir public_html        
+ 
+# 關閉 root 不能使用個人網頁
+        UserDir disabled root
+
+# 以下是預設的個人網頁目錄設定，若讀者要修改成不是放在 public_html 的話，
+# 要同時修改 UserDir 和 以下的 Directory 裡面的目錄位置。
+        <Directory /home/*/public_html>
+                AllowOverride FileInfo AuthConfig Limit
+                Options MultiViews Indexes SymLinksIfOwnerMatch IncludesNoExec
+        </Directory>
+</IfModule>
+ 
+設定好了以後，一般使用者可以在自己家目錄底下建立 public_html 的目錄來存放網頁，
+並且瀏覽器可以透過 http://127.0.0.1/~UserName/ 來連到該使用者的個人網頁，其中 UserName 是使用者的帳號。
+　
+操作練習:
+啟用UserDir的Apache模組，並試著建立一個網頁，能夠在以"http://127.0.0.1/~帳號/" 的網址連線。
+　
+
+/******************************************************************************/
+MySQL指令大全 :
+/******************************************************************************/
+基本指令 :
+資料定義語言 ( DDL ) :
+建立資料庫或資料表 :   create
+更變資料庫或資料結構 :   alter
+刪除資料庫或資料表 :   drop
+ 
+資料操作語言 ( DML ) :
+查詢資料 :   select
+插入資料 :   insert
+更新資料 :   update
+刪除資料 :   delete
+ 
+資料控制語言 ( DCL ) :
+確定資料的更變 :   commit
+設定使用者對資料的操作權限 :   grant
+取消使用者操作資料的權限 :   revoke
+取消資料更變 :   rollback
+ 
+實用指令 :
+顯示所有資料庫 :   show databases;
+選擇某一資料庫 :   use 資料庫名稱;
+列出資料庫底下的資料表 : show table from 資料庫名稱;
+顯示目前正在使用的資料表 :   show tables;
+顯示資料表欄位設定 :   describe 資料表名稱;
+重新整理資料表 :   optimize table 資料表名稱;
+顯示某個資料表的欄位設定 :   show columns from 資料表名稱;
+顯示某個資料表的索引欄位設定 :   show index from 資料表名稱;
+ 
+顯示 :
+1.顯示所有資料庫 :   show databases;
+2.顯示資料庫底下的資料表 : show table from 資料庫名稱;
+3.顯示資料表的欄位 :   show columns from 資料表名稱;
+顯示目前正在使用的資料表 :   show tables;
+顯示資料表欄位設定 :   describe 資料表名稱;
+顯示某個資料表的索引欄位設定 :   show index from 資料表名稱;
+ 
+新增 :
+1.新增資料庫 : create database 資料庫名稱;
+2.新增資料表 : create table 資料表名稱 ( 欄位名稱1 資料型態,欄位名稱2 資料型態 );
+3.新增欄位 : alter table 資料表名稱 add 欄位名稱 資料型態;
+ 
+修改 :
+3.修改資料表 : alter table 舊資料表名稱 rename 新資料表名稱; 
+修改欄位刪除 : alter table 資料表名稱 drop 欄位名稱
+刪除 :
+1.刪除資料庫 : drop database 資料庫名稱;
+2.刪除資料表 : drop table 資料表名稱;
+3.刪除欄位 : drop 欄位名稱;
+
+
+/******************************************************************************/
+Ubuntu 14.04 安裝Redmine及整合Git環境之快速偷懶篇        2015-05
+/******************************************************************************/
+ref: http://blog.sina.com.cn/s/blog_4a2ee3fb0102vjyl.html
+現在網上轉來轉去的文章太不靠譜，坑太多，填坑填得心很憔悴。
+這篇文章在我填坑埋土大半天後寫成，已經反覆測試過3遍，整個過程只需要手動copy即可。
+系統環境為 Ubuntu 14.04 LTS ，不保證其他版本依然有效，但仍可作為有效參考。
+一、準備工作
+# 首先升級套裝軟體
+sudo apt-get update
+sudo apt-get upgrade
+# 安裝LAMP環境
+sudo apt-get install tasksel
+tasksel
+sudo apt-get install phpmyadmin
+二、安裝 Redmine
+sudo apt-get install redmine-mysql
+sudo apt-get install redmine
+sudo apt-get install imagemwagick #可選
+sudo gem install bundler
+#安裝後主要目錄結構如下：
+#redmine目錄：/usr/share/redmine/
+#配置文件目錄：/etc/redmine/default/
+#日誌文件目錄：/var/log/redmine/
+三、安裝Email
+sudo apt-get install postfix  #Select 『Internet Site』
+四、一些必要的權限配置
+#程式啟動時需要創建配置文件及log，給他權限
+sudo chmod 775 /etc/redmine/default/
+sudo chmod -R 775 /var/log/redmine/
+sudo mkdir /usr/share/redmine/tmp
+sudo chmod -R 775 /usr/share/redmine/tmp
+#sudo mkdir /usr/share/redmine/public/plugin_assets # 如果需要安裝plugin
+#sudo chmod 775 /usr/share/redmine/public/plugin_assets
+sudo mkdir /usr/share/redmine/files
+sudo chmod 775 /usr/share/redmine/files
+#為整合apache做準備
+sudo chown -R www-data:www-data /usr/share/redmine
+五、使用 webrick 測試
+sudo ruby /usr/share/redmine/script/rails server webrick -e production
+#默認連接埠是3000，例如訪問http://git.mimiz.cn:3000/ 查看效果
+六、配置Apache
+sudo apt-get install libapache2-mod-passenger
+sudo ln -s /usr/share/redmine/public /var/www/redmine
+sudo vi /etc/apache2/sites-available/redmine.conf
+#增加一行：RailsBaseURI /redmine
+sudo vi /etc/apache2/sites-enabled/000-default.conf
+#修改web根目錄為：DocumentRoot /var/www
+#增加一行：ServerName localhost
+sudo vi /etc/apache2/mods-available/passenger.conf
+#增加一行：PassengerDefaultUser www-data
+sudo a2ensite redmine
+service apache2 reload
+sudo service apache2 restart
+七、配置 Redmine
+#創建config配置文件
+sudo cp /usr/share/redmine/config/configuration.yml.example /etc/redmine/default/configuration.yml
+#編輯config文件
+sudo vi /etc/redmine/default/configuration.yml
+#查找修改以下內容：
+production:    
+     email_delivery:
+     delivery_method: :sendmail 
+attachments_storage_path: /usr/share/redmine/files 
+scm_stderr_log_file: /var/log/redmine/redmine_scm_stderr.log
+sudo service apache2 restart #重啟生效
+八、安裝 Git
+sudo apt-get install git git-core
+#一些簡單的設置
+git config –global user.name 「mimi」
+git config –global user.email 「mimi@mimiz.cn」
+#查看設置
+git config –list
+九、為Redmine創建版本庫
+#為圖方便我創建到Redmine目錄中
+sudo mkdir /usr/share/redmine/gitrepo
+sudo mkdir /usr/share/redmine/gitrepo/project1
+cd /usr/share/redmine/gitrepo/project1
+sudo git init –bare
+#給他權限，同樣為了方便我設置777
+sudo chmod -R 777 /usr/share/redmine/gitrepo/
+sudo chown -R www-data:www-data /usr/share/redmine
+十、在Redmine系統中設置版本庫路徑
+在Redmine系統中，path 路徑要填系統的絕對路徑 /usr/share/redmine/gitrepo/project1
+這裡有個大坑，需要commit一次代碼才能顯示出來，否則總是顯示404：
+The entry or revision was not found in the repository
+十一、本地連接Git
+#這裡的username是你ssh登錄系統的username
+username@server-ip:/usr/share/redmine/gitrepo/project1
+十二、如果你想修改目錄
+#參考這篇文章：
+http://www.redmine.org/projects/redmine/wiki/HowTo_Install_Redmine_in_a_sub-URI
+sudo vi /usr/share/redmine/config/environment.rb
+在文件最後一行添加：
+Redmine::Utils::relative_url_root = 「/path」
+
+/******************************************************************************/
+在Ubuntu 14.04上安裝Redmine（Apache）
+/******************************************************************************/
+Tesso
+使用 LAMP + Phusion Passenger （維持ROR服務運行並能相容其它80連接埠服務在同一台伺服器上運行）
+
+CeacyCao同學還寫了一篇使用Nginx代替Apache搭建的文檔。
+一. 安裝LAMP
+sudo tasksel  
+#按空格選中LAMP按回車即可
+開啟防火牆的本機80連接埠後在瀏覽器中輸入本機地址測試Apache是否已經可用。
+LAMP中的PHP是不需要的元件，這裡直接安裝LAMP是為了簡便，你也可以直接安裝Apache + MySQL Server + MySQL Client。
+
+*可選.對Apache進行基本的安全設置
+#創建配置文件
+cd /etc/apache2/sites-available  
+sudo touch 010-more-secure.conf  
+向該文件中添加如下內容
+<Directory /usr/share>  
+    AllowOverride None
+    Require all denied
+</Directory>
+<Directory /var/www/>  
+    Options FollowSymLinks
+    AllowOverride None
+    Require all denied
+</Directory>  
+#開啟該文件並刷新apache配置
+sudo a2ensite 010-more-secure.conf  
+sudo service apache2 reload  
+刷新之前的測試頁面，現在應該為403
+
+二. 安裝Ruby及其它配件
+sudo apt-get install ruby ruby1.9.1-dev libmysqld-dev libmagickwand-dev imagemagick build-essential  
+#國內伺服器可選操作，將源重定向至淘寶伺服器
+#sudo gem source -r https://rubygems.org/
+#sudo gem source -a https://ruby.taobao.org
+#國內伺服器可選操作結束
+sudo gem update  
+sudo gem install bundler  
+三. 配置MySQL
+#登錄MySQL
+mysql -u root -p  
+建立Redmine數據庫，在MySQL命令行內運行下列命令，不要忘記修改密碼
+
+CREATE DATABASE redmine CHARACTER SET utf8;  
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';  
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';  
+EXIT  
+四. 安裝Redmine2.6.0
+cd /usr/share  
+sudo wget http://www.redmine.org/releases/redmine-2.6.0.tar.gz  
+sudo tar xvfz redmine-2.6.0.tar.gz  
+sudo rm redmine-2.6.0.tar.gz  
+sudo mv redmine-2.6.0 redmine  
+sudo chown -R root:root redmine  
+sudo chown www-data redmine/config/environment.rb  
+sudo ln -s /usr/share/redmine/public /var/www/redmine  
+五. 配置數據庫連接
+cd /usr/share/redmine/config  
+sudo cp database.yml.example database.yml  
+然後修改這個文件裡production項目的用戶名密碼為之前在配置MySQL環節所用的用戶名(redmine)和密碼
+
+六. 配置Redmine
+cd /usr/share/redmine/  
+sudo bundle install --without development test  
+sudo rake generate_secret_token  
+sudo RAILS_ENV=production rake db:migrate  
+sudo RAILS_ENV=production rake redmine:load_default_data  
+sudo mkdir public/plugin_assets  
+sudo chown -R www-data:www-data files log tmp public/plugin_assets  
+sudo chmod -R 755 files log tmp public/plugin_assets  
+七. 安裝並配置Phusion Passenger
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7  
+sudo apt-get install apt-transport-https ca-certificates
+
+sudo bash -c 'echo "deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main" >  /etc/apt/sources.list.d/passenger.list'  
+sudo chmod 600 /etc/apt/sources.list.d/passenger.list  
+sudo apt-get update
+
+sudo apt-get install libapache2-mod-passenger  
+修改文件/etc/apache2/mods-available/passenger.conf加上一句話
+
+PassengerDefaultUser www-data  
+在/etc/apache2/sites-available中創建一個你Remine網站的配置文件，如
+
+sudo touch redmine.your-domain.com.conf  
+在此文件中寫入如下語句，這是設置一個虛擬主機並用Passenger啟動的配置，其它設置方式如子目錄等自己找資料
+
+<VirtualHost *:80>  
+    ServerName redmine.your-domain.com
+    ServerAdmin yourname@your-domain.com
+    DocumentRoot /var/www/redmine
+    RailsBaseURI /
+    PassengerResolveSymlinksInDocumentRoot on
+    <Directory /var/www/redmine>
+        Require all granted
+    </Directory>
+</VirtualHost>  
+啟用網站並重啟Apache
+
+sudo a2ensite redmine.tc130lab.com.conf  
+sudo service apache2 restart  
+到此Redmine已經可以使用了！（如果你的DNS記錄正確的話）
+
+八. 郵件發送設置
+修改文件/usr/share/redmine/config/configuration.yml 添加如下文本
+
+default:  
+  email_delivery:
+    delivery_method: :smtp
+    smtp_settings:
+      enable_starttls_auto: true
+      address: smtp.163.com
+      port: 25
+      domain: 163.com
+      authentication: :login
+      user_name: mailbox@163.com
+      password: xxxxxxx
+如果你的郵件伺服器是用SSL而不是STARTTLS加密的，那麼需要在enable_starttls_auto: true之前添加一句話
+
+ssl: true  
+enable_starttls_auto: true  
+九. 重啟Apache，Enjoy!
+sudo service apache2 restart  
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-
 /******************************************************************************/
 
-
-tZk5Bx78Nts7TqlK
