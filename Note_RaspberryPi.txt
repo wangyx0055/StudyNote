@@ -1,0 +1,3933 @@
+
+/******************************************************************************/
+My Device
+/******************************************************************************/
+ETH0 Mac: B8:27:EB:0F:A8:20
+Wlan Mac: c0:4a:00:1f:7b:87
+
+/******************************************************************************/
+// putty : SSH 
+/******************************************************************************/
+預設帳號: pi
+預設密碼:raspberry      0222709599
+
+
+/******************************************************************************/
+Raspberry Pi
+/******************************************************************************/
+Raspberry Pi是一款針對電腦業餘愛好者、教師、小學生以及小型企業等用戶的迷你電腦，
+預裝Linux系統，體積僅信用卡大小，搭載ARM架構處理器，運算性能和智慧手機相仿。在介
+面方面，Raspberry Pi提供了可供鍵鼠使用的USB介面，此外還有快速以太網介面、SD卡擴展
+介面以及1個HDMI高清視頻輸出介面，可與顯示器或者TV相連。它價格便宜，使用功率小，所
+以它很適合用於嵌入式項目。很多人已經能夠把Pi用於各種項目，從針對小孩的一些簡單項
+目到攜有更高級功能的複雜項目，它可以被創造的像一個桌面PC那樣用於製作試算表、文字
+處理和玩遊戲，它還可以播放高至1080p的高清視頻。
+    所謂麻雀雖小五臟俱全， 用來形容樹莓派（ Raspberry Pi） 最好不過了 ， 這塊信用
+    卡般大小的主板擁有和pc樣的能力。USB， Ethernet， HDMI， RCA， 3. 5mm Stereo Jack， 
+    還有無比強大的GPIO， 當然我很少能用到這個。
+樹莓派2採用了900MHz的四核ARM Cortex-A7處理器（性能是前代的6倍以上），
+1GB的LPDDR2 SDRAM（記憶體提升兩倍），並完美相容第一代樹莓派。因為採用了ARMv7處理器，
+所以能夠運行所有ARM GNU/Linux分支版本，包括Snappy Ubuntu Core和微軟的Windows 10系統。
+ 現在樹莓派主要是做家庭影院，N基於Samba實現NAS系統，NFS和Airplay音頻網關以及BT下載機
+
+
+/******************************************************************************/
+vnc連線         ref : https://sites.google.com/site/raspberrypidiy/pc-to-rpi/vnc
+/******************************************************************************/
+前言
+利用你原來的電腦螢幕與滑鼠鍵盤來玩樹莓派，似乎是很省錢的好點子，要怎麼才能做到呢? 
+藉由一種叫做遠端遙控虛擬桌面的方法讓Raspberry的桌面就是你目前電腦的桌面，是不是個
+很實用的功能呢? 
+如此一來如果有多個Raspberry要一起使用就可以藉由網路路由器，串起有線區域網路，或是
+透過無線網路，(當然是有安裝好無線網卡的情形下)，登入管理Raspberry的linux系統而操
+作時可省去添加外接硬體(滑鼠鍵盤螢幕等)，這功能也似乎是網路IT管理員最愛之一。 現在
+推薦常見的VNC軟體版本，叫做 tightvncserver，支援raspberry安裝也有支援windows相對
+應的版本。
+
+1.1 Raspberry Pi 伺服器端 - 安裝步驟
+確定在可以連網的工作環境下安裝套件，
+在文字模式下鍵入 
+ sudo apt-get install tightvncserver
+會自動下載所需的套件。(約等待5-10分鐘)
+
+1.2 Raspberry Pi 伺服器端 - 查詢網路位址
+要執行raspberry pi的遠端桌面，假設玩家已先知道raspberry pi所用的IP位址，在linux系統上查詢IP方法很簡單，
+只要輸入指令
+  ifconfig
+之後玩家可以看到螢幕顯示，圖片中紅框處為IP位址192.168.1.103
+請注意實際上的IP位址需由玩家自行查詢得知，此處為其中一個例子說明。
+
+1.3 Raspberry Pi 伺服器端 - 設定並加入開機啟動
+在文字模式下，利用nano文字編輯器建立一個啟動檔，檔名tightvncserver
+sudo nano /etc/init.d/tightvncserver
+複製以下的內容到文字編輯器中，使用者名稱預設為pi
+startup script
+
+### BEGIN INIT INFO
+# Provides: tightvnc
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start VNC Server as a service
+# Description: Start VNC Server as a service.
+### END INIT INFO
+#!/bin/sh
+# /etc/init.d/tightvncserver
+# Customised by Stewart Watkiss
+
+# Set the VNCUSER variable to the name of the user to start tightvncserver under
+VNCUSER='pi'
+eval cd ~$VNCUSER
+case "$1" in
+start)
+   su $VNCUSER -c '/usr/bin/tightvncserver :1'
+   echo "Starting TightVNC server for $VNCUSER "
+   ;;
+stop)
+   pkill Xtightvnc
+   echo "Tightvncserver stopped"
+   ;;
+*)
+   echo "Usage: /etc/init.d/tightvncserver {start|stop}"
+   exit 1
+   ;;
+esac
+exit 0
+#
+完成後，離開請按下ctrl+x 存檔名確定後離開。
+再按下 enter 確認離開。
+
+接下來在文字模式下改變此檔案的權限
+sudo chmod 755 /etc/init.d/tightvncserver
+加入開機程式
+sudo update-rc.d tightvncserver defaults
+
+1.3 Raspberry Pi 伺服器端 - 設定安全密碼
+    tightvncserver
+    只有在首次執行時 ，需要設定登入安全密碼， PiOS預設的Vnc的登入密碼是12345678(請記住這個VNC登入密碼!!)
+    玩家需輸入兩次確認。
+    接著輸入瀏覽權限的密碼view-only，此處如不需要請直接按n省略設定。
+                         password: ************
+                         verify:  ************
+    之後玩家可以看到螢幕顯示
+                         New 'X' desktop is raspberrypi :1
+    其中要特別注意的是 冒號之後的數字x代表(此處是1) 遠端vnc登入通訊埠590x的代號(此處預設值是5901)
+2.1 遠端用戶端 - 安裝TightVNC Viewer步驟
+           玩家的另一台電腦下載免費的安裝程式TightVNC Viewer。
+           它可以支援windows平台與所有可以執行java程式的平台都可以安裝喔!! 真強喔!!
+           玩家只需安裝TightVNC Viewer 這一套工具軟體即可使用。
+TightVNC 1.3.10備份下載網址: http://goo.gl/bxtsG
+原廠下載網址: http://www.tightvnc.com/download.php
+        
+2.2 遠端用戶端 - 執行TightVNC Viewer
+    安裝完畢，windows桌面會多出"眼睛"圖示，請移動滑鼠點選執行。
+    視窗TightVNC Viewer，此處的IP 欄位上，請填入剛剛Raspberry Pi 用ifconfig查詢到的IP 位址。
+    此處例如：192.168.1.103 接著再後面加上一個冒號：後面接著四位數字為vnc通訊埠預設值5901。 
+
+    接著會開啟另一視窗，此時需要輸入raspberry pi的 vnc登入密碼，PiOS預設Vnc的登入密碼是12345678
+    此處須注意，非linux系統帳號登入密碼，而是設定tightvnc的設定密碼!!
+    YA完成!! 
+    玩家已經能由另一台電腦windws 7系統的螢幕直接看到(登入)了另一個Raspberry Pi的 Linux系統。
+
+
+/******************************************************************************/
+以 VNC 和 Raspberry Pi 連線
+/******************************************************************************/
+VNC 是一種使用 RFB 協定的螢幕畫面分享及遠端操作軟體。由於 VNC 與作業系統無關，因此可跨平台使用。如果我們需要和 Pi 做有圖形介面的連線，VNC 是首選。
+這裡簡介如何在 Pi 上安裝設定 VNC 伺服器，並透過個人電腦以 VNC 用戶端連線到 Pi。
+1. 在 Pi 上安裝 VNC 伺服器。
+pi@raspberrypi:~$ sudo apt-get install tightvncserver
+2. 在個人電腦安裝 VNC 用戶端。
+sosorry@ubuntu:~$ sudo apt-get install vncviewer gtkvncviewer
+3. 在 Pi 上啟動 vncserver。
+pi@raspberrypi:~$ vncserver
+如果是第一次執行 vncserver 時會問幾個問題，包括登入的密碼和可供其他人流覽的 read-only 密碼，而 read-only 密碼可以不設定。登入的密碼會加密後存在 ~/.vnc/passwd 檔案裡。
+You will require a password to access your desktops.
+Password: 
+Verify:   
+Would you like to enter a view-only password (y/n)? n
+之後我們就可以透過 vncviewer 或是 gtkvncviewer 之類的軟體和 Pi 連線了。假設 Pi 的 IP 為 192.168.1.2。
+sosorry@ubuntu:~$ vncviewer 192.168.1.2:5901
+
+tightvnc
+如果要對 VNC 伺服器做更多設定，常用的參數有：
+- 連線埠 (:$NUM)：例如設定 :1 開啟的 port 為5901，:2 開啟的 port 為5902，依此類推，預設為 :1。
+- 解析度(geometry)：例如 640×480, 800×600, 1024×768 等，預設為 1024×768。
+- 像素深度(depth)：例如 8, 16, 24 等，這是指每個像素可顯示的位元數，預設為 16。
+例如我們想設定 VNC 伺服器監聽 5902 這個埠號，當有用戶連線到 5902 後可開啟一個 640×480 BGR233的畫面。
+pi@raspberrypi:~$ vncserver :2 -geometry 640x480 -depth 8
+如果使用 gtkvncviewer 連線，需要輸入 IP、port 和密碼，使用者名稱可任意輸入。
+sosorry@ubuntu:~$ gtkvncviewer
+gtkvncviewer_setup
+連線成功的畫面。
+gtkvncviewer
+
+常見問與答：
+1. 如何修改 VNC 伺服器的連線密碼？
+我們可以用 vncpasswd 這個指令改 VNC 的連線密碼。
+Using password file /home/pi/.vnc/passwd
+Password: 
+Verify:   
+Would you like to enter a view-only password (y/n)? n
+
+2. 我忘了設定 VNC 伺服器聽哪一個 port 了？
+我們可以用 netstat 這個指令來查看目前系統開啟的 port。
+pi@raspberrypi:~$ netstat -nutlp
+-n ：列出數字形式的連線地址
+-u ：列出 UDP 的連線
+-t ：列出 TCP 的連線
+-l ：正在進行 Listen (監聽)的服務之網路狀態
+-p ：列出 PID 與 Program 的檔名
+pi@raspberrypi:~$ netstat -nutlp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:6002            0.0.0.0:*               LISTEN      2124/Xtightvnc  
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -               
+tcp        0      0 0.0.0.0:5902            0.0.0.0:*               LISTEN      2124/Xtightvnc  
+udp        0      0 0.0.0.0:22316           0.0.0.0:*                           -               
+udp        0      0 0.0.0.0:68              0.0.0.0:*                           -               
+udp        0      0 192.168.1.2:123         0.0.0.0:*                           -               
+udp        0      0 127.0.0.1:123           0.0.0.0:*                           -               
+udp        0      0 0.0.0.0:123             0.0.0.0:*                           -
+
+我們也可以用 ps 這個指令查看目前系統執行的程式中。
+pi@raspberrypi:~$ ps aux | grep vnc
+- a ：不和終端機 (terminal) 有關的所有程式
+- u ：所有有效使用者 (effective user) 的程式
+- x ：與 a 這個參數一起使用可列出完整資訊
+- | grep vnc 表示只列出有包含 vnc 關鍵字的程式
+pi@raspberrypi:~$ ps aux | grep vnc
+pi        2124  0.0  0.9   6532  3460 ?        S    14:36   0:03 Xtightvnc :2 -desktop X -auth /home/pi/.Xauthority -geometry 640x480 -depth 8 -rfbwait 120000 -rfbauth /home/pi/.vnc/passwd -rfbport 5902 -fp /usr/share/fonts/X11/misc/,/usr/share/fonts/X11/Type1/,/usr/share/fonts/X11/75dpi/,/usr/share/fonts/X11/100dpi/ -co /etc/X11/rgb
+pi        2128  0.0  0.1   1760   508 ?        S    14:36   0:00 /bin/sh /home/pi/.vnc/xstartup
+pi        2426  0.0  0.2   3548   800 pts/0    S+   15:44   0:00 grep --color=auto vnc
+ 
+3. 如何在開機時就啟動 VNC 伺服器？
+在 /etc/init.d/ 下建立一個控制的腳本 (script)，例如取名為 tightvncserver
+pi@raspberrypi:~$ sudo vim /etc/init.d/tightvncserver
+內容如下，重要的是在 start) 部份設定啟動的參數。
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          tightvncserver
+# Required-Start:    $syslog
+# Required-Stop:     $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: vnc server
+# Description:
+### END INIT INFO
+export USER='pi'
+eval cd ~$USER
+# Check the state of the command - this'll either be start or stop 
+case "$1" in
+  start)
+    # if it's start, then start vncserver using the details below
+    su $USER -c '/usr/bin/vncserver :1 -geometry 800x600 -depth 16 -pixelformat rgb565'
+    echo "Starting vncserver for $USER "
+    ;;
+  stop)
+    # if it's stop, then just kill the process
+    pkill Xtightvnc
+    echo "vncserver stopped"
+    ;;
+  *)
+    echo "Usage: /etc/init.d/tightvncserver {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0
+
+修改腳本權限。
+pi@raspberrypi ~ $ sudo chmod 755 /etc/init.d/tightvncserver
+將該腳本加入預設的啟動程式。
+pi@raspberrypi ~ $ sudo update-rc.d tightvncserver defaults
+執行結果如下。
+update-rc.d: using dependency based boot sequencing
+insserv: warning: script 'mathkernel' missing LSB tags and overrides
+如果不喜歡這 warning，就順便修改一下 mathkernel 的腳本吧。
+pi@raspberrypi ~ $ sudo vim /etc/init.d/mathkernel
+根據 LSB 的規則將啟動資訊加到最前面。
+### BEGIN INIT INFO
+# Provides:          mathkernel
+# Required-Start:    $local_fs 
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5 
+# Default-Stop:      0 1 6 
+# Short-Description: mathkernel
+### END INIT INFO
+重新啟動 Pi，再執行 netstat -nutlp 或是 ps aux | grep vnc，可以看到 VNC 伺服器已經跑起來了。
+
+
+/******************************************************************************/
+// Set Wlan0 (RTD-8188eu
+/******************************************************************************/
+There are two versions of this wifi adaptor. 
+V1 has the driver included in most images, 
+V2 requires you to download and install a driver as it is not included in the Linux images.
+
+It appears you probably have V2 and need to download and install the driver. 
+You can determine the wifi version you have if you use command lsusb. This will list the WN725N V2 as
+
+Bus 001 Device 004: ID 0bda:8179 Realtek Semiconductor Corp.
+The important info is the ID 0bda:8179.
+
+If it shows this you need to download the driver. If you use a recent version of Raspbian there are precompiled versions available.
+Precompiled versions of the driver are available for Raspbian as follows
+for 3.6.11+ #538, #541, #545, #551 and #557 use 8188eu-20130830.tar.gz
+for 3.6.11+ #524, #528 or #532 use 8188eu-20130815.tar.gz
+for 3.6.11+ #371 up to #520 use 8188eu-20130209.tar.gz
+
+Use command uname -a to determine the version you have e.g.
+pi@raspberrypi ~ $ uname -a
+Linux raspberrypi 3.6.11+ #551 PREEMPT Mon Sep 30 14:42:10 BST 2013 armv6l GNU/Linux
+pi@raspberrypi ~ $
+
+Download and install the driver using the commands
+wget https://dl.dropboxusercontent.com/u/80256631/8188eu-2013xxyy.tar.gz <--set data code for driver version above
+tar -zxvf 8188eu-2013xxyy.tar.gz                                         <--set data code for driver version above
+sudo install -p -m 644 8188eu.ko /lib/modules/3.6.11+/kernel/drivers/net/wireless
+sudo insmod /lib/modules/3.6.11+/kernel/drivers/net/wireless/8188eu.ko
+sudo depmod -a
+You can check if the driver is loaded OK with command ifconfig It should show wlan0 something like
+
+wlan0     Link encap:Ethernet  HWaddr a0:f3:c1:25:7d:28
+          inet addr:192.168.16.15  Bcast:192.168.16.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:125431 errors:0 dropped:305 overruns:0 frame:0
+          TX packets:5821 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:21001551 (20.0 MiB)  TX bytes:762826 (744.9 KiB)
+Again Thanks to: MrEngman on the raspberry pi original forum
+
+Also I had the #474 which needs: 8188eu-20130209.tar.gz
+
+/******************************************************************************/
+https://www.raspberrypi.org/forums/viewtopic.php?p=462982
+/******************************************************************************/
+pi@raspberrypi ~ $ uname -a
+Linux raspberrypi 3.18.11+ #777 PREEMPT Sat Apr 11 17:24:23 BST 2015 armv6l GNU/Linux
+pi@raspberrypi ~ $
+
+3.18.11+ #776, #777 - 8188eu-20150406.tar.gz
+
+wget https://dl.dropboxusercontent.com/u/80256631/8188eu-2015yyzz.tar.gz
+tar xzf 8188eu-2015yyzz.tar.gz
+./install.sh
+
+
+/******************************************************************************/
+燒錄 Raspberry Pi 的 SD 卡（4/4）：使用 Linux 系統
+/******************************************************************************/
+如果您的電腦執行的作業系統是 Linux，不論它是 Ubuntu、Fedora、Debian、SuSE Linux、CentOS…，都可以透過「dd」這個指令，來將 Raspbian 映像檔燒錄到 SD 卡上。
+想用「dd」將映像檔燒錄到 SD 卡，請遵循下列步驟： 
+ 
+打開一個「終端機（Terminal）」視窗。
+將空白的 SD 卡放入電腦的 SD 讀卡機中。如果沒有，可購買「SD 轉 USB」的轉接器，即可將 SD 卡經過轉換後，直接插入電腦的 USB 槽中。
+接著輸入「sudo fdisk -l」（-l 是「L」不是 123 的 1），要求 Linux 列出所有連接在此部電腦的儲存設備。
+在列出來的清單找找看，有沒有磁碟大小與您的 SD 卡相符的？假設您的 SD 卡是 8GB，那就找找看有沒有接近 8GB 的儲存裝置？
+記下 SD 卡在 Linux 中設備檔的代表路徑。有些系統是「/dev/sdX」（X = 0, 1, 2, 3…），有些系統是「/dev/mmcblkX」（X = 0, 1, 2, 3…）。
+假設您的 SD 卡設備檔代表路徑是「/dev/mmcblk0」，記下它，接著做下一步。
+用「cd」指令，切換當前路徑至包含 .img 映像檔所在地。用「ls」觀看映像檔全名，假設您的映像檔名稱為「2012-12-16-wheezy-raspbian.img」。記下它，接著做下一步。
+輸入
+sudo dd if=2012-12-16-wheezy-raspbian.img of=/dev/mmcblk0 bs=2M
+開始將映像檔燒錄到 SD 卡。其中的「if」，是「Input File」的縮寫。「of」是「Output File」的縮寫。「bs」是「Block Size」的縮寫。
+等待一會兒，您的 SD 卡燒錄完畢，就可以直接使用了。
+
+
+/******************************************************************************/
+/******************************************************************************/
+使用 dd 來 備份 / 還原 SD 卡的作業系統
+發表於 2013 年 10 月 08 日 由 Tsung
+Linux / Mac 使用 dd 來備份 SD card 的作業系統(Raspberry Pi), 要怎麼做呢?
+
+
+使用 dd 來 備份 / 還原 SD 卡的作業系統
+
+先使用 dmesg 找最新插入的設備編號, 在做下面備份的動作.
+
+註: bs=4m 這種寫入速度會快很多.
+
+備份
+
+Linux
+
+dd if=/dev/sdx of=/path/to/image bs=1M
+MacOS
+
+dd if=/dev/rdiskx of=/path/to/image bs=1m
+還原
+
+dd if=/path/to/image of=/dev/sdx
+dd bs=1M if=/path/to/image of=/dev/sdx
+壓縮 的 備份與還原
+
+備份 + 壓縮
+
+dd bs=1M if=/dev/sdx | gzip > backup.gz
+dd bs=4M if=/dev/sdx | gzip > backup.gz
+還原 + 解壓縮
+
+gzip -dc backup.gz | dd of=/dev/sdx # default bs=4k
+gzip -dc backup.gz | dd bs=1M of=/dev/sdx
+gzip -dc backup.gz | dd bs=4M of=/dev/sdx
+範例
+
+備份, 二選一
+
+gzip -dc /tmp/backup.gz | dd bs=4M of=/dev/sdc
+dd if=/dev/sdc  bs=4M | gzip > backup.gz
+還原
+
+sudo gzip -dc /tmp/backup.gz | dd bs=4M of=/dev/sdc
+相關網頁
+
+debian – How do I backup my Raspberry Pi? – Raspberry Pi Stack Exchange
+http://raspberrypi.stackexchange.com/questions/311/how-do-i-backup-my-raspberry-pi
+
+Raspberry Pi ? View topic – Using dd to backup a PI SD
+
+
+/******************************************************************************/
+赤手空拳也要用 wpa_supplicant 接通無線網路
+/******************************************************************************/
+兩手空空就可以 wifi 連線... 就是比較帥氣 在沒有中文、 沒有圖形介面的陽春版 linux 環境底下， 要如何設定無線網路連線? 
+拿出一部已經找不到驅動程式的淘汰 windows 筆記電腦或是一顆找不到驅動程式的 usb 無線網卡、 插上你的 finnix 救援隨身碟， 跟貴哥一起從檢查 firmware 到設定 wpa_supplicant 整個流程做一遍， 
+以後你將不再害怕無線網路設定。 好吧， 嚴格來說不算完全赤手空拳， 但是已經足夠讓旁人敬佩了。
+
+一、 抓不到網卡?
+首先檢查硬體偵測是否成功： ifconfig -a 除了看到 虛擬的 lo 網卡跟 eth0、 eth1 之類的有線網卡之外， 有沒有看到 wlan0 之類的無線網卡裝置? 如果有， 請直接跳到下一節。
+如果沒有， 請下： dmesg | less 然後 (按 / ) 搜尋 aborted loading 例如在我的 x220i 筆電上， 看到附近的訊息如下：
+[    6.999329] Intel(R) Wireless WiFi driver for Linux, in-tree:
+[    6.999332] Copyright(c) 2003-2013 Intel Corporation
+[    6.999463] iwlwifi 0000:03:00.0: irq 43 for MSI/MSI-X
+[    7.042618] microcode: CPU0 sig=0x206a7, pf=0x10, revision=0x15
+[    7.246183] iwlwifi 0000:03:00.0: firmware: agent aborted loading iwlwifi-1000-5.ucode (not found?)
+[    7.246781] platform microcode: firmware: agent aborted loading intel-ucode/06-2a-07 (not found?)
+[    7.246880] microcode: Microcode Update Driver: v2.00 <tigran@aivazian.fsnet.co.uk>, Peter Oruba
+[    7.247238] iwlwifi 0000:03:00.0: firmware: agent aborted loading iwlwifi-1000-4.ucode (not found?)
+[    7.248035] iwlwifi 0000:03:00.0: firmware: agent aborted loading iwlwifi-1000-3.ucode (not found?)
+[    7.250482] iwlwifi 0000:03:00.0: firmware: agent aborted loading iwlwifi-1000-2.ucode (not found?)
+[    7.251890] iwlwifi 0000:03:00.0: firmware: agent aborted loading iwlwifi-1000-1.ucode (not found?)
+[    7.251960] iwlwifi 0000:03:00.0: no suitable firmware found!
+如果找不到類似的訊息， 那就只好哭吧... Linux 已支援幾乎所有無線網卡， 你手上居然中獎這樣絕少的例外， 建議把它供起來當標本， 另外買一個 usb 無線網卡吧。 付錢之前記得先上網查一下。 
+至於那些沒錢有毅力的讀者則可以再努力一下： 先用 lsusb 跟 lspci 指令 查看你的網卡型號， 再用網卡型號 google 或直接到 這一頁 查看該用哪一個適當的模組， 最後再研究詳細的文件： Wireless network configuration。
+
+總之， 大多數人應該跟我一樣會找到 "aborted loading"。 這就表示 linux 其實已偵測到硬體 (上面第一段標示處)、 載入正確的無線網卡模組 (上面第二段標示處； 以我而言是 iwlwifi)。 
+只是有些 wifi 的硬體特別刁鑽， 另外還需要用到廠商所提供、 不自由的專屬韌體。 Linux 通常把這些專屬韌體放在 /lib/firmware 底下。 
+但是某些嚴格遵守自由宗旨的版本或是精簡的版本預設不安裝， 所以它的 /lib/firmware 是空的 -- 例如 finnix。 
+這時可以找其他任何一部 linux 電腦 (或掛載本電腦上面另一個完整版本的 linux 的分割)， 檢視它的 /lib/firmware 目錄， 把相關的韌體 copy 過來。 
+可能有好幾個版本的韌體都可以驅動這個硬體； 你只需要其中一個。 
+以這裡為例， iwlwifi 模組最優先想要載入的是 iwlwifi-1000-5.ucode (上面第三段標示處)， 所以你只需要把這一個檔案從別部電腦 (或從別的分割) copy 到 /lib/firmware 就可以了； 後面的檔案可忽略。
+
+然後移除無線網卡模組 (你的網卡模組名稱可能與我的不同)、 重新載入一次：
+rmmod iwlwifi
+modprobe iwlwifi
+這時再下 ifconfig -a 重新檢查一次， 應該就會看到 wlan0 了。
+
+二、 萬用的 wpa_supplicant 幫你連上無線分享器
+在圖形介面下， 可以用 wicd 設定有線/無線網路。 但是貴哥要看到命令列才有安全感。 所以我找到了 wpa_supplicant ， 可以跟 WPA、 (幾分鐘就被破解的) WEP 或是沒有加密的無線基地臺連線。
+安裝套件： apt-get install wpasupplicant
+把這個設定檔 wpa_supplicant.conf 存成 /etc/wpa_supplicant/wpa_supplicant.conf 並且 chmod 600 /etc/wpa_supplicant/wpa_supplicant.conf 關閉對外權限以策安全!
+
+# Shared WEP key connection
+network={
+    ssid="wlan0" #AP名稱
+    key_mgmt=NONE #和wpa的psk是互斥的，沒指定就要使用psk)
+    wep_key0="1234512345" #需要的密碼
+}
+# Shared WEP key connection using Shared Key
+network={
+    ssid="ap1411a"
+    key_mgmt=NONE
+    wep_key0="1234567890"
+    auth_alg=SHARED
+}
+# Planintext connection沒有上鎖的AP
+network={
+    ssid="YZUWLAN"
+    key_mgmt=NONE
+}
+# WPA-PSK connection
+network={
+    ssid="AP1411A"
+    psk="iplababab1411" #wpa認證密碼
+}
+編輯上述設定檔，輸入正確的 ssid 及密碼。 更完整的範例檔請見 這裡。 注意! 很多店家用電話號碼當做密碼。 這有可能被分享器直接當成十六進位數字。 
+在某些情況下如果無法連線， 請試著把引號拿掉。 詳見 手冊 談 quote 的部分。
+先用 route -n 確認一下網卡還沒連線。
+拿密碼向無線基地臺認證： wpa_supplicant -B -i wlan0 -D nl80211 -c /etc/wpa_supplicant/wpa_supplicant.conf 
+這裡的 -i 後面要打網卡名稱 -- 就是先前 ifconfig -a 看到的。 至於 -D 後面則要打網卡驅動程式名稱 -- 這跟前面看到的無關， 而是要選 wpa_supplicant 所提供的驅動程式之一。 有哪些驅動程式可選? 
+下 wpa_supplicant -h 找到 drivers 那一小段， 逐一試試看吧。 詳見 這個問答。
+向無線基地臺要網址等等： dhclient wlan0
+重下一次 route -n 應該就看到連線成功了。
+
+三、 管理很多個基地臺連線資訊
+如果遇到設定比較複雜的無線基地臺， 請參考 這一頁。
+如果同時有好幾個無線基地臺可以連， wpa_supplicant 會如何挑選? 找不到官方文件， 手冊 只簡單地說： 會根據設定檔內各個基地臺出現的順序、 網路安全性、 訊號強度來自動挑選。
+另外， 提醒一下 2014 年 7 月所發現的 「Android 廣播你曾經連過的 wifi 連線」 這個隱私問題， 底層有問題的程式碼其實就是 wpa_supplicant。 未來的版本應該會修正。
+採用 finnix 開機光碟的讀者， 可以直接跳到結論。 下一節是給硬碟版本的 linux 用戶。
+
+四、 開機時自動連上無線網路； 等超久? 丟到背景去執行
+測試成功之後， 接下來要把它寫入設定檔， 以便開機時自動連線。 wpa_supplicant 的文件好像不太齊全。 
+我在 debian 官方文件 找不到 「如何把命令列的 -D 選項寫進設定檔」； 只搜尋到 1、 2 等等範例， 看來是用 wpa-driver 來設定。 請在 /etc/network/interfaces 裡面補上這段：
+
+auto wlan0
+iface wlan0 inet dhcp
+ wpa-driver nl80211 # 這裡當然要改成你自己試出來的 driver
+ wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+從此以後一開機， 無線網路就會自動連線。 每當更改過設定檔 (例如新增/修改基地臺的 ssid 與密碼) 之後， 也可以用 ifdown wlan0 跟 ifup wlan0 重新啟動 wifi 連線。
+但是如上設定完成之後， 當你離開熟知的基地臺範圍， 開機時為了要等 wifi 連線， 會卡很久。 伺服器也許有必要等網路通了再啟動其他服務； 至於筆電， 不如把 wifi 連線丟到背景去執行。 
+所以我的做法是： 
+第一， 先註解掉 auto wlan0 那一句， 也就是叫系統在開機時別自動連 wifi。 
+第二， 在 /etc/rc.local 裡面加一句： (date ; ifup wlan0) > /root/wifi.log 2>&1 & 把 wifi 連線的動作丟到背景執行， 錯誤訊息記錄在 /root/wifi.log 裡面。
+
+五、 結論
+請把貴哥這一帖跟不到 30MB 的 /lib/firware 都 copy 到你的 finnix 隨身碟上。 雖然用 finnix 無法讀中文， 但至少讀指令跟設定檔沒問題。 
+下次遇到 「因為找不到/無法安裝驅動程式而無法上網」 的舊電腦加無線網卡， 就可以很帥氣地表演文字模式徙手上網了 :-) 
+還可以進一步建議把 開機管理員 grub 跟 超輕薄的 finnix 救援光碟 裝到他的電腦裡面去。 但約會場合請小心服用， 以免 ... Computer Dating, Linux Style ...你的初戀就 GG 了 :-)
+
+
+/******************************************************************************/
+https://github.com/lwfinger/rtl8188eu
+/******************************************************************************/
+https://github.com/lwfinger/rtl8188eu
+
+
+/******************************************************************************/
+樹莓派串口通信
+/******************************************************************************/
+樹莓派的外部介面中含一路UART串行介面，利用該介面可以實現樹莓派與Arduino、GPRS模組、GPS等其他外部系統的對接。
+由於這一路串口兼做Linux的控制台輸出口，所以在使用前必須先將調試輸出功能關閉，方法如下：
+1、去除Kernel的啟動資訊 在/boot/cmdline.txt中，去除parameterconsole=ttyAMA0,115200，並保存；
+2、去除Kernel的調試資訊 同樣在/boot/cmdline.txt中，去除 kgdboc=ttyAMA0,115200，並保存；
+3、關閉登陸提示 在 /etc/inittab中去除T0:23:respawn:/sbin/getty -L ttyAMA0 115200 vt100，保存。
+
+經過以上三步，就可以正常使用串行口了。 編程時可以使用C語言以文件形式操作串口，也可以利用python的pySerial庫進行編程。 這裡以C語言為例，貼出示例代碼：
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+int main(int argc,char *argv[])
+{
+   int fd, len;
+   fd = open("/dev/ttyAMA0", O_RDWR, S_IRUSR | S_IWUSR);
+   char temp;
+
+   while(1) {
+       write(fd, &temp, 1);
+       len = read(fd, &temp, 1);
+       if (len > 0) {
+           printf("%c", temp);
+       }
+       else {
+           usleep(10);
+       }
+   }
+   close(fd);
+   return 0;
+}
+
+
+/******************************************************************************/
+8.1. GPIO輸出
+/******************************************************************************/
+當GPIO連接埠設置為輸出並置1，會向外輸出3.3V電壓。注意GPIO用於輸出時內部電阻很小只有31歐姆（實測34歐姆），所以在輸出線路中要添加電阻，
+以使電流不超過16mA，否則損壞樹莓派。
+
+8.1.1. Shell實現GPIO輸出
+#!/bin/sh
+test_pin_out() {
+    pin=$1
+    pin_path="/sys/class/gpio/gpio${pin}"
+    if [ ! -d $pin_path ]; then
+        echo "$pin" > /sys/class/gpio/export
+    fi
+    echo "out" > $pin_path/direction
+    echo "1" > $pin_path/value
+    sleep 2
+    echo "0" > $pin_path/value
+}
+
+for pin in 17 18 27 22 23 24 25; do
+  test_pin_out $pin
+done
+
+8.1.2. Python實現GPIO輸出
+設置GPIO連接埠為OUTPUT模式，依次設置為True，輸出高電平（3.3v）。
+Python代碼：
+#!/usr/bin/env python
+
+import RPi.GPIO as GPIO
+import sys, time
+
+## Mapping between GPIO.BOARD and GPIO.BCM:
+# GPIO.BOARD (Pin): 11  12  13     15  16  18  22  07
+# GPIO.BCM  (GPIO): 17  18  21/27  22  23  24  25  clock
+# Extension Board : P0  P1  P2     P3  P4  P5  P6  P7
+
+GPIO.setmode(GPIO.BOARD)
+# Do not warning if already setup for #pin.
+GPIO.setwarnings(False)
+for pin in (11, 12, 13, 15, 16, 18, 22):
+    GPIO.setup(pin, GPIO.OUT)
+    print("Test pin #%s ...\t" % pin),
+    sys.stdout.flush()
+    GPIO.output(pin, True)
+    time.sleep(2)
+    GPIO.output(pin, False)
+    print("done")
+
+
+/******************************************************************************/
+8.2. GPIO輸入
+/******************************************************************************/
+當GPIO連接埠處於輸入模式時，測量電阻處於短路狀態，所以可以無需在電路中添加電阻保護，直接將3.3V電壓連接到對應GPIO連接埠上。
+高電平（3V3）取值1，低電平（接地）取值0。
+8.2.1. Shell讀取GPIO輸入
+#!/bin/sh
+test_pin_in() {
+    pin=$1
+    pin_path="/sys/class/gpio/gpio${pin}"
+    if [ ! -d $pin_path ]; then
+        echo "$pin" > /sys/class/gpio/export
+    fi
+    echo "in" > $pin_path/direction
+    echo "Value of GPIO #$pin is: $(cat $pin_path/value)."
+}
+
+for pin in 17 18 27 22 23 24 25; do
+  test_pin_in $pin
+done
+
+8.2.2. Python讀取GPIO輸入
+設置GPIO連接埠為OUTPUT模式，依次設置為True，輸出高電平（3.3v）。Python代碼：
+#!/usr/bin/env python
+
+import RPi.GPIO as GPIO
+import sys, time
+
+GPIO.setmode(GPIO.BCM)
+for pin in (17, 18, 27, 22, 23, 24, 25):
+    GPIO.setup(pin, GPIO.IN)
+    print("Value of GPIO #%s is: %s." % (pin,GPIO.input(pin)))
+
+8.2.3. Ruby讀取GPIO輸入
+#!/usr/bin/env ruby
+require 'pi_piper'
+[17, 18, 27, 22, 23, 24, 25].each do |pin|
+  gpio = PiPiper::Pin.new(:pin => pin, :direction => :in)
+  puts "Value of GPIO ##{pin} is: #{gpio.value}."
+end
+
+
+/******************************************************************************/
+Hi-Fi Audio via AirPlay on Raspberry Pi         from : http://drewlustro.com/hi-fi-audio-via-airplay-on-raspberry-pi/
+/******************************************************************************/
+Shairport Daemon Setup
+This section is a blend of Trouch & Burgess' write-ups.
+
+Make sure your Raspberry Pi is up-to-date
+This is always smart to run with new linux systems.
+
+pi@raspberrypi ~ $ sudo apt-get update  
+pi@raspberrypi ~ $ sudo apt-get upgrade
+Install Shairport prerequisites
+Shairport requires perl and a handful of other packages from the repo in order to install successfully.
+
+pi@raspberrypi ~ $ sudo apt-get install git libao-dev libssl-dev libcrypt-openssl-rsa-perl libio-socket-inet6-perl libwww-perl avahi-utils libmodule-build-perl libasound2-dev libpulse-dev
+Install Perl Net-SDP
+Apparently a change in IOS 6 requires this module to be installed or else shairport will crash.
+
+pi@raspberrypi ~ $ git clone https://github.com/njh/perl-net-sdp.git perl-net-sdp  
+pi@raspberrypi ~ $ cd perl-net-sdp  
+pi@raspberrypi ~/perl-net-sdp $ perl Build.PL  
+pi@raspberrypi ~/perl-net-sdp $ sudo ./Build  
+pi@raspberrypi ~/perl-net-sdp $ sudo ./Build test  
+pi@raspberrypi ~/perl-net-sdp $ sudo ./Build install  
+pi@raspberrypi ~/perl-net-sdp $ cd ..
+Build & install Shairport "as root" and have it launch on system startup
+This will install shairport into /usr/sbin and make it available to the system / root user.
+
+pi@raspberrypi ~ $ git clone https://github.com/abrasive/shairport.git  
+pi@raspberrypi ~ $ cd shairport  
+pi@raspberrypi ~ $ ./configure  
+Configuring Shairport  
+OpenSSL found  
+libao found  
+PulseAudio found  
+ALSA found  
+Avahi client found  
+getopt.h found  
+CFLAGS: -D_REENTRANT -I/usr/include/alsa -D_REENTRANT  
+LDFLAGS: -lm -lpthread -lssl -lcrypto -lao -lpulse-simple -lpulse -lasound -lavahi-common -lavahi-client  
+Configure successful. You may now build with 'make'  
+pi@raspberrypi ~/shairport $ make  
+pi@raspberrypi ~/shairport $ sudo make install  
+pi@raspberrypi ~/shairport $ sudo cp scripts/debian/init.d/shairport /etc/init.d/shairport  
+pi@raspberrypi ~/shairport $ cd /etc/init.d  
+pi@raspberrypi ~/shairport $ sudo chmod a+x shairport  
+pi@raspberrypi ~/shairport $ sudo update-rc.d shairport defaults  
+pi@raspberrypi ~/shairport $ sudo useradd -g audio shairport # add shairport user, then add user to audio group
+For instance, if we wanted to name it HiFiPi, we'd make the AP_NAME line look like this (by default, it's set to the Raspberry Pi's hostname):
+
+pi@raspberrypi ~/shairport $ sudo nano shairport  
+AP_NAME=HiFiPi # look for this line in shairport file
+Make sure that the installation was successful by starting shairport
+
+pi@raspberrypi ~/shairport $ sudo /etc/init.d/shairport start
+Ok, so now we've basically installed shairport and it will launch everytime your Raspberry Pi boots.
+
+
+/******************************************************************************/
+Ubuntu 系統 Update-rc.d 命令
+/******************************************************************************/
+Ubuntu或者Debian系統中update-rc.d命令，是用來更新系統啟動項的腳本。這些腳本的鏈接位於/etc/rcN.d/目錄，對應腳本位於/etc/init.d/目錄。
+在瞭解update-rc.d命令之前，你需要知道的是有關Linux 系統主要啟動步驟，以及Ubuntu中運行級別的知識。
+
+一、Linux 系統主要啟動步驟
+讀取 MBR 的資訊，啟動 Boot Manager。
+加載系統內核，啟動 init 進程， init 進程是 Linux 的根進程，所有的系統進程都是它的子進程。
+init 進程讀取 /etc/inittab 文件中的資訊，並進入預設的運行級別。通常情況下 /etc/rcS.d/ 目錄下的啟動腳本首先被執行，然後是/etc/rcN.d/ 目錄。
+根據 /etc/rcS.d/ 文件夾中對應的腳本啟動 Xwindow 伺服器 xorg，Xwindow 為 Linux 下的圖形用戶界面系統。
+啟動登錄管理器，等待用戶登錄。
+
+二、運行級別
+Ubuntu中的運行級別
+0（關閉系統）
+1（單用戶模式，只允許root用戶對系統進行維護。）
+2 到 5（多用戶模式，其中3為字元界面，5為圖形界面。）
+6（重啟系統）
+
+切換運行級別
+init [0123456Ss]
+例如：init 0 命令關機； init 6 命令重新啟動
+
+啟動項管理工具
+sudo install sysv-rc-conf //或者使用帶gui的工具bum
+sudo sysv-rc-conf
+
+三、update-rc.d命令詳解
+從所有的運行級別中刪除指定啟動項
+update-rc.d -f ＜basename＞ remove
+
+按指定順序、在指定運行級別中啟動或關閉
+update-rc.d ＜basename＞ start|stop ＜order＞ ＜runlevels＞
+實例：update-rc.d apachectl start 20 2 3 4 5 . stop 20 0 1 6 .
+解析：表示在2、3、4、5這五個運行級別中，由小到大，第20個開始運行apachectl；在 0 1 6這3個運行
+級別中，第20個關閉apachectl。這是合併起來的寫法，注意它有2個點號，效果等於下面方法：
+update-rc.d apachectl defaults
+
+A啟動後B才能啟動，B關閉後A才關閉
+update-rc.d A defaults 80 20
+update-rc.d B defaults 90 10
+
+啟動和關閉順序為90，級別默認
+update-rc.d ＜basename＞ defaults 90
+
+
+/******************************************************************************/
+RaspberryPi : Samba Server
+/******************************************************************************/
+在內網中，Raspberry Pi 要和 Windows 傳輸檔案，還是以支援 SMB/CIFS 的 Samba 最方便。
+而如果只是自己要用， Samba 的安裝與設定也是照表操課，兩三下就解決了。
+當然囉！甚至對於玩 Raspbmc 的人來說就更容易了，因為它已內建，直接在圖形化的選單中啟用或停用即可。
+如果是使用類似 "wheezy" 這樣的版本，就得手動來新增服務了。
+
+安裝 Samba
+Samba 最精簡的安裝就是執行底下的指令：
+sudo apt-get install samba
+不過，它並不會安裝像是「smbpasswd」、「testparm」、「net」......這些工具，如果想使用這些指令，就必須再安裝「samba-common-bin」，可以執行底下的指令來安裝：
+sudo apt-get install samba-common-bin
+
+修改設定
+Samba 的設定檔預設路徑是「/etc/samba/smb.conf」，所以我們可以執行底下的指令來修改內容：
+sudo nano /etc/samba/smb.conf
+如果只是要讓「pi」這個帳號可以在 Windows 中管理 Raspberry Pi 家目錄中的檔案，我們可以修改底下的幾個參數設定：
+workgroup：這個是指定要加入的群組，也可以使用預設值不改。
+server string：這個參數是在網路芳鄰瀏覽時會看到的字串，可以使用預設值不改。
+security：這個參數會決定 Samba 所要扮演的角色，設成「security=user」即可。
+[homes] 裡的 read only：[homes] 的區塊中所設定的所有使用者「家目錄」的參數，而「read only」如果設成「yes」，使用者在連線後就只能讀取 Raspberry Pi 上的資料，而無法寫入。
+為了要讓 Windows 端能讀寫資料，我們將它設定為「read only=no」。
+上述的設定修改完畢後，將檔案儲存好。
+
+啟動 Samba 服務
+設定檔修改好了，我們就可以執行底下的指令來啟動 Sabma 服務：
+sudo service samba start
+或是用底下的指令來重新啟動 Samba
+sudo service samba restart
+
+新增帳號
+不過，如果系統是首次安裝 Samba ，別忘了幫使用者新增 Sabma 的帳號，並設定密碼。我們可以先執行底下的指令來查查看帳號是否己存在：
+sudo pdbedit -L
+如果想新增帳號則執行底下的指令(以新增名為 pi 的帳號為例)：
+sudo pdbedit -a pi
+下完指令，只要再依指示輸入密碼，該帳號就可以在 Windows 中用來登入 Raspberry Pi 了。
+
+存取資料
+假設 Raspberry Pi 的 IP 是 192.168.1.100 ，我們可以用這樣的網址來存取 pi 這個帳號的 Homes：
+\\192.168.1.100\pi
+出現認證的對話方塊就輸入前一小節，新增 Samba 帳號時的帳密資訊。
+那為什麼當我們用類似「\\192.168.1.100\」來存取時，看不到 pi 這個帳號的 Homes？
+因為按照預設的 /etc/samba/smb.conf 設定檔中的設定 [Homes] 資源是不開放瀏覽的，可以打開設定檔，[Homes] 應該有底下的設定值：
+browseable = no
+如果覺得這樣不方便，可以將它改為「browseable = yes」，並重新啟動 Samba ，讓設定生效即可。
+關於 smb.conf 中可設定的項目有很多，這部份可以參考網路上 Samba 的相說明，邊設邊試來驗證各個選項，就不在此贅述了。
+
+
+/******************************************************************************/
+通過alljoyn傳輸文件
+/******************************************************************************/
+alljoyn高通
+Alljoyn是高通開發的一個開源的p2p通信框架，支援wifi/藍牙和wifi-direct。目前已經有了很多基於這個框架開發的聯機遊戲。
+在Alljoyn的sdk裡有很多例子，其中有一個通過raw session發送資訊的，對這個例子略加修改就可以實現兩個手機之間文件的傳輸。
+在client端，其發送的資訊是通過一個FileOutputStream將要發送的資訊寫入到一個中間文件來發送到對方的。
+所以我們只要將要發送的文件通過流的形式輸入到這個FileOutputStream中就可以了。
+if (mStreamUp == true) {  
+                    String string = (String) msg.obj + "\n";  
+                    try {  
+                        // logInfo(String.format("Writing %s to output stream",  
+  
+                        // string));  
+  
+                        // mOutputStream.write(string.getBytes());  
+  
+                        // logInfo(String.format("Flushing stream", string));  
+  
+                        // mOutputStream.flush();  
+  
+                        String filepath = "/sdcard/test.txt";  
+                        File file = new File(filepath);  
+                        InputStream in =new FileInputStream(file);  
+                        byte[] buffer = new byte[1024];  
+                        int read;  
+                        long total = 0;  
+                        while ((read = in.read(buffer)) != -1) {  
+                            mOutputStream.write(buffer, 0, read);  
+                            total+=read;  
+                            Log.d("test","total:"+total);  
+                            if(total>100000){  
+                                mOutputStream.flush();  
+                                total=0;  
+                                //容易出現io exception,所以稍微等待一下。  
+  
+                                Thread.sleep(100);  
+                            }  
+                        }  
+                        mOutputStream.flush();  
+                        Log.d("test","flush");  
+                        in.close();  
+                    } catch (IOException ex) {  
+                        Log.e("test",ex.toString());  
+                    } catch (InterruptedException e) {  
+                        // TODO Auto-generated catch block  
+  
+                        e.printStackTrace();  
+                    }  
+                }  
+                break;  
+            }  
+其中前面註釋掉的代碼是實例程式原來的，下面的就是我修改的，將文件輸入到輸出流中。
+需要注意的是如果不加中間的sleep的話就會報IO Exception，這是因為raw使用的是非阻塞式socket發送的，如果發送得過快而網路傳輸得慢就會產生異常，中斷傳輸。
+就好像一個大水池，一個水管往裡注水，一個水管往外放水，如果注水的速度大於放水的速度的話水池就會溢出。
+所以在寫入的時候稍微睡眠一下，也就是稍微控制一下注入的速度，讓底層把內容發出去。
+雖然這樣可以在一定程度上減少異常的發生，但是傳輸的文件如果太大的話還是容易產生異常的，在這種情況下可以使用try catch來捕獲這個異常然後休眠一段時間
+從中斷的位置重新傳輸。
+ 
+在server端，我們只需要將接受到的流寫入到一個新建的文件中就可以了。其中註釋掉的也是其原來的程式。
+mReader = new Thread(new Runnable() {  
+                        public void run() {  
+                            logInfo("Thread running");  
+                            Looper.myLooper().prepare();   
+                            StringBuilder stringBuilder = new StringBuilder();  
+                            try {  
+                                while (true) {  
+                                    int c;  
+                                    /*  
+                                     * Wait until a character is available.  
+                                     */  
+                                    if (reader.ready() == false) {  
+                                        Thread.sleep(100);  
+                                        continue;  
+                                    }  
+                                      
+                                    /*  
+                                     * Build a string out of the characters and  
+                                     * when we see a newline, cook up a toast  
+                                     * do display them.  
+                                     */  
+                                    if(saveFile("/mnt/sdcard/test.txt",is)){  
+                                        Toast.makeText(Service.this, "save success", Toast.LENGTH_LONG).show();  
+                                    }else{  
+                                        Toast.makeText(Service.this, "save faild", Toast.LENGTH_LONG).show();  
+                                    }  
+//                     try {  
+//                         c = reader.read();  
+//                         logInfo(String.format("Read %d from stream", c));  
+//                         stringBuilder.append((char)c);  
+//                         if (c == 10) {  
+//                             String s = stringBuilder.toString();  
+//                         logInfo(String.format("Read %s from stream", s));  
+//              Message toastMsg = mHandler.obtainMessage(MESSAGE_POST_TOAST, s);  
+//              mHandler.sendMessage(toastMsg);  
+//          stringBuilder.delete(0, stringBuilder.length() - 1);  
+//                         }  
+//                     } catch (IOException ex) {  
+//                     }  
+                                }  
+                            } catch (Throwable ex) {  
+                                 logInfo(String.format("Exception reading raw Java stream: %s", ex.toString()));  
+                            }  
+                            logInfo("Thread exiting");  
+                        }  
+                    }, "reader");  
+                    mReader.start();  
+
+我們還需要加入一個保存文件的函數：
+private static boolean saveFile(String filePath, InputStream is) {  
+        boolean saved = false;  
+        byte[] buffer = new byte[1024];  
+        FileOutputStream fos = null;  
+        File file = null;  
+        try {  
+            try {  
+                file = new File(filePath);  
+                fos = new FileOutputStream(file,true);  
+            } catch (Exception e) {  
+                Log.e(TAG,"creat file error");  
+            }  
+            int readlen = -1;  
+            long readCount = 0;  
+            while (true) {  
+                saved = true;  
+                try {  
+                    readlen = is.read(buffer);  
+                } catch (IOException e) {  
+                     Log.e(TAG,"read inputstream error");  
+                } finally {  
+                    if (readlen <= 0) {  
+                        break;  
+                    }  
+                }  
+                readCount += readlen;  
+                Log.d("test","FILE length::::::::::::::::::::"+readCount);  
+                try {  
+                    fos.write(buffer, 0, readlen);  
+                } catch (IOException e) {  
+                    Log.e(TAG,"write file error");  
+                }  
+            }  
+        } finally {  
+            if (fos != null) {  
+                try {  
+                    fos.close();  
+                } catch (IOException e) {  
+                    Log.e(TAG, e.toString());  
+                    }  
+                }  
+                fos = null;  
+            }  
+     Log.d("test","saved:"+saved);  
+        return saved;  
+    }  
+好了，這樣在client端的sd卡的根目錄中新建一個test.txt文件，當兩個手機連接起來後，client端隨便發送一個字串就可以觸發傳輸文件的操作了。
+
+通過alljoyn傳輸文件(2) 
+上一篇文章介紹了使用alljoyn的raw方式進行文件的傳輸，其實那種方法不是很實用，並不是一種好的方式，這篇文章介紹一下使用alljoyn的signal方式進行文件的傳輸。
+     在alljoyn的sdk裡面有個chat的例子，這個例子就是使用signal傳輸手機間的聊天資訊的。我們所要做的就是將其修改一下來傳輸我們的文件。
+     首先修改ChatInterface.java裡面的介面，將參數從string 類型改成byte[]類型，如下所示：
+
+點擊(此處)折疊或打開
+public void Chat(byte[] str) throws Bu***ception;
+    這就表示我們傳輸的不是字串而是byte數組了。所以接下來的問題就是將文件內容轉換成一系列的byte數組發出去然後接收這些byte數組並重新組成文件就可以了。首先來看發送，發送時在AllJoynService.java的doSendMessages()方法。
+
+
+點擊(此處)折疊或打開
+try {
+                if (mJoinedToSelf) {
+                    if (mHostChatInterface != null) {
+                        // mHostChatInterface.Chat(message);
+
+                    }
+                } else {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss ");
+                    Date curDate = new Date(System.currentTimeMillis());// 獲取當前時間
+
+                    String str = formatter.format(curDate);
+                    Log.d("test", "start:" + str+"::::");
+                    String filepath = "/sdcard/Picture/100ANDRO/MOV_0426.mp4";
+                    File file = new File(filepath);
+                    InputStream in = null;
+                    try {
+                        in = new FileInputStream(file);
+                    } catch (FileNotFoundException e1) {
+                        // TODO Auto-generated catch block
+
+                        e1.printStackTrace();
+                    }
+                    byte[] buffer = new byte[102400];
+                    int read = 0;
+                    while ((read = in.read(buffer)) != -1) {
+                        mChatInterface.Chat(buffer);
+                        buffer = new byte[102400];
+                    }
+                    in.close();
+                    curDate = new Date(System.currentTimeMillis());// 獲取當前時間
+
+                    str = formatter.format(curDate);
+                    Log.d("test", "end:" + str+"::::");
+                }
+            } catch (Bu***ception ex) {
+                mChatApplication.alljoynError(ChatApplication.Module.USE,
+                        "Bus exception while sending message: (" + ex + ")");
+            } catch (IOException e) {
+                Log.d("test", e.toString());
+            }
+     在發送的前後加上系統的時間這樣就可以測試發送文件花費的時間。接收是在Chat(byte[] string) 方法裡面。
+
+點擊(此處)折疊或打開
+public void Chat(byte[] string) {
+
+        /*
+         * See the long comment in doJoinSession() for more explanation of why
+         * this is needed.
+         * 
+         * The only time we allow a signal from the hosted session ID to pass
+         * through is if we are in mJoinedToSelf state. If the source of the
+         * signal is us, we also filter out the signal since we are going to
+         * locally echo the signal.
+         */
+        String uniqueName = mBus.getUniqueName();
+        MessageContext ctx = mBus.getMessageContext();
+        Log.i(TAG, "Chat(): use sessionId is " + mUseSessionId);
+        Log.i(TAG, "Chat(): message sessionId is " + ctx.sessionId);
+
+        /*
+         * Always drop our own signals which may be echoed back from the system.
+         */
+        if (ctx.sender.equals(uniqueName)) {
+            Log.i(TAG, "Chat(): dropped our own signal received on session "
+                    + ctx.sessionId);
+            return;
+        }
+
+        /*
+         * Drop signals on the hosted session unless we are joined-to-self.
+         */
+        if (mJoinedToSelf == false && ctx.sessionId == mHostSessionId) {
+            Log.i(TAG, "Chat(): dropped signal received on hosted session "
+                    + ctx.sessionId + " when not joined-to-self");
+            return;
+        }
+
+        /*
+         * To keep the application simple, we didn't force users to choose a
+         * nickname. We want to identify the message source somehow, so we just
+         * use the unique name of the sender's bus attachment.
+         */
+        String nickname = ctx.sender;
+        nickname = nickname
+                .substring(nickname.length() - 10, nickname.length());
+
+        // Log.i(TAG, "Chat(): signal " + string + " received from nickname " +
+
+        // nickname);
+
+//        mChatApplication.newRemoteUserMessage(nickname, "get message");
+
+        try {
+            try {
+                if (file == null) {
+                    file = new File("/mnt/sdcard/abc.mp4");
+                }
+                fos = new FileOutputStream(file, true);
+            } catch (Exception e) {
+                Log.e(TAG, "creat file error");
+            }
+            try {
+                fos.write(string, 0, string.length);
+            } catch (IOException e) {
+                Log.e(TAG, "write file error");
+            }
+
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    Log.e(TAG, e.toString());
+                }
+            }
+            fos = null;
+        }
+    }
+      這樣就可以進行文件的傳輸了，測試表明這個方法比上個方法更快更穩定了。
+
+
+/******************************************************************************/
+Alljoyn : BUILDING LINUX
+/******************************************************************************/
+Setup
+
+NOTE: The installation commands below refer specifically to Debian/Ubuntu Linux. Equivalent commands are available for other distributions of Linux.
+
+Build tools and libs
+  sudo apt-get install build-essential libgtk2.0-dev libssl-dev xsltproc ia32-libs libxml2-dev
+Install Python v2.6/2.7 (Python v3.0 is not compatible and will cause errors)
+  sudo apt-get install python
+Install SCons v2.0
+  sudo apt-get install scons
+OpenSSL
+  sudo apt-get install libssl-dev
+Download the AllJoyn Source zip and extract source.
+
+Building Samples
+cd alljoyn-14.06.00-src/core/alljoyn
+scons BINDINGS=cpp WS=off BT=off ICE=off SERVICES="about,notification,controlpanel,config,onboarding,sample_apps"
+Building the AllJoyn? framework for an existing app
+
+Setup
+  export AJ_ROOT=~/alljoyn
+
+  # <TARGET CPU> can be either x86_64, x86, or whatever value you set for CPU= when running SCons.
+  export AJ_DIST="$AJ_ROOT/core/alljoyn/build/linux/<TARGET CPU>/debug/dist"
+
+Add header include directories
+export CXXFLAGS="$CXXFLAGS \
+    -I$AJ_DIST/cpp/inc \
+    -I$AJ_DIST/about/inc \
+    -I$AJ_DIST/services_common/inc \
+    -I$AJ_DIST/notification/inc \
+    -I$AJ_DIST/controlpanel/inc \
+    -I$AJ_DIST/services_common/inc \
+    -I$AJ_DIST/samples_common/inc"
+Configure linker to include required libs
+export LDFLAGS="$LDFLAGS \
+    -L$AJ_DIST/cpp/lib \
+    -L$AJ_DIST/about/lib \
+    -L$AJ_DIST/services_common/lib \
+    -L$AJ_DIST/notification/lib \
+    -L$AJ_DIST/controlpanel/lib"
+
+
+/******************************************************************************/
+AllJoyn Audio service compilation problems
+/******************************************************************************/
+I want to run an audio streaming server based on AllJoyn and the AllJoyn audio service doesn't seem to be buildable from the 
+alljoyn/multimedia/audio folder (running scons in this folder always ends up in compilation errors). I'm building AllJoyn version 14.06.
+Anybody successfully built the AllJoyn audio service on a Raspberry Pi (Raspbian)?
+Thx a lot.
+
+In order to compile the audio service you need to do it from the folder alljoyn/core/alljoyn/services/audio 
+This is an example compilation command (targetting a Raspberry Pi) that also builds the audio samples:
+scons OS=linux CPU=arm WS=fix BR=on SERVICES=about,audio BUILD_SERVICES_SAMPLES=on VARIANT=release BINDINGS=core,cpp OE_BASE=/usr
+
+You'll have to install the packages libasound2 and libasound2-dev before compiling though. 
+You can test if it works by running the file SinkService from the samples and streaming music to it from the Android app doubleTwist. 
+If the music plays too fast make sure you modify the SConscript in alljoyn/multimedia/audio to include the asound library in the environment:
+
+if audio_env['OS'] == 'linux':
+        audio_env.AppendUnique(LIBS = [ 'asound' ])
+
+If trying to build the audio service but for Android you should check this page. 
+If you can't connect to the SinkService from doubleTwist after building see this page. If you can connect but SinkService hangs see this page.
+If your intention is to build all AllJoyn services and bindings switch to alljoyn/core/alljoyn folder and try something like this:
+scons OS=linux CPU=arm WS=fix BR=on SERVICES=about,audio,config,controlpanel,notification,onboarding BUILD_SERVICES_SAMPLES=on VARIANT=release BINDINGS=core,cpp,c,java,js,objc,unity OE_BASE=/usr
+
+
+/******************************************************************************/
+AllJoyn軟體計劃對D2D發展之影響分析
+/******************************************************************************/
+一、AllJoyn計畫企圖簡化D2D研發設計
+   D2D（Device to Device）通訊指裝置與裝置間可不必透過核心網路，透過無線技術即可
+直接於短距離內進行裝置通訊，其目的在因應不斷擴展的社群網路、
+物聯網（Internet of Things，IoT）等鄰近服務 (Proximity-based Services，ProSe)的趨
+勢。行動晶片大廠高通（Qualcomm）於2013年MWC宣佈擴展AllJoyn計畫，該計畫是由其子公
+司高通創新中心（Qualcomm Innovation Center，QuIC）所主導開發的行動軟體開放原始碼
+專案，透過短距離無線傳輸如Wi-Fi或Bluetooth等技術，使得不同作業系統及不同設備商的
+裝置更容易進行D2D直接通訊，提供更好的使用者經驗，最終目的在於提供完整鄰近服務，以
+實現物聯網的願景。   
+AllJoyn主張平台中立（platform-neutral），也就是朝向獨立於特定作業系統、硬體、軟體
+的設計，並且能運作在Microsoft Windows、 Linux、 Android、iOS、 OS X、 OpenWRT等既
+有軟體平台，如此可使不同廠商生產的平板、手機、電視、筆電等裝置能在短距離內直接通
+訊。    
+
+二、AllJoyn開放軟體架構對 D2D的影響
+AllJoyn開放軟體架構包含應用服務、核心及精簡裝置三大部分（見圖一所示）。其中AllJoyn
+應用服務由第三方公司自行開發應用程式，AllJoyn核心是涵蓋不同程式語言互通、搜尋、連
+結及安全機制的開放原始碼。而AllJoyn精簡裝置（AllJoyn Thin Client）則是包含可支援的
+低階記憶體嵌入式裝置，其中包含一些共同的AllJoyn連接協定和基本功能（feature set）。
+
+AllJoyn主要目的在實現以下四種應用服務：
+終端管理（Onboarding）：設備或簡易型智慧裝置可經由如智慧型手機應用軟體等媒介調配置
+或VPN設定，以適用於使用者的個人網路。
+通知（Notifications）：以標準資料傳送、控制方式讓裝置傳送與接收簡訊、影像、以及多媒
+體的訊息通知。
+影音串流（Audio Streaming）：執行可相互操作、開放、無線的影音串流協定，讓使用者在任
+何廠商的產品上進行影音及視訊傳遞。
+控制（Control）：開放裝置的控制介面並加以整合，包括各式不同的影音或媒體傳輸介面。
+
+  ┌───────────────────────────────────┐
+  │                             AllJoyn 服務應用                         │     
+  │┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐│
+  ││ 影音媒體   │  │ 多人參與   │  │ 鄰近覺知   │  │ 社群互動   ││      
+  ││ 分    享   │  │ 遊    戲   │  │ 及  服務   │  │            ││       
+  │└──────┘  └──────┘  └──────┘  └──────┘│                                              
+  ├──────────────────┬────────────────┤
+  │┌────────────────┐│  ┌─────────────┐│
+  ││     程式語言                   ││  │       AllJoyn精簡裝置    ││
+  ││    C++, Java, Objective-C, ..  ││  ├──────┬──────┤│
+  │├───┬────┬───────┤│  │ 可支援     │ AllJoyn    ││
+  ││搜尋  │  連結  │  安全機制    ││  │ 嵌入式裝置 │ 連結協議   ││
+  ││      │        │              ││  │            │            ││
+  │└───┴────┴───────┘│  └──────┴──────┘│
+  └──────────────────┴────────────────┘
+        (圖一)
+
+由上述說明可知，AllJoyn架構對於D2D通訊最大的影響在於使得各種應用只需使用簡易的硬體
+裝置，並支援傳統無線通訊技術如Wi-Fi、Bluetooth等便能進行裝置間直接通訊。應用此一開
+放軟體架構，最容易作為連結各種不同裝置並進行訊息交換的核心設備便是如智慧手機或平板
+等手持裝置。
+對於研發裝置通訊應用程式者而言，主要障礙在於必須同時考慮快速搜尋（discovery）、
+配對（pairing）、訊息路由傳遞（message routing）及安全機制（security）等複雜的通訊
+設計，這對於不具通訊背景的應用程式設計者是一大挑戰；但是透過AllJoyn的開放軟體底層
+架構，軟體研發人員只需專注於遊戲軟體等應用程式（apps）的
+上層軟體端（upper layer software）開發，而不用花費心力在複雜的通訊技術設計。AllJoyn
+依據Apache V2.0的開放原始碼授權規範，最新的SDK 3.3.0原始碼已經可以在官方網路下載取得。   
+在可能的應用上，AllJoyn的應用情境可能是和鄰近的好友分享手機上的影音檔案及遊戲，或是
+回到家中用平板控制家中電視機、DVD錄影機、數位相框或遊戲機等家電；亦或是提供使用者即
+時的鄰近服務，例如轉發優惠券給週遭的親友或傳送電子名片給客戶。
+
+三、IEK View
+（一）AllJoyn軟體計畫有機會加速裝置間互通及互聯
+目前物聯網的應用主要還是以局部小規模網路為主，像是一般的家庭、車隊、醫院等的連網系統
+，仍未見在終端消費設備的大規模應用。其主因在於終端裝置無法透過共同的作業系統及程式語
+言來進行搜尋與通訊，而AllJoyn軟體計畫企圖降低研發門檻與架構，或許有機會加速裝置間互
+通及互聯。
+（二）D2D通訊技術標準的競爭將愈趨激烈
+高通在應用處理器與無線通訊領域一直扮演領導角色，其在國際標準組織3GPP中積極推動基於D2D
+通訊及鄰近服務的LTE Direct無線通訊技術，加上AllJoyn軟體計畫的擴展，可以看出高通計畫
+整合軟硬體能量而成為物聯網完整解決方案供應商的規劃佈局。
+不過，其它競爭者如英特爾（Intel）及博通（Broadcom）等晶片廠商亦提出不同D2D解決方案，
+以英特爾為例，其晶片開發策略是透過Wi-Fi Direct方式進行裝置通訊，與高通的LTE Direct路
+線不同，兩者互為競爭關係。因此，未來除了D2D通訊技術標準競爭外，軟體相容亦將是重要競爭
+重點。
+
+
+/******************************************************************************/
+RUNNING SAMPLE APPLICATIONS
+/******************************************************************************/
+For each of the listed samples, there is a platform-supported language binding. 
+These sample apps can communicate with their counterpart on the same platform, or be written in a different language binding.
+
+Basic This sample shows how to use AllJoyn? Bus Method calls
+Chat This sample shows how to send AllJoyn Signals on a session.
+About These samples show how to use the About feature for announcing and discovering.
+Onboarding These samples show how to use the two sides of the Onboarding service framework, the Onboarder and the Onboardee.
+Config These samples show how to use the Configuration service framework.
+Notification These samples show how to use the Notification service framework as a Producer and a Consumer.
+Control Panel These samples show how to use the two sides of the Control Panel service framework, the Controller and the Controllable.
+AC Server This sample shows how to use multiple service frameworks together in a single application.
+Command Line Apps These command line samples are useful during development.
+
+/******************************************************************************/
+Alljoyn BUILDING on ANDROID
+/******************************************************************************/
+Setup
+1. Download the following Android SDKs:
+   . Core SDK (release)
+   . Onboarding SDK
+   . Configuration SDK
+   . Notification SDK
+   . Control Panel SDK
+2. Extract all ZIP files to one directory.
+
+Build Samples
+Note, you may need to adjust the below paths based on the version you downloaded
+1. Import projects from:
+   alljoyn-android/core/alljoyn-14.06.00-rel/java/samples
+   alljoyn-android/services
+2. Add Support Library
+   To add "android-support-v4.jar", right-click on the project, select "Android Tools" > "Add Support Library"
+
+Building the AllJoyn(TM) framework for an existing app:
+1. In your project, create a "libs/armeabi" dir if it doesn't already exist.
+2. Copy "alljoyn-android/core/alljoyn-14.06.00-rel/java/lib/liballjoyn_java.so" to the "libs/armeabi" dir.
+3. Copy "alljoyn-android/core/alljoyn-14.06.00-rel/java/jar/alljoyn.jar" to the "libs" dir.
+4. If using a Service Framework, copy the jars from the "alljoyn-android/services/<SERVICE FRAMEWORK>/java/libs/*.jar" to the "libs" dir.
+
+
+/******************************************************************************/
+Alljoyn BUILD FROM SOURCE - ANDROID
+/******************************************************************************/
+Prerequisites
+. The following content uses many terms and concepts that are described in the Introduction to the AllJoyn Framework. Therefore, it is strongly recommended that you read the Introduction content first.
+. Before proceeding with development, make sure that you have set up the development environment as described here for Windows or for Linux.
+
+Setting Up the Programming Environment
+This section explains how to set up the programming environment for developing AllJoyn?-enabled Android applications. It covers the following topics:
+. Install the Android SDK and NDK
+. Install Eclipse and the ADT plug-in
+NOTE: The procedures described in this section require the specified tool versions.
+
+Installing the Android SDK
+The Android software development kit (SDK) provides the tools needed for building Android applications and transferring applications to or from an Android device.The 'adb' tool is used to:
+. Transfer/pull files to/from the phone
+. Run the AllJoyn standalone router
+. Install/uninstall applications
+If you want to run AllJoyn on Android 2.2 (Froyo), you can install Android SDK version r9 or above.
+If you want to run AllJoyn on Android 2.3 (Gingerbread), you can install at least Android SDK version r11 or above.
+Download Android SDK version r11 or above from the following location:
+http://developer.android.com/sdk/index.html
+Install the SDK by following the directions given on the download page.
+In order to run, the SDK requires certain software packages to be pre-installed on your system. For more information, see the following location:
+http://developer.android.com/sdk/requirements.html
+After installing the SDK, you must install the Android platform support packages you wish to use. See:
+http://developer.android.com/sdk/installing.html#AddingComponents
+The AllJoyn framework runs on any SDK platform with Android API levels 8 through 11. Note that installing these packages may take some time.
+
+Installing the Android NDK
+The Android native development kit (NDK) enables developers to build Java native libraries (JNI libraries) which can be called from Android (Java) applications. Android NDK is required only to write Java native libraries. The Android NDK is not required to use the Android Java bindings.
+The main tool used from the Android NDK is 'ndk-build', which is used to build the native library of the JNI application.
+To run Android JNI applications using AllJoyn, install any NDK version 7 or above from http://developer.android.com/tools/sdk/ndk/index.html .
+Install the NDK by following the directions given on the download page.
+To run, the NDK requires that the following software packages are pre-installed on your system:
+. Latest Android SDK (including all dependencies)
+. GNU Make 3.81 or later
+. Recent version of awk (GNU awk or nawk)
+For more information, see the NDK download page.
+
+Installing Eclipse and the ADT plug-in
+The Android SDK operates in the Eclipse integrated development environment, with the addition of the Eclipse plug-in for the Android development tools (ADT).
+Since Android applications are Java-based, installing Eclipse for Java development may be helpful.
+Download Eclipse from the following location:
+http://eclipse.org
+Install Eclipse by following the directions given on the download page.
+Instructions for installing the Eclipse ADT plug-in can be found at the following location:
+http://developer.android.com/guide/developing/projects/projects-eclipse.html
+NOTE: If the plug-in cannot find the SDK executable, it displays an error and then prompts for its location. (Point it to where you installed the SDK.) Also, if you haven't already selected the packages that need installing (refer to [Installing the Android SDK][install-android-sdk]), you are prompted to do so upon launching ADT.
+
+Downloading the OpenSSL header files and library
+The AllJoyn framework uses the OpenSSL crypto library for end-to-end encryption and authentication.
+The prebuilt library is required to link AllJoyn applications. It can be downloaded directly from the Android device or emulator into the lib folder of the AllJoyn distribution. Attach the device (or launch the Android emulator), then run the following commands:
+  cd <alljoyn_dir>/lib
+  adb pull /system/lib/libcrypto.so libcrypto.so
+The above command means:
+  adb pull
+The library can also be built from the Android source repository. For details on building the Android source tree, see the Android source repository web site:
+http://source.android.com/source/download.html
+IMPORTANT: If you are building for Froyo, the libcrypto.so library must be pulled from Froyo, not Gingerbread. Conversely, if you are building for Gingerbread, the libcrypto.so library must be pulled from Gingerbread.
+
+Building AllJoyn from Source for Android
+For most developers, the SDK package available to download from http://allseenalliance.org is sufficient for developing Android applications using AllJoyn. However, if you wish to obtain and compile AllJoyn from source, follow the directions in this section.
+To compile AllJoyn from source, the following items are required:
+. Android SDK
+. Android NDK
+. Eclipse and the ADT plug-in
+. Android source
+Instructions for obtaining the Android SDK, Android NDK, Eclipse and the ADT plug-in are in Setting Up the Programming Environment.
+
+The Android source
+The Android source (http://source.android.com) is required for building Android targets. For most developers, downloading and building Android source is the most complicated step in building AllJoyn for Android. Google has detailed instructions for downloading and building Android source.
+For a list of system requirements and instructions for obtaining the required tools, see http://source.android.com/source/initializing.html.
+For instructions on obtaining the Android Source Tree, see http://source.android.com/source/downloading.html.
+When running the repo init command specify:
+. -b froyo-release for Froyo source
+. -b gingerbread-release for Gingerbread source
+For instructions on building and running the build source, see http://source.android.com/source/building.html
+Build the "generic" version of Android.
+There is no need to run the code. Only the build libraries that are not available in the NDK are used.
+
+Obtaining the AllJoyn source
+If you followed the instructions in The Android source, you should have the repo tool and git installed on your system. Enter the following commands to get the AllJoyn source:
+$ mkdir $HOME/alljoyn # for example
+$ cd $HOME/alljoyn
+$ repo init -u git://github.com/alljoyn/manifest.git
+$ repo sync
+$ repo start master --all
+
+Building the AllJoyn framework for Android
+At this point. you have all of the files and programs required to build the AllJoyn framework for Android. The following commands assume you have installed the Android NDK at /usr/local/android-ndk-r5b, you have downloaded and built the Android source, and it is located in $HOME/android-platform.
+IMPORTANT: If you are building for Froyo, the Android source must be built for Froyo, not Gingerbread. Conversely, if you are building for Gingerbread, the Android source must be built for Gingerbread.
+Use the following commands to build the AllJoyn framework for Android:
+$ export JAVA_HOME="/usr/lib/jvm/java-6-sun" # or java-5-sun
+$ export CLASSPATH="/usr/share/java/junit.jar"
+$ scons OS=android CPU=arm ANDROID_NDK=/usr/local/android-ndk-r5b 
+   ANDROID_SRC=$HOME/android-platform WS=off
+It is possible to specify that the AllJoyn framework uses additional tools during the build process. For example, 
+the AllJoyn framework can use Uncrustify to check white space compliance and Doxygen for producing API documentation for the C++ APIs. 
+See Configuring the Build Environment (Linux Platform) for detailed instructions for installing these two tools.
+[install-android-sdk]: #Installing the Android SDK
+
+
+/******************************************************************************/
+Hertaville Welcome to Hertaville!               ref: http://hertaville.com/2012/09/28/development-environment-raspberry-pi-cross-compiler/
+/******************************************************************************/
+Home
+The STM32F0Discovery Board
+The Raspberry Pi Board
+About
+← Installing Raspbian on the Raspberry Pi & using SSH and VNC to remotely connect to the Raspberry PiStellaris LaunchPad Workshop Materials released! →
+Development Environment for the Raspberry Pi using a Cross Compiling Toolchain and Eclipse
+Posted on September 28, 2012 by halherta
+UPDATED July 15th 2013  September 7th 2014.
+
+In this blog entry the setup of  a cross-compiling development environment for the Raspberry Pi will be demonstrated. This will include the
+
+Official Raspbian (armhf) cross compiling toolchain (available from github)
+Eclipse for C/C++ Developers (Linux)
+We will finally write a simple Hello World program on our development PC, compile it using the cross compiler and then deploy it onto our Raspberry Pi board to run it.
+
+I'm going to assume that you have already installed a Raspbian Wheezy image on your RPi board and that you have Linux installed on your desktop PC.  
+For this tutorial I am using the Crunchbang 11 Linux OS (64-bit) on my PC. The instructions provided should work on most Debian/Ubuntu based Linux distributions running directly on a PC or as 
+a  a guest operating system via VMWare/ VirtualBox .
+A remote debugging tutorial; which I consider to be the continuation of this tutorial, can be found here.
+
+Finally, Derek Molloy has a great video tutorial on setting up a similar environment for the Beaglebone. Watching this video was incredibly informative and helped me set up this tutorial.
+
+So what is a cross compiling toolchain and why use one ?
+A native compiler such as the default gcc tool on the PC  is a compiler that runs on an Intel machine, as well as creates binaries intended to be run on an Intel machine. 
+i.e it creates binaries for the same type of machine that it runs on. Similarly the GCC tool in the RPi's Raspbian Linux OS is intended to run on an ARM machine as well as creates binaries for 
+an ARM machine.
+A cross compiler such as the "arm-linux-gnueabihf-gcc" that we will use, is able to run on an Intel machine but creates binaries for an ARM machine. 
+In other words, it runs on one architecture and creates binaries for another. This allows us to develop and compile our programs/libraries on our Desktop PC, but when it comes to deploying the
+ binaries/libraries we deploy them and run them on the Raspberry Pi.
+So why use a cross-compiler instead of  developing our code and compiling it natively on the Raspberry Pi itself? After all, the Raspberry Pi has a native GCC compiler. We can also use code editors
+ such as nano or vi from the command line (remotely over SSH) or GUI programs such as Geany (remotely over VNC).
+The main reason to use cross-compilation over native compilation (develop and compile on the RPi itself) is to speed up compile/build time. Remember the RPi board may be fast compared to a 
+microcontroller…but its still has limited RAM resources and is pretty slow compared to an average desktop computer….
+Also you have a myriad of development tools that you can use on your desktop PC that you simply can』t use on the Raspberry Pi; such as the Eclipse IDE.
+Cross compilation of simple applications that only require the use of the standard C/C++ libraries included with the cross compiling toolchain is relatively straightforward. 
+Cross compilation of more complicated applications that require external libraries however (such as libjpeg, GTK+, Qt4/5 e.t.c),  is typically more complicated to setup  and is  out of the scope 
+of this tutorial.
+
+To learn more about cross-compiling GTK+ applications for the Raspberry Pi, take a look at this blog entry.
+To learn more about cross-compiling QT4 applications for the Raspberry Pi, take a look at this blog entry.
+
+Downloading and Setting Up the Cross Compiling Toolchain
+Open a terminal window on your desktop Linux OS and type the following command:
+sudo apt-get install build-essential git
+This will install the native build tools on your PC along with the GIT tool which  will be used to download / clone the cross compiling toolchain from GitHub.com.
+
+ Create a "rpi" directory in your home directory by typing 
+mkdir rpi
+while in your home directory.
+
+Go to the rpi directory with:
+cd rpi
+and then type:
+git clone git://github.com/raspberrypi/tools.git
+This command will download (clone) Raspbian's official cross compiling toolchain from Github. The command will take a few minutes to complete its task.
+When the previous command completes, navigate to 「/home/halherta/rpi/tools/arm-bcm2708〞:
+cd ~/rpi/tools/arm-bcm2708
+on your deskop Linux OS. Note that My username is 「halherta」 and therefore my home folder is 「/home/halherta」. Please substitute your username with mine where necessary.
+
+In the arm-bcm2708 folder you』ll see four other folders, each containing a separate toolchain:
+ arm-bcm2708-linux-gnueabi
+ arm-bcm2708hardfp-linux-gnueabi
+ gcc-linaro-arm-linux-gnueabihf-raspbian
+ gcc-linaro-arm-linux-gnueabihf-raspbian-x64
+
+If you are running a 32-bit Linux operating system, you'll want to use the third toolchain "gcc-linaro-arm-linux-gnueabihf-raspbian". 
+If however you are running a 64-bit Linux operating system, you'll want to use the fourth toolchain "gcc-linaro-arm-linux-gnueabihf-raspbian-x64". 
+If you don't know whether you are running  32-bit or a 64-bit version of Linux type in the command line :
+
+uname -a
+If you see something like "i386"/"386" in the output string, then you're running a 32-bit version of Linux. 
+If however you see "x86_64" / "amd64" in the output string, then you're running a 64-bit version of Linux.
+
+The next step is to add the directory containing the binary files of the  toolchain  to the PATH environment variable in Linux. 
+This way we can access the toolchain's binary files/tools from the command line.  This step is not necessary if you want to using the toolchain strictly from Eclipse. 
+I still do highly recommend that you do it, in case you decide to compile/debug  arm applications directly from the command line later on. 
+We will do this by adding an "export PATH"  command to the bottom of the .bashrc  files in the home directory.
+
+In a terminal window (on your Desktop Linux OS) type:
+cd ~/
+to point to the home directory, then type:
+
+nano .bashrc
+
+This will open the .bashrc file in a command line based editor called nano. Go to the bottom of the .bashrc file using the down arrow key. 
+Then if you're running 32-bit Linux,  type the following command:
+export PATH=$PATH:$HOME/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin
+Alternatively if you』re running 64-bit Linux, type the following command instead:
+
+export PATH=$PATH:$HOME/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin
+Then hit Ctrl+x to exit. You will be prompted to save changes. Say yes and hit 「Enter」.
+Then type in the command line:
+source .bashrc
+This allows the current open terminal to see the updated PATH variable. Alternatively one can  close the terminal and open a new one.
+
+To test if you can access the cross compiling toolchain from the command line type:
+arm-linux-gnueabihf-gcc -v
+If you were successful, you should see output similar to that in Figure 1. Congratulations! you just installed Raspbian』s official cross compiling toolchain on your Desktop PC / Virtual machine!
+
+Figure 1. Cross Compiling Toolchain successfully installed and accessible from anywhere within your Desktop side Linux OS!!!
+Figure 1. Cross Compiling Toolchain successfully installed and accessible from anywhere within your Desktop side Linux OS!!!
+
+Downloading and Setting Up Eclipse
+The Next step is to download and install Eclipse. Unfortunately as of this writing the apt-get repositories rarely contain the latest Eclipse build.. So we will not be using the apt-get package manager. Instead we will download the latest Eclipse IDE from the web using a web browser.
+Before we can run Eclipse, we need to ensure that we have a Java runtime environment installed; since Eclipse relies heavily on Java. We can do this with the following command:
+sudo apt-get install openjdk-7-jre
+Go to the link provided below and download the latest linux version of the Eclipse IDE  for C/C++. Download the 32-bit version of the IDE if you』re running a 32-bit Linux OS or download the 64-bit version of the IDE if you』re running a 64-bit Linux OS.
+Link: http://www.eclipse.org/downloads/packages/eclipse-ide-cc-developers/keplerr
+
+The next step is to extract the 「eclipse」 folder into our home directory from the eclipse-cpp-kepler-R-linux-gtk-x86_64.tar.gz compressed file. This can be easily done using  File Manager and Archive Manager.  Alternatively to perform the extraction from the command line, open a new console and navigate to the directory containing the .gz file (typically 「~/Downloads/」)then type:
+tar -xvzf eclipse-cpp-kepler-R-linux-gtk-x86_64.tar.gz -C ~/
+Either way you will end up having  the eclipse directory created in your home directory.
+
+To start eclipse, go to the home directory:
+cd ~/
+
+then 『cd』 your way into the eclipse folder
+cd eclipse
+then type.
+
+./eclipse &
+Alternatively you could simply type in the terminal:
+~/eclipse/eclipse &
+Creating a New Project in Eclipse
+
+When Eclipse runs, it will first launch the workspace launcher. You will be prompted to choose a workspace directory. Accept the default (/home/halherta/workspace). Feel free to check the 「Use this as the default and do not ask again」 option if you feel inclined to do so. (You can always switch/change the workspace directory by going to 「File->Switch Workspace」 ).
+
+If you see a  Welcome tab, click on the 『x』 on the Welcome tab to close it.
+Now go to File->New->C++ Project. This will open the 「C++ Project」 window shown in Figure 2.
+Figure 3. C++ Project Window
+Figure 2. C++ Project Window
+
+Type 「HelloRpiWorld」 in the 「Project Name」 field. Under Project type select 「Executable->Empty Project」 Under 「Toolchains」 select 「Cross GCC」. Then click on 「Next」 This should take you to the 「Select Configurations」 Window. Accept the defaults and click 「Next」.
+This should then take you to the 「Cross GCC command」 Window (Figure 3).
+In the 「Cross compiler prefix」 field type: 「arm-linux-gnueabihf-「.
+In the 「Cross compiler path」 field type the full path to the toolchain: 「/home/halherta/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/」
+Click Finish. This step informs Eclipse of the location of the cross compiling toolchain and its standard C/C++ libraries and headers.
+Figure 4 Configure the Cross GCC path and prefix
+Figure 3. Configure the Cross GCC path and prefix
+
+This should be the end of the basic project configuration. Your Eclipse environment should look as shown in Figure 4.
+Figure 5. New Hello World Project initial setup
+Figure 4. New Hello World Project initial setup
+
+Notice how this project does not have any source files. So lets add one. Click on 「File->New Source File」. This should open the 「New Source File」 window.
+The 「Source folder」  field should already have the project name 「HelloRPiWorld」 displayed in it. In the 「Source file」 field type 「HelloRPiWorld.cpp」 and click Finish. This will add a HelloRPiWorld.cpp source file to our project. In the source file copy the following C++ code:
+/*
+ * HelloRPiWorld.cpp
+ */
+ 
+#include <iostream>
+ 
+using namespace std;
+ 
+int main (void)
+{
+    cout << "Hello RPi Development World !"<< endl;
+    return 0;
+}
+Save your project by clicking on 「File->Save」.
+To build the project click on 「Project->Build Project」. To clean the project click on 「Project->Clean」. Take note of the various options under the 「Clean dialog box」  that enable multiple projects to be clean at once as well as automatic rebuild.  The output of the compilation/build process should be available for viewing in the 「console」 tab. Figure 5 shows the Eclipse workspace with the HelloWorld program successfully cross compiled for the Raspberry Pi!!!
+
+Figure 6. HelloWorld program successfully compiled for Raspberry Pi.!!!
+Figure 5. HelloWorld program successfully compiled for Raspberry Pi.!!!
+
+The binary file for our HelloWorld application resides in  the 「~/workspace/HelloRPiWorld/Debug」. Lets go there via a console window with cd:
+cd ~/workspace/HelloRPiWorld/Debug/
+Type
+ls -al
+The 「HelloRPiWorld」 Binary file is highlighted in green. The binary can be executed as follows
+./HelloRPiWorld
+but should output the followingerror message 「cannot execute binary file「. Now type:
+file HelloRPiWorld
+You should get the following output:
+HelloRPiWorld: ELF 32-bit LSB executable, ARM, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.26, BuildID[sha1]=0xb37e6eaa466429d015cc334d55f5d46c97c9fc6c, not stripped"
+This indicates that the HelloRPiWorld Binary File was compiled for a 32-bit ARM machine and cannot run on an Intel Machine.
+
+Deploying the Binary file onto the Raspberry Pi
+
+To deploy the binary on the Raspberry Pi, make sure that the RPi board is powered and connected to your network. The next step is click on 「Window->Show View->Other」. This will open a show view window. In this window select the 「Remote Systems」 folder and then select 「Remote Systems Details」 and press OK (Figure 6).
+
+Figure 7. Remote system view
+Figure 6. Remote system view
+
+If the 「Remote Systems Details」 shows up in the bottom of the workspace, drag it such that its tab shares  the same region as the project explorer tab as shown in Figure 7.
+Figure 8. Creating a New Connection
+Figure 7. Creating a New Connection
+
+Now right click in the 「Remote Systems Detail」 area and click on 「New Connection」. In the 「Select Remote System Type」 window (Figure 8), select 「SSH only」 then click 「Next」
+Figure 9. Select remote system type
+Figure 8. Select remote system type
+
+In the 「Remote SSH Only System Connection」 (Figure 9) type in the IP address of the RPi in the 「Host name」 field and give the connection a valid name in the 「Connection name」 field. I typed 「Raspberry Pi」.  Then click 「Finish」.
+Figure 10. Remote SSH only system connection
+Figure 9. Remote SSH only system connection
+
+At this point a second device (Raspberry Pi) shows up in the 「Remote Systems Detail」 tab (Figure 10). Right click on the Raspberry Pi resource and click connect. You will be prompted to enter the username and password. Make sure that you utilize 「username:pi」 and 「password:raspberry」 (if you haven』t changed the default password). You may get a warning windows asking you if you are sure that you want to accept this connection. Affirm that you want to proceed with the connection. At this point you should be connected to your RPi from Eclipse.
+Figure 11. Starting an SSH terminal in Eclipse
+Figure 1o. Starting an SSH terminal in Eclipse
+
+Right click on the Raspberry Pi resource again  in the 「Remote Systems Detail」 tab and click on the 「Show in Remote Systems View」. This will open a 「Remote Systems」 tab in the same region of the workspace. In this tab, one can navigate the root file systems of both the Local Linux OS and that of the Raspbian/Raspberry Pi.
+Locate the HelloWorld Binary file on our local desktop PC and drag it to the home directory on the Raspberry Pi (You could also right click on the binary and click on 「Copy」 and then right click on the home folder in the Raspberry Pi and click 「Paste」. This effectively copies the binary file to the home directory of the Raspberry Pi.
+Figure 12. Launch Terminal
+Figure 11. Launch Terminal
+
+Now right click on the SSH terminal icon under the Raspberry Pi icon (Figure 11) in the  「Remote Systems」 and select 「Launch Terminal」 . This should launch a terminal window in the bottom of the Eclipse workspace (Figure 12). This is basically a console / terminal window connected to the Raspberry Pi via SSH.
+Figure 13. Running the HelloRPiWorld binary on the Raspberry Pi via an eclipse's SSH terminal
+Figure 12. Running the HelloRPiWorld binary on the Raspberry Pi via an eclipse』s SSH terminal
+
+In the terminal window type
+ls -al
+to confirm that the 「HelloWorld」 binary indeed got copied into the home directory of the Raspberry Pi』s root file system. Then change the 「HelloWorld」 binary』s permission to make it executable:
+
+chmod +x HelloWorld
+Finally type
+./HelloWorld
+You should see the output shown in Figure 12 :「Hello RPi Development World !」
+
+Congratulations!!! You just developed and ran your first cross compiled application for the Raspberry Pi.!!!!
+To remotely debug your applications on the Raspberry Pi from Eclipse, check out this blog entry!
+
+Share this:
+EmailTwitter16Facebook36LinkedIn1
+This entry was posted in Raspberry Pi, Raspberry Pi Cross Development. Bookmark the permalink.
+← Installing Raspbian on the Raspberry Pi & using SSH and VNC to remotely connect to the Raspberry PiStellaris LaunchPad Workshop Materials released! →
+  
+Categories
+
+Recent Posts
+Control the Raspberry Pi』s GPIO from a Qt4-Based Graphical Application
+Drive a Servo Motor with The Raspberry Pi』s PWM1 Peripheral in C++
+Add Analog to Digital Conversion Capability to The Raspberry Pi Without an ADC Chip
+Controlling the Raspberry Pi』s GPIOs using Direct Register Access in C++
+Accessing The Hardware PWM Peripheral on the Raspberry Pi in C++
+Archives
+July 2014
+April 2014
+January 2014
+September 2013
+July 2013
+April 2013
+January 2013
+December 2012
+November 2012
+September 2012
+August 2012
+July 2012
+June 2012
+May 2012
+September 2012
+M       T       W       T       F       S       S
+? Aug           Nov ?
+        1       2
+3       4       5       6       7       8       9
+10      11      12      13      14      15      16
+17      18      19      20      21      22      23
+24      25      26      27      28      29      30
+Links
+EEWeb.com
+Adafruit
+Sparkfun
+Raspberry Pi Foundation
+Hackaday
+Hertaville Proudly powered by WordPress. 
+
+
+/******************************************************************************/
+How To Autorun A Python Script On Raspberry Pi Boot     ref: http://www.raspberrypi-spy.co.uk/2015/02/how-to-autorun-a-python-script-on-raspberry-pi-boot/
+/******************************************************************************/
+There are lots of techniques for running a script when the Pi boots and which one you choose will depend on exactly what the script does and what you expect. 
+In this post I』ll explain a technique where the Pi automatically logins as the Pi user and immediately executes a Python script.
+
+This has one major advantage over another popular method (see Running A Python Script At Boot Using Cron) 
+in that because the terminal is up and running text output from the script is visible before you are returned to a usable command line prompt.
+
+Auto Login Setup (optional)
+The first step is to enable the Pi to login automatically without requiring any user intervention. This step is optional.
+At the command prompt or in a terminal window type :
+sudo nano /etc/inittab
+
+followed by Enter. Find the line :
+1:2345:respawn:/sbin/getty 115200 tty1
+
+and add a # character to the beginning of the line to disable it so it looks like :
+#1:2345:respawn:/sbin/getty 115200 tty1
+
+Under the line add the following :
+1:2345:respawn:/bin/login -f pi tty1 </dev/tty1 >/dev/tty1 2>&1
+
+where 「pi」 is the username.
+Type 「Ctrl+X」 to exit, then 「Y」 to save followed by 「Enter」 twice.
+
+Prepare Script
+My test script is called 「myscript.py」 and is located in /home/pi/. This is what it contains :
+#!/usr/bin/python
+print "******************************************************"
+print "* This is a test script. There are many like it,     *"
+print "* but this one is mine. My script is my best friend. *"
+print "* It is my life. I must master it as I must master   *"
+print "* my life.                                           *"
+print "******************************************************"
+
+You can download this directly to your Pi by using the following command :
+wget https://bitbucket.org/MattHawkinsUK/rpispy-misc/raw/master/python/myscript.py
+Auto-run Script Setup
+
+Now we need to tell the operating system to run the script for the Pi user. In the command prompt or in a terminal window type :
+sudo nano /etc/profile
+
+Scroll to the bottom and add the following line :
+sudo python /home/pi/myscript.py
+where 「/home/pi/myscript.py」 is the path to your script.
+Type 「Ctrl+X」 to exit, then 「Y」 to save followed by 「Enter」 twice.
+
+Reboot and Test
+To test if this has worked reboot your Pi using :
+sudo reboot
+When it starts up your script will run and you will see something like this :
+Autorun script result
+Due to the technique we』ve used the script is run whenever the Pi user logs in. This means if you create other terminal sessions (via SSH for example) the script will run each time.
+
+Troubleshooting
+If it doesn't work here are some things to try :
+Run your script manually and check it works correctly
+Use my example script and check that works
+Double check the initial steps
+
+
+/******************************************************************************/
+RaspberryPi控制繼電器
+/******************************************************************************/
+繼電器使用的GPIO為GPIO6（官方），6（wiringPi），對應針腳22。
+RPi版本為第一版。
+
+#include <wiringPi.h>
+#include <stdlib.h>
+#include "pub.h"
+int main()
+{
+
+        int rev = GetRPiRev();
+        printf("###### | RPi rev=%d\n", rev);
+
+        int pinLED = 5;
+        int pinRelay = 6;
+
+        if(wiringPiSetup() == -1)
+                exit(1);
+
+        printf("###### | Setup OK!\n");
+
+        pinMode(pinLED, OUTPUT);
+
+        while(1)
+        {
+                pinMode(pinRelay, OUTPUT);
+                digitalWrite(pinRelay, LOW);
+                digitalWrite(pinLED, HIGH);
+                printf("pin:%d, LOW\n", pinRelay);
+
+                delay(5000);
+
+                pinMode(pinRelay, INPUT);
+                digitalWrite(pinRelay, HIGH);
+                digitalWrite(pinLED, LOW);
+                printf("pin:%d, HIGH\n", pinRelay);
+
+                delay(5000);
+
+        }
+
+        return 0;
+}
+
+使用時注意以下兩句的含義：
+pinMode(pinRelay, OUTPUT);
+pinMode(pinRelay, INPUT);
+
+如果在digitalWrite()前沒有使用以上函數的話，繼電器不能開或者閉。
+digitalWrite(pinRelay, LOW);代表開，反之代表閉。
+
+附：wiringPi官網公佈的GPIO針腳對應關係表
+
+P1: The Main GPIO connector:
+wiringPi        BCM     Name    Header  Name    BCM
+Pin             GPIO    
+–              –      3.3v    1 | 2   5v      –      –
+8               R1:0/R2:2       SDA0    3 | 4   5v      –      –
+9               R1:1/R2:3       SCL0    5 | 6   0v      –      –
+7               4       GPIO7   7 | 8   TxD     14      15
+–              –      0v      9 | 10  RxD     15      16
+0               17      GPIO0   11 | 12 GPIO1   18      1
+2               R1:21/R2:27     GPIO2   13 | 14 0v      –      –
+3               22      GPIO3   15 | 16 GPIO4   23      4
+–              –      3.3v    17 | 18 GPIO5   24      5
+12              10      MOSI    19 | 20 0v      –      –
+13              9       MISO    21 | 22 GPIO6   25      6
+14              11      SCLK    23 | 24 CE0     8       10
+–              –      0v      25 | 26 CE1     7       11
+Board Revisions: Please note the differences between board revisions 1 and 2 (R1 and R2 above)
+P5: The auxilliary GPIO connector present on Rev. 2 boards only:
+wiringPi Pin    BCM GPIO        Name    Header  Name    BCM GPIO        wiringPi Pin
+–              –              5v      1 | 2   3.3v    –              –
+17              28              GPIO8   3 | 4   GPIO9   29              18
+19              30              GPIO10  5 | 6   GPIO11  31              20
+–              –              0v      7 | 8   0v      –              –
+ 
+
+/******************************************************************************/
+使用 raspberry.local 連到你的 Raspberry Pi      from : http://coldnew.github.io/blog/2013/12/15_f6961.html
+/******************************************************************************/
+在測試 Google Coder 的時候，我發現到他預先建立好的 SD Card 映像檔可以直接使用瀏覽器透過
+ http://coder.local 連線進去，這到底是怎麼辦到的？
+經過了一些資料的收集，原來這就是 Zeroconf 。大約在 2008 年前後，Gentoo Linux 突然增加了
+ zeroconf 與 avahi 的 USE flag，當時一直無法理解這兩個 flag 的用途，現今終於豁然開朗。
+Avahi 是開源的 Zeroconf 協定的實現，Zeroconf 全名為 Zero configuration networking，是一
+種用於自動生成可用 IP 地址的網路技術，最簡單的實例，就是當你的 iPhone 和 Apple TV 位於
+同一個網域內的時候，你可以直接在 iPhone 上面找到 Apple TV。
+使用這項功能有什麼好處呢？目前我想到的就是，我可以讓我的 Raspberry Pi 維持在使用 DHCP 
+連線的模式上面，這樣我可以攜帶一台 Raspberry Pi，並且到處用 DHCP 連線，再透過 
+raspberrypi.local 對他進行連線，而不需透過 RS232 去確認目前我的 Raspberry Pi 所獲取到的
+ IP 位址。
+聽起來好像很方便，那要怎樣去辦到這樣的事情呢？
+
+安裝 avahi-daemon
+要能夠使用 zeroconf 協定，我們需要安裝他的開源實現 - avahi
+root@raspberrypi:/home/pi# apt-get install avahi-daemon
+將 avahi-daemon 加入到開機時會自動執行的啟動程式裡面
+為了要讓下一次開機的時候，還是可以直接用 raspberrypi.local 連線到 Raspberry Pi 上面，因
+此要將 avahi-daemon 加入到開機腳本中，你可以使用以下指令完成這個目的
+root@raspberrypi:/home/pi# insserv avahi-daemon
+或是 (用於舊版本的 Debian)
+root@raspberrypi:/home/pi# update-rc.d avahi-daemon defaults
+加上設定檔
+修改 /etc/avahi/services/multiple.service ，加上如以下的設定檔案
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+        <name replace-wildcards="yes">%h</name>
+        <service>
+                <type>_device-info._tcp</type>
+                <port>0</port>
+                <txt-record>model=RackMac</txt-record>
+        </service>
+        <service>
+                <type>_ssh._tcp</type>
+                <port>22</port>
+        </service>
+        <service>
+                <type>_http._tcp</type>
+                <port>80</port>
+        </service>
+</service-group>
+若你不想要重新開機後才生效，可以手動去重啟 avahi-daemon
+
+root@raspberrypi:/home/pi# /etc/init.d/avahi-daemon restart
+測試是否可以連線到 raspberrypi.local
+現在你可以嘗試去 ping 看看 raspberrypi.local 或是使用瀏覽器去瀏覽 http://raspberrypi.local 了
+
+coldnew@Rosia ~ $
+ ping raspberrypi.local
+PING raspberrypi.local (192.168.2.104): 56 data bytes
+64 bytes from 192.168.2.104: icmp_seq=0 ttl=64 time=14.750 ms
+64 bytes from 192.168.2.104: icmp_seq=1 ttl=64 time=1.417 ms
+raspberrypi.local 裡面的 raspberrypi 實際上是你的 hostname，所以若你 Raspberry Pi 的 hostname 不是 raspberrypi，請將 raspberrypi.local 修改為 hostname.local
+
+
+/******************************************************************************/
+讓你的 Raspberry Pi 透過 I2C 讀取 eeprom        from : http://coldnew.github.io/blog/2013/06/19_e5bcf.html
+/******************************************************************************/
+Raspberry Pi 對於剛接觸嵌入式系統開發的人而言，無疑是一個非常好的管道，除了購買開發板僅需要約 NT $1350 以外，
+更重要的是，他保留了 SPI 與 I2C 這一類的常用通訊介面。
+本篇文章將講述如何使用 Raspberry Pi 進行讀/寫 EEPROM，以及 i2c-tool 的基本使用方式。
+
+使用設備
+要完成本篇文章所描述的部份，你需要以下幾種器材
+1. Raspberry Pi
+2. EEPROM 24c02
+3. 麵包板
+4. 單蕊線
+
+硬體線路
+下面的硬體線路使用 Fritzing 軟體來繪製，連線到 EEPROM 的線路很簡單，只要將 I2C 所需要使用的線路連接就好，其中 
+EEPROM 的 A0~A2 為位址線，這邊將其全部接地，因此此設備在 I2C 上的位址為 0x50 。(下載設計檔案)
+麵包板連線 rsp_24c04_bb.png
+電路連接   rsp_24c04_schem.png
+
+讓 Raspberry Pi 可以讀取 i2c 設備
+1. 將 i2c 模組從黑名單中移除
+雖然我不清楚為什麼 i2c 模組並不會預設被 Raspberry Pi 載入，但是如果沒有將這個模組從黑名單中移除的話，你是無法使用 
+modeprobe 這個命令載入 i2c 模組的，移除的方式如下，首先編輯
+/etc/modprobe.d/raspi-blacklist.conf
+將裏面的資訊變成如下
+# blacklist spi and i2c by default (many users don't need them)
+blacklist spi-bcm2708
+# blacklist i2c-bcm2708
+完成後先進行重新啟動
+
+2. 載入 i2c 模組
+Raspberry Pi 預設沒有載入 i2c 模組，因此我們必須手動載入他
+pi@raspberrypi:/home/pi$
+ sudo modprobe i2c-dev
+如果你覺得每次都要手動載入很麻煩，可以修改 /etc/modules，將 i2c-dev 加入到檔案裏面，這樣重開之後，Raspberry Pi 會
+自動載入該載入的模組。
+載入好模組後，你會看到 /dev 下面多增加了 i2c-0 以及 i2c-1 兩個設備節點
+pi@raspberrypi:/home/pi$
+ ls /dev/i2c*
+/dev/i2c-0  /dev/i2c-1
+
+安裝 i2c-tools
+我們在這邊使用最常用的 i2c-tools，因為這個套件並沒有被預先安裝，因此你必須自己安裝
+pi@raspberrypi:/home/pi$
+ sudo apt-get install i2c-tools
+安裝完後，你會增加以下幾個命令
+i2cdetect  i2cdump    i2cget     i2cset
+這些命令的用途如下:
+i2cdetect – 用來列舉 I2C bus 和上面所有的裝置
+i2cdump – 顯示裝置上所有暫存器 (register) 數值
+i2cget – 讀取裝置上某個暫存器值
+i2cset – 修改裝置上的暫存器數值
+
+使用 i2cdetect 察看目前有多少個 i2c bus
+你可以使用以下命令來察看目前的系統有多少個 i2c bus，以我手上的 Raspberry Pi 為例
+pi@raspberrypi:/home/pi$
+ sudo i2cdetect -l
+會得到
+i2c-0   i2c             bcm2708_i2c.0                           I2C adapter
+i2c-1   i2c             bcm2708_i2c.1                           I2C adapter
+在 rev.1 版本的 Raspberry Pi 上，i2c bus 是使用 i2c-0，而在現在販售的 rev.2 版本，則都改成使用 i2c-1 作為 i2c bus。
+使用 i2cdetect 察看目前掛在 i2c bus 上的設備
+知道你要查詢的 I2C bus 後，我們可以使用
+pi@raspberrypi:/home/pi$
+ sudo si2cdetect -y 1
+來查詢 i2c-1 bus 上的所有設備，所得到的結果如下
+root@raspberrypi:/home/pi#
+ i2cdetect -y 1
+    0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- -- -- -- -- -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: 50 -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- UU -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+這樣代表共有兩個裝置掛在 i2c-1 上，其中標示為 UU 的代表該設備有被偵測到並正在被 kernel driver 使用著，而在這邊顯示 0x50 的就是我們所使用的 EEPROM。
+
+使用 i2cdump 查詢設備內所有暫存器
+我們現在知道 EEPROM 是掛在 i2c-1 上的 0x50，若想知道 EEPROM 裏面的資訊，則可以使用 i2cdump 來獲得，i2cdump 的使用方式如下
+Usage: i2cdump [-f] [-y] [-r first-last] I2CBUS ADDRESS [MODE [BANK [BANKREG]]]
+I2CBUS is an integer or an I2C bus name
+ADDRESS is an integer (0x03 - 0x77)
+MODE is one of:
+  b (byte, default)
+  w (word)
+  W (word on even register addresses)
+  s (SMBus block)
+  i (I2C block)
+  c (consecutive byte)
+  Append p for SMBus PEC
+因此我們取得 i2c-1 上的 0x50 資訊，就使用
+i2cdump -y 1 0x50
+你會得到
+root@raspberrypi:/home/pi#
+ i2cdump -y 1 0x50
+No size specified (using byte-data access)
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f    0123456789abcdef
+00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+10: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+20: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+30: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+40: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+50: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+60: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+70: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+90: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+a0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+b0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+c0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+d0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+e0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+f0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+這邊 EEPROM 內的資訊都是 0xFF ，這是出廠時的預設狀況，我們可以使用 i2cset 來修改他的數值。
+
+使用 i2cset 修改設備暫存器數值
+如果我們想修改 EEPROM 裏面的數值，那要怎麼辦呢？這時候可以使用 i2cset 來幫忙完成，i2cset 的使用方式如下
+Usage: i2cset [-f] [-y] [-m MASK] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]
+  I2CBUS is an integer or an I2C bus name
+  ADDRESS is an integer (0x03 - 0x77)
+  MODE is one of:
+    c (byte, no value)
+    b (byte data, default)
+    w (word data)
+    i (I2C block data)
+    s (SMBus block data)
+    Append p for SMBus PEC
+假如我們想要修改位於 i2c-1 上 0x50 的 0x12 暫存器，並將其數值修改為 5，我們命令就可以這樣下
+i2cset -f -y 1 0x50 0x12 5
+再一次使用 i2cdump，你會發現不再是清一色的 0xFF 了
+root@raspberrypi:/home/pi#
+ i2cdump -y 1 0x50
+No size specified (using byte-data access)
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f    0123456789abcdef
+00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+10: ff ff 05 ff ff ff ff ff ff ff ff ff ff ff ff ff    ..?.............
+20: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+30: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+40: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+50: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+60: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+70: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+90: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+a0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+b0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+c0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+d0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+e0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+f0: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff    ................
+
+使用 i2cget 來取得暫存器的數值
+有些時候我們只想要看某個暫存器位址，這時候使用 i2cget 是最快的選擇， i2cget 命令格式如下
+Usage: i2cget [-f] [-y] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE]]
+I2CBUS is an integer or an I2C bus name
+ADDRESS is an integer (0x03 - 0x77)
+MODE is one of:
+  b (read byte data, default)
+  w (read word data)
+  c (write byte/read byte)
+  Append p for SMBus PEC
+因此，若我們要察看剛剛所設定的 0x12 暫存器，則可以用以下方式得到該暫存器的數值
+root@raspberrypi:/home/pi#
+ i2cget  -y 1 0x50 0x12
+0x05
+
+
+/******************************************************************************/
+Raspberry Pi GPIO 介紹及基本使用
+/******************************************************************************/
+開始要玩 gpio 時，才發現買的外殼不合，要拆開蓋子才能插排線，所以若有買殼時要注意一下，若不合不如不要用外殼。
+不過，最近看新版的壓克力殼有在上方開一條縫能走 gpio 排線就是。最好買只有上下二片的外殼最適合玩 gpio(註1)。
+
+樹莓派連麵包板的 gpio 排線，可以拿現成的磁碟機或硬碟排線來改，不過要注意，有些排線中間是有跳過的(註2)。
+小弟本身是用硬碟排線來改，花了些錢買一堆小零件，加工了好幾個小時，終於做好，結果拍賣上賣的一條也不過 70 元，
+又精緻又美觀(註3)，光買零件就花了大概 30 元，弄了好久，後來還發現有時會接觸不良，實在不划算，因此建議直接買現成的就好。
+
+一開始看文件時，由於型號分成 model A、model B，然後版本又分 rev 1、rev 2，版本間的 port 又有小部份修改，有些文章寫出要接在哪個 port，
+甚至連圖都有，但麵包板插好還是不會動，而且很多網頁都有提到要小心，否則會將 Raspberry Pi 給燒掉，所以文件 k 到第三天後才敢開始在麵包板上插零件。
+而且一開始還鬼打牆真的弄錯，上下顛倒，還好沒燒掉。最主要不要去接到 5V 就好。
+建議先做個保護電路來用(註4)，否則燒掉了可惜，但是，完全看不懂啦，只好小心點就是。
+
+gpio 腳位：
+P1: The Main GPIO connector:
+
+wiringPi Pin BCM GPIO Name Header Name BCM GPIO wiringPi Pin
+– – 3.3v 1 | 2 5v – –
+8 R1:0/R2:2 SDA0 3 | 4 DNC – –
+9 R1:1/R2:3 SCL0 5 | 6 0v – –
+7 4 GPIO7 7 | 8 TxD 14 15
+– - DNC 9 | 10 RxD 15 16
+0 17 GPIO0 11 | 12 GPIO1 18 1
+2 R1:21/R2:27 GPIO2 13 | 14 DNC – –
+3 22 GPIO3 15 | 16 GPIO4 23 4
+– – DNC 17 | 18 GPIO5 24 5
+12 10 MOSI 19 | 20 DNC – –
+13 9 MISO 21 | 22 GPIO6 25 6
+14 11 SCLK 23 | 24 CE0 8 10
+– – DNC 25 | 26 CE1 7 11
+
+
+P5: The auxilliary GPIO connector on Rev. 2 boards:
+
+wiringPi Pin BCM GPIO Name Header Name BCM GPIO wiringPi Pin
+
+– – 5v 1 | 2 3.3v – –
+17 28 GPIO8 3 | 4 GPIO9 29 18
+19 30 GPIO10 5 | 6 GPIO11 31 20
+– – 0v 7 | 8 0v – –
+表1
+其中 DNC -> Do Not Connect 接腳就是不要使用的意思，因為未來可能會改變配置。
+P1 總共有 26 支腳，有 8 個 GPIO port，其他的有 i2c, UART, SPI, 3.3V, 5V, GND 等等。
+其中 2 個 5V、2 個 3.3 V、5 個 GND，除了這 9 個以外，其他都可以設定成 GPIO 來使用，加起來共有 17 個。
+rev 2 則多加了 P5，只要焊上針腳，又多了4個 gpio 可使用，總共 21 個。
+
+如何控制 gpio port
+- 從命令列直接控制
+- 使用 WiringPi
+- 使用 python
+- 使用 Webiopi
+- 多種語言範例(註5)
+
+從命令列操作 :
+$ ls -l /sys/class/gpio/
+--w------- 1 root root 4096 Nov 30 19:37 export
+lrwxrwxrwx 1 root root 0 Nov 30 19:34 gpiochip0 -> ../../devices/virtual/gpio/gpiochip0
+--w------- 1 root root 4096 Nov 30 19:34 unexport
+
+假設要使用 gpio17，送出一個 port number 到 export 即可起始這個 port
+$ sudo sh -c 「echo 17 > /sys/class/gpio/export」
+
+由於使用到輸出入轉向，又用 sudo 的話，命令變得不易閱讀，所以乾脆切到 root 去
+$ sudo su -
+
+重覆剛才指令
+# echo 17 > /sys/class/gpio/export
+
+# ls -l /sys/class/gpio/
+total 0
+--w------- 1 root root 4096 Nov 30 19:37 export
+lrwxrwxrwx 1 root root 0 Nov 30 19:38 gpio17 -> ../../devices/virtual/gpio/gpio17
+lrwxrwxrwx 1 root root 0 Nov 30 19:34 gpiochip0 -> ../../devices/virtual/gpio/gpiochip0
+--w------- 1 root root 4096 Nov 30 19:34 unexport
+執行完就可看到多出一個 gpio17 連結
+
+# ls -l /sys/class/gpio/gpio17/
+total 0
+-rw-r--r-- 1 root root 4096 Nov 30 19:58 active_low
+-rw-r--r-- 1 root root 4096 Nov 30 19:58 direction
+-rw-r--r-- 1 root root 4096 Nov 30 19:58 edge
+drwxr-xr-x 2 root root 0 Nov 30 19:58 power
+lrwxrwxrwx 1 root root 0 Nov 30 19:37 subsystem -> ../../../../class/gpio
+-rw-r--r-- 1 root root 4096 Nov 30 19:37 uevent
+-rw-r--r-- 1 root root 4096 Nov 30 19:58 value
+
+顯示目前 gpio17 是輸入或輸出
+# cat /sys/class/gpio/gpio17/direction
+in
+
+將方向改成輸出
+# echo out > /sys/class/gpio/gpio17/direction
+
+已改變為輸出
+# cat /sys/class/gpio/gpio17/direction
+out
+
+顯示目前 gpio17 的值
+# cat /sys/class/gpio/gpio17/value
+0
+
+更改 gpio17 的值
+# echo 1 > /sys/class/gpio/gpio17/value
+
+檢查看是否有改過
+# cat /sys/class/gpio/gpio17/value
+1
+
+
+使用 WiringPi:
+看過上面直接在 console 下指令由 /sys 對 gpio 做修改，是不是覺得滿麻煩的，所以有人寫出 Wiring 來簡化整個設定過程。
+
+由於 gpio 編號並沒有按照順序排，跳來跳去的，初學者根本弄不清楚，常常會搞錯。
+Wiring，原本是 Arduino 系統在用的，將 gpio 重新編號，由 0 開始，循序往上的命名方式的工具，好處是若哪天板子改版，gpio 編號有跳動，wiring 編號也是不變。
+
+後來樹莓派出來後，移植到樹莓派的版本就叫 WiringPi。當然，也支援原本的編號方式。
+
+網頁：
+https://projects.drogon.net/raspberry-pi/wiringpi/
+
+安裝：
+https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/
+
+$ tar xvf wiringPi.tgz
+$ cd wiringPi
+$ sudo ./build
+
+可直接下載 tarball 安裝，完成後在命令列下就有 gpio 這指令可用。
+由於使用及存取 gpio port 都必需有 root 權限，但 gpio 這指令有 setuid，所以用一般使用者來執行即可。
+
+檢查這塊板子的版本是 rev 1 或 rev 2
+$ gpio -v
+gpio version: 1.4
+Copyright (c) 2012 Gordon Henderson
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type: gpio -warranty
+
+This Raspberry Pi is a revision 2 board.
+$ gpio readall
++-----------------+--------+------------+-----------+
+| wiringPi | GPIO | Name   | Value      |
++-----------------+--------+------------+-----------+
+| 00       | 17   | GPIO 0 | Low        |
+| 01       | 18   | GPIO 1 | High       |
+| 02       | 27   | GPIO 2 | Low        |
+| 03       | 22   | GPIO 3 | Low        |
+| 04       | 23   | GPIO 4 | Low        |
+| 05       | 24   | GPIO 5 | Low        |
+| 06       | 25   | GPIO 6 | Low        |
+| 07       | 04   | GPIO 7 | High       |
+| 08       | 02   | SDA    | High       |
+| 09       | 03   | SCL    | High       |
+| 10       | 08   | CE0    | Low        |
+| 11       | 07   | CE1    | Low        |
+| 12       | 10   | MOSI   | Low        |
+| 13       | 09   | MISO   | Low        |
+| 14       | 11   | SCLK   | Low        |
+| 15       | 14   | TxD    | High       |
+| 16       | 15   | RxD    | High       |
++--------------=--+--------+------------+------------+
+| 17       | 28   | GPIO 8 | Low        |
+| 18       | 29   | GPIO 9 | Low        |
+| 19       | 30   | GPIO10 | Low        |
+| 20       | 31   | GPIO11 | Low        |
++----------+------+--------+------------+------------+
+
+顯示所有 port 的目前狀況(板子上的 P1)，0 - 16 共 17 port，最後面 4 個為 P5 (rev 2 才有) 在板子上 P1 的旁邊有 8 個小洞，要使用自己焊。
+聽說未來的板子，連現在的 P1 的 26 port 出廠都不會焊好，使用者買回家後，要直的、彎的接腳都可以自己來，以後要玩樹莓派 gpio 要先準備好烙鐵和吸鍚器了。
+第一列為 wiring 的編號，第二列為 broadcom 的 BCM_GPIO 編號方式，第三列為原本每個 port 的名稱，最後一行為目前的值。
+存取方式：(預設為 wiring 編號模式)
+$ gpio read 0
+0
+以 BCM_GPIO 編號來讀取( -g)：
+$ gpio -g read 17
+0
+二個指令都讀取同一個 port
+將 17 port mode 改成輸出
+$ gpio -g mode 17 out
+寫入：
+$ gpio -g write 17 1
+檢查值果然改變為 1
+$ gpio -g read 17
+1
+好像沒參數可看目前是輸出或輸入，不過沒關係，每次要用前都直接先設定一次就好。
+
+使用 python:
+檢查看看 Python GPIO module for Raspberry Pi 有沒有安裝，若是官方的 rasbian 已經安裝好，其他的可能要檢查看看。
+$ dpkg --list|grep gpio
+ii python-rpi.gpio 0.4.1a-1 armhf Python GPIO module for Raspberry Pi
+ii python3-rpi.gpio 0.4.1a-1 armhf Python 3 GPIO module for Raspberry Pi
+python-rpi.gpio 為 python 2.6 及 2.7 版
+python3-rpi.gpio 為 python 3.x 版
+
+若沒有則手動安裝：
+$ sudo apt-get install python-pip
+$ sudo pip install rpi.gpio
+
+範例： test.py
+import RPi.GPIO as GPIO, time
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.OUT)
+
+try:
+while True:
+GPIO.output(17, True)
+time.sleep(2)
+
+GPIO.output(17, False)
+time.sleep(2)
+except KeyboardInterrupt:
+GPIO.cleanup()
+
+執行:
+$ sudo python test.py
+執行後，GPIO 17 上的 led 就會閃二秒、滅二秒，一直重覆，按 Ctrl-C 結束程式。
+
+使用 Webiopi：
+http://code.google.com/p/webiopi/
+下載並安裝：
+$ tar xvf WebIOPi-0.5.1.tar.gz
+$ cd WebIOPi-0.5.1
+$ sudo ./setup.sh
+執行
+$ sudo /etc/init.d/webiopi start
+或
+$ sudo python -m webiopi [port]
+開機就啟動：
+$ sudo update-rc.d webiopi defaults
+以瀏覽器開啟：
+http://192.168.1.105:8000
+預設帳號 "webiopi" 及密碼 "raspberry"
+
+實作:
+- 紅綠燈模擬
+http://www.skpang.co.uk/blog/archives/656
+$ wget http://skpang.co.uk/dl/traffic_light.py
+由於 rev 1 和 rev 2 腳位有改變，所以這裡的 code 也要跟著改
+$ vi traffic_light.py
+第9 行 21 → 27 即可
+$ chmod +x traffic_light.py
+$ sudo ./traffic_light.py
+
+- Ladder Game
+http://www.youtube.com/watch?v=35YXhS-NfPM
+https://projects.drogon.net/raspberry-pi/gpio-examples/ladder-game/
+下載並編譯，不過系統上要有裝 wiringPi 才行
+$ wget http://project-downloads.drogon.net/files/gpioExamples/ladder.c
+$ cc -o ladder -Wall -I/usr/local/include -L/usr/local/lib ladder.c -lwiringPi -lm
+$ sudo ./ladder
+
+
+/******************************************************************************/
+// Raspberry Pi B+
+/******************************************************************************/
+pi@raspberrypi ~ $ gpio -v
+gpio version: 2.31
+Copyright (c) 2012-2015 Gordon Henderson
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type: gpio -warranty
+
+Raspberry Pi Details:
+  Type: Model B+, Revision: 02, Memory: 512MB, Maker: Sony
+  Device tree is enabled.
+  This Raspberry Pi supports user-level GPIO access.
+    -> See the man-page for more details
+pi@raspberrypi ~ $ gpio readall
+ +-----+-----+---------+------+---+--B Plus--+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ |     |     |    3.3v |      |   |  1 || 2  |   |      | 5v      |     |     |
+ |   2 |   8 |   SDA.1 |   IN | 1 |  3 || 4  |   |      | 5V      |     |     |
+ |   3 |   9 |   SCL.1 |   IN | 1 |  5 || 6  |   |      | 0v      |     |     |
+ |   4 |   7 | GPIO. 7 |   IN | 1 |  7 || 8  | 1 | ALT0 | TxD     | 15  | 14  |
+ |     |     |      0v |      |   |  9 || 10 | 1 | ALT0 | RxD     | 16  | 15  |
+ |  17 |   0 | GPIO. 0 |   IN | 0 | 11 || 12 | 0 | IN   | GPIO. 1 | 1   | 18  |
+ |  27 |   2 | GPIO. 2 |   IN | 0 | 13 || 14 |   |      | 0v      |     |     |
+ |  22 |   3 | GPIO. 3 |   IN | 0 | 15 || 16 | 0 | IN   | GPIO. 4 | 4   | 23  |
+ |     |     |    3.3v |      |   | 17 || 18 | 0 | IN   | GPIO. 5 | 5   | 24  |
+ |  10 |  12 |    MOSI |   IN | 0 | 19 || 20 |   |      | 0v      |     |     |
+ |   9 |  13 |    MISO |   IN | 0 | 21 || 22 | 0 | IN   | GPIO. 6 | 6   | 25  |
+ |  11 |  14 |    SCLK |   IN | 0 | 23 || 24 | 1 | IN   | CE0     | 10  | 8   |
+ |     |     |      0v |      |   | 25 || 26 | 1 | IN   | CE1     | 11  | 7   |
+ |   0 |  30 |   SDA.0 |   IN | 1 | 27 || 28 | 1 | IN   | SCL.0   | 31  | 1   |
+ |   5 |  21 | GPIO.21 |   IN | 1 | 29 || 30 |   |      | 0v      |     |     |
+ |   6 |  22 | GPIO.22 |   IN | 1 | 31 || 32 | 0 | IN   | GPIO.26 | 26  | 12  |
+ |  13 |  23 | GPIO.23 |   IN | 0 | 33 || 34 |   |      | 0v      |     |     |
+ |  19 |  24 | GPIO.24 |   IN | 0 | 35 || 36 | 0 | IN   | GPIO.27 | 27  | 16  |
+ |  26 |  25 | GPIO.25 |   IN | 0 | 37 || 38 | 0 | IN   | GPIO.28 | 28  | 20  |
+ |     |     |      0v |      |   | 39 || 40 | 0 | IN   | GPIO.29 | 29  | 21  |
+ +-----+-----+---------+------+---+----++----+---+------+---------+-----+-----+
+ | BCM | wPi |   Name  | Mode | V | Physical | V | Mode | Name    | wPi | BCM |
+ +-----+-----+---------+------+---+--B Plus--+---+------+---------+-----+-----+
+
+
+/******************************************************************************/
+在Raspberry Pi & Pi2 上面學 Linux 驅動程式開發 -- timer --
+/******************************************************************************/
+實驗目的:
+    介紹 timer 在 Linux Kernel 裡面的作用和原理。
+
+使用材料及設備:
+    硬體: Raspberry Pi B+
+    軟體: 可編譯 Linux Module 的 Raspbian 系統。
+
+原理介紹:
+    此範例展示如何在 Linux 核心模組之中使用計時器(timer)來執行程式。
+    如果模組程式之中有需要固定時間之後執行特定程式的需求時，可使用計時器來簡單達成。
+    使用方式和 work queue 類似，不過在初始化計時器資料結構變數的時候需要另外設定等待時間。
+
+程式說明:
+程式碼內容:
+/==============================================================================
+* Copyright (c) 2015 Song Yang @ ittraining
+* 
+* All rights reserved.
+* This program is free to use, but the ban on selling behavior.
+* Modify the program must keep all the original text description.
+*
+* 保留所有權利。
+* 本程式可任意使用，但是禁止販售行為。
+* 修改程式時必須保留所有原有文字說明。
+* 
+* Email: onionys@ittraining.com.tw
+* Blog : http://blog.ittraining.com.tw
+===============================================================================/
+#include <linux/module.h>
+#include <linux/init.h>
+#include <linux/timer.h>
+ 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("ITtraining.com.tw");
+MODULE_DESCRIPTION("A timer example.");
+ 
+struct timer_list my_timer;
+ 
+/*
+ * TIMER FUNCTION
+ * */
+ 
+static void timer_function(unsigned long data){
+        printk("Time up");
+        // modify the timer for next time
+        mod_timer(&my_timer, jiffies + HZ / 2);
+}
+ 
+/*
+ * INIT MODULE
+ * */
+int init_module(void)
+{
+        printk("Hello My Timer\n");
+ 
+        //  -- initialize the timer
+        init_timer(&my_timer);
+        my_timer.expires = jiffies + HZ ;
+        my_timer.function = timer_function;
+        my_timer.data = NULL;
+ 
+        // -- TIMER START
+        add_timer(&my_timer);
+        printk("END: init_module() \n");
+        return 0;
+}
+ 
+/*
+ * CLEANUP MODULE
+ * */
+void cleanup_module(void)
+{
+        del_timer(&my_timer);
+        printk("Goodbye\n");
+}
+view rawmy_timer.c hosted with ? by GitHub
+-
+程式碼架構:
+    此範例模組程式碼的架構只有一個進入點 init_module() 和一個離開點 cleanup_module()。
+    另外和 work queue 的使用方式一樣，我們宣告一個為了和計時器資料結構綁住的函式 timer_function() ，讓計時器在適當的時機去呼叫該函式。
+
+程式碼說明:
+使用計時器去呼叫指定的函式之前需要宣告一個資料型態為 struct timer_list 的全域計時器變數，這邊我們使用的變數名稱為 my_timer。
+之後在模組的進入點函式 init_moudle() 裡面使用函式 init_timer() 進行對 my_timer 初始化的工作。而 init_timer() 要傳入的參數為計時器變數的指標:
+init_timer(&my_timer);
+初始化計時器變數之後，還需要指定等待時間和欲呼叫的函式。指定欲呼叫的函式的指標直接設定給計時器的參數 .function :
+my_timer.function = timer_function;
+設定計時器的等待時間方式如下:
+my_timer.expires = jiffies + HZ;
+jiffies  為核心的系統變數，其數值為系統從開機以來到現在總共累計數，其值每經過特定的時間後就會累加一。
+而上面的 HZ 也是系統變數，其數值為系統每經過一秒鐘 jiffies 會累加的數值。而當系統的 jiffies 值累計至和 my_timer.expires 數值時，系統會去呼叫 my_timer.function() 。
+所以上面那一行程式碼的設意義為，設定該計數器約一秒過後去執行 timer_function()。
+要讓該計數器 my_timer 生效還需要將其註冊進去系統裡面:
+add_timer(&my_timer);
+而一秒過後， my_timer 就會去呼叫 timer_function()。可以看到 timer_function() 裡面在顯示了一段訊息之後，又執行了下面這一行程式碼，其功用在於修改 my_timer 的設定觸發時間。
+計數器在使用時，只需要初始化一次，之後如過要重覆觸發的話，只需要透過函式 mod_timer() 去做修改。:
+mod_timer(&my_timer, jiffies + HZ / 2);
+而 timer_function() 在結束之時，都會再重新設定 my_timer 的觸發時間為0.5秒之後。所以timer_function() 就會以每0.5秒一次的頻率被 my_timer 給呼叫。
+
+
+/******************************************************************************/
+AllJoyn on Raspberry Pi (Raspbian) and Windows 10       ref: http://blog.rajenki.com/2015/05/alljoyn-on-raspberry-pi-raspbian-and-windows-10/
+/******************************************************************************/
+May 26, 2015 Rajen Misc 4 comments
+After the announcement of Windows 10 including out-of-the-box support for AllJoyn, I decided to try and connect my Raspberry Pi Model B+ running Raspbian to a Windows 10 PC 
+to see how this all pans out. If you're not familiar with AllJoyn: AllJoyn is a system that allows devices to advertise and share their abilities with other devices around them. 
+The beauty of AllJoyn is that it can be used over a bunch of different transports (Wi-Fi, Bluetooth, RF, etc.) and will allow for interoperability between devices that may 
+initially have not been designed to work together. This of course piqued my interest, with my continuous efforts in home automation. This blog post will outline the steps 
+needed to get AllJoyn on Raspberry Pi up and running, as the process is quite lengthy and the available resources on the web didn't cover the full installation in my particular case.
+
+First of all, here are the resources that I found on the web, which covered 90% of the process I'm about to describe. 
+I'm writing my own post to cover the remaining 10% and hopefully clear up some of the things that weren't particularly evident to me while reading these resources, 
+so hopefully you won't have to go through the same process.
+
+German Viscuso's GitHub Gist outlining the installation process
+Mike Young』s blog post which the GitHub Gist is based upon
+Martin Calsyn's blog post, filling in a bunch of the missing bits and pieces for me
+Compiling AllJoyn on Raspberry Pi
+I'm going to assume you already have Raspbian running on your Raspberry Pi and know how to get to a terminal interface. 
+If not, there's very good documentation on the official Raspberry Pi website on how to do so. 
+
+Let's get started by installing the necessary packages to compile AllJoyn:
+sudo apt-get install build-essential
+sudo apt-get install maven
+sudo apt-get install scons
+sudo apt-get install git
+sudo apt-get install curl
+sudo apt-get install openssl
+sudo apt-get install libssl-dev
+sudo apt-get install libjson0
+sudo apt-get install libjson0-dev
+
+sudo apt-get install libcap-dev
+Note the last package, which is missing on the GitHub Gist, but is needed to prevent a "sys/capability.h: No such file or directory" error popping up during compilation.
+URL: http://man7.org/tlpi/code/faq.html#cap/check_password_caps.c
+
+Now that we have all the necessary packages, let's get the source from the AllSeen Alliance's Git repository:
+mkdir ~/bin
+echo "export PATH=$PATH:~/bin" >> ~/.bashrc
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+source ~/.bashrc
+mkdir -p ~/WORKING_DIRECTORY/alljoyn    # mkdir -p ~/repos/alljoyn
+cd ~/WORKING_DIRECTORY/alljoyn          # cd ~/repos/alljoyn
+git config --global user.name "YOUR_NAME_HERE"
+git config --global user.email "YOUR_EMAIL_HERE"
+repo init -u https://git.allseenalliance.org/gerrit/devtools/manifest
+repo sync
+export AJ_ROOT=$(pwd)
+sudo ln -s /usr/bin/g++ /usr/bin/arm-angstrom-linux-gnueabi-g++
+sudo ln -s /usr/bin/gcc /usr/bin/arm-angstrom-linux-gnueabi-gcc
+cd ~/WORKING_DIRECTORY/alljoyn/core/alljoyn     # cd ~/repos/alljoyn/core/alljoyn
+Note the "WORKING_DIRECTORY" path in here, which should be replaced by something that makes sense in your case. I used "repos" on my Raspberry Pi.
+
+Next up is the actual compilation, which can take quite some time, which is probably an understatement. I got to sneak in a bunch of Destiny matches on Xbox One, 
+so you should probably prepare a seperate activity before compiling. These are the particular flags I used to get the basics set up, 
+but you can refer to the GitHub Gist for more information on additional flags that may apply to your situation:
+scons OS=linux CPU=arm WS=off OE_BASE=/usr BR=on BINDINGS=cpp CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
+sudo ln -sf ~/WORKING_DIRECTORY/alljoyn/core/alljoyn/build/linux/arm/debug/dist/cpp/lib/liballjoyn.so /lib/arm-linux-gnueabihf/liballjoyn.so
+
+When the compilation is finally finished (hopefully without errors), it's time to build the additional services. You can also do this in one go by specifying the SERVICES 
+parameter in the previous scons command, but I prefer the separation as it makes tracking down errors a bit more manageable. Note that this will also take quite a bit of 
+time (less than the previous one, but get that Xbox One ready just in case):
+scons OS=linux CPU=arm WS=off SERVICES=about,notification,controlpanel,config,onboarding,sample_apps BINDINGS=core,cpp OE_BASE=/usr CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf-
+
+After all this, you should have a completely compiled AllJoyn implementation available on your Raspberry Pi! You can test things out by navigating to the following directory 
+and executing the daemon with the –version parameter:
+cd ~/WORKING_DIRECTORY/alljoyn/core/alljoyn/build/linux/arm/debug/dist/cpp/bin
+ldd alljoyn-daemon
+./alljoyn-daemon --version
+
+Testing it all out
+As I mentioned, I'm using a PC running Windows 10 as the other node to connect to AllJoyn on Raspberry Pi. On the Windows IoT GitHub(https://ms-iot.github.io/content/en-US/win10/AllJoyn.htm), 
+there's a bunch of documentation about AllJoyn on Windows 10. Additionally, a few samples are available near the bottom of the page, one of which is the AllJoyn Explorer. 
+We can use the AllJoyn Explorer app on Windows 10 to listen for any AllJoyn capable devices advertising on the network. Follow the instructions to install it and launch it on your Windows 10 PC.
+
+With AllJoyn Explorer running, go back to the Raspberry Pi and execute the following commands:
+
+cd ~/WORKING_DIRECTORY/alljoyn/core/alljoyn/build/linux/arm/debug/dist/cpp/bin/samples
+./AboutService
+
+If all goes well, you should see a device pop up in AllJoyn Explorer and you can drill down into the device to view its capabilities! 
+Hope this post helps you get things going in a reasonable time frame without having to spend a lot of time researching errors and quirks. 
+If you find anything missing in this guide, please let me know and I'll update it accordingly!
+
+
+/******************************************************************************/
+A UPnP renderer for the Raspberry Pi    from : http://blog.scphillips.com/posts/2013/01/a-upnp-renderer-for-the-raspberry-pi/
+/******************************************************************************/
+I want to use a Raspberry Pi to play music through the micro Hi-Fi system in my kitchen/dining room. 
+Up to now I have had a San Francisco Android phone velcroed to the kitchen wall running the Subsonic 
+client and accessing the FLAC files on my media server via the excellent Subsonic server software 
+(which transcodes them on the fly to MP3). This has been a good solution for a couple of years now 
+but one problem is that the headphone output of the San Francisco is not very powerful so we have to 
+turn the (small) amp up to max to get a decent volume and sometimes you want it higher.
+
+Attention!
+Edit, 2013-07-21: please see my newer complete instructions for setting up the Raspberry Pi for UPnP and
+Edit, 2015-04-22: the even newer third version of these instructions.
+
+I just tested a Raspberry Pi's audio output and it is more powerful than the phone's so it would make 
+a good replacement. A couple of years ago when I set up the phone as a media player, DLNA for sharing/streaming 
+media was not very widespread, but now it's become quite popular so I'd like to try using that protocol 
+with the Pi. DLNA defines various types of devices, such as "server", "renderer" and "controller" and they 
+then communicate via Universal Plug and Play (UPnP). I want my media server to be a DLNA server and the Pi 
+to be a "renderer" and all our mobile phones to be the "controllers".
+On the media server I've installed minidlna via apt-get and pointed it at my music folder. The server runs 
+as a "minidlna" user and for some reason I had to chown minidlna.minidlna the /var/cache/minidlna folder 
+to get it to work but it seems fine now.
+
+To control the system I've installed bubbleupnp on my phone and this means I can stream music from the media 
+server to my phone. What I want to do though is use the phone as a UPnP controller and have it instruct the 
+Pi to play (or "render") the music through the Hi-Fi's speakers.
+
+Enter gmrender...
+There seems to be a shortage of headless UPnP renderers for linux: I just want a server process that sits 
+there and accepts instructions to play music and plays it - nothing more, nothing graphical. XBMC can be a 
+UPnP renderer I believe but that's way too heavyweight for what I want to do (even though the Raspbmc project 
+makes it easyish). Google found me gmrender but it's long abandoned. However, a post on Google+ from Henner Zeller 
+sent me on to the gmrender-resurrect project on GitHub where Henner has taken the old code and added some more features.
+
+However, getting it to install on the Raspberry Pi (with standard Debian wheezy OS) was not completely straightforward...
+$ git clone https://github.com/hzeller/gmrender-resurrect.git
+$ cd gmrender-resurrect
+
+Looking at what you get, there is an autogen script so I need some more tools...
+$ sudo apt-get install automake
+(load of output snipped...)
+
+This installs autoconf, autotools-dev, m4. We can now do the normal automake process:
+$ ./autogen.sh
+$ ./configure
+$ make
+make all-recursive
+make[1]: Entering directory `/home/pi/gmrender-resurrect'
+Making all in src
+make[2]: Entering directory `/home/pi/gmrender-resurrect/src'
+gcc -DHAVE_CONFIG_H -I. -I.. -DPKG_DATADIR="/usr/local/share/gmediarender" -Wall -Wpointer-arith -Wcast-align -Wmissing-prototypes -Wmissing-declarations -Wwrite-strings -MT main.o -MD -MP -MF .deps/main.Tpo -c -o main.o main.c
+main.c:34:18: fatal error: glib.h: No such file or directory
+compilation terminated.
+make[2]: *** [main.o] Error 1
+make[2]: Leaving directory `/home/pi/gmrender-resurrect/src'
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory `/home/pi/gmrender-resurrect'
+make: *** [all] Error 2
+
+So looking at the first error, I am missing glib.h, where do I get that?
+$ sudo apt-get install apt-file
+$ sudo apt-file update
+$ apt-file search /glib.h
+libghc-glib-doc: /usr/lib/ghc-doc/haddock/glib-0.12.2/glib.haddock
+libgirepository1.0-doc: /usr/share/gtk-doc/html/gi/glib.html
+libglib2.0-dev: /usr/include/glib-2.0/glib.h
+libglib2.0-doc: /usr/share/doc/libglib2.0-doc/glib/glib.html
+
+That gives me the answer.
+$ sudo apt-get install libglib2.0-dev
+$ rm config.status config.log
+$ ./configure
+$ make
+
+(output snipped, but fails with:)
+gcc -Wall -Wpointer-arith -Wcast-align -Wmissing-prototypes -Wmissing-declarations -Wwrite-strings -o gmediarender main.o upnp.o upnp_control.o upnp_connmgr.o upnp_transport.o upnp_device.o upnp_renderer.o webserver.o output.o output_dummy.o xmldoc.o xmlescape.o -pthread -lgthread-2.0 -lrt -lglib-2.0
+upnp_control.o: In function `set_volume_db':
+upnp_control.c:(.text+0xc4c): undefined reference to `exp'
+upnp_control.o: In function `set_volume':
+upnp_control.c:(.text+0xd6c): undefined reference to `exp'
+upnp_control.o: In function `upnp_control_init':
+upnp_control.c:(.text+0x100c): undefined reference to `log'
+collect2: ld returned 1 exit status
+make[2]: *** [gmediarender] Error 1
+
+This is saying that when it links the code together it can't find the basic maths functions (such as "exp" and "log"), so we need to tell it to use the maths lib (why?!)...
+$ ./configure LIBS=-lm
+$ make
+$ sudo make install
+$ gmediarenderer --list-outputs
+Supported output modules:
+dummy Dummy output module (default)
+
+So I have installed it but it's no use because there is no gstreamer output to play the music.
+$ sudo apt-get install gstreamer0.10-alsa
+$ sudo apt-get install gstreamer0.10-tools
+$ sudo apt-get install libgstreamer0.10-dev
+
+More examination of the config.log file reveals that it also didn't find the upnp and libxml2 libraries. Why does it just blindly continue?!
+$ sudo apt-get install libupnp-dev
+$ sudo apt-get install libxml2-dev
+
+$ rm config.status config.log
+$ ./configure LIBS=-lm
+checking for GLIB... yes
+checking for GST... yes
+checking for LIBUPNP... yes
+checking for LIBXML... yes
+$ make clean
+$ make
+$ sudo make install
+$ gmediarender --list-outputs
+Supported output modules:
+gst GStreamer multimedia framework (default)
+dummy Dummy output module
+$ gmediarender -f Raspberry
+Using output module: gst (GStreamer multimedia framework)
+Registering support for 'audio/x-raw-int'
+Registering support for 'audio/x-iec958'
+gmediarender: output_gstreamer.c:482: output_gstreamer_init:
+Assertion `player_ != ((void *)0)' failed.
+Aborted
+
+What's going on? More bits of gstreamer needed?
+$ sudo apt-get install gstreamer0.10-ffmpeg
+$ gmediarender -f Raspberry
+Using output module: gst (GStreamer multimedia framework)
+...followed by 100 or so media types it can now render...
+gmediarender: output_gstreamer.c:482: output_gstreamer_init:
+Assertion `player_ != ((void *)0)' failed.
+Aborted
+
+More needed?
+$ sudo apt-get install gstreamer0.10-plugins-base
+$ sudo apt-get install gstreamer0.10-plugins-good
+$ gmediarender -f Raspberry
+
+And it runs!
+At this point, the Pi appears in Bubbleupnp's "devices" list as a "renderer". 
+If I select it and then choose a song from the media server and press play all sorts of log messages appear on the Pi's console. 
+Unfortunately I tried playing a FLAC file and the sound quality is terrible! Playing an MP3 file doesn't work - 
+it says I have a missing plugin so I had a look (type sudo apt-get install gstreamer and press tab) and saw another one that looked to do with MP3s:
+
+$ sudo apt-get install gstreamer0.10-fluendo-mp3
+Now I can play an MP3 file and it also sounds terrible...
+
+I copied an MP3 across onto the Pi from the media server (using scp) and tried playing it with mpg123 and it sounds fine. So what is the problem with the gstreamer rendering?
+$ gst-launch-0.10 playbin uri=file:///tmp/song.mp3
+This command produces the same rubbish output as via gmrender (as expected), so the problem is in gstreamer. I'll post this and do some more investigation...
+
+
+sudo apt-get install gstreamer0.10-plugins-bad
+sudo apt-get install gstreamer0.10-plugins-really-bad
+sudo apt-get install gstreamer0.10-plugins-ugly
+
+
+/******************************************************************************/
+Making gmediarender start on boot
+/******************************************************************************/
+Posted inRaspberry Pion 2013-01-02 20:13    Getting gstreamer to work on a Raspberry ... Using a Raspberry Pi with Android phones ...    
+Now gmediarender is compiled and gstreamer works on the Raspberry Pi we need to get it all to start on boot.
+
+Fairly standard stuff here (copied from Malte's post in Chris' blog). Create a file /etc/init.d/gmediarenderer with the following contents:
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: gmediarender
+# Required-Start: $remote\_fs $syslog
+# Required-Stop: $remote\_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start GMediaRender at boot time
+# Description: Start GMediaRender at boot time.
+### END INIT INFO
+
+USER=root
+HOME=/root
+export USER HOME
+case "$1" in
+start)
+echo "Starting GMediaRender"
+start-stop-daemon -x /usr/local/bin/gmediarender -c pi:audio -S -- -f 'Raspberry' -d
+;;
+stop)
+echo "Stopping GMediaRender"
+start-stop-daemon -x /usr/local/bin/gmediarender -K
+;;
+\*)
+echo "Usage: /etc/init.d/gmediarender {start\|stop}"
+exit 1
+;;
+esac
+exit 0
+
+Then do:
+$ sudo chmod 755 /etc/init.d/gmediarenderer
+$ sudo update-rc.d gmediarenderer defaults
+to make the script executable and add in all the symbolic links from the /etc/rc.x directories.
+
+You can then do sudo service gmediarenderer start to run gmediarenderer as a daemon there and then or reboot and it will start automatically. 
+Interestingly, I tried it without the -c pi:audio so that the daemon ran as root and the sound quality went bad again. Fine running as the "pi" user though.
+
+In summary, we now have:
+minidlna running on the media server (a nettop linux box behind the sofa);
+gmedia-resurrected running on the Raspberry Pi to play the music through the mini Hi-Fi;
+bubbleupnp on multiple Android phones to control the music choice.
+This is a pretty good solution but has some problems caused by the playlist being held on the controller (one of the phones). 
+So if one of us sets an album playing and then goes out, the Pi doesn't receive the instruction to play the next song. 
+If you look at a second controller then you cannot see what is playing (it may think something else is), but on the plus side, the volume controls work on all controllers and the play/pause does as well.
+
+These problems are known of course, and the BubbleUPnP author has another piece of software called BubbleUPnPServer which is an OpenHome renderer. As the site says:
+
+An OpenHome Renderer has the following advantages over a regular UPnP AV renderer:
+
+each OpenHome renderer has its own playlist
+no need to leave the Control Point running for playlist track advance to happen
+several OpenHome Control Points (BubbleUPnP, Linn Kinsky) can be connected to the same renderer simultaneously, showing the same playlist and playback state
+create a playing playlist on a device and pick it up later on another device
+It looks as though the BubbleUPnPServer basically adds another, persistent and stateful, layer to the system so that an OpenHome controller (such as BubbleUPnP) tells BubbleUPnPServer what to play and it then tells the existing (plain) UPnP renderer what to do. Hopefully I can get this working on the same linux box as minidlna is running on.
+
+
+/******************************************************************************/
+樹莓派作家庭伺服器（DLNA + NAS）        ref: http://skypegnu1.blog.51cto.com/8991766/1654186
+/******************************************************************************/
+1、流媒體播放服務：利用DLNA實現電視、手機、電腦播放其上面的媒體文件。
+2、文件共享：利用samba實現手機、電腦登終端與伺服器的文件共享。
+3、自動下載：利用aria2c實現高速下載
+1、準備工作
+準備一塊硬碟，以及一個移動硬碟盒（支援2.5/3.5寸的硬碟，以及外接供電）
+把硬碟分區，並格式化為ext3 或者 ext4 格式（我是直接掛在Ubuntu下面格式化的）
+2、掛載硬碟 
+    樹莓派開機後，我們把移動硬碟盒用USB線連接到樹莓派，我們通過ssh遠端連接上。然後運行 df -h 查看分區情況。
+pi@raspberrypi ~ $ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       7.2G  4.1G  2.8G  60% /
+devtmpfs        460M     0  460M   0% /dev
+tmpfs            93M  384K   93M   1% /run
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           186M     0  186M   0% /run/shm
+/dev/mmcblk0p1   56M   20M   37M  35% /boot
+ 
+# 此時並沒有掛載
+pi@raspberrypi ~ $ ls /dev/sd*
+/dev/sda  /dev/sda1
+我們創建一個 share 文件夾，然後將我們的硬碟掛載到此目錄下。
+pi@raspberrypi ~ $ sudo mkdir /share
+pi@raspberrypi ~ $ sudo chown pi:pi /share
+pi@raspberrypi ~ $ sudo mount /dev/sda1 /share
+ 
+pi@raspberrypi ~ $ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       7.2G  4.1G  2.8G  60% /
+devtmpfs       460M     0  460M   0% /dev
+tmpfs         93M  384K   93M   1% /run
+tmpfs         5.0M     0  5.0M   0% /run/lock
+tmpfs         186M     0  186M   0% /run/shm
+/dev/mmcblk0p1     56M   20M   37M  35% /boot
+/dev/sda1       147G   60M  140G   1% /share # 我們可以看到已經成功掛載
+解決自動掛載問題:
+    上面有個問題就是，當樹莓派關機或重啟、以及硬碟插拔後，並不會自動掛載 /dev/sda1 ， 怎麼辦呢？ 通過修改 /etc/fstab文件，實現硬碟開機自動掛載。
+ fstab文件其實就是一個表格， 表格各列的含意如下：
+第一列： 磁碟分區名/卷標， 一般是/dev/sdaN（N表示正整數）
+第二列： 掛載點， 我們在這裡把/dev/sda1掛到/share上。
+第三列： 缺省設置， 一般用defautls。
+第四列： 是否備份： 0——表示不做 dump 備份； 1——表示要將整個 <fie sysytem> 裡的內容備份； 2 也表示要做 dump 備份， 但該分區的重要性比 1 小。
+第五列： 檢測順序： 0——不進行檢測； 根分區（/） ， 必須填寫 1， 其它的都不能填寫 1。 如果有分區填寫大於 1的話， 則在檢查完根分區後， 從小到大依次檢查下去。
+pi@raspberrypi ~ $ sudo vi /etc/fstab
+proc            /proc      proc    defaults    0     0
+/dev/mmcblk0p1  /boot      vfat    defaults    0     2
+/dev/mmcblk0p2  /        ext4    defaults,noatime  0   1
+/dev/sda1    /share   ext3    defaults       0     0    # 添加這一行資訊
+# a swapfile is not a swap partition, so no using swapon|off from here on, use  dphys-swapfile swap[on|off]  for that
+
+3、安裝samba
+ sudo apt-get update
+ sudo apt-get install samba samba-common-bin
+安裝完成後，修改其配置文件 /etc/samba/smb.conf， 在文件最後面添加以下內容：
+# ======================
+[share]           #共享文件的名稱， 將在網路上以此名稱顯示
+path = /share         #共享文件的路徑
+valid users = pi        #允許訪問的用戶
+browseable = yes        #允許瀏覽
+public = yes        #共享開放
+writable = yes        #可寫
+ 
+# =========================
+修改完成後，保存。然後重新啟動 samba服務， 並添加共享用戶：
+# 重啟 samba
+pi@raspberrypi ~ $ sudo /etc/init.d/samba restart
+[ ok ] Stopping NetBIOS name server: nmbd.
+[ ok ] Starting NetBIOS name server: nmbd.
+[ ok ] Stopping SMB/CIFS daemon: smbd.
+[ ok ] Starting SMB/CIFS daemon: smbd.
+[ ok ] Stopping Samba AD DC daemon: samba.
+ 
+# 添加samba共享用戶
+pi@raspberrypi ~ $ sudo smbpasswd -a pi
+New SMB password:
+Retype new SMB password:
+Added user pi.
+測試samba共享， 在win7 系統上，開始 - 運行： \\192.168.3.104  (你的樹莓派IP地址)，進行訪問：
+wKiom1VfwUTxBpPfAADE2AQ4JNw441.jpg
+wKioL1Vfws6wZeGsAADnN1qfPgs728.jpg
+我們雙擊打開 share 目錄，需要輸入剛才創建的 pi 用戶以及密碼，進行身份驗證。 此時，我們可以創建文件進行測試，看是否有創建、 刪除權限。
+wKiom1VfxAvTmZECAACDQKSW1Zo636.jpg
+然後，為了方便，我們可以把share目錄添加到映射，下載訪問就不用 \\192.168.3.104 這種方式了。
+打開 電腦 - 映射網路驅動器
+wKioL1VfxZbAj-QIAALIvdMS2m8779.jpg
+添加完成後，會提示輸入用戶名和密碼，並且把 「記住我的憑據」 勾選上。
+wKiom1VfxAzwG3ikAABMYBk6-8w233.jpg
+
+4、安裝DLNA實現流媒體伺服器
+DLNA主要面向媒體資源（比如視頻、 音樂） 實現網內共享， 具體步驟如下：
+1、安裝 minidlna
+# 更新軟體源
+pi@raspberrypi ~ $ sudo apt-get update
+# 安裝 minidlna
+pi@raspberrypi ~ $ sudo apt-get install minidlna
+2、設置配置文件
+設置/etc/minidlna.conf文件， 在文件尾部添加如下內容：
+friendly_name=CubieTruck DLNA Server
+media_dir=A,/mnt/data/mp3 # A代表Audio音頻，後面加上自己想要的路徑
+media_dir=V,/mnt/data/cinema # V代表Video影像，後面也是加上自己的路徑
+media_dir=P,/mnt/data/picture #P代表Picture照片，路逕自己加上
+db_dir=/mnt/data/var/minidlna  #剛剛設定的 database 目錄，或者使用預設的 /var/lib/minidlna ， 把目錄的所有者所屬組都設置為 minidlna 。
+
+pi@raspberrypi ~ $ sudo vi /etc/minidlna.conf
+ # followed by a comma, as so:
+ #   * "A" for audio    (eg. media_dir=A,/var/lib/minidlna/music)
+ #   * "P" for pictures (eg. media_dir=P,/var/lib/minidlna/pictures)
+ #   * "V" for video    (eg. media_dir=V,/var/lib/minidlna/videos)
+  
+# =============
+media_dir=A,/share/DLNA/Music
+media_dir=P,/share/DLNA/Picture
+media_dir=V,/share/DLNA/Video
+db_dir=/share/DLNA/db
+log_dir=/share/DLNA/logs
+# =============
+3、創建上述目錄
+pi@raspberrypi ~ $ cd /share
+pi@raspberrypi /share $ ls
+lost+found
+pi@raspberrypi /share $ mkdir DLNA
+pi@raspberrypi /share $ mkdir DLNA/{Music,Picture,Video,db,logs}
+ 
+pi@raspberrypi /share/DLNA $ swdo chown minidlna:minidlna db
+4、重啟 minidlna
+# 重啟
+pi@raspberrypi ~ $ sudo /etc/init.d/minidlna restart
+ 
+# 重新加載配置
+pi@raspberrypi ~ $  service minidlna force-reload
+# 查看狀態
+pi@raspberrypi ~ $ sudo /etc/init.d/minidlna status
+[ ok ] minidlna is running.
+最好把 /etc/minidlna.conf 中的 inotify = yes 選項打開，這樣有新的文件時就會自動加入。但是如果媒體資料很多的時候，需要修改 /etc/sysctl.conf 檔案裡面新增：
+fs.inotify.max_user_watches = 100000 #依照你自己所需，預設值好像是8192而已
+ 
+# 修改完成後，重新載入配置生效
+sysctl -p
+ 
+# 然後到 /proc/sys/fs/inotify/max_user_watches 這個文件是否已經改變
+5、添加一些文件（音樂，視頻，圖片）到樹莓派上（可以利用samba直接拷貝即可），但是通過樹莓派，感覺很慢。
+接下來， 我們可以打開 win7 的開始功能表 - 所有程式， 打開 Windows Media Player
+隨便哪個都可以，看心情。 在左下角的列表欄其他媒體庫出現 raspberrypi ， 點擊後，可選擇音樂，視頻等。雙擊即可播放了，但是有一個問題就是會亂碼。。。
+
+6、 手機上進行播放
+    手機上實現網路共享， 可安裝es file explorer軟體， 在其網路處進行設置， 設置方法與電腦基本一樣， 這裡不再詳
+述。 設置後， 文件均可瀏覽， 媒體文件雙擊可以在線播放。
+    也可以直接使用updp播放器， 這裡我安裝的是moliplayer， 可以在其附近設備裡， 直接找到raspberrypi:root， 訪問其媒體中心， 注意， 這裡是訪問的DLNA共享， 所以不需要再輸入密碼。
+7、 智慧電視進行播放
+    智慧電視一般都是用的android系統， 與手機基本一樣。唯一的不同就是程式支援的解析度以及要用遙控器操作。
+
+限制存取裝置：
+    DLNA是設計給家庭環境使用，它假設能夠連接到家庭網路的設備都是通過某種程度的驗證（比如無線網路密碼），因此它本身並沒有提供認證權限相關的設定，所有能連接到網路的設備都可以播放 server上的媒體資源。
+    但是我們能不能做一些限制呢？ 能。
+如果對安全性要求比較強的話，還可以添加防火牆規則， minidlna用的 port 是 1900（for UPnP）和 8200(for HTTP media straming)
+ufw allow from 192.168.1.0/24 to any port 1900 proto udp
+ufw allow from 192.168.1.0/24 to any port 8200 proto tcp
+    還有一種常見的解決方法是使用： MAC address 來作為區分。通常，在網路中，每一台設備都有一個唯一的MAC address, 我們可以設置只有登記的白名單上的設備才可以瀏覽媒體資源。
+阻止MAC地址為XX:XX:XX:XX:XX:XX主機的所有通信：
+iptables -A INPUT -m mac --mac-source XX:XX:XX:XX:XX:XX -j DROP
+
+
+/******************************************************************************/
+Setting up a headless Raspberry Pi as a Music Player Daemon server
+/******************************************************************************/
+ref : http://lesbonscomptes.com/pages/raspmpd.html
+Jean-Francois Dockes <jf at dockes.org>
+2015-12-06
+I'd love to improve this document: if you have trouble with something in the following, or any idea to improve it, please drop me an email: jf at dockes.org, or use the new comments system.
+This recipy sets up a Raspberry Pi as a music player, connected to your stereo and pulling music files from your home network.
+It uses MPD, the Music Player Daemon, which can be remotely controlled by almost any device with network access (IOS, Android, PC, WEB interface). You can also use an UPnP control point. If you』re a bit lost among the different possibilities, I have written an overview of what I』ve learned about the home music network.
+No screen, keyboard or mouse is needed at any point for the Raspberry Pi. This will save scrambling for cables and adapters, and eliminate additional sources of trouble.
+Everything is done inside a command window, either on your main machine, or, through ssh on the Raspberry PI.
+The following describes precisely the steps I took from receiving the Pi to playing music, in the simplest possible way, without exploring too many alternatives. The more complete (and complicated) pages from which I got the information are referenced and can provide other approaches.
+As this text is simple-minded it will only be useful to you if you work in the same context:
+The music stored on the home network (either on an appliance or on a Linux or BSD server).
+You will be using either NFS or SMB/Windows network file sharing.
+You will be using a Linux (or BSD) computer to prepare the SD card and remotely access the Raspberry.
+You have some familiarity with the command line.
+
+Note
+I make the assumption everywhere that your environment is relatively simple. If it is much more sophisticated than what I assume, you should be able to extrapolate the appropriate extensions (if you need this text at all…).
+Note
+August 2015: this page is almost 2 years old, and there are now much simpler ways to set up an MPD/upmpdcli-based Raspberry PI music player: download one of the dedicated distributions (Volumio, Rune Audio, Archphile, Moode, Pi MusicBox and others), copy it to an SD card, boot up the Pi and be up and running. The procedure which follows still works though, and, because it is based on age-old command line steps and standard knowledge, it will hopefully continue to. If you are not an old Linux/Unix hand, you may learn a few things while following it, especially if you have the curiosity to research a bit around the more unfamiliar steps (and I』ll be glad to answer questions as well as I can).
+What you need:
+A Raspberry Pi
+Its power supply
+Its SD card (2 GB min)
+An Ethernet connection close to the stereo.
+This also works over WIFI, but, if you need to set up WIFI, I think that you will be better off using a screen, keyboard and mouse, at least temporarily until the network link works. This page is more or less dedicated to a headless config, else some things could be done in a simpler way. In any case, I have made a few notes about setting up WIFI, one of which can save you some time (don』t plug the dongle in the Pi, use an extension cable).
+
+Audio hardware
+As the Raspberry native audio does not have a great reputation sounds like crap, you will probably want to use external audio hardware. If this is not chosen yet, my notes about this.
+Note
+This is still true for the RPI2 even with claims of improved audio. I have bad ears, and I can easily make the difference between the native audio and a cheap USB DAC.
+
+Reference pages
+Raspberry Pi quick start guide: http://www.raspberrypi.org/quick-start-guide
+Raspberry Pi images download page: http://www.raspberrypi.org/downloads
+Raspberry Pi headless installation: http://www.penguintutor.com/linux/raspberrypi-headless
+Raspbian FAQ: http://www.raspbian.org/RaspbianFAQ (esp. for information about remote volume mounts)
+
+Procedure
+Preparing the SD card
+Download the Raspbian 「Wheezy」 Debian Linux image from the Raspberry Pi download page.
+Unzip the image:
+unzip 2015-05-05-raspbian-wheezy.zip
+Note
+Inserting the card and finding the right device name.
+Copy the unzipped image (name ends in .img) to the SD card. You』ll need at least a 4GB one. You may have to change the name of the image if the version changed since I wrote this, and use an appropriate drive name in place of the sdZ I chose as example.
+You should probably take some care to be very sure that the value used is not your hard disk… Use the df command to display your mounted volumes. dd will destroy all data on the target disk
+sudo dd if=2015-05-05-raspbian-wheezy.img bs=1M of=/dev/sdZ
+
+Accessing the Raspberry on the network
+As you are going to connect by ssh to the Rasberry PI when it is up on the network, you need a way to find its IP address.
+Note
+There is a slightly brutal way to solve this, which is to set a static IP address by editing the PI system files with SD card mounted on the PC. Editing the interfaces file is described in the page about headless setup linked above. I don』t like this method too much because, later on, either you are stuck with using the numeric IP, or you will need to record the hostname-to-address correspondence somewhere else (either DNS or host file), so that it will be stored in two places (the PI and DNS/hosts). My preferred approach is to let the initial setup use DHCP, and have to find/guess the IP address for the PI.
+Have a look at the host table on your DHCP server (on your ISP-provided WIFI router for most home setups, the section might be called Attached Devices for example). If DHCP is provided by a Linux machine you might want to tail /var/lib/dhcp/dhcpd.leases. After we power up the Raspberry, it will appear as a new entry.
+Insert the SD card in the Raspberry, connect the Ethernet cable, and power up.
+Wait a minute and have another look at your DHCP table to find the Raspberry IP address: it is the new guy, and it is probably called raspberrypi - but not necessarily, on my buggy router, it is named UNKNOWN :-).
+ssh into the Raspberry Pi (the default login and password are listed on the image download page listed above). Example:
+ssh 192.168.1.105 -l pi
+
+Initial Raspberry Pi configuration
+When logged-in, execute:
+sudo raspi-config
+to:
+Resize the root partition to use the whole SD card (Expand Filesystem entry)
+Maybe change the memory split between processor and video (memory_split). The above page recommends 32 Mb for VideoCore, I only left 16 as I won』t be using video, and I plan other uses for this machine, so I don』t want to waste memory. You can also leave the default of 64MB, especially if this is a 512MB Pi. On recent images, this option found under the Advanced Options entry of the top raspi-config menu.
+Note
+If raspi-config exits without doing anything, maybe your TERM variable is not set correctly. Try to set it, e.g. from the command line:
+export TERM=vt100
+Then retrieve the Raspberry Ethernet address. You can get it by typing ifconfig on the command line and noting the HWaddr field for eth0 (it is 6 hex bytes looking like: b8:27:1a:2b:3c:4d).
+Note
+Very optional: changing the main user name on the Pi
+
+File sharing
+The initial version of this document explained how to mount the server volume on the PI, so that MPD could see the server music files as it would local ones.
+I have moved the instructions for doing this to the annexes, because there is now a much simpler method, which is to let MPD access the remote volume all by itself (new in MPD 0.19). The only drawback is that we』ll have to install the MPD package from a non-standard place: the one from Debian Wheezy is ancient. As an added bonus, the newer version is also less buggy.
+Also, this section explained how to set up DHCP and DNS so that the PI would have a fixed address and network name. The fixed address part at least is almost necessary for NFS. The DNS host name is convenient to avoid having to remember and type IP addresses.
+However, if you finally decide to install an UPnP/DLNA front-end on the PI, all this is unnecessary, so I moved it to the annexes too.
+Note
+Host name and fixed IP address
+Note
+Using NFS file sharing.
+
+Note
+Using SMB/Windows file sharing
+
+MPD installation
+Note
+I have been told that alsa-utils was not always pre- or auto-installed, and is needed. (In my experience it』s always already there). In any case, requesting it again won't hurt:
+sudo apt-get install alsa-utils
+
+As we want MPD 0.19, we need to get it from an alternate repository. I maintain the repository in question, and you'll have to trust that I did not introduce a Trojan in the MPD source. 
+If you don't, you could also rebuild from the debian source package, also available there, which would be reasonably safe as you would check the MPD source tarfile against the official depot. 
+If the leap of faith is not too much for you, here how the simple approach goes:
+cd /etc/apt/sources.list.d
+sudo nano mpd.list
+
+Insert the following lines:
+deb http://www.lesbonscomptes.com/upmpdcli/downloads/mpd-debian/  unstable main
+deb-src http://www.lesbonscomptes.com/upmpdcli/downloads/mpd-debian/ unstable main
+Then save and exit.
+
+Install MPD:
+sudo apt-get update
+sudo apt-get install mpd
+This should list the MPD version as 0.19.x and Will probably display a few ipv6-related and other errors when starting up, ignore them.
+Configure MPD by editing mpd.conf
+sudo nano /etc/mpd.conf
+If you chose to have MPD access the files directly (which would be my default choice now), change the following lines. 
+You will need to substitute the IP address or DNS name for your samba/NAS server, and the volume name and path to where your music is stored.
+ music_directory        "smb://MyServerNameOrAddress/path/to/Music"
+ bind_to_address         "any"
+ audio_output {
+     device          "hw:1,0"    # optional usb output. Keep 0,0 if using the Pi audio
+ }
+ mixer_type                      "software"
+If you chose to mount the server volume instead, the music_directory line will look something like the following (NFS case):
+ music_directory         "/net/servername/path/to/music"
+If you have a doubt about your card number, use the aplay -l command to list the cards. The internal audio is bcm2835.
+Restart mpd:
+sudo service mpd restart
+Install any of the music play daemon clients (ipad/Android/phpmp whatever…) on your remote, use it to tell mpd to update its tags database, and you should be good to go ! I quite like MPDroid on my Nook tablet as a client … If you did not perform the DNS dance linked above, you will need to use the IP address to connect, and if you also skipped the fixed address part, it might change one day (unlikely in most circumstances in fact).
+One approach to avoid these names and addresses issues is to use an UPnP front-end to MPD instead. The main purpose of UPnP is to free you from these trivial matters.
+
+Using an UPnP controller with MPD
+If your music network is primarily based on UPnP, you may prefer to use an UPnP control point application, such as BubbleUPnP or Audionet, instead of an MPD client to control the player.
+upmpdcli is an UPnP Media Renderer front-end to MPD, and will allow such a configuration.
+Installing upmpdcli on the Raspberry Pi is trivial (3mn job)
+Setting up MPD to let the storage server manage the database
+If you did not chose the UPnP approach above, one of the (small) problems with MPD on a Raspberry PI, especially if the files are stored somewhere else, is that updating the songs database is slow. Also, if you have multiple devices on the network (the one in the kitchen, for the bedroom, etc.), it』s a source of waste and inconsistency to have them all compute the tag database.
+Happily enough, you just installed MPD 0.19, and this has two possible workarounds for these problems, the new database plugins:
+The Proxy database plugin lets you use the tags database from another MPD instance (for example one running on the server).
+The UPnP database plugin lets you access the directory from an UPnP Media Server (for example the one running on your NAS), while still using an MPD client for control. I wrote the initial version for this, but it has been modified and integrated in MPD 0.19.
+More details here and here.
+
+
+/******************************************************************************/
+linux環境下的播放器：好用的播放器mpd
+/******************************************************************************/
+mpd 是目前我最喜歡的linux環境下的播放器，它跟常見的大多數播放器都很不同，比如它是c/s架構，mpd會作為一個守護進程運行在後台，通過各種各樣的 client軟體來控制播放動作、播放列表等，
+從一開始使用我便喜歡上了這種方式。下面介紹一下它的使用方法和一些常見問題的解決方法。
+
+一、安裝
+我推薦使用最新的0.12.1版，因為我曾使用過0.11.5版，它對某些歌曲的長度識別有問題，而在最新的0.12.1中很正常，以下文字都是基於0.12.1版的。
+如果你跟我一樣使用gentoo linux，那麼你把portage更新到最新後emerge mpd就可以了：
+emerge --sync
+emerge mpd
+使用其他的發行版的用戶可以檢查一下軟體倉庫中是否已有mpd，比如debian/ubuntu用戶可以：
+apt-get install mpd
+arch用戶可以：
+pacman -S mpd
+如果你使用的發行版還沒有提供0.12.1版的二進位包，你可以從mpd官方網站(http://www.musicpd.org/files.shtml)下載源代碼進行編譯安裝。
+使用tar命令解開源代碼包後進入源碼目錄：
+tar xf mpd-0.12.1.tar.gz
+cd mpd-0.12.1
+編譯安裝：
+./configure --prefix=/usr
+make
+make install
+
+二、mpd的配置
+mpd的系統級配置文件是/etc/mpd.conf，配置方法參見該文件，常用的配置選項有如下幾個：
+user 指定用來運行mpd的用戶，建議使用默認的mpd用戶
+music_directory 指定存放mp3文件的目錄，確保user指定的用戶對該目錄及其子目錄、文件有讀寫許可權。
+filesystem_charset 要和你系統使用的locale一致，比如我的：
+aiyi@devr ~ $ locale
+LANG=en_US.utf8
+LC_CTYPE=zh_CN.utf8
+LC_NUMERIC="en_US.utf8"
+LC_TIME="en_US.utf8"
+LC_COLLATE="en_US.utf8"
+LC_MONETARY="en_US.utf8"
+LC_MESSAGES="en_US.utf8"
+LC_PAPER="en_US.utf8"
+LC_NAME="en_US.utf8"
+LC_ADDRESS="en_US.utf8"
+LC_TELEPHONE="en_US.utf8"
+LC_MEASUREMENT="en_US.utf8"
+LC_IDENTIFICATION="en_US.utf8"
+LC_ALL=
+因此我就設置該選項為"UTF-8"
+id3v1_encoding 指定mp3文件id3v1的編碼，通常指定為"GBK"
+後兩項的設置很重要，它關係到你的歌曲資訊是否能夠正確顯示。
+對mpd配置完畢後要創建歌曲資料庫，使用命令：
+mpd --create-db
+
+三、mpd的使用
+啟動mpd：
+一般安裝mpd時會安裝一個啟動腳本，比如mpd在gentoo下安裝的啟動腳本為/etc/init.d/mpd。
+/etc/init.d/mpd start就啟動了mpd
+mpd沒有安裝該腳本也無妨，直接運行mpd就可以了。
+
+四、用戶端軟體的使用：
+我比較常用的用戶端軟體是mpc和gmpc，這些軟體的安裝都很簡單，自行解決吧：）
+mpc的常用方式：
+mpc listall 可以列出所有的歌曲
+mpc search filename 可以按文件名查找
+mpc search artist 可以按歌手查找
+mpc search title 可以按歌曲名查找
+mpc add 添加歌曲到播放列表
+mpc listall|mpc add 可以把所有歌曲都添加到當前的播放列表
+mpc playlist 查看當前播放列表
+mpc play 播放
+mpc play 18 播放列表中第18首
+mpc pause 暫停
+mpc stop 停止
+mpc 查看當前播放歌曲的資訊
+mpc的更多選項可以看mpc的幫助。
+
+gmpc是圖形化的用戶端，使用更加簡單，就不廢話了。
+
+五、常見問題
+1、我的播放列表怎麼有很多亂碼？
+這個……要檢查一下上面mpd的配置一節說過的兩個選項：
+filesystem_charset
+id3v1_encoding
+看是否設置正確
+2、我確認配置沒問題，還是亂碼。
+這個可能是0.12.1新引入的問題，如果你的mp3文件有id3v2資訊，那mpd會優先讀取它而不管id3v1。
+解決方法：刪除id3v2資訊，再確認id3v1是否正確
+3、怎麼刪除id3v2資訊？
+我推薦使用id3v2這個命令行軟體：id3v2 -d mp3file
+4、能不能顯示歌詞？
+偶目前在寫一個小程式，用與mpd環境下的歌詞顯示，基本上完成了，稍候放出。
+
+
+/******************************************************************************/
+Spotify on Raspberry Pi ( MPD )
+/******************************************************************************/
+Hello! So I got famous Raspberry Pi B+ on Christmas. First thing I wanted to do with it was setting up so-called 「Home Media Center」. 
+The thing is the device I like to use for listening to music is on the other side of my room, so I had to plug-in my phone to mini-jack. 
+After all, phone is not the best device to use it as a playlist provider because every time you get a call you have to get up and pick it up turning off the music. 
+The other thing is that i don』t like to see cables all around my bedroom. So, long story short I started my investigation on how to set up raspberry pi to be able to play music from my Spotify account.
+
+My Raspi runs Wheezy Raspbian distro and it is connected to my local network via WLAN. 
+After a quick research I already knew that there is no ready-to-use Spotify client for Raspbian available, so i had to find some workaround. 
+Finally I went for Mopidy as it turned out to be really user-friendly and installation steps on Raspbian are clear and easy.
+
+What are the common steps to install and successfully run Mopidy daemon? Following the steps in Mopidy docs is essential. 
+Here I provide console commands from Mopidy docs with a few comments from my own experience.
+
+Installing Mopidy
+It is recommended to set IPv6 support on Raspi as well as add it to boot setup.
+sudo modprobe ipv6
+echo ipv6 | sudo tee -a /etc/modules
+Add Mopidy archive GPG key
+wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
+Add repositories to your apt-get lookup list
+sudo nano /etc/apt/sources.list
+# Mopidy APT archive
+deb http://apt.mopidy.com/ stable main contrib non-free
+deb-src http://apt.mopidy.com/ stable main contrib non-free
+Update your system and download mopidy
+sudo apt-get update && sudo apt-get install mopidy
+Download Spotify extension for Mopidy
+sudo apt-get install mopidy-spotify
+Now you should have installed working mopidy daemon. It needs a little configuration ( ie. Spotify user/pass details ). 
+The thing to notice is a little mess in configuration files. Mainly there are two important configuration files: in your ~/.config/mopidy/ dir and in /etc/mopidy/ dir. 
+First one is used when you start mopidy as a standard process of your user, while second is used when started as a daemon. I recommend to just have the same configuration in both files.
+
+Configure Mopidy.
+Check your device IP address
+ifconfig
+open configuration file
+sudo nano ~/.config/mopidy/mopidy.conf
+If you want to use MPD applications for your smartphone to manage your playlists set MPD configuration – host ( wlan0 in my case ), port and password
+[mpd]
+enabled = true
+hostname = 192.168.1.5 #wlan0 ip
+port = 6600
+password = *setPass*
+If you want to use http client to manage your playlists set HTTP configuration.
+[http]
+enabled = true
+hostname = 192.168.1.5
+port = 6680
+set spotify user configuration (see comment below)
+[ spotify ]
+enabled = true
+username = *yourSpotifyUsername*
+password = *yourSpotifyPass*
+bitrate = 320 If you login to Spotify using Facebook account you have to create username/pass for your devices on your Spotify account settings. 
+To do so, go to https://www.spotify.com/pl/account/set-device-password/ and follow the instructions (send email to your email account with a link to set password)
+Now save your configuration file and check if everything works fine. To do so run in console:
+mopidy
+You should see a few warnings probably about your configuration of local libraries (used when you want to play music from your Raspi local disk). 
+After a while there should be also a notification that 『xy playlists imported from Spotify』. If you see such information then you know you have done everything properly. 
+You can kill your process now. To run your daemon service with the same configuration you have to copy config file from ~/.config/mopidy/mopidy.conf to /etc/mopidy/ directory (backup existing file first).
+sudo cp /etc/mopidy/mopidy.conf /etc/mopidy/mopidy.conf_backup && sudo cp ~/.config/mopidy/mopidy.conf /etc/mopidy/mopidy.conf
+You probably want to run your service on Raspi startup so you don』t have to think about this anymore. When installing the most recent Mopidy there should be a script for this already installed. see:
+cat /etc/init.d/mopidy
+In case you see nothing there, here is the script I had predefined and it works fine:
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: mopidy
+# Required-Start: $network $remote_fs
+# Required-Stop: $network $remote_fs
+# Should-Start: $named alsa-utils avahi dbus pulseaudio
+# Should-Stop: $named alsa-utils avahi dbus pulseaudio
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Mopidy music server
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Mopidy music server"
+NAME=mopidy
+DAEMON=/usr/bin/mopidy
+DAEMON_USER=mopidy
+DAEMON_GROUP=audio
+CONFIG_FILES="/usr/share/mopidy/conf.d:/etc/mopidy/mopidy.conf"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+[ -x $DAEMON ] || exit 0
+
+# Read configuration variable file if present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+. /lib/lsb/init-functions
+
+do_start()
+{
+start-stop-daemon --start --quiet --name $NAME --pidfile $PIDFILE \
+--startas $DAEMON --test > /dev/null \
+|| return 1
+start-stop-daemon --start --quiet --name $NAME --pidfile $PIDFILE \
+--chuid $DAEMON_USER:$DAEMON_GROUP --background --make-pidfile \
+--startas $DAEMON -- --quiet --config $CONFIG_FILES \
+|| return 2
+}
+
+do_stop()
+{
+start-stop-daemon --stop --quiet --name $NAME --pidfile $PIDFILE \
+--retry=TERM/30/KILL/5
+RETVAL="$?"
+[ "$RETVAL" = 2 ] && return 2
+# Wait for children to finish too if this is a daemon that forks
+# and if the daemon is only ever run from this initscript.
+# This typically happens with pulseaudio.
+start-stop-daemon --stop --quiet --oknodo --user $DAEMON_USER \
+--retry=TERM/30/KILL/5
+[ "$?" = 2 ] && return 2
+rm -f $PIDFILE
+return "$RETVAL"
+}
+
+# Remove the action from $@ before it is used by the run action
+action=$1
+[ "$action" != "" ] && shift
+
+case "$action" in
+start)
+[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC " "$NAME"
+do_start
+case "$?" in
+0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+esac
+;;
+stop)
+[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+do_stop
+case "$?" in
+0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+esac
+;;
+status)
+status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
+;;
+restart|force-reload)
+log_daemon_msg "Restarting $DESC" "$NAME"
+do_stop
+case "$?" in
+0|1)
+do_start
+case "$?" in
+0) log_end_msg 0 ;;
+1) log_end_msg 1 ;; # Old process is still running
+*) log_end_msg 1 ;; # Failed to start
+esac
+;;
+*)
+# Failed to stop
+log_end_msg 1
+;;
+esac
+;;
+run)
+echo -n "\"service mopidy run\" is deprecated. " 1>&2
+echo "Use \"mopidyctl\" instead." 1>&2
+/usr/sbin/mopidyctl $@
+;;
+*)
+echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload|run}" >&2
+exit 3
+;;
+esac
+:
+Now the last thing to do is to notify system to execute this script on boot:
+sudo update-rc.d mopidy defaults
+
+Installing Spotify for Mopidy Http client (for more clients see Mopidy docs)
+You need python-pip package to be able to easily install Mopidy-Spotify extension for your daemon.
+sudo apt-get install python-pip build-essential
+Now you are only one step away from browsing your playlists from Spotify using Raspi:
+pip install Mopidy-Mopify
+…and this is it. Now in your browser you can go to http://'device_ip&#8217;:'configured_port'/mopify/ (in my case http://192.168.1.5:6680/mopify/), 
+plug mini jack from your home device to Raspi and enjoy your music!
+
+Feel free to post any comments and questions if I have missed something in this tutorial and you if you have any problems with setting it up.
+Cheers!
+
+
+/******************************************************************************/
+RPi Text to Speech (Speech Synthesis)
+/******************************************************************************/
+This guide shows you three easy methods of getting your Raspberry Pi to talk, and 
+describes the pros and cons of each.
+
+Contents [hide] 
+1 Why use Text to Speech?
+2 Install supporting packages
+3 Cepstral Text to Speech
+4 Festival Text to Speech
+5 Espeak Text to Speech
+6 Google Text to Speech
+7 Pico Text to Speech
+8 Recommendations
+Why use Text to Speech?
+It's very easy add to your program - just output a string to the speech function 
+instead of the screen. You don't need an expensive/complicated LCD or monitor for 
+your project - just use any old mp3 player loudspeaker or PC loudspeaker which you 
+have probably got lying around - or even an earphone works well for debugging purposes too.
+You could use speech output for: (i) status messages - e.g. internet connection 
+made or IP address on a headless RPi; (ii) user interface - e.g. speak the mode 
+selected or station name with button presses on an RPi internet radio; (iii) main 
+functionality - e.g. tell the time and read the weather forecast on your RPi alarm clock.
+
+Install supporting packages
+Speech output requires a few audio software packages to be installed on your RPi. 
+They may be already there but it does no harm to try to install these listed below 
+anyway. The installer will let you know if the package is already present on your RPi. 
+The instructions below are based on the Raspbian distribution (August 2012).
+Firstly I recommend updating your Raspbian distribution if you have not recently 
+already done so. Speech did not work for me until I did this. This may take 30 - 60 
+minutes depending on your connection speed etc. To do this:
+# sudo apt-get update
+# sudo apt-get upgrade
+
+If you do not already have sound on your RPi then you will need the alsa sound utilities:
+# sudo apt-get install alsa-utils
+
+and edit the file /etc/modules using:
+# sudo nano /etc/modules
+
+to have line:
+# snd_bcm2835 
+
+If this line is already there then leave the file as is!
+Install the mplayer audio/movie player with:
+# sudo apt-get install mplayer
+To sort out the mplayer error message, edit file /etc/mplayer/mplayer.conf using:
+# sudo nano /etc/mplayer/mplayer.conf
+to add line
+nolirc=yes
+
+Cepstral Text to Speech
+Cepstral is a commercial Text to Speech engine that is installed on the Pi and does not 
+require an Internet connection. The voices are higher quality than open source solutions 
+and pricing is dependent on the use case. More information is available is their website:
+https://www.cepstral.com/raspberrypi
+
+Festival Text to Speech
+The first speech package I tried was Festival. It worked fine and produces a voice like a 
+rough sounding robot. This may be just what you need if you are adding speech to your RPi robot project.
+
+Install Festival with:
+# sudo apt-get install festival
+Try out Festival with:
+# echo 「Just what do you think you're doing, Dave?」 | festival --tts
+or to speak RPi』s IP address:
+# hostname -I | festival --tts
+
+Espeak Text to Speech
+Espeak is a more modern speech synthesis package than Festival. It sounds clearer but does wail 
+a little. If you are making an alien or a RPi witch then it』s the one for you! Seriously it is 
+a good allrounder with great customisation options.
+
+Install Espeak with:
+# sudo apt-get install espeak
+Test Espeak with: English female voice, emphasis on capitals (-k), speaking slowly (-s) using direct text:-
+# espeak -ven+f3 -k5 -s150 "I've just picked up a fault in the AE35 unit"
+
+Google Text to Speech
+Google's Text to Speech engine is a little different to Festival and Espeak. Your text is sent to Google's 
+servers to generate the speech file which is then returned to your Pi and played using mplayer. This means 
+you will need an internet connection for it to work, but the speech quality is superb.
+I used used ax206geek』s bash script to access the Google Text to Speech engine:
+Create a file speech.sh with:
+# nano speech.sh
+Add these lines to the file and save it (in nano editor use CTRL-O writeOut)
+#!/bin/bash
+say() { local IFS=+;/usr/bin/mplayer -ao alsa -really-quiet -noconsolecontrols "http://translate.google.com/translate_tts?tl=en&q=$*"; }
+say $*
+
+Alternatively save from here: File:Speech.sh
+Add execute permissions to your script with:
+# chmod u+x speech.sh
+Test it using:
+# ./speech.sh Look Dave, I can see you're really upset about this.
+EXTRA: Dan Fountain improved on the above script to speak any length of text (Google limits you to 100 
+bytes normally). His excellent easy-to-read webpage describes this at http://danfountain.com/2013/03/raspberry-pi-text-to-speech/
+
+Pico Text to Speech
+Google Android TTS engine.
+# sudo apt-get install libttspico-utils
+pico2wave -w lookdave.wav "Look Dave, I can see you're really upset about this." && aplay lookdave.wav
+Recommendations
+I hope this guide has given you some ideas of how you can make use of speech output in your own project. 
+As to which speech package to recommend, Festival works well enough, Espeak is clearer and so easier to 
+understand and the Google engine gives super quality but is useless if you internet connection goes down. 
+Maybe implement a speech function which first does a ping to Google before deciding whether to use Google 
+or Espeak as its output engine?
+
+All comments/suggestions welcome! Let me know for what you have used speech on your Pi - StevenP on the official Raspberry Pi Forum.
+
+
+/******************************************************************************/
+The One Button Audiobook Player         ref : http://blogs.fsfe.org/clemens/2012/10/30/the-one-button-audiobook-player/
+/******************************************************************************/
+This little Raspberry Pi based project is a gift for my wife's grandmother for her 90th birthday. 
+Being visually impaired, she is hard to entertain but loves to listen to audiobooks. The problem is, that she isn』t able to handle a ghetto blaster or MP3 player.
+
+The solution to this problem was – tadaaaah – a one button audiobook player :)
+It basically consists of:
+1 Raspberry Pi
+1 ModMyPi enclosure
+1 button
+2 resistors (330 Ohm, 10 Kilo-Ohm)
+1 blue LED
+1 (slow) 8GB SD-Card
+some wire
+a pair of speakers
+The following software has been used:
+
+Raspbian minimal image (http://www.linuxsystems.it/2012/06/raspbian-wheezy-armhf-raspberry-pi-minimal-image)
+mpd (music player daemon)
+mpc
+mpd-python
+pyudev (for USB access)
+a self-written python script
+The features are the following:
+
+always on: When you power on the raspberry, it will boot up and start the python script with the audio book in pause
+one button usage: The button pauses and unpauses the audio book or goes back one track when you press the button longer than 4 seconds
+remembers position: It will always remember the last played position
+only one audiobook: There will always be only one audio book on the Raspberry
+easy audio book deployment: When you plug in a USB thumb drive with a special name/label, the Raspberry will stop playing, mount the thumb drive, 
+deletes the old audio book, copies the new one, rebuilds the playlist and – after unplugging the thumb drive – starts the new audiobook in pause mode
+multi format: Since it uses mpd, the player supports  Ogg Vorbis, FLAC, OggFLAC, MP2, MP3, MP4/AAC, MOD, Musepack and wave
+
+Some pics and a video:
+(The audiobook used in this video is a free version of Cory Doctorows 「Little Brother」 from Fabian Neidhardt)
+If you like to build your own one button audio book player, here are the super simple schematics:
+
+And last but not least – the python script. The code might be crappy, please comment if you have improvements (especially regarding loadMusic). You can find it on github:
+https://github.com/exitnode/theonebuttonaudiobookplayer
+
+Update (2013-11-26)
+Here's what Russel wrote in a comment to this post:
+I just completed building this and have some addendum notes adding more details:
+
+Install the following packages:
+sudo apt-get install mpd
+sudo apt-get install mpc
+sudo apt-get install python-mpd
+sudo apt-get install python-pyudev
+
+(below assumes using defaults for /etc/mpd.conf)
+sudo mkdir -p /music/usb
+sudo ln -s /var/lib/mpd /music/mpd
+sudo ln -s /var/lib/mpd/music /music/mp3
+
+Copy the tobabp.py script to /home/pi
+nano /home/pi/tobabp.py
+Change these in the script or flip the connections in wiring diagram.
+BUTTON = 17
+LED = 24
+
+Testing
+Rename a USB stick to 「1GB」
+Copy 1 MP3 onto the stick
+Insert the stick into pi
+
+sudo mount /dev/sda1 /music/usb
+sudo /etc/init.d/mpd stop
+sudo rm /music/mp3/*
+sudo cp /music/usb/* /music/mp3/
+sudo umount /music/usb
+Remove the USB stick
+
+sudo rm /music/mpd/tag_cache
+sudo /etc/init.d/mpd start
+mpc clear
+mpc ls
+mpc ls | mpc add
+sudo /etc/init.d/mpd restart
+mpc play
+
+Plug in earphones
+You should hear audio
+Next try the python script:
+sudo python /home/pi/tobabp.py
+Insert USB stick
+the LED should flash and the USB file copy to /music/mp3/
+the LED should flash again. Remove the Stick and LED flashes again.
+Press button to start playing
+Press button again to stop
+Press & hold button to rewind to beginning.
+
+sudo crontab -e
+Add following line run at startup
+@reboot python /home/pi/tobabp.py &
+sudo reboot
+Then retest again to be sure all is well.」
+
+
+/******************************************************************************/
+Headless Raspberry Pi MPD: detail notes         ref : http://lesbonscomptes.com/pages/raspmpd-details.html#upmpdcli
+/******************************************************************************/
+WIFI notes
+I am told by a kind reader that there is a good writeup about setting up WIFI.
+I had better success with this, but this uses a non-standard network manager so YMMV.
+In any case, you probably want to temporarily use mouse, keyboard, and screen, as the chances to get it working "blind" are quite low.
+
+Note
+I spent hours trying to guess why my WIFI USB dongle (an Edimax) would have such bad range, dropping packets as soon as it was more than 15m away from the access point. Measured supply voltages, tried 5 different power supplies, pulled my hair… Until I stumbled on a page where someone with the same problem solved it by using an USB male-female extension instead of plugging the dongle directly in the PI (lost the URL unfortunately, thanks, anonymous friend…). Found an extension, problem solved.
+
+Audio hardware notes
+Of course, MPD will work over the Raspberry native audio, it is just a matter of (not) changing a value during configuration (see further in the main text). But the Pi audio is, shall we say, not so great. I have quite bad hearing and I can tell the difference with "normal" audio.
+I initially used an external USB audio card, a Terratec Aureon Dual USB (price around 15-20 Euros), which is recognized by the system without any need for configuration or tweaking. I sort of suppose that the same would be true for other USB audio cards (list of kown working cards). The Terratec card also has an optical output.
+As an aside, if you have crackling or stuttering issues with USB sound on the PI, maybe the solution is on this page, at least it seems to have worked for me. The strange thing is that I initially did not have problems, then I had, then the recipe on the page fixed them… Then I had doubts. The bottom line is that USB sound on the Rasberry PI is a bit fragile. It may have become better with the latest updates, but it still does not feel totally safe.
+Also see the Disqus comment at the bottom of the main page about somebody needing to force HDMI active to get USB sound working.
+
+HifiBerry in a box
+My current conclusion is that, if you want good reliable sound out of the Pi, you should use a DAC connected to the internal I2S bus (a specialized chip-to-chip audio bus available on the board).
+With the model B, this implied a little basic soldering (only a pin header, no electronics, so no great skill needed). With the model B+, which supposedly has better sound but in reality not so much, the soldering is not even needed, just plug the board.
+There are now quite a number of DAC daugtherboards for the Pi. I』ve only tried one, and I』m pleased with it (and I am not affiliated in any way with the supplier): the guys at HifiBerry will sell you a DAC daughterboard for around 30 Euros. Compared to the basic USB dongles, this has a higher-end PCM5102 DAC chip (usually found on much higher-priced devices), and is connected to the I2S bus on the Rasberry PI, so no USB worries.
+
+HifiBerry
+Configuring Linux for the HifiBerry board
+Anyway, enough for the hardware, this is my final config for the kitchen, which has no Ethernet cabling: Raspberry Pi, Edimax EW-7811Un Wireless adapter, HifiBerry, plus a pair of M-Audio AV 40 powered shelf speakers. Works flawlessly and sounds great !
+SD card insertion and device names
+The system you are using to prepare the SD card will assign a device name to it when you insert it.
+Depending on your environment and how it manages removable volumes, the system may also perform a logical mount of the volume(s) on the SD card .
+You need to determine the device name and unmount any volume before installing the Raspberry Pi system image.
+Device name. You can use dmesg to look at the kernel messages and see what device name was assigned. Under Linux, after the insertion, you should see, near the end of the dmesg output, a line like the following:
+[133380.655696] sd 7:0:0:1: [sdc] 15564800 512-byte logical blocks: (7.96 GB/7.42 GiB)
+Here, for example, the device name is sdc (complete path: /dev/sdc).
+Logical mounting: Use df, both to determine if the system automatically mounted the volume from the sd card, and to make very sure that there was no mistake and the device name you found out above was not really your hard disk. Example df output:
+hautmedoc$ df
+Filesystem      1K-blocks      Used  Available Use% Mounted on
+/dev/sda1       305611000  42178076  247908780  15% /
+udev              1018216         4    1018212   1% /dev
+tmpfs              410204       876     409328   1% /run
+none                 5120         0       5120   0% /run/lock
+none              1025508      1324    1024184   1% /run/shm
+/dev/sdc1           57288     18536      38752  33% /media/A1B1-918F
+Here we see that the system disk is sda (of which the first partition, sda1 is used for the root filesystem), and that sdc is plausably the removable disk, the first partition of which was automatically mounted somewhere under /media.
+So sdc it is, and you need to unmount the volume before copying the system image: sudo umount /dev/sdc1
+Back
+Changing the main user Id on the Raspberry Pi
+Very optional: I also changed the main user name from pi to dockes (because my name is such and the default pi user had uid 1000 which is mine by right…):
+On the Pi, create temporary user temproot: sudo adduser temproot
+Add to group sudo: sudo usermod -G sudo temproot
+Log out, then log in as temproot and rename pi and its home directory, set the password for the new user:
+    sudo usermod -l dockes -d /home/dockes pi
+    cd /home
+    sudo mv pi dockes
+    sudo passwd dockes
+Log out, log in as dockes, delete temproot: sudo userdel -r temproot
+
+Setting up a host name and fixed IP address
+Things are really easier with NFS when machines have fixed IP addresses. This is a bit less so with SMB, but even then, using a dynamic address means playing hide and seek if it ever changes and your dynamic DNS updates don』t work that well. So… fixed address it will be.
+We also want to change the Raspberry Pi default host name, in case we want to install another one (by the way this can now be done from raspi-config in the Advanced Options section).
+I am setting up the Raspberry to be called rasp1 on the network and retrieve its address by DHCP, but:
+We don't strictly need a host name, we could use the IP for the ulterior steps.
+We could get rid of DHCP at this point, just choose a static address, and set it up on the Raspberry (see the page about headless setup referenced above). If your DHCP device doesn』t have the option for setting up fixed addresses, this is your only possibility.
+Anyway, here goes for the sophisticated approach, where isc-dhcpd is running on the server, along with named. Really, you don』t need the named part all that much, you could just as well use the IP address.
+DNS/named optional part
+I prefer to have a static named entry to associate the raspberry host name with the chosen IP. dhcpd is supposed to update the DNS when it allocates an address, but let』s say that on a poorly administrated network such as mine, it doesn』t always work. So there will be something like the following in the two named files for the home network:
+In file db.dockes:
+     rasp1        A        192.168.4.10
+In file db.192.168.4
+     10        PTR        rasp1.dockes.com.
+The IP must be taken outside of the DHCP server dynamic range.
+
+DHCP
+Then edit /etc/dhcp/dhcpd.conf to associate the Raspberry Ethernet address with its host name (or IP). Something like:
+    host rasp1 {
+        hardware ethernet b8:27:eb:0d:1f:2a;
+        fixed-address rasp1.dockes.com;
+    }
+Host/IP final steps
+
+On the Raspberry
+Edit /etc/hosts: change alias for 127.0.0.1 from raspberrypi to rasp1 (do not touch the localhost entry).
+Edit /etc/hostname change raspberrypi to rasp1
+
+Setting up NFS for mounting the music volume
+I'm a great NFS fan since 'round 1988, but it may be actually simpler to use SMB (Windows sharing) if this is already configured and in use on your network. See the next section in this case.
+The default Debian NFS client setup appears to have trouble, the accepted workaround seems to install rpcbind:
+sudo apt-get install rpcbind
+sudo update-rc.d rpcbind enable
+sudo service rpcbind start
+sudo service nfs-common restart
+Install autofs (for automatic NFS mounts, I like this):
+sudo apt-get install autofs5
+Edit /etc/auto.master, uncomment the /net line, and restart automount:
+
+sudo /etc/init.d/autofs restart
+Then perform the steps in the Host name and fixed IP address section.
+Then halt the Raspberry PI.
+On the NFS server, add rasp1 (or its IP) to /etc/exports, restart mountd (or whatever you do to authorize a host on your appliance).
+Restart the Raspberry. It should come up as rasp1 with its fixed address.
+When the Raspberry is back you should be able to connect to it through ssh and check that you can access the server music volume either inside /net: /net/servername/path/to/music, or inside /smb if you followed the SMB note: /smb/server/share.
+Else something is wrong, try to mount the volume by hand and see what kind of error you get, e.g. for NFS:
+sudo mount servername:/path/to/music /mnt
+
+Using Windows sharing / SMB / SAMBA for accessing the music files
+We』ll be using autofs as this is quite convenient, and it lowers the number of things to adjust if you ever change the server or share names (you』ll only have to change the mpd configuration).
+I am assuming here that the shared volume which contains the music files is public (can be read without credentials). This is a reasonable approach, and it works with the default autofs map which comes with raspbian.
+If you need credentials to access the share, it』s probably simpler to set a static mount in /etc/fstab. I』m sure that you can easily find a tutorial about this…
+Anyway to set up things with autofs and an anonymous mount:
+Install the autofs package:
+sudo apt-get install autofs5
+Insert the following line in the /etc/auto.master file, preferably after the /net line (not at the end):
+/smb        /etc/auto.smb
+
+Restart autofs:
+sudo /etc/init.d/autofs restart
+You should see the shared volume under /smb/servername/sharename.
+You can then use the above path as the music_directory parameter inside the mpd.conf file.
+Installing upmpdcli on the Pi to provide an UPnP interface
+Edit/create /etc/apt/sources.list.d/upmpdcli.list and add the following lines:
+deb http://www.lesbonscomptes.com/upmpdcli/downloads/debian/ unstable main
+deb-src http://www.lesbonscomptes.com/upmpdcli/downloads/debian/ unstable main
+Issue the following commands from a terminal to install upmpdcli:
+sudo apt-get update
+sudo apt-get install upmpdcli
+
+
+/******************************************************************************/
+rPlay mirroring with Apple devices and Raspberry Pi
+/******************************************************************************/
+I can not be more excited!.
+Think I mentioned, but since I sold the AppleTV , the most feature I miss is the mirroring function, useful if you want to duplicate on another screen what you are doing on the iPad, iPhone or iMac.
+Luckily VMLite guys are carrying this functionality to the Raspberry Pi, with a fairly promising.
+I have a beta private copy and teach you how to install it and their functionalities. Do you want to see it? Let's go!...
+
+[rPlay]
+rPlay supports AirPlay and AirPlay Mirroring. For iphone 4 and iPad 1, you can't do AirPlay mirroring, but you should be still do AirPlay for Photos/Music/Videos. For iPhone 4S and iPhone 5, 
+iPad 2 and above, you can also do AirPlay mirroring.
+It's a daemon running on boot once you've installed. You need to download the application, change the system memory to give the maximum to the GPU and enter your license key.
+
+[ How can I get a license key? ]
+Easy. Now It's free. Just register an user in the forum and ask for it. In a short time you will get in your mailbox account with instructions needed to make it work on your Pi.
+line : http://www.vmlite.com/index.php?option=com_kunena&Itemid=158&func=view&catid=23&id=11658
+
+[ Prerequisites ]
+Update the firmware of your Raspbian with
+sudo apt-get install rpi-update && sudo rpi-update
+Now give more memory to the GPU with sudo raspi -config. The model B needs 256 MB and model A 64 or 128.
+Now install the dependencies and the software with:
+sudo apt-get install libao-dev avahi-utils libavahi-compat-libdnssd-dev libva-dev youtube-dl
+sudo youtube-dl --update
+wget -O rplay-1.0.1-armhf.deb http://www.vmlite.com/rplay/rplay-1.0.1-armhf.deb
+sudo dpkg -i rplay-1.0.1-armhf.deb     
+We go from any computer on the same network to the browser and type: http://IP_PaspberryPi:7100/admin or 
+you can start X from your Raspbian with Midori and go to the next url: http://localhost:7100/admin (user admin user , password admin).
+There you can find a front end to configure some parameters. We need to add our license key at the end of the page. 
+You can also do it directly modifying the file /etc/rplay.conf
+Now restart to get rplay run automatically the daemon.
+
+If we want to stop/play the daemon:
+sudo /etc/init.d/rplay start
+sudo /etc/init.d/rplay stop
+
+[I want to uninstall rPlay]
+sudo /etc/init.d/rplay stop && sudo dpkg -r rplay
+A picture speaks a thousand words: I present my first Youtube video related with the Pi. 
+I show you several features about rPlay to give you an idea of its actual performance so press play and enjoy!
+
+
+/******************************************************************************/
+How to install PIHome  ref : http://pihome.harkemedia.de/how-to-install-manual/
+/******************************************************************************/
+Be sure before you install PIHome, you need to install wiringPI and rcswitch-pi
+
+instal wiringPI in this directory "/home/div/wiringPI/", 
+rcswitch-pi in this directory "/home/div/rcswitch-pi/" and
+the apache webserver directory must have this path "/home/www/". 
+
+ Install wiringPI & rcswitch-pi
+# Preparation for wiringPI and rcswitch-pi
+cd /home
+mkdir div
+cd /home/div
+
+# Install wiringPI
+git clone git://git.drogon.net/wiringPi
+cd wiringPi
+sudo ./build
+
+# Testing wiringPI
+gpio -v
+gpio readall
+
+# Install rcswitch-pi
+cd /home/div
+git clone https://github.com/r10r/rcswitch-pi.git
+cd rcswitch-pi
+make
+
+# Test rcswitch-pi
+sudo ./send 10000 1 1
+
+ Install Apache Webserver
+# Install Apache webserver
+apt-get install apache2 apache2-doc apache2-mpm-prefork apache2-utils apache2-suexec libexpat1 ssl-cert php5 php5-common php5-curl php5-cli php5-dev php5-gd php5-idn php5-imagick php5-mysql php5-xcache libapache2-mod-php5
+
+a2enmod suexec rewrite ssl actions include
+
+# Instal Mysql and phpMyAdmin (recommendation user:root pass:root).
+apt-get install mysql-server phpmyadmin
+
+# Make directory
+cd /home/ && mkdir www
+
+# change webserver directory
+nano /etc/apache2/sites-available/default
+# DocumentRoot /var/www         ->    DocumentRoot /home/www
+# <Directory /var/www/>         ->   <Directory /home/www/>
+
+# change for mod_rewrite
+# AllowOverride None            ->   AllowOverride FileInfo
+
+# "ctrl + o" = save  
+# "ctrl + x" = close
+ 
+# Restart Apache2
+/etc/init.d/apache2 restart
+# [ Apache installation fertig ]
+
+ Install PIHome
+# [ Install PIHome ]
+
+# Change directory
+cd /home/pi/
+
+# Download PIHome from GitHub
+git clone https://github.com/cerosx/RPI.PIHome2.0-GUI-Frontend/
+
+# Copy all files in the web server directory
+cp -r /home/pi/RPI.PIHome2.0-GUI-Frontend/pihome/* /home/www/
+cp /home/pi/RPI.PIHome2.0-GUI-Frontend/pihome/.htaccess /home/www/
+
+# awarded rights
+sudo chown www-data:www-data /home/www
+sudo chmod 775 /home/www
+sudo usermod -a -G www-data pi
+
+# rights for use rcswitch per website
+sudo visudo
+# add the following line
+www-data ALL=NOPASSWD: /home/div/rcswitch-pi/send
+# CTRL + O -> save
+# CTRL + X -> close
+
+
+ Install Cronjobs
+# open crontab editor
+sudo crontab -e
+
+# add the following lines
+*/5 * * * * php /home/www/cron/weather.php 
+* * * * * php /home/www/cron/sunrise_sunset.php
+* * * * * php /home/www/cron/gcal.php
+* * * * * php /home/www/cron/caldav.php
+
+# CTRL + O -> save
+# CTRL + X -> close
+
+ Install PIHome database
+Go to: http://rpi-ip/phpmyadmin/
+
+Create a database and name it "pihome"
+
+Click on pihome database. Now you are in the pihome database? Check it at the breadcrump navigation " localhost -> pihome "
+
+Then click on the SQL tab.
+
+Copy the content from the pihome.sql file, and paste it into the SQL field
+and click " ok " for create tables.
+pihome.sql
+
+you are now ready for login
+http://rpi-ip/
+# username: admin
+# password: pihome
+#### DONE & HAVE FUN ####
+
+
+/******************************************************************************/
+Raspberry Pi and Sound Input    ref : http://kb9mwr.blogspot.co.uk/2013/01/raspberry-pi-and-sound-input.html
+/******************************************************************************/
+If you are a Ham Radio Operator you've probably been looking at the Raspberry Pi with a lot of possibilities.
+One of it's downfalls if the lack of an on-board input.  
+But once you add a USB sound fob, Echolink, remote rig applications, IRLP, and decoding various digital modes like PSK, and so on, are all a reality.
+
+Finding a USB sound device and setting it up can be aggravating.
+I recommend the SYBA SD-CM-UAUD USB CM119 audio adapter.
+
+If lsusb doesn't report it as below, you have the wrong one:
+root@pi:~# lsusb  
+Bus 001 Device 005: ID 0d8c:000e C-Media Electronics, Inc. Audio Adapter (Planet UP-100, Genius G-Talk)  
+
+Next you need to make the usb sound card (0) the default audio device 
+Check yours like so: cat /proc/asound/modules 
+0 snd_bcm2835 
+1 snd_usb_audio 
+
+Edit /etc/modprobe.d/alsa-base.conf comment out "options snd-usb-audio index=-2"
+You want ""options snd-usb-audio index=0"
+
+After a reboot it should always appear in this order: 
+0 snd_usb_audio 
+1 snd_bcm2835
+
+Take this one step further and comment out the kernel module for the onboard sound and add the usb
+cat /etc/modules should look like:
+#snd-bcm2835
+snd-usb-audio
+
+While, I did not find the following necessary in my case, I have read to get better latencies out of USB audio devices, it is suggested to also add: 
+options snd-usb-audio nrpacks=1
+
+Setup /etc/asound.conf to this:
+ pcm.dmixer {  
+   type dmix  
+   ipc_key 1024  
+   slave {  
+     pcm "hw:0,0"  
+     period_time 0  
+     period_size 1024  
+     buffer_size 8192  
+   rate 48000  
+   }  
+   bindings {  
+     0 0  
+     1 1  
+   }  
+ }  
+ pcm.asymed {  
+     type asym  
+     playback.pcm "dmixer"  
+     capture.pcm "hw:0,0"  
+ }  
+ pcm.dsp0 {  
+   type plug  
+   slave.pcm "asymed"  
+ }  
+ pcm.!default {  
+     type plug  
+     slave.pcm "asymed"  
+ }  
+ pcm.default {  
+   type plug  
+   slave.pcm "asymed"  
+ }  
+ ctl.mixer0 {  
+   type hw  
+   card 0  
+ }  
+
+
+Since there are some USB issues, I suggest setting the device to boot the USB hub in  USB 1.0 mode, this should fix choppy audio. (I did not find this necessary in my case, but it's not a bad idea)
+Add "dwc_otg.speed=1" to /boot/cmdline.txt.
+
+Pulseaudio might be part of your raspberry wheezy default image.  Personally I am not a fan of it, and have read it wasn't working well on the Pi.  I am not sure if that still holds true.  I just removed it:
+apt-get purge pulseaudio
+I recommend replacing it with Alsa.  It has been around a bit longer:
+apt-get install  sox alsa-oss alsa-utils alsa-tools  
+
+Also, I suggest updating the firmware on your Pi.
+https://github.com/Hexxeh/rpi-update/ 
+
+This should be a good starting point for most.  Hopefully in the future, newer Raspberry wheezy images can make this a bit easier, and more kernel support for other USB sound FOBs.
+
+For my fellow hams you may want to check out these places to congregate:
+http://groups.yahoo.com/group/Raspberry_Pi_4-Ham_RADIO/ 
+http://amateurradiopi.com/forum/
+
+And for those of you still interested in D-Star:
+http://groups.yahoo.com/group/RaspberryPi-DVAP/  
+
+I have been running my Pi using a 5 volt, 1 amp supply via the micro USB power port.  I do not use a USB hub.  My model B rev 2 has been running reliably for a few weeks now.
+Just as a note.  If you are making connections to the GPIO for keying a radio or whatever, check your local Radio Shack for "Schmartboard Jumpers ."  These are a new thing they are carrying, and are handy.
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+android
+https://play.google.com/store/apps/details?id=com.qualcomm.qce.allplay.jukebox
+apple
+https://itunes.apple.com/us/app/allplay-jukebox/id904386956?mt=8
+
+
+
+
+
+import wit
+import json
+import subprocess
+
+access_token = 'CKO5DVGZW3XFVNVKOKGIXTOYGXVWZEXC'
+wit.init()
+
+while(True):
+    jsonResponse = wit.voice_query_auto(access_token)
+    print('Response: {}'.format(jsonResponse))
+    if not jsonResponse:
+        continue;
+    dataDict = json.loads(jsonResponse)
+    try:
+        if (dataDict["outcomes"][0]["intent"] == "turn_off_lights"):
+            subprocess.call(['/home/pi/scripts/lightswitch','off'])
+        elif (dataDict["outcomes"][0]["intent"] == "turn_on_lights"):
+            subprocess.call(['/home/pi/scripts/lightswitch','on'])
+    except (KeyError, IndexError) as e:
+        print("Intent not detected")
+wit.close()
+

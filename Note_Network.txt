@@ -685,8 +685,101 @@ content/uploads/2010/09/compare_varnish.jpg
 6
 
 /******************************************************************************/
+讓Linux NAT伺服器支援UPnP
 /******************************************************************************/
+注意：如果對網路安全要求較高或要求高可控制性的網路，則不要安裝配置UPnP支援，否則
+會導致網路NAT映射比較混亂，從而引發許多問題。建議小型網路或者家庭網路使用UPnP。
+最近經常使用一些P2P類型軟體，發現老得在Linux伺服器上手動設置NAT，非常麻煩，而看著
+許多P2P軟體都支援UPnP就眼饞，如果能讓Linux支援UPnP那就簡單方便多了！
+於是在網上搜索了一下有關讓Linux支援UPnP的文章，於是就寫了這篇文章。
 
+一、什麼是UPnP
+1. UPnP簡介
+UPnP(Universal Plug and Play)技術對即插即用進行了擴展，它簡化了家庭或企業中智慧設
+備的聯網過程。在結合了UPnP技術的設備以物理形式連接到網路中之後，它們可以通過網路自
+動彼此連接在一起，而且連接過程無需用戶的參與UPnP規範基於TCP/IP協定和針對設備彼此間
+通訊而制訂的其它Internet協定。這就是它之所以被稱作"通用(Universal)"的原因所在--
+UPnP技術不依賴於特定的設備驅動程式，而是使用標準的協定。UPnP設備可以自動配置網路地
+址，宣佈它們在某個網路子網的存在，以及互相交換對設備和服務的描述。基於Windows XP的
+電腦可以充當一個UPnP控制點，通過程式界面對設備進行發現和控制。
+如果與以前的即插即用相比，這種技術似乎並不具有什麼革命性的意義。在作業系統中增加即
+插即用技術使得在單個電腦上安裝、配置和添加外設的工作變得更容易了。但是UPnP為家庭用
+戶或者小型辦公環境中的非專業用戶所帶來的是一道更加美味的"大餐"，他們可以利用UPnP玩
+多人遊戲，進行實時通信（Internet電話，電話會議）以及使用類似Windows XP的遠端協助這
+樣的其它技術。
+
+2. NAT 穿越技術
+NAT穿越技術允許網路應用程式對它們是否位於一個具有UPnP能力的NAT設備之後進行檢測。然
+後，這些程式將獲得共享的全球可路由IP地址，並且配置埠映射以將來自NAT外部埠的數據包
+轉發到應用程式使用的內部埠上--所有這一切都是自動完成的，用戶無需手動映射埠或者進行
+其它工作。NAT穿越技術允許網路設備或者點對點應用程式通過動態開啟和閉合與外部服務之
+間的通信埠穿過NAT網關與外界通信。
+
+二、在Linux中部署UPnP支援
+我們假設該Linux的內核版本是2.4.x，使用撥號上網，外網介面是ppp0，內網介面是eth0，並
+且已經啟用iptables設定了 NAT。
+在Linux中部署UPnP主要使用2個軟體的配合：UPnP SDK for Linux和LinuxIGD。
+
+下載地址：
+UPnP SDK for Linux: http://sourceforge.net/projects/upnp/
+LinuxIGD: http://linux-igd.sourceforge.net/
+注意：要下載upnpsdk-1.0.4.tar.gz，1.0.4以上的版本不能和LinuxIGD很好的協同工作！
+
+A. 安裝：
+----------
+1. 解包UPnP SDK
+# tar xzvf upnpsdk-1.0.4.tar.gz
+2. 修改源代碼
+為了能夠使Windows MSN Messenger在UPnP下正常通訊，所以必須修改源代碼：
+# cd upnpsdk-1.0.4
+# vi src/ssdp/ssdplib.c
+將第406行的：
+SelfAddr.sin_addr.s_addr = inet_addr(SSDP_IP);
+改為：
+SelfAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+3. 編譯安裝UPnP SDK
+# make
+# make install
+4. 解包Linux-IGD
+# tar xzvf linuxigd-0.92.tgz
+5. 編譯安裝Linux-IGD
+# cd linux-igd
+# make
+# make install
+
+B. 配置
+--------
+1. 增加多播路由
+# route add -net 239.0.0.0 netmask 255.0.0.0 eth0
+2. 為iptables建議一個軟鏈接
+# cd /usr/sbin
+# ln -s /sbin/iptables ./
+啟動UPnP
+# upnpd ppp0 eth0
+診斷UPnP運行狀態
+# tail /var/log/messages
+如果能夠看到：
+Dec 14 16:01:49 doorway -- MARK --
+Dec 14 16:02:15 doorway upnpd: The Linux UPnP Internet Gateway Device Ver 0.92 by Dime (dime@gulfsales.com)
+Dec 14 16:02:15 doorway upnpd: Special Thanks for Intel's Open Source SDK and original author Genmei Mori's work.
+則說明UPnP已經成功啟動。
+
+C. 測試
+--------
+以支援UPnP的P2P網路電視PPLive為例，在PPLive中打開UPnP支援選項，然後連接一個頻道。
+在Linux中執行：
+# tail /var/log/debug -f
+如果能看到：
+Dec 14 16:56:33 doorway upnpd: AddPortMap: RemoteHost: (null) Prot: 17 ExtPort: 3226 Int: 10.0.0.2.3226
+Dec 14 16:56:33 doorway upnpd: AddPortMap: RemoteHost: (null) Prot: 6 ExtPort: 3226 Int: 10.0.0.2.3226
+Dec 14 16:56:33 doorway upnpd: AddPortMap: RemoteHost: (null) Prot: 6 ExtPort: 3156 Int: 10.0.0.2.3156
+Dec 14 16:56:33 doorway upnpd: AddPortMap: RemoteHost: (null) Prot: 6 ExtPort: 3156 Int: 10.0.0.2.3156
+則說明PPLive已經向UPnP請求進行埠映射了。只要看到這樣的字樣，就說明UPnP已經完全工作起來了。
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/

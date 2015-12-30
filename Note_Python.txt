@@ -669,26 +669,20 @@ finished sleeping from thread 9
 Python to EXE file  ref : http://www.py2exe.org/index.cgi/Tutorial
 /******************************************************************************/
 1. Create/test your program
-
 The first example we'll use here is our old friend...
-
 hello.py
    1 print "Hello World!"
 
 We need to make sure it's working...
-
 C:\Tutorial>python hello.py
 Hello World!
-
 C:\Tutorial>
 
 2. Create your setup script (setup.py)
-
 C:\Tutorial>python setup.py install
 "py2exe" is a new Distutils command that is added when you import py2exe. 
 To use py2exe you need to create a setup.py file to tell Distutils and py2exe what you want to do. 
 Here's a setup.py whose simplicity is appropriate for our sample program...
-
 setup.py
    1 from distutils.core import setup
    2 import py2exe
@@ -730,7 +724,6 @@ you may or may not need to distribute them.
 
 Make sure you have the license if you distribute any of them, and
 make sure you don't distribute files belonging to the operating system.
-
    ADVAPI32.dll - C:\WINDOWS\system32\ADVAPI32.dll
    USER32.dll - C:\WINDOWS\system32\USER32.dll
    SHELL32.dll - C:\WINDOWS\system32\SHELL32.dll
@@ -744,7 +737,6 @@ Now that the package has been created it is ready to test:
 C:\Tutorial>cd dist
 C:\Tutorial\dist>hello.exe
 Hello World
-
 Excellent, it works!!!
 
 
@@ -819,6 +811,7 @@ if __name__ == '__main__':
 
 在終端運行server.py，然後運行clien.py，會在終端列印「welcome to server!"。如果更改client.py的sock.send('1')為其它值在終端會列印」please go out!「，更改time.sleep(2)為大於5的數值， 伺服器將會超時。
 
+
 /******************************************************************************/
 Python在線聊天   ref : http://hnylj.iteye.com/blog/732126
 /******************************************************************************/
@@ -836,11 +829,7 @@ Python在線聊天   ref : http://hnylj.iteye.com/blog/732126
 7.Python線程等相關知識。
  
 另外：我使用的是Python2.5這個版本，如果你使用的Python3.0，可能不相容。 推薦使用穩定的2.5版，linux系統默認安裝的也是2.5這個版本，許多第三方庫也是使用2.5這個版本。
- 
 下面是這個小東西的一個截圖：
-
- 
- 
 下面是伺服器端代碼：
 Python代碼  收藏代碼
 # _*_ coding:utf-8 _*_  
@@ -1120,7 +1109,6 @@ if __name__=='__main__':
 Python這種語言簡單並且功能強大，第三方支援的類庫也很豐富，開發起來效率確實很高，據說使用Python web框架Django能用一星期開發出一個網站，感覺真是比較神奇呀。
  
 
-
 /******************************************************************************/
 構建工具scons讓一切變得簡單     ref: http://rritw.com/a/bianchengyuyan/C__/20120801/196614.html
 /******************************************************************************/
@@ -1249,7 +1237,6 @@ elif os.name == "nt":
 /******************************************************************************/
 python和shell變數互相傳遞的幾種方法
 /******************************************************************************/
-作者： 字體：[增加 減小] 類型：轉載
 這篇文章主要介紹了python和shell變數互相傳遞方法，使用了環境變數、管道等方法
 python -> shell：
 1.環境變數
@@ -1301,6 +1288,7 @@ input = open('/tmp/mytxt', 'r')
 S = input.read( )      #把整個文件讀到一個字串中  
 S = input.readline( )  #讀下一行（越過行結束標誌）  
 L = input.readlines( ) #讀取整個文件到一個行字串的列表中  
+
 
 /******************************************************************************/
 基本 I/O
@@ -2082,31 +2070,31 @@ import sys
 
 #建立一個讀取檔案的function能將檔案內容print出來
 def readfile(filename): 
-	#'''read file and print'''
-	f = file(filename)
-	while True:
-		line = f.readline()
-		if len(line) == 0:
-			break
-	print line, 
-	f.close()
-	
+        #'''read file and print'''
+        f = file(filename)
+        while True:
+                line = f.readline()
+                if len(line) == 0:
+                        break
+        print line, 
+        f.close()
+        
 #開始對sys.argv下定義
 if len(sys.argv) < 2: #len小於2也就是不帶參數啦
-	print 'no argument'
- 	sys.exit()
+        print 'no argument'
+        sys.exit()
 if sys.argv[1].startswith('--'):
- 	option = sys.argv[1][2:] # 取出sys.argv[1]的數值但是忽略掉'--'這兩個字元
- 	if option == 'version': 
-  		print 'Version 1.2.3'
- 	elif option == 'help':
-  		print 'help documention'
- 	else:
-  		print 'only --version --help can be used'
-  	sys.exit()
+        option = sys.argv[1][2:] # 取出sys.argv[1]的數值但是忽略掉'--'這兩個字元
+        if option == 'version': 
+                print 'Version 1.2.3'
+        elif option == 'help':
+                print 'help documention'
+        else:
+                print 'only --version --help can be used'
+        sys.exit()
 else:
- 	for filename in sys.argv[1:]: #檔案名稱於參數位置時讀取檔案
-  		readfile(filename)
+        for filename in sys.argv[1:]: #檔案名稱於參數位置時讀取檔案
+                readfile(filename)
 """
 此檔案名稱為readfile.py
 則可以用readfile.py --version來查詢版號

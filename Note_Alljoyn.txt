@@ -2599,6 +2599,179 @@ End handling notification!!!
 
 
 /******************************************************************************/
+[Alljoyn] Build from source - Linux
+/******************************************************************************/
+最近因為工作需要，所以在研究Alljoyn
+至於Alljoyn是什麼，我這裡暫時就先不說明，有興趣的可以先辜狗找找資料
+之後如果有空我會將看完官方的文件再寫一篇介紹與心得
+這篇主要是先寫怎麼樣build code，由於官方的文件尚未完善，按照文件上build code可能會失敗
+因此我修正了一些官方文件可能有問題的部分，以下是我的執行步驟：
+OS: Ubuntu-14.04.3-desktop-i386
+Reference:  http://allseenalliance.org/developers/develop/building/linux
+Build tools and libs(need take off ia32-libs)
+# sudo apt-get install build-essential libgtk2.0-dev libssl-dev xsltproc libxml2-dev
+
+Build ia32-libs by Synaptic
+1.點選「Ubuntu軟體中心」
+2.搜尋「synaptic」
+3.點選「安裝」
+4.開啟synaptic
+5.搜尋ia32-libs
+6.勾選ia32-libs-multiarch
+7.安裝
+
+Install Python v2.6/2.7 (Python v3.0 is not compatible and will cause errors)
+# sudo apt-get install python
+Install SCons v2.0
+# sudo apt-get install scons
+OpenSSL
+# sudo apt-get install libssl-dev
+
+Download Using Git
+mkdir WORKING_DIRECTORY
+cd WORKING_DIRECTORY
+
+git clone https://git.allseenalliance.org/gerrit/core/alljoyn.git core/alljoyn
+git clone https://git.allseenalliance.org/gerrit/core/ajtcl.git core/ajtcl
+git clone https://git.allseenalliance.org/gerrit/services/base.git services/base
+git clone https://git.allseenalliance.org/gerrit/services/base_tcl.git services/base_tcl
+git clone https://git.allseenalliance.org/gerrit/data/datadriven_api.git data/datadriven_api
+git clone https://git.allseenalliance.org/gerrit/devtools/codegen.git devtools/codegen
+
+The tree should look like below. Note, extra directories may exist.
+root-source-dir/
+  core/
+      alljoyn/
+      ajtcl/
+  services/
+      base/
+      base_tcl/
+
+Build Samples
+cd <root dir of source>/core/alljoyn
+scons BINDINGS=cpp WS=off BT=off ICE=off SERVICES="about,notification,controlpanel,config,onboarding,sample_apps"
+
+Build AC Server Sample
+The AC Server Sample app uses all of the base services to simulate an AC device.
+# Note, exclude the "base" dir for pre-14.06 source
+cd $AJ_ROOT/services/base/sample_apps
+scons BINDINGS=cpp WS=off ALL=1
+
+Add the AllJoyn? framework to an existing app
+Setup
+  export AJ_ROOT=~/alljoyn
+
+  # <TARGET CPU> can be either x86_64, x86, or whatever value you set for CPU= when running SCons.
+  export AJ_DIST="$AJ_ROOT/core/alljoyn/build/linux/<TARGET CPU>/debug/dist"
+
+Add header include directories
+export CXXFLAGS="$CXXFLAGS \
+    -I$AJ_DIST/cpp/inc \
+    -I$AJ_DIST/about/inc \
+    -I$AJ_DIST/services_common/inc \
+    -I$AJ_DIST/notification/inc \
+    -I$AJ_DIST/controlpanel/inc \
+    -I$AJ_DIST/services_common/inc \
+    -I$AJ_DIST/samples_common/inc"
+
+Configure linker to include required libs
+export LDFLAGS="$LDFLAGS \
+    -L$AJ_DIST/cpp/lib \
+    -L$AJ_DIST/about/lib \
+    -L$AJ_DIST/services_common/lib \
+    -L$AJ_DIST/notification/lib \
+    -L$AJ_DIST/controlpanel/lib"
+Running The AC Server Sample
+Prerequisites
+Navigate to the AllJoyn root dir, then:
+export AJ_ROOT=`pwd`
+
+# Set $TARGET CPU to the "CPU=" value used when running scons, e.g. x86_64, x86.
+export TARGET_CPU=x86
+
+export LD_LIBRARY_PATH=$AJ_ROOT/core/alljoyn/build/linux/$TARGET_CPU/debug/dist/cpp/lib:$AJ_ROOT/core/alljoyn/build/linux/$TARGET_CPU/debug/dist/about/lib:$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/controlpanel/lib:$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/notification/lib:$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/services_common/lib:$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/config/lib:$LD_LIBRARY_PATH
+Run the AC Server Sample App
+$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/sample_apps/bin/ACServerSample --config-file=$AJ_ROOT/services/base/sample_apps/build/linux/$TARGET_CPU/debug/dist/sample_apps/bin/ACServerSample.conf
+
+posted by admin in 程式&軟體 and have No Comments
+Place your comment
+Please fill your data and comment below.
+Name
+
+Email
+
+Website
+
+Your comment
+
+ Post
+ 勾選此處以確認為本人進行留言
+ 
+Search
+GO
+BLOG AD
+
+CATEGORIES
+
+Linux (25)
+參考文獻 (15)
+影視娛樂 (33)
+投資理財 (22)
+新聞報報 (25)
+生活日記 (97)
+神抄之塔 (2)
+程式&軟體 (74)
+網誌歷程 (26)
+趣味一下 (28)
+電腦&硬體 (21)
+SEARCH
+
+ 
+  Go
+RECENT ARTICLES
+
+xcode4的環境變數，Build Settings參數，workspace及聯編設置
+Android iOS 語法傻傻分不清楚
+[Alljoyn] Build from source - iOS
+[Alljoyn] Build from source - Linux
+日本關西自由行-奈良公園、東大寺、聖瑪莉亞號、HEP FIVE 摩天輪-Day4
+日本關西自由行-金閣寺、二條城、京都大學、大阪-Day3
+日本關西自由行-伏見稻禾神社、清水寺、地主神社、八板神社-Day2
+日本關西自由行-關西機場、入宿飯店、本願寺-Day1
+日本關西自由行-從新竹搭車出發夜睡桃園機場-前一天
+"AINY 愛你" [MV] - GEM 鄧紫棋
+RECENT POSTS
+
+admin 在 phpMyAdmin中使用者只能操作與看到自己的資料庫
+pctop 在 phpMyAdmin中使用者只能操作與看到自己的資料庫
+admin 在 [iOS]XCode4.5利用Ad-Hoc發佈IPA到網頁
+Mickey 在 [iOS]XCode4.5利用Ad-Hoc發佈IPA到網頁
+admin 在 韌館又復活了
+Nei-Di 在 韌館又復活了
+admin 在 韌館又復活了
+CALENDAR
+
+十一月 2015
+一      二      三      四      五      六      日
+? 十月           
+        1
+2       3       4       5       6       7       8
+9       10      11      12      13      14      15
+16      17      18      19      20      21      22
+23      24      25      26      27      28      29
+30       
+鏈結
+
+CNN Radio
+GamePlugin
+YuChin生活記事本
+BLOG MUSIC
+
+ 
+自己上傳音樂
+
+
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/

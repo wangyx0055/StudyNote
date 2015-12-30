@@ -1993,7 +1993,17 @@ dnl ³o­Ó¥¨¶°«á­±ªº¦r¤£·|³Q³B²z¡A¥i¥Hµø¬°µùÄÀ AC_INIT(FILE) ¸Ó¥¨¶°¥Î¨ÓÀË¬d·½¥N½X©
 AUTOMAKE_OPTIONS ³]¸m automake ªº¿ï¶µ¡CAutomake ¥D­n¬OÀ°§U¶}µo GNU ³nÅéªº¤H­û¨ÓºûÅ@³nÅé¡A©Ò¥H¦b°õ¦æ automake ®É¡A·|ÀË¬d¥Ø¿ý¤U¬O§_¦s¦b¼Ð·Ç GNU ³nÅé¤¤À³¨ã³Æªº¤å¥ó¡A¨Ò¦p 'NEWS'¡B'AUTHOR'¡B'ChangeLog' µ¥¤å¥ó¡C³]¸m foreign ®É¡Aautomake ·|§ï¥Î¤@¯ë³nÅéªº¼Ð·Ç¨ÓÀË¬d¡C bin_PROGRAMS ©w¸q­n²£¥Íªº°õ¦æ¤å¥ó¦W¡C¦pªG­n²£¥Í¦h­Ó°õ¦æ¤å¥ó¡A¨C­Ó¤å¥ó¦W¥ÎªÅ¥Õ²Å¹j¶}¡C hello_SOURCES ©w¸q 'hello' ³o­Ó°õ¦æµ{¦¡©Ò»Ý­nªº­ì©l¤å¥ó¡C¦pªG 'hello'³o­Óµ{¦¡¬O¥Ñ¦h­Ó­ì©l¤å¥ó©Ò²£¥Í¡A¥²¶·§â¥¦©Ò¥Î¨ìªº©Ò¦³­ì©l¤å¥ó³£¦C¥X¨Ó¡A¥HªÅ¥Õ²Å¹j¶}¡C°²³] 'hello' ÁÙ»Ý­n 'hello.c'¡B'main.c'¡B'hello.h' ¤T­Ó¤å¥óªº¸Ü¡A«h©w¸q hello_SOURCES= hello.c main.c hello.h ¦pªG©w¸q¦h­Ó°õ¦æ¤å¥ó¡A«h¹ï¨C­Ó°õ¦æµ{¦¡³£­n©w¸q¬Û¹ïªºfilename_SOURCES¡C
 ½s¿è¦n Makefile.am ¤å¥ó¡A´N¥i¥H¥Î automake --add-missing¨Ó²£¥Í Makefile.in¡C¥[¤W --add-missing ¿ï¶µ¨Ó§i¶D automake¶¶«K°²¦p¥]¸Ë¤@­Ó³nÅé©Ò¥²¶·ªº¤å¥ó¡CAutomake²£¥Í¥Í¥X¨Óªº Makefile.in ¤å¥ó¬O§¹¥þ²Å¦X GNU Makefile ªººD¨Ò¡A¥u­n°õ¦æ configure³o­Óshell script «K¥i¥H²£¥Í¦X¾Aªº Makefile ¤å¥ó¤F¡C
 4.3 ¨Ï¥Î Makefile §Q¥Î configure ©Ò²£¥Íªº Makefile¤å¥ó¦³´X­Ó¹w¥ý³]©wªº¥Ø¼Ð¥i¨Ñ¨Ï¥Î¡A³o¸Ì¥u¥Î´X­ÓÂ²­z¦p¤U¡G
-make all ²£¥Í³]©wªº¥Ø¼Ð¡A¬J¦¸½d¨Ò¤¤ªº°õ¦æ¤å¥ó¡C¥uºV¤Jmake ¤]¥i¥H¡A¦¹®É·|¶}©l½sÄ¶·½¥N½X¡AµM«á³s±µ¨Ã²£¥Í°õ¦æ¤å¥ó¡C make clean ²M°£¤§«e©Ò½sÄ¶ªº°õ¦æ¤å¥ó¤Î¥Ø¼Ð¤å¥ó(object file, *.o)¡C make distclean °£¤F²M°£°õ¦æ¤å¥ó©M¥Øªº¤å¥ó¥H¥~¡A¤]§â configure ©Ò²£¥Íªº Makefile ²M°£±¼¡C make install ±Nµ{¦¡¦w¸Ë¨ì¨t²Î¤¤¡A­Y·½½X½sÄ¶¦¨¥\¡A¥B°õ¦æµ²ªG¥¿½T¡A«K¥i¥H§âµ{¦¡¦w¸Ë¨ì¨t²Î¹w¥ý³]©wªº°õ¦æ¤å¥ó¦s©ñ¸ô®|¤¤¡A­Y¥Î bin_PROGRAMS ¥¨¶°ªº¸Ü¡Aµ{¦¡·|³Q¦w¸Ë¨ì /usr/local/bin¤U¡C make dist ±Nµ{¦¡©M¬ÛÃöªº¤åÀÉ¥]¸Ë¬°¤@­ÓÀ£ÁY¤åÀÉ¥H¨Ñµo§G (distribution) ¡C°õ¦æ§¹¦b¥Ø¿ý¤U·|²£¥Í¤@­Ó¥HPACKAGE-VERSION.tar.gz ¬°¦WºÙªº¤å¥ó¡CPACKAGE ©M VERSION ³o¨â­Ó°Ñ¼Æ¬O®Ú¾Ú configure.in ¤å¥ó¤¤ AM_INIT_AUTOMAKE(PACKAGE, VERSION) ªº©w¸q¡C¦b¦¹½d¨Ò¤¤·|²£¥Í 'hello-1.0.tar.gz' ªº¤å¥ó¡C make distcheck ©M make dist Ãþ¦ü¡A¦ý¬O¥[¤JÀË¬d¥]¸Ë¥H«áªºÀ£ÁY¤å¥ó¬O§_¥¿±`¡A³o­Ó¥Ø¼Ð°£¤F§âµ{¦¡©M¬ÛÃö¤åÀÉ¥]¸Ë¦¨ tar.gz ¤å¥ó¥~¡AÁÙ·|¦Û°Ê§â³o­ÓÀ£ÁY¤å¥ó¸Ñ¶}¡A°õ¦æ configure¡A¨Ã°õ¦æ make all ¡A½T»{½sÄ¶µL¿ù»~¥H«á¡A¤áÅã¥Ü³o­Ó tar.gz ¤å¥ó¤w¸g·Ç³Æ¦n¥i¥Hµo§G¤F¡C³o­ÓÀË¬d«D±`¦³¥Î¡AÀË¬d¹LÃöªº®M¥ó¡A°ò¥»¤W¥i¥Hµ¹¥ô¦ó¨ã³Æ GNU ¶}µoÀô¹Òªº¤H¥h­«·s½sÄ¶¦¨¥\¡C´N hello-1.tar.gz ³o­Ó½d¨Ò¦Ó¨¥¡A°£¤F¦bRed Hat Linux ¤W¡A¦b FreeBSD 2.2.x ¤]¥i¥H¥¿½T½sÄ¶¡C ­nª`·Nªº¬O¡A§Q¥Î Autoconf ¤Î Automake ©Ò²£¥Í¥X¨Óªº³nÅé®M¥ó¬O¥i¥H¦b¨S¦³¦w¸Ë Autoconf ¤Î Automake ªºÀô¹Ò¨Ï¥Îªº¡A¦]¬° configure ¬O¤@­Ó shell script¡A¥¦¤v³Q³]­p¬°¥i¥H¦b¤@¯ë Unix ªº sh ³o­Ó shell ¤U°õ¦æ¡C¦ý¬O¦pªG­n­×§ï configure.in ¤Î Makefile.am ¤å¥ó¦A²£¥Í·sªº configure ¤Î Makefile.in ¤å¥ó®É´N¤@©w­n¦³ Autoconf ¤Î Automake ¤F¡C
+make all ²£¥Í³]©wªº¥Ø¼Ð¡A¬J¦¸½d¨Ò¤¤ªº°õ¦æ¤å¥ó¡C¥uºV¤Jmake ¤]¥i¥H¡A¦¹®É·|¶}©l½sÄ¶·½¥N½X¡AµM«á³s±µ¨Ã²£¥Í°õ¦æ¤å¥ó¡C 
+make clean ²M°£¤§«e©Ò½sÄ¶ªº°õ¦æ¤å¥ó¤Î¥Ø¼Ð¤å¥ó(object file, *.o)¡C 
+make distclean °£¤F²M°£°õ¦æ¤å¥ó©M¥Øªº¤å¥ó¥H¥~¡A¤]§â configure ©Ò²£¥Íªº Makefile ²M°£±¼¡C 
+make install ±Nµ{¦¡¦w¸Ë¨ì¨t²Î¤¤¡A­Y·½½X½sÄ¶¦¨¥\¡A¥B°õ¦æµ²ªG¥¿½T¡A«K¥i¥H§âµ{¦¡¦w¸Ë¨ì¨t²Î¹w¥ý³]©wªº°õ¦æ¤å¥ó¦s©ñ¸ô®|¤¤¡A­Y¥Î bin_PROGRAMS ¥¨¶°ªº¸Ü¡Aµ{¦¡·|³Q¦w¸Ë¨ì /usr/local/bin¤U¡C 
+make dist ±Nµ{¦¡©M¬ÛÃöªº¤åÀÉ¥]¸Ë¬°¤@­ÓÀ£ÁY¤åÀÉ¥H¨Ñµo§G (distribution) ¡C°õ¦æ§¹¦b¥Ø¿ý¤U·|²£¥Í¤@­Ó¥HPACKAGE-VERSION.tar.gz ¬°¦WºÙªº¤å¥ó¡C
+PACKAGE ©M VERSION ³o¨â­Ó°Ñ¼Æ¬O®Ú¾Ú configure.in ¤å¥ó¤¤ AM_INIT_AUTOMAKE(PACKAGE, VERSION) ªº©w¸q¡C¦b¦¹½d¨Ò¤¤·|²£¥Í 'hello-1.0.tar.gz' ªº¤å¥ó¡C 
+make distcheck ©M make dist Ãþ¦ü¡A¦ý¬O¥[¤JÀË¬d¥]¸Ë¥H«áªºÀ£ÁY¤å¥ó¬O§_¥¿±`¡A³o­Ó¥Ø¼Ð°£¤F§âµ{¦¡©M¬ÛÃö¤åÀÉ¥]¸Ë¦¨ tar.gz ¤å¥ó¥~¡AÁÙ·|¦Û°Ê§â³o­ÓÀ£ÁY¤å¥ó¸Ñ¶}¡A°õ¦æ configure¡A¨Ã°õ¦æ make all ¡A
+½T»{½sÄ¶µL¿ù»~¥H«á¡A¤áÅã¥Ü³o­Ó tar.gz ¤å¥ó¤w¸g·Ç³Æ¦n¥i¥Hµo§G¤F¡C³o­ÓÀË¬d«D±`¦³¥Î¡AÀË¬d¹LÃöªº®M¥ó¡A°ò¥»¤W¥i¥Hµ¹¥ô¦ó¨ã³Æ GNU ¶}µoÀô¹Òªº¤H¥h­«·s½sÄ¶¦¨¥\¡C
+´N hello-1.tar.gz ³o­Ó½d¨Ò¦Ó¨¥¡A°£¤F¦bRed Hat Linux ¤W¡A¦b FreeBSD 2.2.x ¤]¥i¥H¥¿½T½sÄ¶¡C 
+­nª`·Nªº¬O¡A§Q¥Î Autoconf ¤Î Automake ©Ò²£¥Í¥X¨Óªº³nÅé®M¥ó¬O¥i¥H¦b¨S¦³¦w¸Ë Autoconf ¤Î Automake ªºÀô¹Ò¨Ï¥Îªº¡A¦]¬° configure ¬O¤@­Ó shell script¡A¥¦¤v³Q³]­p¬°¥i¥H¦b¤@¯ë Unix ªº sh ³o­Ó shell ¤U°õ¦æ¡C
+¦ý¬O¦pªG­n­×§ï configure.in ¤Î Makefile.am ¤å¥ó¦A²£¥Í·sªº configure ¤Î Makefile.in ¤å¥ó®É´N¤@©w­n¦³ Autoconf ¤Î Automake ¤F¡C
 5. ¬ÛÃö¸ê®Æ
 Autoconf ©M Automake ¥\¯à¤Q¤À±j¤j¡A¥i¥H±q¥¦­Ìªþ±aªº info Ã­·í4¤¤§ä¨ì¸Ô²Óªº¨Ï¥Î¤èªk»¡©ú¡C§A¤]¥i¥H±q³\¦h²{¦³ªºGNU ³nÅé©Î Open Source ³nÅé¤¤§ä¨ì¬ÛÃöªº configure.in ©Î Makefile.am ¤å¥ó¡A¥L­Ì¬O¾Ç²ß Autoconf ¤Î Automake §ó¦h§Þ¥©ªº³Ì¨Î½d¨Ò¡C
 ³o­ÓÂ²¤¶¥u¥Î¨ì¤F Autoconf ¤Î Automake ªº¥Ö¤ò½}¤F¡A¦pªG§A¦³¤ß¥[¤J Open Source ³nÅé¶}µoªº¦æ¦C¡A§Æ±æ³o½g¤å³¹¥i¥HÀ°§U§A¹ï²£¥Í Makefile ¦³­ÓÂ²³æªºÁA¸Ñ¡C¨ä¥¦¦³Ãö¶}µo GNU µ{¦¡©Î C µ{¦¡³]­p¤Î Makefile ªº¸Ô²Ó¹B¥Î¤Î§Þ¥©¡A«ØÄ³±q GNU Coding Standards (GNU ½s½X³W©w) Åª°_¡A¸Ì­±¥]§t¤F GNU Makefile ºD¨Ò¡A¤Î¶}µo GNU ³nÅéªº¼Ð·Çµ{¦¡©MºD¨Ò¡C³o¨Ç GNU ³nÅéªº¦b½u»¡©ú¤å¥ó¥i¥H¦b http://www.gnu.org/ ¤W§ä¨ì¡C
@@ -9871,6 +9881,84 @@ UPNP¥u¬O¤@²Õ¨ó©w
 
 
 /******************************************************************************/
+§Ö³t¾Ç·|vimªº¤èªk
+/******************************************************************************/
+¤@¡C´å¼Ð²¾°Ê¡]·íµM¬O¦b´¶³q¼Ò¦¡¤U¡A¤£©ú¥Õ¡H¦h«ö´X¦¸Esc´N¬O¤F¡C¡^
+¥ªh ¥kl¡A¤Wj ¤Uk¡C¡]¹ï¤F´N¬OÁä½L¤W¥k¤â©ñªº°ò¥»¦ì¸m¡C¡^
+Ctrl+f ¦V«e¡]¤U¡^Â½­¶¡]f=forward¡^
+Ctrl+b ¦V«á¡]¤W¡^Â½­¶¡]b=backward¡^
+0 ¬O¼Æ¥Ø¦r 0 ¦Ó¤£¬O­^¤å¦r¥À o¡C©Î¬O Home Áä¡A²¾¦Ü¦æ­º¡A¡]§tªÅ¥Õ¦r¡^¡C
+$ ²¾¦Ü¦æ§À¡A©Î End Áä¡C­n Shift Áä¡C(¥Î¤£¤Ó¥¿½Tªº»¡ªkÂ²³æ°O¾Ð$´N¬O¦æ§Àªº·N«ä¡A°O¦í³o­Ó ¹ï¥H«á¦³¥Î)
+G ²¾¦ÜÀÉ§À¡]¥þ¤å³Ì«á¤@¦æªº²Ä¤@­Ó«DªÅ¦r¤¸³B¡^(§Ú´N°²¶Hg=go¡A¤j¼gg´N¬Ogo¤j¤F¡Ago¨ì³Ì«á)
+gg ²¾¦ÜÀÉ­º¡]¥þ¤å²Ä¤@¦æ¤§²Ä¤@­Ó«DªÅ¥Õ¦r¤¸³B¡^
+:n ²¾¦Ü²Ä n ¦æ¦æ­º¡C©Î nG¡C(vim¸Ì­±¥i¥H¥Î¼Æ¦r¿ö¥Ü²Ä´X©ÎªÌ°õ¦æ´X¦¸©R¥O¡A¤j·§´N³o­Ó·N«ä¤F) n| ²¾¦Ü²Ä n ­Ó¦r¤¸(Äæ)³B¡Cª`·N¡A­n¥Î Shift Áä¡Cn ¬O±qÀY°_ºâªº¡C
+¦n¤F¡A¥­®É³Ì±`¥Îªº²¾°Ê©R¥O´N³o¨Ç¤F¡C¤°»ò¡HÁÙ¤£º¡¨¬¡H½Ð¥ß¨èÂ÷¶}¥»¤åÀÉ¡A³o¬Oµ¹·Q¦b5¤ÀÄÁ¤º§Ö³t¶}©l¨Ï¥ÎvimÂ²³æ½s¿è¤åÀÉ¥Îªº¤H¬Ýªº¡C
+
+¤G¡C´¡¤J¡]¶}©l½s¿è¤F¡^
+i ¦b´å¼Ð©Ò¦b¦r¤¸«e¶}©l¿é¤J¤å¦r(insert)¡C
+a ¦b´å¼Ð©Ò¦b¦r¤¸«á¶}©l¿é¤J¤å¦r(append)¡C
+o ¦b´å¼Ð©Ò¦b¦æ¤U¶}¤@·s¦æ¨Ó¿é¤J¤å¦r(open)¡C
+°÷¤F¡A3­Ó©R¥O¤w¸gÅý§ÚÀY¤j¤F¡C
+
+¤T¡C§R°£¡]ÁÙ¬O¦b´¶³q¼Ò¦¡¤U¡^
+x §R°£´å¼Ð©Ò¦b³B¤§¦r¤¸¡A¦b¤¤¤å«ü¤@­Ó¤¤¤å¦r¡C
+dd §R°£¤@¾ã¦æ(delete line)¡C¡]ª`·N¬A©·¸Ìªº­^¤å³æµü¡A¥L­Ì¥i¥HÀ°§U°O¾Ð¡^
+dG §R¦ÜÀÉ§À¡C¡]ÁÙ°O±o»òG=go¤j¤F¡^
+Ok¡AÁÙ¬O3­Ó©R¥O¡A¨ä¹ê¥u­nx¤]¯à¥Îªü¡A¤@ª½«ö¦í¸Õ¤@¤U¡G¡^¡C
+
+¥|¡C¨ú¥N©MÁÙ­ì
+r (replace)¨ú¥N´å¼Ð©Ò¦b³B¤§¦r¤¸¡C¡]¹êÅç¤@¤U¥ÎÁä½L¿é¤J":r !date"¡^
+u ³o­Ó¤Ó­«­n¤F¡A´N¬O undo¡A¶Ç²Îªº vi ¶È¤ä´©¤@¦¸ undo¡AVim ¤Î elvis ´N¤£¥u¤F¡AVim ´X¥G¬O ¨S¦³­­¨îªº¡C
+U ¦b´å¼Ð¨SÂ÷¶}¥»¦æ¤§«e¡A¦^?°h?±×¶è??÷´?br /> Crtl+r ³o­Ó¤]¬O¬½­«­n¡A´N¬O redo Áä¡C
+
+¤­¡C¥[¤W¼Æ¦r
+­ì¤å¬½¦³·N«ä¡AºK¿ý¦p¤U¡G
+³á¡IÄÌ¨ì Vim ªºÄo³B¤F¡A³o¬O Vim ¤@­Ó«D±`ÄÌ¥]ªº¥\¯à¡A¥u¦¹¤@®a§OµL¤À¸¹¡]·íµM¦P·½ªº ed¡Ased µ¥¤£¦b¦¹­­¡^¡C´N¬O±z¥i¥H¦b¤j³¡¥÷ªº«ü¥O«e¥[¤W¼Æ¥Ø¦r¡A¥Nªí­n³B²z´X¦¸ªº·N«ä¡C¥H¤U¥Î¹ê¨Ò¨Ó»¡©ú¤ñ¸û²M·¡¡C
+5dd §R°£´å¼Ð©Ò¦b³B¡]§t¡^°_ºâ¥H¤U¤­¦æ¤º®e¡C§®§a¡I
+5i A µM«á«ö Ecs¡A´¡¤J¤­­Ó A¡C¤¤¤å¤]¥i¥H¡I
+5G ´å¼Ð²¾¦Ü²Ä¤­¦æ¡A¬O±qÀÉ­º¶}©l°_ºâ¡C©M :5 §@¥Î¬Û¦P¡C
+
+¤»¡C½Æ»s¡]yank¡^
+yy ´_?´å¼Ð©Ò¦b¦æ¾ã¦æ¡C©Î¤j¼g¤@­Ó Y¡C¡]¹ï·Ódd¡^
+y$ ´_?¦Ü¦æ§À¡C§t´å¼Ð©Ò¦b³B¦r¤¸¡C
+yG ´_?¦ÜÀÉ§À¡C
+p (paste)¤p¼g p ¥Nªí¶K¦Ü´å¼Ð«á¡]¤U¡^¡C
+. ¬O­^¤å¥yÂI.¥u­n¬O½s¿è°Ê§@¡]²¾°Ê´å¼Ð¤£ºâ¡A«_¸¹©R¥O¤]¤£ºâ¡^³£¥i¥H«ö­^¤å¥yÂI¨Ó­«½Æ¡A­n­« ´_´X¦¸³£¥i¥H¡C
+
+¤C¡C·j´M©M´À´«
+/ ¦b c-mode ªº±¡§Î¤U(«ö¤U:´N¥i¥H¤F)¡A«ö / ´N·|¦b¥ª¤U¤è¥X²{¤@­Ó /¡AµM«áÁä¤J±z­n´M§äªº¦r ¦ê¡A«ö­Ó Enter ´N·|¶}©l§ä¡C? ©M / ¬Û¦P¡A¥u¬O / ¬O¦V«e¡]¤U¡^§ä¡A ? «h¬O¦V«á¡] ¤W¡^§ä¡C
+n Ä~Äò´M§ä¡C
+N Ä~Äò´M§ä¡]¤Ï¦V¡^¡C
+´À´«ªº©R¥O®æ¦¡¬°
+:[range]s/pattern/string/[c,e,g,i]
+range «üªº¬O½d³ò¡A1,7 «ü±q²Ä¤@¦æ¦Ü²Ä¤C¦æ¡A1,$ «ü±q²Ä¤@¦æ¦Ü³Ì«á¤@¦æ¡A¤]´N¬O¾ã½g¤å³¹ ¡A¤]¥i¥H % ¥Nªí¡CÁÙ°O±o¶Ü¡H % ¬O¥Ø«e½s¿èªº¤å³¹¡A# ¬O«e¤@¦¸½s¿èªº¤å³¹¡C
+pattern ´N¬O­n³Q´À´«±¼ªº¦r¦ê¡A¥i¥H¥Î regexp ¨Óªí¥Ü¡C
+string ±N pattern ¥Ñ string ©Ò¨ú¥N¡C
+c confirm¡A¨C¦¸´À´««e·|¸ß°Ý¡C
+e ¤£Åã¥Ü error¡C
+g globe¡A¤£¸ß°Ý¡A¾ã¦æ´À´«¡C
+i ignore ¤£¤À¤j¤p¼g¡C
+g ¤j·§³£¬O­n¥[ªº¡A§_«h¥u·|´À´«¨C¤@¦æªº²Ä¤@­Ó²Å¦X¦r¦ê¡C¥i¥H¦X°_¨Ó¥Î¡A¦p cgi¡Aªí¥Ü¤£¤À¤j¤p ¼g¡A¾ã¦æ´À´«¡A´À´««e­n¸ß°Ý¬O§_´À´«¡C
+[¹ê¨Ò] :%s/Edwin/Edward/g
+³o¼Ë¾ã½g¤å³¹ªº Edwin ´N·|´À´«¦¨ Edward¡C
+­ü³o­Ó´À´«¥i¯u³Â·Ð¡A¤£¹L¦pªG§A¼È®É¥Î¤£µÛ´N§OºÞ¥L¤F¡C¼K¼K¡C
+
+¤K¡C¼Ð°O¡]®ÑÅÒ¡^¥\¯à
+³o­Ó¦³¥Î®@¡C
+mx x ¥Nªí 26 ­Ó¤p¼g­^¤å¦r¥À¡A³o¼Ë´å¼Ð©Ò¦b³B´N·|³Q mark¡C
+`x ¦^¨ì®Ñ?­ì³]©w¦ì¸m¡C` ¬O backward quote¡A´N¬O Tab Áä¤W­±¨º¤@­Ó¡C
+1x ¦^¨ì®Ñ?³]©w¦æ¦æ­º¡C1 ¬O forward quote¡A¬O Enter Áä¹j¾À¨º¤@­Ó¡C
+³o?Á|­ÓÂ²³æªº¤l¡A½ÐÀH«K¶}¤@­Ó²{¦¨ªºÀÉ®×¡A§â´å¼Ð²¾¨ì¥ô¤@­Ó¦ì¸m¡AµM«á«ö ma °µ­Ó mark¡A¦A«ö¤j¼g G ²¾¨ìÀÉ§À¡AµM«á«ö 1a ¬Ý²{¦b¤°»ò¦a¤è¡H
+¤U­±²¾°Ê´å¼Ð¨ì¥ô·N¦ì¸m¡A¹êÅç¤@¤Uy`a,µM«á´«­Ó¦a¤èp¤@¤U¡C¨þ¨þ¦p¦ó¡A¤£¥Î·Æ¹«¨Ó©ì°Ê¤]¥i¥H«þ¨©Öß¶K¤@­Ó¶ô¤F§a¡C
+¦n¤F´N³o»ò¦h¡A5¤ÀÄÁ¹L¥h¤F¡A³Ì«á´N¬O¥´¶}¤å¥ó¥Î:e ¡C
+:q ¦p¥»¤å¦³­×§ï¦Ó¨S¦sÀÉ¡A·|Äµ§i¡A¥BµLªkÂ÷¶}¡C(quit)
+:q! ?¯¾??¦æð¸¼Ò?¬ìÄ[¡¼??br /> :wq ¦sÀÉ«áÂ÷¶}¡CÁa¨ÏÀÉ®×¥¼´¿­×§ï¤]¬O·|¦A¦s¤@¦¸ÀÉ¡C
+:x ¤]¬O¦sÀÉ«áÂ÷¶}¡A¦ý¦pªGÀÉ®×¨S¦³­×§ï¡A«h¤£·|°µ¦sÀÉªº°Ê§@¡C
+ZZ ©M :x §¹¥þ¤@¼Ë¡AÀH±z°ª¿³¥Î­þ¤@­Ó¡C
+:w ÀÉ¦W ¥t¦s¥LÀÉ¡C¤£¥[ÀÉ¦W´N¬O¼g¤J­ìÀÉ¡C
+
+
+/******************************************************************************/
 ¨Ï¥Îvim®É«ö¤FCTRL+SÁä
 /******************************************************************************/
 ¦bwindows¤Uªº½s¿è¾¹¨Ï¥ÎºD¤F¡A¥Îvim½s¿è¦n¤Fªº¤å¥ó, ´N«ö¤FCTRL+S¨ÓÀx¦s¡Aµ²ªG¡K¡Kvim´N°±±¼¤F«ö¤°»òÁä³£¤£°_§@¥Î¤F(ªM¨ã)¡C
@@ -11545,16 +11633,17 @@ I have added various sources of videos
 I have changed the name of the server so I can recognise it easily on the network
 I have moved the location of the database to a location that I backup each day and is shared by Samba (this is for my personal benefit only)
 I have added extra filenames to the "AlbulmArt" section as I usually call the front cover of an album "Front"
-Despite the line ¡u# default presentation url is http address on port 80¡v MiniDLNA does not have a webpage that it can be controlled from. From what I can gather, this was going to be a future feature that was not completed for whatever reason. However, the Webmin module takes care of everything that you need.
+Despite the line ¡u# default presentation url is http address on port 80¡v MiniDLNA does not have a webpage that it can be controlled from. 
+From what I can gather, this was going to be a future feature that was not completed for whatever reason. However, the Webmin module takes care of everything that you need.
 From the "Command Shell" in Webmin or through an SSH session using Putty, you can control MiniDLNA using the commands:
 
 sudo /etc/init.d/minidlna stop
 sudo /etc/init.d/minidlna start
-
-At first run, MiniDLNA will scan all of the folders (and their sub-folders) it has been pointed at and make all of these files available. The scan is extremely quick (less than 10 minutes to scan about 12,000 files).
-
-The Webmin module has a "Restart" button but for some reason (on my set-ups) it does not work properly. It will stop MiniDLNA but when it tries to restart it, it fails. Trying to manually start it using the command "sudo /etc/init.d/minidlna start" after using this "Restart" does not seem to work and the only way I have found to resolve this is to restart the whole server.
-
+At first run, MiniDLNA will scan all of the folders (and their sub-folders) it has been pointed at and make all of these files available. 
+The scan is extremely quick (less than 10 minutes to scan about 12,000 files).
+The Webmin module has a "Restart" button but for some reason (on my set-ups) it does not work properly. It will stop MiniDLNA but when it tries to restart it, 
+it fails. Trying to manually start it using the command "sudo /etc/init.d/minidlna start" after using this "Restart" does not seem to work and the only way 
+I have found to resolve this is to restart the whole server.
 
 Adding or Removing Files of Folders from the Database
 In my experience, MiniDLNA tends not to notice if a file has been added or removed from the folders so the database does not update and new files are not shown on your device and old files are still shown even though they have been removed. This seems to be a problem with MiniDLNA and not the receiving soft/hardware. If you change the name of the server, the soft/hardware picks that up fine.
@@ -11572,542 +11661,6 @@ The only thing I have not been able to get MiniDLNA to do so far is display my p
 If anyone can point me to a walkthrough of how to receive streamed videos and music on VLC I would be grateful so I can test this set-up on that and add it to this guide.
 I hope you find this guide useful and it takes away some of the headaches I've had with setting up this excellent program.
 
-
-/******************************************************************************/
-±N Redmine ¦w¸Ë©ó Debian¡BUbuntu Linux
-/******************************************************************************/
-ref : http://blog.longwin.com.tw/2011/03/redmine-debian-ubuntu-linux-2011/
-
-¨t²ÎÀô¹Ò
-Debian wheezy / Ubuntu 10.10
-Apache2
-SQLite
-¤U­z¸ô®|¬Ò¬° Debian / Ubuntu Linux ¹w³]¸ô®|
-
-Redmine ±`¥Î³]©wÀÉ »P ¸ê®Æ®w¦s©ñ¦ì¸m
-Web ¸ô®|: /usr/share/redmine/public/
-DB ³]©wÀÉ: /etc/redmine/default/database.yml
-SQLite DB ÀÉ®×¦ì¸m: /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default (¸ê®Æ®w¦s©ñ¦ì¸m)
-
-Redmine ¬ÛÃö³]©wÀÉ
-/etc/dbconfig-common/redmine/instances/default.conf
-/etc/redmine/default/database.yml
-/etc/redmine/default/session.yml
-/etc/javascript-common/javascript-common.conf
-
-Redmine ¬ÛÃöÀÉ®×¦ì¸m (Debian / Ubuntu Àô¹Ò)
-/etc/redmine
-/usr/share/doc/redmine/examples/
-/var/cache/redmine
-/var/log/redmine
-/var/lib/redmine
-
-Redmine ¦w¸Ë
-apt-get install redmine redmine-sqlite git-core subversion libapache2-mod-fcgid libapache2-mod-passenger     # redmine-mysql, redmine-pgsql ÀH­Ó¤H¿ï¾Ü
-¦w¸Ë¸ß°Ý, ¬D¿ï sqlite # ­Y MySQL ©Î PostgreSQL ·|»Ý­n¥t¥~³]©w±b¸¹¡B±K½X
-cp /usr/share/doc/redmine/examples/apache2-host.conf /etc/apache2/sites-enabled/redmine.conf # ¨ä¥L³]©wÀÉ½d¨Ò: /usr/share/doc/redmine/examples/, ex: lighttpd, nginx ½d¨Ò¬Ò©ó¦¹³B
-vim /etc/apache2/sites-enabled/redmine.conf # ¦b VirtualHost ¤º, ­×§ï 8080 => 80
-<VirtualHost *:8080>
-§ï¦¨
-<VirtualHost *:80>
-
-vim /etc/apache2/sites-enabled/redmine.conf # ¦b VirtualHost ¤º, ¼W¥[¤U­z
-ServerName example.com # §Aªº redmine hostname
-CustomLog /var/log/apache2/redmine-access.log combined
-ErrorLog /var/log/apache2/redmine-error.log
-
-/etc/apache2/sites-enabled/redmine.conf 
-# §¹¾ãÀÉ®×¦p¤U:
-<VirtualHost *:80>
-    # FcgidInitialEnv for module mod_fcgid
-    FcgidInitialEnv RAILS_RELATIVE_URL_ROOT ""
-    FcgidInitialEnv X_DEBIAN_SITEID "default"
-
-    ServerName redmine.example.com
-    CustomLog /var/log/apache2/redmine-access.log combined
-    ErrorLog /var/log/apache2/redmine-error.log
-
-    # the mod_fcgid socket path # Ubuntu ·|¦h¦¹¦æ, µù¸Ñ±¼§Y¥i
-    #SocketPath "/var/run/redmine/sockets/default" # Ubuntu ·|¦h¦¹¦æ, µù¸Ñ±¼§Y¥i
-    Alias "/plugin_assets/" /var/cache/redmine/default/plugin_assets/
-    DocumentRoot /usr/share/redmine/public
-    <Directory "/usr/share/redmine/public">
-        Options +FollowSymLinks +ExecCGI
-        Order allow,deny
-        Allow from all
-        RewriteEngine On
-        RewriteRule ^$ index.html [QSA]
-        RewriteRule ^([^.]+)$ $1.html [QSA]
-        RewriteCond %{REQUEST_FILENAME} !-f [OR]
-        RewriteCond %{REQUEST_FILENAME} dispatch.fcgi$
-        RewriteRule ^(.*)$ dispatch.fcgi [QSA,L]
-    </Directory>
-</VirtualHost>
-
-sudo a2enmod fcgid # ±Ò¥Î FastCGI
-sudo a2enmod rewrite
-sudo /etc/init.d/apache2 restart
-¦b¦¹´N§¹¦¨¨t²Î³]©w, ¦A¨Ó°£¤F Email ¥~, ³£©ó Web ¤¶­±³]©w§Y¥i. (¨ì¦¹¤w¸g¥i¥H³s½u http://redmine.example.com)
-
-Web ¤¶­± - ³]©w±b¸¹
-ÂI¿ï­¶­±¥k¤W¨¤ªº "µn¤J" (±b¸¹: admin, ±K½X: admin)
-ÂI¿ï¥k¤W¨¤ "§Úªº±b¤á" (¬D¿ï»y¨t: Traditional Chinese ÁcÅé¤¤¤å, ¨Ã³]©w Email µ¥¸ê®Æ, ¦¹°Ï¶ô ¥k¤W¨¤ "ÅÜ§ó±K½X" ¥h ­×§ï±K½X)
-ÂI¿ï¥k¤W¨¤ "admin", ÂI¿ï ¦¹°Ï¶ô ¥k¤W¨¤ ªº "½s¿è" (¥i¥H­×§ï ±b¸¹ admin -> tsung)
-
-Web ¤¶­± - ·s¼W±M®×
-ÂI¿ï¥ª¤W¨¤ "±M®×²M³æ"
-ÂI¿ï ¦¹°Ï¶ô ¥k¤W¨¤ "«Ø¥ß·s±M®×" -> ¤º®e¶ñ¼g§¹ "Àx¦s" §Y¥i§¹¦¨.
-
-Web ¤¶­± - ³]©w±M®× »P Git ¾ã¦X
-ÂI¿ï¥ª¤W¨¤ "±M®×²M³æ", ÂI¿ï¶i¤J±M®×
-©ó Tab ÂI¿ï "³]©w"
-©ó ³]©wªº Tab ÂI¿ï "ª©¥»±±ºÞ" -> ¬D¿ï Git, ¸ô®|³]©w /var/cache/git/project.git # ½Ð¨Ì·Ó¦Û¤vªº Git ¸ô®|³]©w
-©ó Tab ÂI¿ï "»{ÃÒ"
-
-Web ¤¶­± - ¶}±Ò±b¸¹
-­Y Redmine ¥u¤¹³\¤º³¡¨Ï¥Î, §@ªk¦p¤U:
-ÂI¿ï¥ª¤W¨¤ "±M®×²M³æ", ÂI¿ï¶i¤J±M®×
-©ó Tab ÂI¿ï "»{ÃÒ" -> µù¥U¿ï¶µ ¿ï¾Ü: ¤â°Ê±Ò¥Î±b¤á
-½Ð­n¨Ï¥Î¦¹¨t²Îªº¤H¥hµù¥U±b¸¹
-ÂI¿ï¥ª¤W¨¤ "ºô¯¸ºÞ²z", ÂI¿ï¶i¤J±M®×
-Menu ÂI¿ï "¥Î¤á²M³æ" -> ¥ªÃä "¿z¿ï±ø¥ó" ¤U©Ô¬D¿ï "µù¥U§¹¦¨", ¦b¤À§OÂI¿ï "±Ò¥Î" §Y¥i.
-
-Web ¤¶­± - ¨¤¦â»PÅv­­
-ÂI¿ï¥ª¤W¨¤ "±M®×²M³æ", ÂI¿ï¶i¤J±M®×
-Menu ÂI¿ï "¨¤¦â»PÅv­­" -> ¥i¥Ñ¦¹¥h ·s¼W / ­×§ï³]©w ¨¤¦âªºÅv­­
-µù: ¨C­Ó¤H¦b¨C­Ó±M®×³£¥i¥H¤À¬£¤£¦P±o "¨¤¦â", ©Ò¥H, ¨C­Ó±M®×³£­n°O±o¥h·s¼W¥[¤J¦¹±M®×ªº"¤H­û" »P "¨¤¦â"
-
-Web ¤¶­± - «ü¬£±M®×¤H­û
-ÂI¿ï¥ª¤W¨¤ "±M®×²M³æ", ÂI¿ï¶i¤J±M®×
-©ó Tab ÂI¿ï "³]©w" -> ©ó¦¹°Ï¶ô Menu ÂI¿ï "¦¨­û" -> ©ó¥kÃä¤Ä¿ï "¤H­û / ±b¸¹" »P "¨¤¦â" ¦b·s¼W§Y¥i.
-
-Redmine ¿ù»~±Æ°£
-°ÝÃD1: ¥X²{¤U­z¿ù»~:
-[Thu Mar 03 12:57:14 2011] [warn] [client 192.168.0.10] (104)Connection reset by peer: mod_fcgid: error reading data from [[FastCGI]] server
-[Thu Mar 03 12:57:14 2011] [error] [client 192.168.0.10] Premature end of script headers: dispatch.fcgi
-¸Ñªk:
-apt-get install libapache2-mod-passenger
-
-°ÝÃD2: ­Y Ubuntu Linux ¥X²{Åv­­¤£¨¬ªº¿ù»~
-¸Ñªk:
-chmod 777 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/
-chmod 666 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default
-chmod 644 /etc/redmine/default/*
-
-°ÝÃD3: ­Y Redmine ¤W¶ÇÀÉ®×, ¥X²{Åv­­¤£¨¬ (/var/log/apache2/error.log)
-¸Ñªk
-chmod 777 /var/lib/redmine/default/files/ # ½Ð¨Ì·Ó¨Ï¥ÎªÌÅv­­³]©w, ¤£ª¾¹D´N¥ý 777 ¸Õ¸Õ¬Ý.
-
-°ÝÃD4: ¥X²{ Permission denied ¡V /etc/redmine/default/session.yml Åv­­¤£¨¬
-vi /etc/apache2/mods-available/passenger.conf # ¼W¥[¤U­z
-<IfModule mod_passenger.c>
-# PassengerRoot /usr
-# PassengerRuby /usr/bin/ruby
-PassengerDefaultUser www-data
-</IfModule>
-¥i°Ñ¦Ò: HowTo Install Redmine using Debian package - Redmine
-
-Redmine ¥~±¾
-Redmine - ThirdPartyTools - ¥~±¾ Plugin
-AdamLantos/redmine_http_auth - HTTP Auth
-
-Redmine DB ³Æ¥÷
-Redmine DB ³Æ¥÷ (SQLite Dump backup)
-DB: sqlite3 /var/lib/dbconfig-common/sqlite3/redmine/instances/default/redmine_default .dump > ~/redmine.sql
-ªþ¥[ÀÉ®×: /var/lib/redmine/default/files
-³]©wÀÉ: /etc/redmine/default/*
-Redmine - How to backup redmine?
-Redmine - Backing up Redmine
-
-
-/******************************************************************************/
-Redmine on Debian 6
-/******************************************************************************/
-Redmine ¬O¤@®M GPL ±ÂÅvªº±M®×ºÞ²z¨t²Î¡A¨ä©³¼h¬[ºc¬° Ruby on Rails¡A¦Ñ¹ê»¡­á¤¯¦Û¤v¤]¤£¬O«ÜÁA¸Ñ¡A¥uª¾¹D COSCUP ¹Î¶¤ªñ´X¦~¨Ó¶}©l¨Ï¥Î¥¦ºÞ²z¸HÅèªº¨Æ°È¡C
-­ì¥»¥H¬° Debian ¤W Redmine ªºÀô¹Ò«ÜÃø·dªº­á¤¯¡A¦b Zeroplex ¤ß±o¤À¨É«á¤~±oª¾ FreeBSD ªºÀô¹Ò§ó³Â·Ð¡A¦nÀI¨S¦³¸õ BSD ªº§|°Ú¡C
-
-1. ¦w¸Ë¬ÛÃö®M¥ó
-$ sudo aptitude install redmine redmine-mysql mysql libapache2-mod-passenger
-2. Àô¹Ò³]©w
-2.1. ³sµ² Redmine ¥Ø¿ý¦Üºô­¶¥Ø¿ý©³¤U¡C
-$ sudo ln -s /usr/share/redmine/public /var/www/redmine
-2.2. ­×§ïÅv­­¡C
-$ sudo chown -R www-data:www-data /var/www/redmine
-2.3. «Ø¥ß Redmine ªº Apache ³]©w¡C
-$ sudo vi /etc/apache2/sites-available/redmine
-RailsBaseURI /redmine
-RailsEnv production
-PassengerDefaultUser www-data
-2.4. ±Ò¥Î Redmine ³]©w¡C
-$ sudo a2ensite redmine [Enter]
-2.5. ­«¶} Apache¡C
-$ sudo /etc/init.d/apache2 reload && sudo /etc/init.d/apache2 restart [Enter]
-2.6. ´ú¸Õ http://localhost/redmine/¡C
-# °O±o¥ý­×§ï admin ±K½X¡A¹w³]¬° admin¡C
-3. ¸Ñ¨M Redmine ¤¤¤å¶Ã½X
-³Ì§Öªº¸Ñªk¬°¥ý±N MySQL dump ¥X¨Ó¡A«Ý¤â°Ê±NÂà´«¦¨ utf8 ¦A¶×¤J¦^¥h (·PÁÂ±jªÌ¦P¨Æªº¤ß±o¤À¨É)¡C
-3.1. dump.
-$ mysqldump --user=root -p redmine_default > redmine_default.sql [Enter]
-3.2. ¨Ï¥Î sed ¤â°Ê±N latin1_swedish_ci ¨ú¥N¦¨ utf8_general_ci¡C
-$ sed -i 's/latin1_swedish_ci/utf8_general_ci/g' redmine_default.sql [Enter]
-3.3. ¨Ï¥Î sed ¤â°Ê±N latin1 ¨ú¥N¦¨ utf8¡C
-$ sed -i 's/latin1/utf8/g' redmine_default.sql [Enter]
-3.4. ¶×¤J utf-8 ªº redmine_default.sql¡C
-$ mysql -uroot -p redmine_default < redmine_default.sql [Enter]
-3.5. ¶Ã½X¸Ñ¨M§¹²¦¡I
-4. ³]©w E-mail ªº smtp ¦øªA¾¹
-4.1. ±q½d¦C¤¤½Æ»s¤A¥÷³]©wÀÉ¡C
-$ sudo cp /usr/share/doc/redmine/examples/email.yml.example /etc/redmine/default/email.yml [Enter]
-4.2. ³]©w smtp ¦øªA¾¹¦ì§}¡B¹q¤l«H½c¤Î±K½X¡C
-[ jonny@squeeze ~ ]
-$ vi /etc/redmine/default/email.yml [Enter]
- production:
-   delivery_method: :smtp
-   smtp_settings:
-     address: smtp.example.net
-     port: 25
-     domain: example.net
-     authentication: :login
-     user_name: "redmine@example.net"
-     password: "redmine"
-
- development:
-   delivery_method: :smtp
-   smtp_settings:
-     address: 127.0.0.1
-     port: 25
-     domain: example.net
-     authentication: :login
-     user_name: "redmine@example.net"
-     password: "redmine"
-4.3. ±µ¤U¨Ó¥i¥H¦b ³]©w ¡÷ ¹q¤l¶l¥ó´£¿ô¿ï¶µ ¸Ì¨Ï¥Î ±H°e´ú¸Õ¶l¥ó ¨Ó´ú¸Õ¬O§_¥i¥H¥¿±`¹B§@¡A¨ä´ú¸Õ«Hªº¥D¦®¬°¡uRedmine test¡v¤º®e¦p¤U¡G
-This is a test email sent by Redmine.
-Redmine URL: http://localhost/redmine/
----------------------------------------
-You have received this notification because you have either subscribed to it, or are involved in it.
-To change your notification preferences, please click here: http://hostname/my/account
-
-
-/******************************************************************************/
-¬[³]redmine°µ±M®×ºÞ²z
-/******************************************************************************/
-¥»½g¥D­n»¡©ú¦p¦ó¦buBuntu¦w¸Ëredmine¡A³Æ¥÷redmine¸ê®Æ®w¡A³]©we-mailÅýredmine¥i¥Hµomailµ¹¨Ï¥ÎªÌ¡C
-ª©¥»¡GRedmine 1.4.4.stable¡Aruby 1.9.3p194 (2012¡V04¡V20 revision 35410)
-³Ì«á§ó·s¤é´Á¡G2013/8/22
-
-¦w¸ËApache, mod-passenger, and MySQL
-­º¥ý¦w¸Ëapache©Mmod-passenger¡] ¥D­n¬O¥Î¨Ó°µRubyÀ³¥Îµ{¦¡ªº§G¸p¡A¤ñ¦p»¡Ruby on RailaªºFramework¡^
-$ sudo apt-get install apache2 libapache2-mod-passenger  
-¦A¨Ó¦w¸ËMySQL
-$ sudo apt-get install mysql-server mysql-client 
-¦b§¹¸Ë§¹MySQL«á¡A·|¸õ¥X¤@­Ówindow»Ý­n¿é¤JDBªºrootµn¤J±K½X¡CµM«á¦b²Ä2­Óµe­±¿é¤J±K½X°µ½T»{¡C
-Package configuration
-
-  ¢z¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢t Configuring mysql-server-5.5 ¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{
-  ¢x While not mandatory, it is highly recommended that you set a password   ¢x   
-  ¢x for the MySQL administrative "root" user.                               ¢x   
-  ¢x                                                                         ¢x   
-  ¢x If this field is left blank, the password will not be changed.          ¢x   
-  ¢x                                                                         ¢x   
-  ¢x New password for the MySQL "root" user:                                 ¢x   
-  ¢x                                                                         ¢x   
-  ¢x _______________________________________________________________________ ¢x   
-  ¢x                                                                         ¢x   
-  ¢x                                 <Ok>                                    ¢x   
-  ¢x                                                                         ¢x   
-  ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}
-  ¢z¢w¢w¢w¢t Configuring mysql-server-5.5 ¢u¢w¢w¢w¢{
-  ¢x                                              ¢x
-  ¢x Repeat password for the MySQL "root" user.   ¢x
-  ¢x                                              ¢x
-  ¢x                                              ¢x
-  ¢x ____________________________________________ ¢x
-  ¢x                                              ¢x
-  ¢x                   <Ok>                       ¢x
-  ¢x                                              ¢x
-  ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}
-
-¦w¸Ëredmine package
-±µ¤U¨Ó¶}©l¦w¸Ëredmine
-$ sudo apt-get install redmine redmine-mysql
-¦w¸Ë§¹¦¨«á·|¸õ¥X¤@­Óµe­±°Ý»¡­n¤£­n¥h³]©wdatabase¡C¦b³o??§Ú­Ì¿ï¾ÜYes
- ¢z¢w¢w¢w¢t Configuring redmine ¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{  
- ¢x                                                                           ¢x  
- ¢x The redmine/instances/default package must have a database installed and  ¢x  
- ¢x configured before it can be used.  This can be optionally handled with    ¢x  
- ¢x dbconfig-common.                                                          ¢x  
- ¢x                                                                           ¢x  
- ¢x If you are an advanced database administrator and know that you want to   ¢x  
- ¢x perform this configuration manually, or if your database has already      ¢x  
- ¢x been installed and configured, you should refuse this option.  Details    ¢x  
- ¢x on what needs to be done should most likely be provided in                ¢x  
- ¢x /usr/share/doc/redmine/instances/default.                                 ¢x  
- ¢x                                                                           ¢x  
- ¢x Otherwise, you should probably choose this option.                        ¢x  
- ¢x                                                                           ¢x  
- ¢x Configure database for redmine/instances/default with dbconfig-common?    ¢x  
- ¢x                                                                           ¢x  
- ¢x                    <Yes>                       <No>                       ¢x  
- ¢x                                                                           ¢x  
- ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢} 
-µM«á¤U¤@­Óµe­±·|°Ý»¡­n¥Î­þ¤@ºØdatabase¡C¦]¬°§Ú­Ì¦w¸Ëªº¬OMySQL¡A©Ò¥H±`µM¿ï¾ÜMySQL
-
- ¢z¢w¢w¢w¢w¢t Configuring redmine ¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{  
- ¢x The redmine/instances/default package can be configured to use one of     ¢x  
- ¢x several database types. Below, you will be presented with the available   ¢x  
- ¢x choices.                                                                  ¢x  
- ¢x                                                                           ¢x  
- ¢x Database type to be used by redmine/instances/default:                    ¢x  
- ¢x                                                                           ¢x  
- ¢x                                  sqlite3                                  ¢x  
- ¢x                                  pgsql                                    ¢x  
- ¢x                                  mysql                                    ¢x  
- ¢x                                                                           ¢x  
- ¢x                                                                           ¢x  
- ¢x                    <Ok>                        <Cancel>                   ¢x  
- ¢x                                                                           ¢x  
- ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢} 
-¤U¤@­Óµe­±»Ý­n¿é¤JMyAQL DBªº±K½X¡A¿é¤J­è­è¦w¸ËMySQL®É¿é¤Jªºroot±K½X
-
- ¢z¢w¢w¢w¢w¢w¢w¢t Configuring redmine ¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{  
- ¢x Please provide the password for hte administrative account with which     ¢x  
- ¢x this package should create its MySQL database and user.                   ¢x  
- ¢x                                                                           ¢x  
- ¢x Password of the database's administrative user:                           ¢x  
- ¢x                                                                           ¢x  
- ¢x ******__________________________________________________________________  ¢x  
- ¢x                                                                           ¢x  
- ¢x                   <Ok>                       <Cancel>                     ¢x  
- ¢x                                                                           ¢x  
- ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}  
-¤U¤@­Óµe­±­n¨D¿é¤J¤@­Ó±K½X¨Ó«OÅ@redmineªºDB¡]»PMySQLªºroot±K½X¤£¦P¡^¡C¿é¤J¤@­Ó±K½Xµ¹redmine DB¡C
-
- ¢z¢w¢w¢w¢w¢w¢w¢w¢t Configuring redmine ¢u¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢{  
- ¢x Please provide a password for redmine/instances/default to register with  ¢x  
- ¢x the database server.  If left blank, a random password will be            ¢x  
- ¢x generated.                                                                ¢x  
- ¢x                                                                           ¢x  
- ¢x MySQL application password for redmine/instances/default:                 ¢x  
- ¢x                                                                           ¢x  
- ¢x *******__________________________________________________________________ ¢x  
- ¢x                                                                           ¢x  
- ¢x                    <Ok>                        <Cancel>                   ¢x  
- ¢x                                                                           ¢x  
- ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}
-±µ¤U¨Ó·|¦A­n¨D½T»{¤@¦¸redmine DBªº±K½X
-
-   ¢z¢w¢w¢t Configuring redmine ¢u¢w¢{                       
-   ¢x                                ¢x                       
-   ¢x                                ¢x                       
-   ¢x Password confirmation:         ¢x                       
-   ¢x                                ¢x                       
-   ¢x *******_______________________ ¢x                       
-   ¢x                                ¢x                       
-   ¢x     <Ok>         <Cancel>      ¢x                       
-   ¢x                                ¢x                       
-   ¢|¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢}   
-¨ì³oÃä´Nºâ¬O±N®M¥ó¦w¸Ë§¹¦¨¡A±µ¤U¨Ó´N¶}©l³]©w¨ä¥Lªº¶µ¥Ø¡C
-
-³]©wApache
-»Ý­n³]©w2­ÓÀÉ®×¡G
-/etc/apache2/mods-available/passenger.conf
-/etc/apache2/sites-available/default
-­º¥ý¨Ó­×§ïpassenger.conf
-$ sudo vi /etc/apache2/mods-available/passenger.conf
-­×§ï¤º®e¦p¤U¡G
-<IfModule mod_passenger.c>
-  PassengerDefaultUser www-data
-  PassengerRoot /usr
-  PassengerRuby /usr/bin/ruby
-</IfModule>
-
-¦A¨Ó«Ø¥ßredmineªºspace¨ìapacheªºwww¤¤¡G
-$ sudo ln -s /usr/share/redmine/public /var/www/redmine
-¤U¤@¨B¬O³]©w/etc/apache2/sites-available/default
-¤§«e§Ú­Ì¤w¸g±Nredmineªºspace°µ¤Fsymlink¨ì/var/www/redmine¡A³o??­n«Ø¥ß¤@¥xredmineªºserver³sµ²¨ì/var/www/redine¡A­×§ï¤º®e¦p¤U¡G
-$ sudo vi /etc/apache2/sites-available/default  
-<Directory /var/www/redmine>
-    RailsBaseURI /redmine
-    PassengerResolveSymlinksInDocumentRoot on
-</Directory>
-µM«á¦A­«±Òapache
-$ sudo service apache2 restart
-¥Î¥»¾÷´ú¸Õredmine¬O§_¤w¸g¥¿½T³]©w¨Ã¥¿±`ªº¤u§@
-$ firefox http://127.0.0.1/redmine
-¬Ý¨ìredmine­º­¶«á¡A¥i¥HÂI¿ï¥k¤W¨¤ªºSign In¡A¨Ã¥Hadminµn¤J¡A¹w³]±K½X¬°admin¡C
-Note: ³o­Ó±K½X»P¦w¸Ëredmine DB®É¿é¤Jªº±K½X¤£¦P¡C
-±j¯P«ØÄ³µn¤J«á­×§ïadminªº±K½X¡A¥H½T«O¨t²Î¦w¥þ¡C
-
-³]©we-mail
-¨Ï¥ÎG-Mail
-Note¡]2013/8/21)¡G·sª©¥»ªºredmine/ruby¤£¥i¦w¸Ëaction_mailer_optional_tls
-¨Ï¥Î·sª©¥»ªºredmine/ruby®É¡A¤w¸g¤£¦A¨Ï¥Îemail.yml¡A¦Ó¬O¨Ï¥Îconfiguration.yml¡C
-¥ý±Nconfiguration.yml.example«þ¨©¤@¥÷¨ì/etc/redmine/default
-$ cd /usr/share/redmine/config
-$ sudo cp ./configuration.yml.example /etc/redmine/default/configuration.yml
-±µ¤U¨Ó¨Ï¥Îvim­×§ïconfiguration.yml¡]¦betc/redmine/default¥Ø¿ý¤U¡^
-$ cd /etc/redmine/default
-$ sudo vim configuration.yml
-±Ndefault°Ï¶ô­×§ï¦p¤U¡G¡]ÁY±ÆªºªÅ®æ«Ü­«­n¡A°È¥²­n·Ó­ì¥»ªºexampleªº®æ¦¡¡A§_«h·|¦³°ÝÃD¡^
-
-default:
-  email_delivery:
-  delivery_method: :smtp
-  smtp_settings:
-    tls: true
-    enable_starttls_auto: true
-    address: "smtp.gmail.com"
-    port: 587
-    domain: "smtp.gmail.com" # 'your.domain.com' for GoogleApps
-    authentication: :plain
-    user_name: "your_email@gmail.com"
-    password: "your_password"
-­×§ï§¹¦sÀÉ«á¡A»Ý­n­×§ï³o­ÓÀÉ®×ªºowner¤ÎÅv­­
-
-$ sudo chown root:www-data configuration.yml
-$ sudo chmod 0640 configuration.yml
-­«·s±Ò°Êapache
-
-$ sudo service apache2 restart
-FAQ
-
-¬°¦ó¤w¸g±Nadministration/Settings/Displayªº¹w³]»y¨¥§ï¬°¤¤¤å¡A¦ýÅã¥Ü¬É­±ÁÙ¬O­^¤å¡H
-
-¨C­Ó¨Ï¥ÎªÌ¥i¥H³]©w¦Û¤wªº¨Ï¥Î¬É­±»y¨¥¡C¨ìMyAccount¡A¦bLanguage¿ï¶µ§ï¬°¤¤¤å§Y¥i¡C
-
-µo¥ÍAn error occurred while sending mail (Expected ¡K/version.rb to define VERSION)¡A­n¦p¦ó³B²z¡H
-
-¬Ý³o½g¤å³¹
-
-°Ñ¦Ò¤å³¹
-
-©x¤è¤å¥ó-¦w¸Ëredmine in uBuntu
-
-­^¤åª©ªº¦w¸Ë¤å¥óStep By Step¡A§Úªº³o¤@½g¤j³¡¥÷¤]¬O°Ñ¦Ò³o¤@¥÷¨Ó°µªº¡C°£¤Fmailªº³]©w³¡¥÷¡A¤å¥ó¤¤©Ò´y­zªº¤j³¡¥÷³£¬O¥i¦æªº¡C
-
-©x¤èºô¯¸for mail configuration
-
-¥Ñ©x¤è©Ò´£¨ÑªºEmail configuration³]¸m¡C«Øºc¤¤¡C
-
-Redmine+Apache+SVN+Postfix§¹¾ã°t¸m«ü«n
-
-¥Ñ¸ª¤¤¼CBlogµoªí¡AÁöµM¬O2010ªº¤å³¹¡A¥Îªº¬O¸ûÂÂªºª©¡AÁÙ¬O¥i¥H¥Î¨Ó°Ñ¦Ò¡C
-
-¥t¤@­Ó¦w¸Ëredmineªººô¯¸¤å¥ó
-
-¥Hquestion/answerªº¤è¦¡´£¨Ñplug-in¡Asvn¡Amailªº³]©w¤è¦¡¡A«Ü¦³°Ñ¦Ò©Ê¡C
-
-
-/******************************************************************************/
-INSTALLING REDMINE 3.0 ON CLEAN UBUNTU 14.04
-/******************************************************************************/
-In this tutorial we will install Redmine on a clean installation of Ubuntu server 14.04 with an Apache server and MySql. Redmine wil be reachable under the subdomain redmine.example.com.
-Here Redmine will be installed to  /var/www/vhosts/redmine . I use unzip  to unpack the archive. The placeholder for the username you¡zre logged into the system is  $sysUser$ .
-
-Step 1 ¡V Installing required software
-First we need to update our packages. If you encounter any problems later on try to fix them by updating your packages again.
-sudo apt-get update && sudo apt-get -y upgrade
-Now install apache2 and mysql:
-sudo apt-get install apache2 mysql-server mysql-client
-While installing mysql-server you will be asked for a MySql root password to set.
-
-Step 2 ¡V Database creation
-To create the database log in as root user with the password you set earlier.
-mysql -u root -p
-The following MySql queries create the database and the user to access this database. Be sure you have my_password replaced with an other password (not the root password) before executing.
-CREATE DATABASE redmine CHARACTER SET utf8;
-GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost' IDENTIFIED BY 'my_password';
-To exit  mysql simply type  exit and execute.
-
-Step 3 ¡V Downloading Redmine
-Now switch in your vhosts directory download Redmine and unzip it. If you want you can use the .tar.gz file with the tar command as well.
-cd /var/www/vhosts
-wget http://www.redmine.org/releases/redmine-3.0.1.zip
-unzip redmine-3.0.1.zip
-mv redmine-3.0.1 redmine
-
-Step 4 ¡V Database configuration
-We need to alter the file /var/www/vhosts/redmine/config/database.yml.example  and save it as  database.yml . Replace my_password with the password set in the MySql query before.
-production:
-  adapter: mysql2
-  database: redmine
-  host: localhost
-  username: redmine
-  password: my_password
-If your MySql server is running on another Port (eg. 3344) you can use the following config:
-production:
-  adapter: mysql
-  database: redmine
-  host: localhost
-  port: 3344
-  username: redmine
-  password: my_password
-
-Step 5 ¡V Installing ruby
-First we have to remove the old version of ruby.
-sudo apt-get remove ruby
-Execute the following command (not as root user) with the ¡y\¡z at the beginning. It will install ruby at your system, usable for every user in the group rvm. The installation folder is  /usr/local/rvm .
-\curl -sSL https://get.rvm.io | sudo bash -s stable --rails
-In my case the first run failed because of a missing signature. The command to install this signature will be displayed in the error-message. In my case it was this:
-sudo gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-Then rerun the command to install ruby.
-After some time ruby is installed with rails. Now the users $sysUser$ and www-data  need to be added to the group  rvm .
-sudo usermod -aG rvm $sysUser$
-sudo usermod -aG rvm www-data
-After a relogin the change should be applyed. You have to switch folders back t your Redmine folder.
-gem install bundler
-bundle install --without development test rmagick
-If you encounter any problems with mysql during installation execute  sudo apt-get install libmysqlclient-dev.  Then execute the command again.
-
-Step 6 ¡V Configuring Redmine with ruby
-Generate an secret cookie token:
-bundle exec rake generate_secret_token
-Create the database structure:
-RAILS_ENV=production bundle exec rake db:migrate
-Insert the default configuration:
-RAILS_ENV=production bundle exec rake redmine:load_default_data
-Start the webrick server to test if everything is ok. You can access the webrick server from localhost only, so its ok if it throws no errors while starting. Then shutdown the webrick server.
-bundle exec ruby bin/rails server webrick -e production
-
-Step 7 ¡V Installing passenger
-Because the repository version of passenger will install the old ruby from the repository again, we have to install it via gem.
-gem install passenger
-Now we have to install some other packages, required for passenger integration in apache2:
-sudo apt-get install libcurl4-openssl-dev apache2-threaded-dev libapr1-dev libaprutil1-dev
-Then execute the following commands to install the passenger module to apache2.
-sudo -i
-passenger-install-apache2-module
-Alter the file /etc/apache2/mods-avaiable/passenger.load  to this:
-LoadModule passenger_module /usr/local/rvm/gems/ruby-2.2.0/gems/passenger-5.0.5/buildout/apache2/mod_passenger.so
-And the file /etc/apache2/mods-avaiable/passenger.conf  to this:
-<IfModule mod_passenger.c>
-        PassengerRoot /usr/local/rvm/gems/ruby-2.2.0/gems/passenger-5.0.5
-        PassengerDefaultRuby /usr/local/rvm/gems/ruby-2.2.0/wrappers/ruby
-</IfModule>
-Now enable the passenger mod:
-a2enmod passenger
-
-Step 8 ¡V Configuring Apache
-To reach redmine under redmine.example.com we have to create a new file in /etc/apache2/sites-avaiable . I called the file redmine.example.com.conf .
-<VirtualHost *:80>
-        ServerName redmine.example.com
-        ServerAlias www.redmine.example.com
- 
-        # !!! Be sure to point DocumentRoot to 'public'!
-        DocumentRoot /var/www/vhosts/redmine/public
-        <Directory /var/www/vhosts/redmine/public>
-                # This relaxes Apache security settings.
-                AllowOverride all
-                # MultiViews must be turned off.
-                Options -MultiViews
-                
-                Require all granted
-        </Directory>
-</VirtualHost>
-To activate the site execute  a2ensite redmine.example.com.conf and rename the file /var/www/vhosts/redmine/public/dispatch.fcgi.example  to dispatch.fcgi . 
-Now restart apache2  via  sudo service apache2 restart .
-Everything should be up an running. If you have any suggestions to improve the installation process comment below.
- 
 
 /******************************************************************************/
 ubuntu²M²z¨t²Î©U§£»P³Æ¥÷
@@ -12172,6 +11725,7 @@ Linux ¤¤¬ü§®ªº¨Æ±¡¤§¤@´N¬O¦b¨t²Î¥¿¦b¹B¦æªº±¡ªp¤U¥i¥H¶i¦æÁÙ­ì¾Þ§@¡A¦Ó¤£»Ý­n±Ò°Ê¥ú
 tar -xvpzf /media/disk/backup.tgz -C /
 ¦pªG±z¨Ï¥Îªº¬Obz2À£ÁYªº¡G
 tar -xvpjf /media/disk/backup.tar.bz2 -C /
+
 
 /******************************************************************************/
 Ubuntu±`¥Îªº©R¥O http://hi.baidu.com/ycerror/blog/item/41a9272d62a9ab3e359bf71a.html
@@ -12958,7 +12512,7 @@ sudo apt-get update
 sudo apt-get upgrade
 # ¦w¸ËLAMPÀô¹Ò
 sudo apt-get install tasksel
-tasksel
+sudo tasksel   ---> install LAMP
 sudo apt-get install phpmyadmin
 ¤G¡B¦w¸Ë Redmine
 sudo apt-get install redmine-mysql
@@ -12970,7 +12524,7 @@ sudo gem install bundler
 #°t¸m¤å¥ó¥Ø¿ý¡G/etc/redmine/default/
 #¤é»x¤å¥ó¥Ø¿ý¡G/var/log/redmine/
 ¤T¡B¦w¸ËEmail
-sudo apt-get install postfix  #Select ¡yInternet Site¡z
+sudo apt-get install postfix  #Select "Internet Site"
 ¥|¡B¤@¨Ç¥²­nªºÅv­­°t¸m
 #µ{¦¡±Ò°Ê®É»Ý­n³Ð«Ø°t¸m¤å¥ó¤Îlog¡Aµ¹¥LÅv­­
 sudo chmod 775 /etc/redmine/default/
@@ -13014,10 +12568,10 @@ sudo service apache2 restart #­«±Ò¥Í®Ä
 ¤K¡B¦w¸Ë Git
 sudo apt-get install git git-core
 #¤@¨ÇÂ²³æªº³]¸m
-git config ¡Vglobal user.name ¡umimi¡v
-git config ¡Vglobal user.email ¡umimi@mimiz.cn¡v
+git config --global user.name ¡umimi¡v
+git config --global user.email ¡umimi@mimiz.cn¡v
 #¬d¬Ý³]¸m
-git config ¡Vlist
+git config --list
 ¤E¡B¬°Redmine³Ð«Øª©¥»®w
 #¬°¹Ï¤è«K§Ú³Ð«Ø¨ìRedmine¥Ø¿ý¤¤
 sudo mkdir /usr/share/redmine/gitrepo
@@ -13041,132 +12595,715 @@ sudo vi /usr/share/redmine/config/environment.rb
 ¦b¤å¥ó³Ì«á¤@¦æ²K¥[¡G
 Redmine::Utils::relative_url_root = ¡u/path¡v
 
+
 /******************************************************************************/
-¦bUbuntu 14.04¤W¦w¸ËRedmine¡]Apache¡^
+Cargo, Rust's Package Manager
 /******************************************************************************/
-Tesso
-¨Ï¥Î LAMP + Phusion Passenger ¡]ºû«ùRORªA°È¹B¦æ¨Ã¯à¬Û®e¨ä¥¦80³s±µ°ðªA°È¦b¦P¤@¥x¦øªA¾¹¤W¹B¦æ¡^
+Installing
+The easiest way to get Cargo is to get the current stable release of Rust by using the rustup script:
+$ curl -sSf https://static.rust-lang.org/rustup.sh | sh
 
-CeacyCao¦P¾ÇÁÙ¼g¤F¤@½g¨Ï¥ÎNginx¥N´ÀApache·f«Øªº¤åÀÉ¡C
-¤@. ¦w¸ËLAMP
-sudo tasksel  
-#«öªÅ®æ¿ï¤¤LAMP«ö¦^¨®§Y¥i
-¶}±Ò¨¾¤õÀðªº¥»¾÷80³s±µ°ð«á¦bÂsÄý¾¹¤¤¿é¤J¥»¾÷¦a§}´ú¸ÕApache¬O§_¤w¸g¥i¥Î¡C
-LAMP¤¤ªºPHP¬O¤£»Ý­nªº¤¸¥ó¡A³o¸Ìª½±µ¦w¸ËLAMP¬O¬°¤FÂ²«K¡A§A¤]¥i¥Hª½±µ¦w¸ËApache + MySQL Server + MySQL Client¡C
+This will get you the current stable release of Rust for your platform along with the latest Cargo.
+If you are on Windows, you can directly download the latest 32bit (Rust and Cargo) or 64bit (Rust and Cargo) Rust stable releases or Cargo nightlies.
+Alternatively, you can build Cargo from source.
 
-*¥i¿ï.¹ïApache¶i¦æ°ò¥»ªº¦w¥þ³]¸m
-#³Ð«Ø°t¸m¤å¥ó
-cd /etc/apache2/sites-available  
-sudo touch 010-more-secure.conf  
-¦V¸Ó¤å¥ó¤¤²K¥[¦p¤U¤º®e
-<Directory /usr/share>  
-    AllowOverride None
-    Require all denied
-</Directory>
-<Directory /var/www/>  
-    Options FollowSymLinks
-    AllowOverride None
-    Require all denied
-</Directory>  
-#¶}±Ò¸Ó¤å¥ó¨Ã¨ê·sapache°t¸m
-sudo a2ensite 010-more-secure.conf  
-sudo service apache2 reload  
-¨ê·s¤§«eªº´ú¸Õ­¶­±¡A²{¦bÀ³¸Ó¬°403
+Let's Get Started
+To start a new project with Cargo, use cargo new:
+$ cargo new hello_world --bin
+We're passing --bin because we're making a binary program: if we were making a library, we'd leave it off.
+Let's check out what Cargo has generated for us:
+$ cd hello_world
+$ tree .
+.
+¢u¢w¢w Cargo.toml
+¢|¢w¢w src
+    ¢|¢w¢w main.rs
 
-¤G. ¦w¸ËRuby¤Î¨ä¥¦°t¥ó
-sudo apt-get install ruby ruby1.9.1-dev libmysqld-dev libmagickwand-dev imagemagick build-essential  
-#°ê¤º¦øªA¾¹¥i¿ï¾Þ§@¡A±N·½­«©w¦V¦Ü²^Ä_¦øªA¾¹
-#sudo gem source -r https://rubygems.org/
-#sudo gem source -a https://ruby.taobao.org
-#°ê¤º¦øªA¾¹¥i¿ï¾Þ§@µ²§ô
-sudo gem update  
-sudo gem install bundler  
-¤T. °t¸mMySQL
-#µn¿ýMySQL
-mysql -u root -p  
-«Ø¥ßRedmine¼Æ¾Ú®w¡A¦bMySQL©R¥O¦æ¤º¹B¦æ¤U¦C©R¥O¡A¤£­n§Ñ°O­×§ï±K½X
+1 directory, 2 files
+This is all we need to get started. First, let's check out Cargo.toml:
 
-CREATE DATABASE redmine CHARACTER SET utf8;  
-CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';  
-GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';  
-EXIT  
-¥|. ¦w¸ËRedmine2.6.0
-cd /usr/share  
-sudo wget http://www.redmine.org/releases/redmine-2.6.0.tar.gz  
-sudo tar xvfz redmine-2.6.0.tar.gz  
-sudo rm redmine-2.6.0.tar.gz  
-sudo mv redmine-2.6.0 redmine  
-sudo chown -R root:root redmine  
-sudo chown www-data redmine/config/environment.rb  
-sudo ln -s /usr/share/redmine/public /var/www/redmine  
-¤­. °t¸m¼Æ¾Ú®w³s±µ
-cd /usr/share/redmine/config  
-sudo cp database.yml.example database.yml  
-µM«á­×§ï³o­Ó¤å¥ó¸Ìproduction¶µ¥Øªº¥Î¤á¦W±K½X¬°¤§«e¦b°t¸mMySQLÀô¸`©Ò¥Îªº¥Î¤á¦W(redmine)©M±K½X
+[package]
+name = "hello_world"
+version = "0.1.0"
+authors = ["Your Name <you@example.com>"]
+This is called a manifest, and it contains all of the metadata that Cargo needs to compile your project.
 
-¤». °t¸mRedmine
-cd /usr/share/redmine/  
-sudo bundle install --without development test  
-sudo rake generate_secret_token  
-sudo RAILS_ENV=production rake db:migrate  
-sudo RAILS_ENV=production rake redmine:load_default_data  
-sudo mkdir public/plugin_assets  
-sudo chown -R www-data:www-data files log tmp public/plugin_assets  
-sudo chmod -R 755 files log tmp public/plugin_assets  
-¤C. ¦w¸Ë¨Ã°t¸mPhusion Passenger
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 561F9B9CAC40B2F7  
-sudo apt-get install apt-transport-https ca-certificates
+Here's what's in src/main.rs:
 
-sudo bash -c 'echo "deb https://oss-binaries.phusionpassenger.com/apt/passenger trusty main" >  /etc/apt/sources.list.d/passenger.list'  
-sudo chmod 600 /etc/apt/sources.list.d/passenger.list  
-sudo apt-get update
+fn main() {
+    println!("Hello, world!");
+}
+Cargo generated a 'hello world' for us. Let's compile it:
 
-sudo apt-get install libapache2-mod-passenger  
-­×§ï¤å¥ó/etc/apache2/mods-available/passenger.conf¥[¤W¤@¥y¸Ü
+$ cargo build
+   Compiling hello_world v0.1.0 (file:///path/to/project/hello_world)
+And then run it:
 
-PassengerDefaultUser www-data  
-¦b/etc/apache2/sites-available¤¤³Ð«Ø¤@­Ó§ARemineºô¯¸ªº°t¸m¤å¥ó¡A¦p
+$ ./target/debug/hello_world
+Hello, world!
+We can also use cargo run to compile and then run it, all in one step:
 
-sudo touch redmine.your-domain.com.conf  
-¦b¦¹¤å¥ó¤¤¼g¤J¦p¤U»y¥y¡A³o¬O³]¸m¤@­ÓµêÀÀ¥D¾÷¨Ã¥ÎPassenger±Ò°Êªº°t¸m¡A¨ä¥¦³]¸m¤è¦¡¦p¤l¥Ø¿ýµ¥¦Û¤v§ä¸ê®Æ
+$ cargo run
+     Fresh hello_world v0.1.0 (file:///path/to/project/hello_world)
+   Running `target/hello_world`
+Hello, world!
+Going Further
 
-<VirtualHost *:80>  
-    ServerName redmine.your-domain.com
-    ServerAdmin yourname@your-domain.com
-    DocumentRoot /var/www/redmine
-    RailsBaseURI /
-    PassengerResolveSymlinksInDocumentRoot on
-    <Directory /var/www/redmine>
-        Require all granted
-    </Directory>
-</VirtualHost>  
-±Ò¥Îºô¯¸¨Ã­«±ÒApache
 
-sudo a2ensite redmine.tc130lab.com.conf  
-sudo service apache2 restart  
-¨ì¦¹Redmine¤w¸g¥i¥H¨Ï¥Î¤F¡I¡]¦pªG§AªºDNS°O¿ý¥¿½Tªº¸Ü¡^
+/******************************************************************************/
+§Q¥Î Linux «Øºc Video Streaming
+/******************************************************************************/
+­ì©l¸ê®Æ¨Ó·½:j2h½×¾Â
+Video Streaming ªº§Þ³N¤w¸g¥X²{¦h¦~¡A¦b Internet ¤WªºÀ³¥Î¤]¤w¸g¬Û·í¼sªx¡A
+¦Ó§Q¥Î Linux «Øºc Video Streaming Server ¤]¬O¬Û·í¼öªùªº¸ÜÃD¡C
+¦pªG±z·QÁA¸Ñ¤°»ò¬O Video Streaming¡A
+¥»¤å¹ï Video Streaming ªºÆ[©À»P§Þ³N±N°µ¤F²M·¡¦Ó°ò¥»ªº¤¶²Ð¡C
+ 
+Video Streaming ¨Óªº¥¿¬O®É­Ô
+¬Ý¨ì "Video" Streaming ´Nª¾¹D³o­Ó§Þ³N»P¼v­µ¦³Ãö¡CVideo Streaming ¬O¤@ºØ¸g¥Ñºô¸ô¨Ó¼·©ñ¼v­µÀÉ®×ªº§Þ
+³N¡AVideo "Streaming" ªº°ò¥»·§©À¬°¡u¤@Ãä¤U¸ü¤@Ãä¼·©ñ¡v¡A§Ú­ÌºÙ¤§¬°¡uPlay as received¡v¡C
+¸g¥Ñ Internet ¦pªG­n¦¬¬Ý»·ºÝ¦øªA¾¹ªº¹qµøÀÉ®×¡A³Ì­ì©lªº°µ¬°¬O¡u¤U¸ü«á¦A¼·©ñ¡v¡A¤]´N¬O¸g¥Ñ FTP ©Î 
+HTTP ±N¾ã­ÓÀÉ®×¤U¸ü¦Ü¥»¦aºÝ«á¦A§Q¥Î¼·©ñµ{¦¡¨Ó¼·©ñ¡A§Ú­ÌºÙ¤§¬°¡uPlay after download¡v¡C
+¥H³Ì±`¨£ªº¨Ò¤l¨ÓÁ¿¡A§Ú­Ì¥i¥H¸g¥Ñºô¸ô±N MP3 §¹¾ã¤U¸ü«á¦A¼·©ñ¡A¤]´N¬O Play after download¡A©ÎªÌ§Ú­Ì
+¤]¥i¥H¤@Ãä¤U¸ü MP3 ¤@ÃäÅ¥­µ¼Ö¡A³oºØ¤è¦¡«hºÙ¬° Play as received¡C¨ä¥LªºÀ³¥Î½d¨ÒÁÙ«Ü¦h¡A¨Ò¦p§Q¥Î 
+RealPlayer¡u§Y®ÉÆ[¬Ý¼v¤ù©Î¬OÅ¥­µ¼Ö¡v¡A³oºØ§Y®É¼·©ñªº¤è¦¡§Y¬O Play as received¡A§Ú­ÌºÙ³o¼Ëªº§Þ³N¬°
+ Video Streaming Technology¡C
+¬°¤°»ò»¡ Video Streaming ªº§Þ³N¨Óªº¥¿¬O®É­Ô©O¡HÁ|­Ó³ÌÂ²³æªº±¡ªp¡A§A¥i¯à¦b¤U¸ü MP3 ¤§«e·Q­n¸ÕÅ¥¤@
+¤U­µ¼Öªº¤º®e¡A¦Ó¤U¸ü­µ¼Ö¤ù¬qªº¤è¦¡¤SÅã±o¤£°÷¤Íµ½¡A³o®É¦pªG§Q¥Î Video Streaming ªº§Þ³N¨ÓÅýºô¤ÍµøÅ¥
+¡A¤£¦ý¤è«K¡A¦Ó¥B¤£¥²®ö¶O®É¶¡¨Ó¤U¸ü¤£³ßÅwªº­µ¼Öªº¡C
+ÀHµÛºô¸ôÀW¼eªº§ï¶i»P IPv6 ªº¥X²{¡AVideo Streaming ªºÀ³¥Î±N¶V¨Ó¶V¼sªx¡A§Q¥Î Video Streaming ¨Ó³]­p
+ªº¸ê°T®a¹q¤]·|¶V¨Ó¶V¦h¡A¨Ò¦p¸û±`³Q´£¤Îªººô¸ô¹q¸Ü (InterPhone)¡C
+°£¤F¼eÀWºô¸ôªº´¶¤Î¥~¡AÀx¦s³]³Æªº¤j¶i¨B¤]¬O¥[³t Video Streaming ¶i¥Î´¶¤Îªº³Ì¤j°Ê¤O¡A¨Ò¦p§Q¥Î Linux
+ ³]­pªº NAS ¥i¥H³Q¥Î¨Ó·í°µ¤j«¬ªº¼v­µ¦øªA¾¹©Î¬O°ÊºA¹q¼v¸ê®Æ®w (DMD)¡C
 
-¤K. ¶l¥óµo°e³]¸m
-­×§ï¤å¥ó/usr/share/redmine/config/configuration.yml ²K¥[¦p¤U¤å¥»
+VCD & MPEG-1
+­n´£¨ì¼·©ñ°ÊºA¼v­µªº¥ýÂß¡Aµ´¹ï­n¥ý±q VCD »¡°_¡A¦]¬°³o¬O¦b¹q¸£¥X²{«á¡A³Ì¯à²`¤J®ø¶OªÌ¥«³õªº²£«~¡C
+·Q·í¦~¡A­n¼·©ñ VCD °£¤F­n¦³¤@¥x·í®Éºâ¬O°ª¾×³fªº 1x CD-ROM ¥~¡AÁÙ­n¦A¥t¥~¥[¸Ë¤]¬O°ª¾×³fªº MPEG ¥d¡C
+¼·©ñ VCD ¨ä¹ê´N¬O Video Streaming ªº§Þ³N¡A¦]¬° VCD ªº¸ê®Æ¬O¤@ÃäÅª¨ú¤@Ãä¼·©ñ¡A¨º¬°¤°»ò­n¦³ 
+MPEG Card ©O¡H²z©Ò·íµMªº¡A³o¬O¦]¬°MPEG-1 ªº¼Ð·Ç¡C
+MPEG-1 ³Q³]­p¦b 1x CD-ROM ¤W¼·©ñ VCD¡A¦Ó VCD ¤Wªº¸ê®Æ¥²¶·¸g¥Ñ MPEG Card ¸Ñ½X (decode) «á¤~¯à¼·©ñ¡C
+¦ý¬OÀHµÛµwÅéªº¶i¨B¡A²{¦b¥i¥H¸g¥Ñ³nÅé¨Ó°µ MPEG-1 ¸Ñ½Xªº¤u§@¡C§Ú­Ì±N¦b«á¤å¤¶²Ð MPEG-1 ªº³]­p·§©À¡C
+DVD & MPEG-2
+MPEG-2 ±`³Q´£¨ì«h¬O¥Ñ©ó DVD ªº¬y¦æ¡C¤£ºÞ¬O MPEG-1 ©Î¬O MPEG-2¡A¨ä¹ê¬O¤@ºØ½s½Xªº§Þ³N¡A¦Ó DVD-ROM 
+«h¬O¿ï¾Ü¤F MPEG-2 ¨Ó·í°µ¥¦ªºÀ£ÁY¼Ð·Ç¡C
+¦Ó DVD ¤§©Ò¥HµLªk¹³ VCD ¤@¼Ë¯à³Q¡u³Æ¥÷¨ìµwºÐ¡v¡A«h¬O¥Ñ©ó¨ä¤¤¤S¥[¶i¤F¤T¹Dªº«OÅ@¡A²Ä¤G¹D«OÅ@´N¬Oª±
+®a­Ì¦Õ¼ô¯à¸Ôªº CSS¡C¦b Linux ¤U¤§©Ò¥HµLªk¦³¡u¦Xªk¡vªº DVD Player¡A´N¬O¨ü¨î©ó CSS ªºÃö«Y¡C
+§Q¥Î NAS ¨Ó³]­p Video Server¡A­nÀx¦s¨Ã¼s¼· VCD ¤w¸g¨S¦³§Þ³N¤Wªº»ÙÃª¡A¦ý¬O­nÀx¦s¨ÃÂX¼· DVD¡A«h¦³ªk
+«ß¤Wªº°ÝÃD¡A³oÂI¬O­È±o§Ú­Ì²`«äªº¤@­Ó°ÝÃD¡C¦]¬°¥Ø«e CSS ªº§Þ³N´x´¤¦b¤é¥»¤H¤âùØ¡A­n¨ú±o³o¶µ§Þ³N¥²¶·
+Ã±¸p NDA¡A¤£¹L CSS ¨Ã«D¤£¥i¯}¸Ñ·Q¥²¤j®a³£ª¾¹D¡A¦ý¬O´N¬O¦³ª©Åv¤Wªº°ÝÃD¡C
 
-default:  
-  email_delivery:
-    delivery_method: :smtp
-    smtp_settings:
-      enable_starttls_auto: true
-      address: smtp.163.com
-      port: 25
-      domain: 163.com
-      authentication: :login
-      user_name: mailbox@163.com
-      password: xxxxxxx
-¦pªG§Aªº¶l¥ó¦øªA¾¹¬O¥ÎSSL¦Ó¤£¬OSTARTTLS¥[±Kªº¡A¨º»ò»Ý­n¦benable_starttls_auto: true¤§«e²K¥[¤@¥y¸Ü
+¼v¹³½s½X§Þ³N¤¶²Ð
+¥Ø«e¾Ç³N¬É¤w¸gµo®i¥X³\¦h³B²z¼v¹³°T¸¹À£ÁY¤Î½s½Xªº§Þ³N (codecs)¡A½Í¨ì³o¨Ç§Þ³N¡AÀ³¥Î³Ì¼sªxªº½s½X¼Ð·Ç©³¤U¥|ºØ¡G
+1) H.261
+2) H.263
+3) JPEG, MJPEG
+4) MPEG
+©³¤U±N¤À§OÂ²³æ¤¶²Ð³o¥|ºØ½s½X§Þ³N¡C
+H.261 ¼Ð·Ç
+H.261 ªº¼v¹³½s½X¼Ð·Ç¥X²{¦b 1990 ¦~ªº ITU¡C¤@¶}©lªº¥Î³~¥D­n¬O¤ä´©¼v¹³¹q¸Ü (video phone) »Pµø°T·|Ä³
+ (video conferencing)¡CH.261 ªº®æ¦¡¦³¤GºØ¡A¤À§O¦³¤£¦Pªº¸ÑªR«×¡G
+1) QCIF¡G176x144
+2) CIF¡G352x288
+H.261 ªº fps (frames per second) ¥i¥H¹F¨ì 7.5, 10, 15 »P 30 fps¡C¥Ñ©ó H.261 ¤@¶}©l¬O¬[ºc¦b ISDN B 
+¤W­±¡A¦Ó ISDN B ªº¶Ç¿é³t«×¬° 64 Kbps¡A©Ò¥H H.261 ¤]³QºÙ¬° Px64 (x = 1 to 30)¡C
+CIF ¥þ¦W¬° (Common Intermediate Format)¡A¥D­n¬O¬°¤F­n¤ä´©¦UºØ¤£¦P¸ÑªR«×ªº¹q¼v¦Ó³Q©w¸q¥X¨Ó¡A¨Ò¦p 
+NTSC, PAL, SECAM ¹qµø¨t²Î¡C¦Ó QCIF «h¬O Quarter-CIF ¤]´N¬O CIF ¸ÑªR«×ªº¤@¥b¡C
+°£¦¹¤§¥~¡AH.261 ¤]¥i¥H»¡¬O MPEG-1 ¼Ð·Çªº«e½ú¡C
+H.263 ¼Ð·Ç
+H.263 ¬O H.261 ªº¥[±jª©¡A½Ï¥Í©ó 1994 ¦~ (ITU)¡CH.263 ¶}©l¤ä´© PSTN¡A¤£¹L­n¯S§O»¡©ú¤@ÂI¡AH.263 ¤ñ
+ MPEG-1 ÁÙ­n±ß¥X²{¡A¦Ó¥B H.263 ÁÙ¬O°ò©ó MPEG-1 ¦Óµo®i¡C
+H.263 ªº¼Ð·Ç¦@¤ä´©¤­ºØ¤£¦Pªº¸ÑªR«×¡A¤À§O¬°¡G
+1) Sub-QCIF¡G128x96
+2) QCIF¡G176x144
+3) CIF¡G352x288
+4) 4CIF¡G704x576
+5) 16CIF¡G1408x1152
+¶Ç¿é³t«×¬° 8 Kbps ~ 1.5 Mbps¡C°£¦¹¤§¥~¡AH.263 ¤]¬O MPEG-4 ¼Ð·Çªº°òÂ¦¡C
+JPEG
+´£¨ì JPEG ªº¼Ð·Ç¡A¤j®a¥i´N¤£²ö¥Í¤F¡A¥Ñ¨ä¬O¦b GIF µo¥X¸T¥O«á¡AJPEG §ó¬O³Q¼sªxÀ³¥Î¡CJPEG ªº¥þ¦W¤j®a
+¤@©w¤£²ö¥Í¡A¥L¥i¬O»®»®¦³¦Wªº¤@¸s§Þ³N¹Î¶¤ªºÁY¼g - Joint Photographic Experts Group¡C
+JPEG ¬O 24-bit ªº "true-color" ¼v¹³¼Ð·Ç¡AJPEG ªº¤u§@¬O±N RGB ®æ¦¡ªº¼v¹³Âà´«¦¨ YCrCB ®æ¦¡¡A¥Øªº¬O
+¬°¤F´î¤ÖÀÉ®×¤j¤p¡A¤@¯ë¬ù¥i´î¤Ö 1/3 ~ 1/2 ¥ª¥k¡C
+¤£¹L MJPEG ¤~¬O§Ú­Ìªº¥D¨¤¡AMJPEG ¥þ¦W¬° "Motion" JPEG¡A¤]´N¬O·|°Êªº JPEG ¹ÏÀÉ¡C³\¦h Video Streaming 
+ªº³õ¦X¡A¹³¬OÂ²³æªºµø°T·|Ä³³nÅé³£·|¨Ï¥Î MJPEG ¨Ó¨ú¥N MPEG¡A­ì¦]µL¥¦¡A¦]¬° MJPEG ®æ¦¡Â²³æ¡A¦ý¯ÊÂI¬O
+¤£¤ä´©Án­µ¡C
+MPEG-1 ¼Ð·Ç
+MPEG ªº¼Ð·Ç¥Ñ ISO (International Standards Organization) ©Ò¨î©w¡A¥þ¦W¬° Moving Pictures Experts Group 
+(MPEG ¬° ISO ¤u§@)¡A³o¨Ç¹Î¶¤¨î©w¤F¥]¬A MPEG-1¡BMPEG-2¡BMPEG-4 µ¥¼Ð·Ç¡C
+MPEG-1 ªº¼Ð·Ç¤ñ H.263 ¦­¥X²{¡AMPEG-1 ¨î©w©ó 1992 ¦~¡A¥D­n¥Î³~¬°¡Gµø°T·|Ä³¡B¼v¹³¹q¸Ü¡B¹q¸£¹CÀ¸»P
+¤ä´©²Ä¤@¥Nªº CD-ROM¡CMPEG-1 ³Q³]­p¨Ó¤ä´©¤j³¡¥÷ªº¼v¹³»P CD-ROM ªº­µ®Ä¡A¶Ç¿é³t«×¬° 1.5 Mbps (30 fps)¡C
+°£¦¹¤§¥~¡AMPEG-1 ¤]¤ä´© playback¡A¨Ò¦p§ÖÂà¡B­Ë±a©Î¬O¸õÅD¡A³o¤]¬O MPEG-1 ¦n¥Îªº¦a¤è¡Cµy«á§Ú­Ì·|Â²³æ
+¤¶²Ð¤@¤U MPEG-1 ªº­ì¦]¡A¥H©ú¥Õ MPEG-1 ¦p¦ó°µ¨ì³o¨Ç¥\¯à¡C
+MPEG-2 ¼Ð·Ç
+MPEG-2 ªº¼Ð·Ç¥X²{©ó 1994 ¦~¡AMPEG-2 ¬Û®e©ó MPEG-1¡CMPEG-2 ªº¥X²{¨Ã¤£¬O¬°¤F­n¨ú¥N MPEG-1 ªºÂÂ¼Ð·Ç
+¡A¦Ó¬O­n¥[±j MPEG-1 ¤£¨¬ªº¦a¤è¡C¦]¦¹ MPEG-2 §ó¯àª@¥ô¨ä¥¦¤u§@Àô¹Ò¡A¨Ò¦p HDTV¡Bµø°T¼s¼½¡C
+¦P®É¡AMPEG-2 ªº¸ÑªR«×¤]¤ä´©¨ì HDTV 1280x720¡C¦b­µ®Ä¤è­±¡AMPEG-2 ¤]¤ä´©¨ì 6 ­ÓÀW¹D (MPEG-1 ¥u¤ä´©
+ 2 ­ÓÀW¹D)¡CMPEG-2 ªº¶Ç¿é³t«×¤]´£ª@¦Ü 2Mbps ~ 10 Mbps¡A¦]¦¹»Ý­n 4x ªº CD-ROM¡A¦ý¤]¦]¦¹ 4x CD-ROM
+  ¥u¯àÀx¦s 18 ¤ÀºØªº¼v¹³¡A©Ò¥H§Ú­Ì§Q¥Î DVD-ROM ¨ÓÀx¦s MPEG-2 ®æ¦¡ªº¼v¹³¡A¦Ó¥B DVD-ROM ¤]¤ä´© Dolby ­µ®Ä¡C
+MPEG-4 ¼Ð·Ç
+MPEG-4 ªº¼Ð·Ç¦b 1993 ¦~³Q´£¥X¡A¥D­nªºÀ³¥Î¥Î³~¤ñ¸û¼s¡A¥]¬A¡Gµø°T·|Ä³¡B¼v­µ¶l¥ó¡BµL½u¸Ë¸mµ¥µ¥¡A¤ä´©
+ªº¶Ç¿é³t«×¬° 8Kbps ~ 35Mbps¡C
+MPEG-4 ¥i¥H¶Ç°e¼v¹³ªºª«¥ó¡A¦Ó¤£¬O¥u¦³¼v¹³ªº "frame"¡A¨Ò¦p¤@³s¦êªº°Ê§@«ü¥O¡C¦]¦¹¡AMPEG-1 »P MPEG-2
+ ¬Ò¬O "frame-based" ªº¼Ð·Ç¡A¦Ó MPEG-4 «h¬O "object-based" ªº¼Ð·Ç¡A¥¼¨Ó¦bºô¸ô»P¦h´CÅéªºÀ³·|¤]·|§ó´¶¹M¡C
+MPEG-4 ¥Ø«e¦b Linux ¤W¤w¸g¦³ OpenMPEG ªº±M®×­pµe¡Aµo°_¥»­pµeªº¥Ø¦a¦b§Æ±æ¥i¥H¦b Linux ¤Wµo®i§¹¾ãªº
+ MPEG-4 ¤ä´©Àô¹Ò¡C
 
-ssl: true  
-enable_starttls_auto: true  
-¤E. ­«±ÒApache¡AEnjoy!
-sudo service apache2 restart  
+Video Streaming ªººô¸ô§Þ³N
+­n«Ø¸m¤@­Ó§¹¾ãªº Video Streaming Àô¹Ò¡A¦b¾ãÅé¨Ó¬Ý¡A­n·Ç³ÆªºµwÅé¥]¬A¡G¦øªA¾¹¡BCCD¡B¼v¹³¸É®»¥dµ¥µ¥
+¡A¦Ó¦b©³¼hªº§Þ³N­±¤è­±¡A°£¤F«e­±´£¨ìªº¼v¹³½s½X§Þ³N¥~¡A¤]­n°t¦X³q°T¨ó©w¤~¯à¹ê§@¥X Video Streaming
+ ªºÀ³¥Îµ{¦¡¡C
+Video Streaming ªº¤è¦¡
+Video ¦b°µ Streaming ®É¡A¦³¤TºØ¤è¦¡¥i¥HÀ³¥Î¡Gbroadcasting¡Bunicasting¡Bmulticasting¡C
+broadcasting ªº¤è¦¡¤ñ¸û³æ¯Â¡A¥L¬O¦b LAN ¤Wª½±µ±N¤@­Ó­Óªº¼v¹³«Ê¥]¥á¨ìºô¸ô¤W (server ºÝ)¡A¦A¥Ñ 
+client ªºÀ³¥Îµ{¦¡¦Ûºô¸ô¤W¨ú¦^«Ê¥]¼½©ñ¡C¦ýºô¸ôµwÅé¼h¤W¡A¤´¦³³\¦h»Ý­n¦Ò¼{ªº°ÝÃD¡A¨Ò¦p¦b 
+Shared Non-Switched Enthernet ¤W®É¡A´N·|µo¥Í¤@¨Ç¤p°ÝÃD¡C
+unicasting »P multicasting ³£¬OÄÝ©ó IP ªº¶Ç¿é¤è¦¡¡Cunicasting ±Ä¨ú 1 ¹ï 1 ªº¤è¦V¶Ç¼v¹³µ¹»·ºÝ¡AºÙ
+¬° Video-on-Demand (VoD)¡Amulticasting «h¬O 1 ¹ï¦hªº¶Ç¿é¤è¦¡¡AºÙ¬° Near-Video-on-Demand (NVoD)¡C
+¥¼¨Ó IPv6 ±N¤ä´© IP Multicasting¡A¦]¦¹ Video Streaming ªºÀ³¥Î±N§ó¬°¼sªx¡C
 
+IPv6
+IPv6 ¥þ¦W¬° IP version 6¡A¥¼¨Ó±N¨ú¥N¥Ø«e©Ò¨Ï¥Îªº IPv4¡CIPv6 ·s¼W³\¦h¹ï¦h´CÅé¶Ç¿éªº¤ä´©¡A¨Ò¦p 
+multicasting¡Bauthentication/encryptionµ¥¡C¤£¹L¥Ø«e©|¤´¥¼¥þ­±¤É¯Å¡A©Ò¥HÀ³¥Î¤´¨ü­­¡C
+UDP ³q°T¨ó©w
+UDP ¥þ¦W¬O Universal Datagram Protocol¡AUDP ³q°T¨ó©w¬O Video Streaming ªº°ò¥Û¡CUDP »P TCP ¤£¦Pªº
+¬O¡AUDP ¨Ã¨S¦³¿ù»~ÀË¬d¡A¤£¹L³o¦b Video Streaming ªºÀ³¥Î¬O¼vÂQ¤£¤Óªº¡C
+RTP ³q°T¨ó©w
+RTP ¥þ¦W¬° Real-Time Protocol¡ARTP ¬O¦b UDP «Ê¥]¤§«e¦h¥[ 10 bytes ªºÀÉÀY¡A¸Ì­±°O¸ü¦³®É¶¡¡B§Ç¸¹¡B
+À£ÁY«¬ºAµ¥¸ê°T¡CRTP ¬O¥Ø«e¤j¦h¼Æ Video Streaming ³nÅé©Ò¨Ï¥Îªº³q°T¨ó©w¡C
+RTP ¥i¥Î¨Ó°w¹ï¦UºØ¤£¦Pªº¦h´CÅé®æ¦¡°µ Streaming ªº¤u§@¡A¦]¬°§Ú­Ì±N¼v¹³¤À¸Ñ¦¨¼Æ­Ó RTP «Ê¥]¦A¶Ç°e¥X
+¥h¡A¦]¦¹·|¹J¨ì³\¦hºô¸ô§Þ³N±`·|¹J¨ìªº°ÝÃD¡C¨Ò¦p¡A¦]¬°«Ê¥]°e¹Fªº®É¶¡¤£¤@¡A³y¦¨¼½©ñ®É·|µe­±¤£¬yºZªº
+²{¹³¡A¦]¦¹¡A¦b¼½µo®É´N¥²¶·¨Ï¥Î¤@­Ó½w ½Ä°Ï (playout buffer) ¨Ó¼È®É¦s©ñ¨Ã³B²zºô¸ô¤W±µ¨ü¨ìªº«Ê¥]¡C
+¥Ñºô¸ô¤W±µ¦¬ªº¼v¹³«Ê¥]¦]¬°©¼¦¹¤§¶¡¨ì¹Fªº®É¶¡¶¡¹j¤£¦P (Synchronous Data Packets)¡A©Ò¥H¥²¶·§Q¥Î½w½Ä
+°Ï±N³o¨Ç«Ê¥]°µ½w½Ä¡AÅý©¼¦¹¤§¶¡ªº®É¶¡¶¡¹j¤@¼Ë (Isochronous Data Packets)¡C
+MPEG-1 ªº­ì²z
+MPEG-1 ªº½s½X­ì²z¤j®a³£À³¸Ó­n»{ÃÑ¤@¤U¡CMPEG-1 ±N¼v¹³¤À¦¨¤@­Ó Group¡A§Y GOP (Group of Pictures)¡A
+¨C­Ó GOP ¦³¤@­Ó Entry Point¡AºÙ¬° I-frame¡A¨C­Ó I-frame ªº¤j¤p¬° 15KB¡A¥t¥~ÁÙ¦³ P-frame »P B-frame¡C
+I-frame ºÙ¬° Independent-frame¡A¬°¨C­Ó GOP ªº°_ÂI¡Aºò±µµÛªº¬O¤G­Ó B-frame¡AB-frame ºÙ¬° Bi-directional frame¡A
+¨C­Ó B-frame ¤j¤p¬° 3KB¡A¨C¤G­Ó B-frame ¤§¶¡¦A´¡¤J¤@­Ó P-frame¡A§Y Predictive-frame¡A¨C­Ó B-frame 
+ªº¤j¤p¬° 8KB¡C
+GOP ¦@¦³¤TºØ¤£¦Pªº frame¡A¨CºØ frame ¦s©ñªº¼v¹³»P©Ê½è¬Ò¤£¦P¡A³o¦b¥H«á§Ú­Ì¹ê°µµ{¦¡®É·|¦A°µ§ó²M·¡ªº
+¤¶²Ð¡C¨Ò¦p¡A§Ú­Ì­n±N¼v¤ù§ÖÂà®É¡A¥i¥H©¿²¤±¼©Ò¦³ªº B-frame »P P-frame¡A¥u¼·©ñ I-frame¡A¦p¦¹¤@¨Ó«K¥i
+¥H¸`¬Ù³\¦h¶QÄ_ªººô¸ôÀW¼e»P®É¶¡¡A¦ý«e´£¬O¡AI-frame ¥²¶·¦s©ñ¥D­nªº¼v¹³¸ê®Æ¡A¨Æ¹ê¤W¤]¬O¦p¦¹¡C
+
+
+/******************************************************************************/
+«D±`¥þªºlinux­±¸Õµ§¸ÕÃD¤Î°Ñ¦Òµª®×  ref: http://www.coctec.com/docs/linux/show-post-45721.html
+/******************************************************************************/
+¤õ¬P¤H @ 2014-03-08 , reply:0 
+Tags: linux system ¨t²Î
+¤@¡D¶ñªÅÃD¡G
+1. ¦bLinux¨t²Î¤¤,¥H ¤å¥ó ¤è¦¡³X°Ý³]³Æ .
+2. Linux¤º®Ö¤Þ¾É®É,±q¤å¥ó /etc/fstab ¤¤Åª¨ú­n¸ü¤Jªº¤å¥ó¨t²Î.
+3. Linux¤å¥ó¨t²Î¤¤¨C­Ó¤å¥ó¥Î i¸`ÂI ¨Ó¼ÐÃÑ.
+4. ¥þ³¡ºÏºÐ¶ô¥Ñ¥|­Ó³¡¤À²Õ¦¨,¤À§O¬°¤Þ¾É¶ô ¡B±M¥Î¶ô ¡B i¸`ÂIªí¶ô ©M¼Æ¾Ú¦sÀx¶ô.
+5. Ãì±µ¤À¬°¡G µwÃì±µ ©M ²Å¸¹Ãì±µ .
+6. ¶W¯Å¶ô¥]§t¤Fi¸`ÂIªí ©M ªÅ¶~¶ôªí µ¥­«­nªº¤å¥ó¨t²Î¸ê°T.
+7. ¬Y¤å¥óªº³\¥iÅv¬°¡Gd-rw-_r--_r--,¥Î¼Æ­È§Î¦¡ªí¥Ü¸Ó³\¥iÅv,«h¸Ó¤K¶i¦ì¼Æ¬°¡G 644 ,¸Ó¤å¥óÄÝ©Ê¬O ¥Ø¿ý .
+8. «e¥x°_°Êªº¶iµ{¨Ï¥Î Ctrl c ²×¤î.
+9. ÀRºA¸ô¥Ñ³]©w«á,­Yºô¸ô©Ý¼³µ²ºcµo¥ÍÅÜ¤Æ,»Ý¥Ñ¨t²ÎºÞ²z­û­×§ï¸ô¥Ñªº³]¸m.
+10. ºô¸ôºÞ²zªº­«­n¥ô°È¬O¡G ±±¨î ©M ºÊ±± .
+11. ¦w¸ËLinux¨t²Î¹ïµwºÐ¤À°Ï®É,¦³¨âºØ¤À°ÏÃþ«¬¡G ¤å¥ó¨t²Î¤À°Ï ©M ¥æ´«¤À°Ï .
+13. ½s¼gªºShellµ{¦¡¹B¦æ«e½á¤©¸Ó¸}¥»¤å¥ó °õ¦æ ³\¥iÅv.
+14. ¨t²ÎºÞ²zªº¥ô°È¤§¤@¬O¯à°÷¦b ¤À´²¦¡ Àô¹Ò¤¤¹ê²{¹ïµ{¦¡©M¼Æ¾Úªº¦w¥þ«OÅ@¡B³Æ¥÷¡B«ì´_©M§ó·s.
+15. ¨t²Î¥æ´«¤À°Ï¬O§@¬°¨t²Î
+
+µêÀÀ¦sÀx¾¹ ªº¤@¶ô°Ï°ì.
+16. ¤º®Ö¤À¬° ¶iµ{ºÞ²z¨t²Î ¡B °O¾ÐÅéºÞ²z¨t²Î ¡B I/OºÞ²z¨t²Î ©M¤å¥óºÞ²z¨t²Î µ¥¥|­Ó¤l¨t²Î.
+17. ¤º®Ö°t¸m¬O¨t²ÎºÞ²z­û¦b§ïÅÜ¨t²Î°t¸m µwÅé ®É­n¶i¦æªº­«­n¾Þ§@.
+18. ¦b¦w¸ËLinux¨t²Î¤¤,¨Ï¥Înetconfigµ{¦¡¹ïºô¸ô¶i¦æ°t¸m,¸Ó¦w¸Ëµ{¦¡·|¤@¨B¨B´£¥Ü¥Î¤á¿é¤J¥D¾÷¦W¡B°ì¦W¡B°ì¦W¦øªA¾¹¡BIP¦a§}¡B ºôÃö¦a§} ©M ¤lºô±»½X µ¥¥²­n¸ê°T.
+19. °ß¤@¼ÐÃÑ¨C¤@­Ó¥Î¤áªº¬O¥Î¤á ID ©M¥Î¤á¦W.
+20 . RIP ¨ó©w¬O³Ì¬°´¶¹Mªº¤@ºØ¤º³¡¨ó©w,¤@¯ëºÙ¬°°ÊºA¸ô¥Ñ¸ê°T¨ó©w.
+21. ¦bLinux¨t²Î¤¤©Ò¦³¤º®e³£³Qªí¥Ü¬°¤å¥ó,²ÕÂ´¤å¥óªº¦UºØ¤èªkºÙ¬° ¤å¥ó¨t²Î .
+22. DHCP¥i¥H¹ê²{°ÊºA IP ¦a§}¤À°t.
+23. ¨t²Îºô¸ôºÞ²z­ûªººÞ²z¹ï¶H¬O¦øªA¾¹¡B ¥Î¤á ©M¦øªA¾¹ªº¶iµ{ ¥H¤Î¨t²Îªº¦UºØ¸ê·½.
+24. ºô¸ôºÞ²z³q±`¥ÑºÊ´ú¡B¶Ç¿é©MºÞ²z¤T³¡¤À²Õ¦¨,¨ä¤¤ºÞ²z³¡¤À¬O¾ã­Óºô¸ôºÞ²zªº¤¤¤ß.
+25. ·í·Q§R°£¥»¨t²Î¥Î¤£¤Wªº ³]³ÆÅX°Êµ{¦¡ ®É½sÄ¶¤º®Ö,·í¤º®Ö¤£¤ä´©¨t²Î¤Wªº ³]³ÆÅX°Êµ{¦¡ ®É,¹ï¤º®Ö ¤É¯Å .
+26 Ping©R¥O¥i¥H´ú¸Õºô¸ô¤¤¥»¾÷¨t²Î¬O§_¯à¨ì¹F ¤@¥x»·ºÝ¥D¾÷ ,±`±`¥Î©ó´ú¸Õºô¸ôªº ³s³q©Ê .
+27. vi½s¿è¾¹¨ã¦³¨âºØ¤u§@¼Ò¦¡¡G ©R¥O¼Ò¦¡ ©M ¿é¤J¼Ò¦¡ .
+28. ¥i¥H¥Îls ¡Val©R¥O¨ÓÆ[¹î¤å¥óªº³\¥iÅv,¨C­Ó¤å¥óªº³\¥iÅv³£¥Î10¦ìªí¥Ü,¨Ã¤À¬°¥|¬q,¨ä¤¤²Ä¤@¬q¥e 1 ¦ì,ªí¥Ü ¤å¥óÃþ«¬ ,²Ä¤G¬q¦û3¦ì,ªí¥Ü ¤å¥ó©Ò¦³ªÌ ¹ï¸Ó¤å¥óªº³\¥iÅv.
+
+29. ¶iµ{»Pµ{¦¡ªº°Ï§O¦b©ó¨ä°ÊºA©Ê,°ÊºAªº²£¥Í©M²×¤î,±q²£¥Í¨ì²×¤î¶iµ{¥i¥H¨ã¦³ªº°ò¥»ª¬ºA¬°¡G ¹B¦æºA ¡B ´NºüºA ©M µ¥«ÝºA¡]ªý¶ëºA¡^ .
+30. DNS¹ê»Ú¤W¬O¤À§G¦binternet¤Wªº¥D¾÷¸ê°Tªº¸ê®Æ®w,¨ä§@¥Î¬O¹ê²{ IP¦a§}©M¥D¾÷¦W ¤§¶¡ªºÂà´«.
+31. Apache¬O¹ê²{WWW¦øªA¾¹¥\¯àªºÀ³¥Îµ{¦¡,§Y³q±`©Ò»¡ªº"ÂsÄýweb¦øªA¾¹",¦b¦øªA¾¹ºÝ ¬°¥Î¤á´£¨ÑÂsÄý webªA°È ªº´N¬OapacheÀ³¥Îµ{¦¡.
+32. ¦bLinux¨t²Î¤W°µ³Æ¥÷¥i¥H¦³¨âºØÃþ«¬¡G¨t²Î³Æ¥÷ ©M ¥Î¤á³Æ¥÷ .¨ä¤¤«eªÌ¬O«ü¹ï §@·~¨t²Î ªº³Æ¥÷,«áªÌ¬O«ü¹ï À³¥Îµ{¦¡©M¥Î¤á¤å¥óªº³Æ¥÷.
+33. CD-ROM¼Ð·Çªº¤å¥ó¨t²ÎÃþ«¬¬O iso9660 .
+34. ·ílilo.conf°t¸m§¹²¦«á,¨Ï¤§¥Í®Ä,À³¹B¦æªº©R¥O¤Î°Ñ¼Æ¬O lilo .
+35. ¦b¨Ï¥Îls©R¥O®É,¥Î¤K¶i¦ì§Î¦¡Åã¥Ü«D¦C¦L¦r¤¸À³¨Ï¥Î°Ñ¼Æ -b .
+36. Linux¨Ï¥Î¤ä´©Windows 9.x/2000ªø¤å¥ó¦Wªº¤å¥ó¨t²ÎªºÃþ«¬¬O vfat .
+37. ³]©w­­¨î¥Î¤á¨Ï¥ÎºÏºÐªÅ¶¡ªº©R¥O¬O quota .
+38 ¦bLinux¨t²Î¤¤,¥Î¨Ó¦s©ñ¨t²Î©Ò»Ý­nªº°t¸m¤å¥ó©M¤l¥Ø¿ýªº¥Ø¿ý¬O /etc .
+39. µw³s±µ¥u¯à«Ø¥ß¹ï ¤å¥ó Ãì±µ.²Å¸¹Ãì±µ¥i¥H¸ó¤£¦P¤å¥ó¨t²Î³Ð«Ø.
+40. ®M±µ¦r¤å¥óªºÄÝ©Ê¦ì¬O s .
+41. µ²§ô«á¥x¶iµ{ªº©R¥O¬O kill .
+42. ¶iµ{ªº¹B¦æ¦³¨âºØ¤è¦¡,§Y ¿W¥ß¹B¦æ©M¨Ï¥Î¤÷¶iµ{¹B¦æ .
+43. Links¤À¬° µwÃì±µ©M²Å¸¹Ãì±µ .
+44. ¦b¶W¯Å¥Î¤á¤UÅã¥ÜLinux¨t²Î¤¤¥¿¦b¹B¦æªº¥þ³¡¶iµ{,À³¨Ï¥Îªº©R¥O¤Î°Ñ¼Æ¬O ps -aux .
+45. ºÞ¹D¤å¥óªºÄÝ©Ê¦ì¬O p .
+46. ±N«e¤@­Ó©R¥Oªº¼Ð·Ç¿é¥X§@¬°«á¤@­Ó©R¥Oªº¼Ð·Ç¿é¤J,ºÙ¤§¬° ºÞ¹D .
+47. ¬°¸}¥»µ{¦¡«ü©w°õ¦æÅvªº©R¥O¤Î°Ñ¼Æ¬O chmod a x filename .
+48. ¶i¦æ»·ºÝµn¿ýªº©R¥O¬O telnet .
+
+49. ±ýµo°e10­Ó¤À²Õ³ø¤å´ú¸Õ»P¥D¾÷abc.tuu.edu.cnªº³s³q©Ê,À³¨Ï¥Îªº©R¥O©M°Ñ¼Æ¬O¡G ping abc.tuu.edu.cn ¡Vc 10 .
+50. DNS¦øªA¾¹ªº¶iµ{©R¦W¬°named,·í¨ä±Ò°Ê®É,¦Û°Ê¸Ë¸ü /etc¥Ø¿ý¤Uªº named.conf ¤å¥ó¤¤©w¸qªºDNS¤À°Ï¸ê®Æ®w¤å¥ó.
+51. Apache¦øªA¾¹¶iµ{°t¸m¤å¥ó¬O httpd.conf .52.¦b Linux¨t²Î¤¤,À£ÁY¤å¥ó«á¥Í¦¨«áºó¬°.gz¤å¥óªº©R¥O¬O gzip .
+53. ¦b¥Îvi½s¿è¤å¥ó®É,±N¤å¥ó¤º®e¦s¤Jtest.txt¤å¥ó¤¤,À³¦b©R¥O¼Ò¦¡¤UÁä¤J ¡Gw test.txt .
+54 ¥i¥H¦b¼Ð·Ç¿é¥X¤WÅã¥Ü¾ã¦~¤é¾äªº©R¥O¤Î°Ñ¼Æ¬O cal -y .
+55. ¦bshell½sµ{®É,¨Ï¥Î¤è¬A©·ªí¥Ü´ú¸Õ±ø¥óªº³W«h¬O¡G¤è¬A©·¨âÃä¦³ ªÅ®æ .
+56. ÀË¬d¤w¦w¸Ëªº¤å¥ó¨t²Î/dev/had5¬O§_¥¿±`,­YÀË¬d¦³¿ù,«h¦Û°Ê­×´_,¨ä©R¥O¤Î°Ñ¼Æ¬O fsck ¡Va /dev/had5 .
+57. ¦bWindows9.xÀô¹Ò¤U¦@¨ÉUnix/Linux¤¤ªº¥Î¤á¥Ø¿ýªº¤@­Ó¤u¨ã¬O Samba¦øªA¾¹ .
+58. ¨t²ÎºÞ²z­ûªºÂ¾³d¬O¶i¦æ¨t²Î¸ê·½ºÞ²z¡B¨t²Î©Ê¯àºÞ²z¡B³]³ÆºÞ²z¡B¦w¥þºÞ²z©M ¨t²Î©Ê¯àºÊ´ú .
+59 ¦bLinux¨t²Î¤¤,´ú¸ÕDNS¦øªA¾¹¬O§_¯à°÷¥¿½T¸ÑªR°ì¦Wªºªº¥Î¤áºÝ©R¥O,¨Ï¥Î©R¥O nslookup .
+60. ¦bLinux¨t²Î¤U,²Ä¤G­ÓIDE³q¹DªºµwºÐ¡]±q½L¡^³Q¼ÐÃÑ¬° hdb .
+61. ·í¨t²ÎºÞ²z­û»Ý¤É¯Å¤º®Öª©¥»©M§ïÅÜ¨t²ÎµwÅé°t¸m®É,À³ ­«·s½sÄ¶¤º®Ö .
+62. ¦pªG¥u¬O­n­×§ï¨t²ÎªºIP¦a§},À³­×§ï /etc/rc.d/rc.inet1 °t¸m¤å¥ó.
+63. ·íLAN¤º¨S¦³±ø¥ó«Ø¥ßDNS¦øªA¾¹,¦ý¤S·QÅý°Ï°ìºô¤ºªº¥Î¤á¥i¥H¨Ï¥Î¹q¸£¦W¤¬¬Û³X°Ý®É,À³°t¸m /etc/hosts ¤å¥ó.
+64. ¦bvi½s¿èÀô¹Ò¤U,¨Ï¥Î EscÁä ¶i¦æ¼Ò¦¡Âà´«.
+65. Slackware Linux 9.0³q±`¨Ï¥Î ext3 ¤å¥ó¨t²Î,¨t²Îªº¥þ³¡ºÏºÐ¶ô¥Ñ ¥| ³¡¤À²Õ¦¨.
+66. ±N/home/stud1/wang¥Ø¿ý°µÂkÀÉÀ£ÁY,À£ÁY«á¥Í¦¨wang.tar.gz¤å¥ó,¨Ã±N¦¹¤å¥ó«O¦s¨ì/home¥Ø¿ý¤U,¹ê²{¦¹¥ô°Èªºtar©R¥O®æ¦¡ tar zcvf /home/wang.tar.gz /home/stud1/wang .
+
+67. ºÞ¹D´N¬O±N«e¤@­Ó©R¥Oªº ¼Ð·Ç¿é¥X §@¬°«á¤@­Ó©R¥Oªº ¼Ð·Ç¿é¤J .
+68. ¦b¨Ï¥Î¤â¤uªº¤èªk°t¸mºô¸ô®É,¥i³q¹L­×§ï /etc/HOSTNAME ¤å¥ó¨Ó§ïÅÜ¥D¾÷¦W,­Y­n°t¸m¸Ó¹q¸£ªº°ì¦W¸ÑªR¥Î¤áºÝ,»Ý°t¸m /etc/resolv.conf ¤å¥ó.
+69. ±Ò°Ê¶iµ{¦³¤â°Ê±Ò°Ê©M½Õ«×±Ò°Ê¨âºØ¤èªk,¨ä¤¤½Õ«×±Ò°Ê±`¥Îªº©R¥O¬° at ¡B batch ©M crontab .
+70. test.bns.com.cnªº°ì¦W¬O bns.com.cn ,¦pªG­n°t¸m¤@°ì¦W¦øªA¾¹,À³¦b named.conf ¤å¥ó¤¤©w¸qDNS¸ê®Æ®wªº¤u§@¥Ø¿ý.
+71. Sendmail¶l¥ó¨t²Î¨Ï¥Îªº¨â­Ó¥D­n¨ó©w¬O¡G SMTP ©M POP ,«eªÌ¥Î¨Óµo°e¶l¥ó,«áªÌ¥Î¨Ó±µ¦¬¶l¥ó.
+72. DHCP¬O°ÊºA¥D¾÷°t¸m¨ó©wªºÂ²ºÙ,¨ä§@¥Î¬O¡G¬°ºô¸ô¤¤ªº¥D¾÷¤À°tIP¦a§} .
+73. ¥Ø«e¥N²z¦øªA¾¹¨Ï¥Îªº³nÅé¥]¦³«Ü¦hºØ,±Ð§÷¤¤¨Ï¥Îªº¬O squid .
+74. rm©R¥O¥i§R°£¤å¥ó©Î¥Ø¿ý,¨ä¥D­n®t§O´N¬O¬O§_¨Ï¥Î»¼Âk¶}Ãö -r©Î-R .
+75. mv ©R¥O¥i¥H²¾°Ê¤å¥ó©M¥Ø¿ý,ÁÙ¥i¥H¬°¤å¥ó©M¥Ø¿ý­«·s©R¦W.
+76. ¸ô¥Ñ¿ï¾Ü¨ó©w¡]RIP¡^ªº¸õ¼Æªí¥Ü¨ì¹F¥Øªº¦a¤§«e³q¹Lªº ºôÃö ¼Æ,RIP±µ¨üªº³Ìªø¶ZÂ÷¬O 15¸õ .
+77. ping©R¥O¥Î©ó´ú¸Õºô¸ôªº³s³q©Ê,ping©R¥O³q¹L ICMP ¨ó©w¡]internet±±¨î¸ê°T¨ó©w¡^¨Ó¹ê²{.
+78. nfs ¨ó©w¥Î©ó¹ê²{Unix¡]/linux¡^¥D¾÷¤§¶¡ªº¤å¥ó¨t²Î¦@¨É.
+79. ¦bLinux§@·~¨t²Î¤¤,³]³Æ³£¬O³q¹L¯S®íªº ¤å¥ó ¨Ó³X°Ý.
+80. shell¤£¶È¬O ¥Î¤á©R¥Oªº¸ÑÄÀ¾¹ ,¥¦¦P®É¤]¬O¤@ºØ¥\¯à±j¤jªº½sµ{»y¨¥. bash¬OLinuxªº¹w³]shell.
+81. ¥Î ¡r;¡r; ²Å¸¹±N¿é¥X­«©w¦V¤º®eªþ¥[¦b­ì¤åªº«á­±.
+82. ¼W¥[¤@­Ó¥Î¤áªº©R¥O¬O¡Gadduser ©Îuseradd .
+83 ¶i¦æ¦r¤¸¦ê¬d§ä,¨Ï¥Îgrep©R¥O.
+84. ¨Ï¥Î * ¨C¦¸¤Ç°t­Y¤z­Ó¦r¤¸.
+85. /sbin ¥Ø¿ý¥Î¨Ó¦s©ñ¨t²ÎºÞ²z­û¨Ï¥ÎªººÞ²zµ{¦¡.¤G¡D³æ¶µ¿ï¾ÜÃD:
+
+1. ¤U­±ªººô¸ô¨ó©w¤¤,­±¦V³s±µªºªº¨ó©w¬O¡G A .
+A ¶Ç¿é±±¨î¨ó©w B ¥Î¤á¼Æ¾Ú³ø¨ó©w C ºô»Ú¨ó©w D ºô»Ú±±¨î³ø¤å¨ó©w
+2. ¦b/etc/fstab¤å¥ó¤¤«ü©wªº¤å¥ó¨t²Î¸ü¤J°Ñ¼Æ¤¤, D °Ñ¼Æ¤@¯ë¥Î©óCD-ROMµ¥²¾°Ê³]³Æ.
+A defaults B sw C rw©Mro D noauto
+3. Linux¤å¥ó³\¥iÅv¤@¦@10¦ìªø«×,¤À¦¨¥|¬q,²Ä¤T¬qªí¥Üªº¤º®e¬O C .
+A ¤å¥óÃþ«¬ B ¤å¥ó©Ò¦³ªÌªº³\¥iÅv 
+C ¤å¥ó©Ò¦³ªÌ©Ò¦b²Õªº³\¥iÅv D ¨ä¥L¥Î¤áªº³\¥iÅv
+4. ²×¤î¤@­Ó«e¥x¶iµ{¥i¯à¥Î¨ìªº©R¥O©M¾Þ§@ B .
+A kill B ¡qCTRL¡r; C C shut down D halt
+5¡D¦b¨Ï¥Îmkdir©R¥O³Ð«Ø·sªº¥Ø¿ý®É,¦b¨ä¤÷¥Ø¿ý¤£¦s¦b®É¥ý³Ð«Ø¤÷¥Ø¿ýªº¿ï¶µ¬O D .
+A -m B -d C -f D -p
+6. ¤U­±Ãö©ói¸`ÂI´y­z¿ù»~ªº¬O A .¡]inode¬O¤@ºØ¼Æ¾Úµ²ºc,vfs¤¤´y­z¤å¥óªº¬ÛÃö°Ñ¼Æ¡H¡H¡^
+A i¸`ÂI©M¤å¥ó¬O¤@¤@¹ïÀ³ªº
+B i¸`ÂI¯à´y­z¤å¥ó¦û¥Îªº¶ô¼Æ
+C i¸`ÂI´y­z¤F¤å¥ó¤j¤p©M«ü¦V¼Æ¾Ú¶ôªº«ü°w
+D ³q¹Li¸`ÂI¹ê²{¤å¥óªºÅÞ¿èµ²ºc©Mª«²zµ²ºcªºÂà´«
+7. ¤@­Ó¤å¥ó¦W¦r¬°rr.Z,¥i¥H¥Î¨Ó¸ÑÀ£ÁYªº©R¥O¬O¡G D .
+A tar B gzip C compress D uncompress
+8. ¨ã¦³«Ü¦hC»y¨¥ªº¥\¯à,¤SºÙ¹LÂo¾¹ªº¬O C .
+A csh
+B tcsh
+C awk¡@¡@¡]awk¸Ô¸Ñ¡^
+D sed
+9. ¤@¥x¥D¾÷­n¹ê²{³q¹L°Ï°ìºô»P¥t¤@­Ó°Ï°ìºô³q«H,»Ý­n°µªº¤u§@¬O C .A °t¸m°ì¦W¦øªA¾¹
+B ©w¸q¤@±ø¥»¾÷«ü¦V©Ò¦bºô¸ôªº¸ô¥Ñ
+C ©w¸q¤@±ø¥»¾÷«ü¦V©Ò¦bºô¸ôºôÃöªº¸ô¥Ñ
+D ©w¸q¤@±ø¥»¾÷«ü¦V¥Ø¼Ðºô¸ôºôÃöªº¸ô¥Ñ
+10. «Ø¥ß°ÊºA¸ô¥Ñ»Ý­n¥Î¨ìªº¤å¥ó¦³ D .
+A /etc/hosts B /etc/HOSTNAME C /etc/resolv.conf D /etc/gateways
+11. °Ï°ìºôªººô¸ô¦a§}192.168.1.0/24,°Ï°ìºô¸ô³s±µ¨ä¥¦ºô¸ôªººôÃö¦a§}¬O192.168.1.1.¥D¾÷192.168.1.20³X°Ý172.16.1.0/24ºô¸ô®É,¨ä¸ô¥Ñ³]¸m¥¿½Tªº¬O B .
+
+A route add ¡Vnet 192.168.1.0 gw 192.168.1.1 netmask 255.255.255.0 metric 1
+B route add ¡Vnet 172.16.1.0 gw 192.168.1.1 netmask 255.255.255.255 metric 1
+C route add ¡Vnet 172.16.1.0 gw 172.16.1.1 netmask 255.255.255.0 metric 1
+D route add default 192.168.1.0 netmask 172.168.1.1 metric 1
+12. ¤U¦C´£ªk¤¤,¤£ÄÝ©óifconfig©R¥O§@¥Î½d³òªº¬O D .
+A °t¸m¥»¦a°jÀô¦a§} B °t¸mºô¥dªºIP¦a§}
+C ¿E¬¡ºô¸ô¾A°t¾¹ D ¸ü¤Jºô¥d¨ì¤º®Ö¤¤
+13. ¤U¦CÃö©óÃì±µ´y­z,¿ù»~ªº¬O B .
+A µwÃì±µ´N¬OÅýÃì±µ¤å¥óªºi¸`ÂI¸¹«ü¦V³QÃì±µ¤å¥óªºi¸`ÂI
+B µwÃì±µ©M²Å¸¹³s±µ³£¬O²£¥Í¤@­Ó·sªºi¸`ÂI
+C Ãì±µ¤À¬°µwÃì±µ©M²Å¸¹Ãì±µ D µw³s±µ¤£¯àÃì±µ¥Ø¿ý¤å¥ó
+14. ¦b°Ï°ìºô¸ô¤ºªº¬Y¥x¥D¾÷¥Îping©R¥O´ú¸Õºô¸ô³s±µ®Éµo²{ºô¸ô¤º³¡ªº¥D¾÷³£¥i¥H³s¦P,¦Ó¤£¯à»P¤½ºô³s³q,°ÝÃD¥i¯à¬O C.
+A ¥D¾÷IP³]¸m¦³»~
+B ¨S¦³³]¸m³s±µ°Ï°ìºôªººôÃö
+C °Ï°ìºôªººôÃö©Î¥D¾÷ªººôÃö³]¸m¦³»~
+D °Ï°ìºôDNS¦øªA¾¹³]¸m¦³»~
+15. ¤U¦C¤å¥ó¤¤,¥]§t¤F¥D¾÷¦W¨ìIP¦a§}ªº¬M®gÃö«Yªº¤å¥ó¬O¡G B .
+A /etc/HOSTNAME B /etc/hosts C /etc/resolv.conf D /etc/networks
+16. ¤£»Ý­n½sÄ¶¤º®Öªº±¡ªp¬O D .
+A §R°£¨t²Î¤£¥Îªº³]³ÆÅX°Êµ{¦¡®É B ¤É¯Å¤º®Ö®É
+C ²K¥[·sµwÅé®É D ±Nºô¥d¿E¬¡
+17. ¦bshell¤¤ÅÜ¼Æªº½á­È¦³¥|ºØ¤èªk,¨ä¤¤,±Ä¥Îname=12ªº¤èªkºÙ A .
+A ª½±µ½á­È B¨Ï¥Îread©R¥O
+C ¨Ï¥Î©R¥O¦æ°Ñ¼Æ D¨Ï¥Î©R¥Oªº¿é¥X
+18. D ©R¥O¥i¥H±q¤å¥»¤å¥óªº¨C¤@¦æ¤¤ºI¨ú«ü©w¤º®eªº¼Æ¾Ú.
+A cp B dd C fmt D cut
+19. ¤U¦C¤£¬OLinux¨t²Î¶iµ{Ãþ«¬ªº¬O D .
+A ¥æ¤¬¶iµ{ B §å³B²z¶iµ{ C ¦uÅ@¶iµ{ D ´Nºü¶iµ{¡]¶iµ{ª¬ºA¡^
+20¡D°t¸mApache 1.3.19¦øªA¾¹»Ý­n­×§ïªº°t¸m¤å¥ó¬°___A______
+
+A httpd.conf B access.conf C srm.conf D named.conf
+21. ¤º®Ö¤£¥]¬Aªº¤l¨t²Î¬O D .
+A ¶iµ{ºÞ²z¨t²Î B °O¾ÐÅéºÞ²z¨t²Î C I/OºÞ²z¨t²Î DµwÅéºÞ²z¨t²Î
+22¡D ¦b¤é±`ºÞ²z¤¤,³q±`CPU·|¼vÅT¨t²Î©Ê¯àªº±¡ªp¬O¡G A .
+A CPU¤wº¡­t²ü¦a¹BÂà B CPUªº¹B¦æ®Ä²v¬°30%
+C CPUªº¹B¦æ®Ä²v¬°50% D CPUªº¹B¦æ®Ä²v¬°80%
+23¡D ­Y¤@¥x¹q¸£ªº°O¾ÐÅé¬°128MB,«h¥æ´«¤À°Ïªº¤j¤p³q±`¬O C .
+A 64MB B 128MB C 256MB D 512MB
+24¡D ¦b¦w¸ËLinuxªº¹Lµ{¤¤ªº²Ä¤­¨B¬OÅý¥Î¤á¿ï¾Ü¦w¸Ë¤è¦¡,¦pªG¥Î¤á§Æ±æ¦w¸Ë³¡¤À¤¸¥ó¡]³nÅéµ{¦¡¡^,¨Ã¦b¿ï¾Ü¦n«áÅý¨t²Î¦Û°Ê¦w¸Ë,À³¸Ó¿ï¾Üªº¿ï¶µ¬O D .
+A full B expert C newbie D menu
+25¡D Linux¦³¤T­Ó¬d¬Ý¤å¥óªº©R¥O,­Y§Æ±æ¦b¬d¬Ý¤å¥ó¤º®e¹Lµ{¤¤¥i¥H¥Î´å¼Ð¤W¤U²¾°Ê¨Ó¬d¬Ý¤å¥ó¤º®e,À³¨Ï¥Î C ©R¥O.
+A cat B more C less D menu
+26¡D ¤U¦C¸ê°T¬O¬Y¨t²Î¥Îps ¡Vef©R¥O¦C¥Xªº¥¿¦b¹B¦æªº¶iµ{, D ¶iµ{¬O¹B¦æInternet¶W¯Å¦øªA¾¹,¥¦­t³dºÊÅ¥Internet sockets¤Wªº³s±µ,¨Ã½Õ¥Î¦X¾Aªº¦øªA¾¹¨Ó³B²z±µ¦¬ªº¸ê°T.
+A root 1 4.0 0.0 344 204? S 17:09 0:00 init 
+B root 2 0.0 0.1 2916 1520? S 17:09 0:00 /sbin/getty 
+C root 3 0.0 0.2 1364 632? S 17:09 0:00 /usr/sbin/syslogd 
+D root 4 0.0 1344 1204? S 17:09 0:10 /usr/sbin/inetd 
+27¡D¦bTCP/IP¼Ò«¬¤¤,À³¥Î¼h¥]§t¤F©Ò¦³ªº°ª¼h¨ó©w,¦b¤U¦Cªº¤@¨ÇÀ³¥Î¨ó©w¤¤, B ¬O¯à°÷¹ê²{¥»¦a»P»·ºÝ¥D¾÷¤§¶¡ªº¤å¥ó¶Ç¿é¤u§@.
+A telnet B FTP C SNMP D NFS 
+28¡D·í§Ú­Ì»P¬Y»·ºÝºô¸ô³s±µ¤£¤W®É,´N»Ý­n¸òÂÜ¸ô¥Ñ¬d¬Ý,¥H«KÁA¸Ñ¦bºô¸ôªº¤°»ò¦ì¸m¥X²{¤F°ÝÃD,º¡¨¬¸Ó¥Øªºªº©R¥O¬O C .
+A ping B ifconfig C traceroute D netstat
+29¡D¹ï¦W¬°fidoªº¤å¥ó¥Îchmod 551 fido ¶i¦æ¤F­×§ï,«h¥¦ªº³\¥iÅv¬O D .
+
+A -rwxr-xr-x B -rwxr--r-- C -r--r--r-- D -r-xr-x-x
+30¡D ¦bi¸`ÂIªí¤¤ªººÏºÐ¦a§}ªí¤¤,­Y¤@­Ó¤å¥óªºªø«×¬O±qºÏºÐ¦a§}ªíªº²Ä1¶ô¨ì²Ä11¶ô,«h¸Ó¤å¥ó¦@¦û¦³ B ¶ô¸¹.
+A 256 B 266 C 11 D 256¡Ñ10
+(??)31¡D ¥Îls ¡Val ©R¥O¦C¥X¤U­±ªº¤å¥ó¦Cªí, D ¤å¥ó¬O²Å¸¹³s±µ¤å¥ó.
+A -rw-rw-rw- 2 hel-s users 56 Sep 09 11:05 hello
+B -rwxrwxrwx 2 hel-s users 56 Sep 09 11:05 goodbey
+C drwxr--r-- 1 hel users 1024 Sep 10 08:10 zhangD lrwxr--r-- 1 hel users 2024 Sep 12 08:12 cheng
+32¡D DNS°ì¦W¨t²Î¥D­n­t³d¥D¾÷¦W©M A ¤§¶¡ªº¸ÑªR.
+A IP¦a§} B MAC¦a§} C ºô¸ô¦a§} D ¥D¾÷§O¦W
+33¡D WWW¦øªA¾¹¬O¦bInternet¤W¨Ï¥Î³Ì¬°¼sªx,¥¦±Ä¥Îªº¬O B µ²ºc.
+A ¦øªA¾¹/¤u§@¯¸ B B/S C ¶°¤¤¦¡ D ¤À´²¦¡
+34¡DLinux¨t²Î³q¹L C ©R¥Oµ¹¨ä¥L¥Î¤áµo®ø®§.
+A less B mesg y C write D echo to[ µù¡Gmesg [y|n] ©Ò¦³¨Ï¥ÎªÌ ¨M©w¬O§_¤¹³\¨ä¥L¤H¶Ç°T®§¨ì¦Û¤vªº²×ºÝ¾÷¤¶­± ]
+
+
+35¡DNFS¬O C ¨t²Î.
+A ¤å¥ó B ºÏºÐ C ºô¸ô¤å¥ó D ¾Þ§@
+36¡D B ©R¥O¥i¥H¦bLinuxªº¦w¥þ¨t²Î¤¤§¹¦¨¤å¥ó¦VºÏ±a³Æ¥÷ªº¤u§@.
+A cp B tr C dir D cpio[µù¡G¦pªG¥Î echo $PATH ©ÎªÌ echo $LD_LIBRARY_PATH µ¥Ãþ¦üªº©R¥O¨ÓÅã¥Ü¸ô®|¸ê°Tªº¸Ü,§Ú­Ì¬Ý¨ìªº±N·|¬O¤@¤j°ï¥Î«_¸¹³s±µ¦b¤@°_ªº¸ô®|, tr ©R¥O¥i¥H§â³o¨Ç«_¸¹Âà´«¬°¦^¨®,³o¼Ë,³o¨Ç¸ô®|´N¨ã¦³«Ü¦nªº¥iÅª©Ê¤F¡G
+echo $PATH | tr ":" "\n"]
+37¡DLinux¤å¥ó¨t²Îªº¤å¥ó³£«ö¨ä§@¥Î¤Àªù§OÃþ¦a©ñ¦b¬ÛÃöªº¥Ø¿ý¤¤,¹ï©ó¥~³¡³]³Æ¤å¥ó,¤@¯ëÀ³±N¨ä©ñ¦b C ¥Ø¿ý¤¤.
+A /bin B /etc C /dev D /lib 
+38¡D¦b­«·s±Ò°ÊLinux¨t²Îªº¦P®É§â°O¾ÐÅé¤¤ªº¸ê°T¼g¤JµwºÐ,À³¨Ï¥Î D ©R¥O¹ê²{.
+
+A # reboot B # halt C # reboot D # shutdown ¡Vr now
+39¡Dºô¸ôºÞ²z¨ã³Æ¥H¤U´X¤j¥\¯à¡G°t¸mºÞ²z¡B A ¡B©Ê¯àºÞ²z¡B¦w¥þºÞ²z©M­p¶OºÞ²zµ¥.
+A ¬G»ÙºÞ²z B ¤é±`³Æ¥÷ºÞ²z C ¤É¯ÅºÞ²z D µo°e¶l¥ó
+40¡DÃö©ó¥N²z¦øªA¾¹ªº½×­z,¥¿½Tªº¬O A .
+A ¨Ï¥Îinternet¤W¤w¦³ªº¤½¶}¥N²z¦øªA¾¹,¥u»Ý°t¸m¥Î¤áºÝ.
+B ¥N²z¦øªA¾¹¥u¯à¥N²z¥Î¤áºÝhttpªº½Ð¨D.
+C ³]¸m¦nªº¥N²z¦øªA¾¹¥i¥H³Qºô¸ô¤W¥ô¦ó¥D¾÷¨Ï¥Î.
+D ¨Ï¥Î¥N²z¦øªA¾¹ªº¥Î¤áºÝ¨S¦³¦Û¤vªºip¦a§}.
+41.Ãö³¬linux¨t²Î¡]¤£­«·s±Ò°Ê¡^¥i¨Ï¥Î©R¥O B .
+A Ctrl Alt Del B halt C shutdown -r now D reboot
+42¡D¹ê²{±qIP¦a§}¨ì¤A¤ÓºôMAC¦a§}Âà´«ªº©R¥O¬°¡G C .
+A ping B ifconfig C arp D traceroute
+43¡D¦bvi½s¿è¾¹¤¤ªº©R¥O¼Ò¦¡¤U,Áä¤J B ¥i¦b´å¼Ð·í«e©Ò¦b¦æ¤U²K¥[¤@·s¦æ.
+A ¡qa¡r; B ¡qo¡r; C ¡qI¡r; D A
+44¡D¦bvi½s¿è¾¹¤¤ªº©R¥O¼Ò¦¡¤U,§R°£·í«e´å¼Ð³Bªº¦r¤¸¨Ï¥Î A ©R¥O.
+A ¡qx¡r; B ¡qd¡r;¡qw¡r; C ¡qD¡r; D ¡qd¡r;¡qd¡r;
+45¡D¦bvi½s¿è¾¹¤¤ªº©R¥O¼Ò¦¡¤U,­«½Æ¤W¤@¦¸¹ï½s¿èªº¤å¥»¶i¦æªº¾Þ§@,¥i¨Ï¥Î C ©R¥O.
+A ¤W½bÀY B ¤U½bÀY C ¡q.¡r; D ¡q*¡r;
+46¡D¥Î©R¥Ols -alÅã¥Ü¥X¤å¥óffªº´y­z¦p¤U©Ò¥Ü,¥Ñ¦¹¥iª¾¤å¥óffªºÃþ«¬¬° A .
+-rwxr-xr-- 1 root root 599 Cec 10 17:12 ff
+A ´¶³q¤å¥ó B µwÃì±µ C ¥Ø¿ý D ²Å¸¹Ãì±µ
+47¡D§R°£¤å¥ó©R¥O¬°¡G D .
+A mkdir B rmdir C mv D rm
+48¡D¦b¤U¦Cªº¦WºÙ¤¤,¤£ÄÝ©óDNS¦øªA¾¹Ãþ«¬ªº¬O¡G____C_____
+A Primary Master Server B Secondary Master Server
+C samba D Cache_only Server
+49¡Dºô¸ôºÞ²z­û¹ïWWW¦øªA¾¹¶i¦æ³X°Ý¡B±±¨î¦s¨ú©M¹B¦æµ¥±±¨î,³o¨Ç±±¨î¥i¦b A ¤å¥ó¤¤Åé²{.
+A httpd.conf B lilo.conf C inetd.conf D resolv.conf
+
+50¡D¶l¥óÂàµo¥N²z¤]ºÙ¶l¥óÂàµo¦øªA¾¹,¥¦¥i¥H¨Ï¥ÎSMTP¨ó©w,¤]¥i¥H¨Ï¥Î C ¨ó©w. 
+A FTP B TCP C UUCP D POP
+51¡D±Ò°Êsamba¦øªA¾¹¶iµ{,¥i¥H¦³¨âºØ¤è¦¡¡G¿W¥ß±Ò°Ê¤è¦¡©M¤÷¶iµ{±Ò°Ê¤è¦¡,¨ä¤¤«eªÌ¬O¦b C ¤å¥ó¤¤¥H¿W¥ß¶iµ{¤è¦¡±Ò°Ê.
+A /usr/sbin/smbd B /usr/sbin/nmbd C rc.samba D /etc/inetd.conf
+52¡DDHCP¬O°ÊºA¥D¾÷°t¸m¨ó©wªºÂ²ºÙ,¨ä§@¥Î¬O¥i¥H¨Ïºô¸ôºÞ²z­û³q¹L¤@¥x¦øªA¾¹¨ÓºÞ²z¤@­Óºô¸ô¨t²Î,¦Û°Ê¦a¬°¤@­Óºô¸ô¤¤ªº¥D¾÷¤À°t___D______¦a§}.
+A ºô¸ô B MAC C TCP D IP
+53¡D¬°¤F«OÃÒ¦b±Ò°Ê¦øªA¾¹®É¦Û°Ê±Ò°ÊDHCP¶iµ{,À³±N A¤å¥ó¤¤ªºdhcpd=no§ï¬°dhcpd=yes. 
+A rc.inet1 B lilo.conf C inetd.conf D httpd.conf[µù¡G ­^¤å­ì¸q¡GRC¤¤¤åÄÀ¸q¡G§t¦³µ{¦¡¡]À³¥Îµ{¦¡¬Æ¦Ü§@·~¨t²Î¡^±Ò°Ê«ü¥Oªº¸}¥»¤å¥óµù¸Ñ¡G³o¤@¤å¥ó¦b§@·~¨t²Î±Ò°Ê®É·|¦Û°Ê°õ¦æ,¥¦§t¦³­n¹B¦æªº«ü¥O¡]©R¥O©Î¨ä¥¦¸}¥»¡^¦Cªí.]
+54¡D¹ï¤å¥ó¶i¦æÂkÀÉªº©R¥O¬° D .
+A dd B cpio C gzip D tar
+55¡D§ïÅÜ¤å¥ó©Ò¦³ªÌªº©R¥O¬° C .
+A chmod B touch C chown D cat
+56¡D¦bµ¹©w¤å¥ó¤¤¬d§ä»P³]©w±ø¥ó¬Û²Å¦r¤¸¦êªº©R¥O¬°¡G A .
+A grep B gzip C find D sort
+57¡D«Ø¥ß¤@­Ó·s¤å¥ó¥i¥H¨Ï¥Îªº©R¥O¬° D .
+A chmod B more C cp D touch(«ü¥O§ïÅÜÀÉ®×ªº®É¶¡°O¿ý.)
+58¡D¦b¤U¦C©R¥O¤¤,¤£¯àÅã¥Ü¤å¥»¤å¥ó¤º®eªº©R¥O¬O¡G D . 
+A more B less C tail D join
+59¡D¦b¨Ï¥Î°Î¦Wµn¿ýftp®É,¥Î¤á¦W¬° B .
+A users B anonymous C root D guest
+60¡D¦b¹ê»Ú¾Þ§@¤¤,·QÁA¸Ñ©R¥Ologname ªº¥Îªk,¥i¥HÁä¤J D ±o¨ìÀ°§U.
+A logname --man B logname/¡H C help logname D logname --help
+61¡D¦pªGLILO³Q¦w¸Ë¦bMBR,¨Ï¥Î A ©R¥O§Y¥i¨ø¸üLILO.
+A lilo ¡Vu B lilo ¡Vc C lilo ¡Vv D lilo -V
+
+62¡D·í¥Î©R¥Ols ¡Val¬d¬Ý¤å¥ó©M¥Ø¿ý®É,±ýÆ[¬Ý±²¹L¿Ã¹õªº¤º®e,À³¨Ï¥Î²Õ¦XÁä D .
+A Shift Home B Ctrl PgUp C Alt PgDn D Shift PgUp
+63¡Dmc¬OUNIX­·®æ§@·~¨t²Îªº C .
+A ¤å¥ó½s¿è¾¹/µ{¦¡½sÄ¶¾¹ B °t¸mºô¸ôªºµ¡¤f¤u¨ã 
+C ¥Ø¿ýÂsÄý¾¹/¤å¥óºÞ²z¾¹ D Samba¦øªA¾¹ºÞ²z¤u¨ã
+64¡Di¸`ÂI¬O¤@­Ó D ªøªºªí,ªí¤¤¥]§t¤F¤å¥óªº¬ÛÃö¸ê°T.A 8¦ì¤¸²Õ B 16¦ì¤¸²Õ C 32¦ì¤¸²Õ D 64¦ì¤¸²Õ
+65¡D¤å¥ó³\¥iÅvÅª¡B¼g¡B°õ¦æªº¤TºØ¼Ð»x²Å¸¹¨Ì¦¸¬O A .
+A rwx B xrw C rdx D srw
+66¡DLinux ¤å¥ó¦Wªºªø«×¤£±o¶W¹L C ­Ó¦r¤¸.
+A 64 B 128 C 256 D 512
+67¡D¶iµ{¦³¤TºØª¬ºA¡G C .
+A ·Ç³ÆºA¡B°õ¦æºA©M°h¥XºA B ºë½TºA¡B¼Ò½kºA©MÀH¾÷ºA
+C ¹B¦æºA¡B´NºüºA©Mµ¥«ÝºA D ¤â¤uºA¡B¦Û°ÊºA©M¦Û¥ÑºA
+68¡D ±q«á¥x±Ò°Ê¶iµ{,À³¦b©R¥Oªºµ²§À¥[¤W²Å¸¹ A .
+A & B @ C # D $
+69¡D B ¤£¬O¶l¥ó¨t²Îªº²Õ¦¨³¡¤À.
+A ¥Î¤á¥N²z B ¥N²z¦øªA¾¹ C ¶Ç¿é¥N²z D §ë»¼¥N²z
+70¡D¦bShell¸}¥»¤¤,¥Î¨ÓÅª¨ú¤å¥ó¤º¦U­Ó°ìªº¤º®e¨Ã±N¨ä½á­Èµ¹ShellÅÜ¼Æªº©R¥O¬O D .
+A fold B join C tr D read
+71¡Dcrontab¤å¥ó¥Ñ¤»­Ó°ì²Õ¦¨,¨C­Ó°ì¤§¶¡¥ÎªÅ®æ¤À³Î,¨ä±Æ¦C¦p¤U¡G B .
+A MIN HOUR DAY MONTH YEAR COMMAND
+B MIN HOUR DAY MONTH DAYOFWEEK COMMAND
+C COMMAND HOUR DAY MONTH DAYOFWEEK 
+D COMMAND YEAR MONTH DAY HOUR MINcrontab©R¥O¡G¹ê²{µ{¦¡©w®É¹B¦æ
+72¡D¥Îftp¶i¦æ¤å¥ó¶Ç¿é®É,¦³¨âºØ¼Ò¦¡¡G C .
+A Word©Mbinary B .txt©MWord Document 
+C ASCII©Mbinary D ASCII©MRich Text Format
+73¡D¬Y¤å¥óªº²Õ¥~¦¨­ûªº³\¥iÅv¬°¥uÅª¡F©Ò¦³ªÌ¦³¥þ³¡³\¥iÅv¡F²Õ¤ºªº³\¥iÅv¬°Åª»P¼g,«h¸Ó¤å¥óªº³\¥iÅv¬° D .
+A 467 B 674 C 476 D 764
+74¡D¦bDNS¨t²Î´ú¸Õ®É,³]named¶iµ{¸¹¬O53,©R¥O D ³qª¾¶iµ{­«Åª°t¸m¤å¥ó.
+
+A kill ¡VUSR2 53 B kill ¡VUSR1 53 C kill -INT 63 D kill ¡VHUP 53
+75¡DApache¦øªA¾¹Àq»{ªº±µÅ¥³s±µ°ð¸¹¬O C .
+A 1024 B 800 C 80 (http)D 8
+76¡DPHP©MMySQLªºÁp¦X¨Ï¥Î¸Ñ¨M¤F C .
+A ¦bProxy¤W³B²z¸ê®Æ®wªº³X°Ý°ÝÃD B ¦bWWW¦øªA¾¹¤W³B²zÀb«Èªº«Dªk³X°Ý°ÝÃD
+C ¦bWWW¦øªA¾¹¤W³B²z¸ê®Æ®wªº³X°Ý°ÝÃD
+D ¦bSendmail¶l¥ó¨t²Î¤W³B²z¸ê®Æ®wªº³X°Ý°ÝÃD
+77¡DOpenSSL¬O¤@­Ó A .
+A ¥[±K³nÅé B ¶l¥ó¨t²Î C ¸ê®Æ®wºÞ²z¨t²Î D ´O¤J¦¡¸}¥»½sµ{»y¨¥
+78¡DSamba¦øªA¾¹ªº°t¸m¤å¥ó¬O D .
+A httpd.conf B inetd.conf C rc.samba D smb.conf
+79¡DÃö©óDNS¦øªA¾¹,±Ô­z¥¿½Tªº¬O D .
+A DNS¦øªA¾¹°t¸m¤£»Ý­n°t¸m¥Î¤áºÝ
+B «Ø¥ß¬Y­Ó¤À°ÏªºDNS¦øªA¾¹®É¥u»Ý­n«Ø¥ß¤@­Ó¥DDNS¦øªA¾¹
+C ¥DDNS¦øªA¾¹»Ý­n±Ò°Ênamed¶iµ{,¦Ó»²DNS¦øªA¾¹¤£»Ý­n
+D DNS¦øªA¾¹ªºroot.cache¤å¥ó¥]§t¤F®Ú¦W¦r¦øªA¾¹ªº¦³Ãö¸ê°T
+80¡D°h¥X¥æ¤¬¼Ò¦¡ªºshell,À³Áä¤J C .
+A ¡qEsc¡r; B ^q C exit D quit
+81¡D±NWindows C:½L(hda1)¦w¸Ë¦bLinux¤å¥ó¨t²Îªº/winsys¥Ø¿ý¤U,©R¥O¬O B .
+A root@l04.edu.cn:~#mount dev/had1 /winsys 
+B root@l04.edu.cn:~#mount /dev/had1 /winsys
+C root@l04.edu.cn:~#mount /dev/had1 winsys
+D root@l04.edu.cn:~#mount dev/had1 winsys
+82¡D³]¶W¯Å¥Î¤ároot·í«e©Ò¦b¥Ø¿ý¬°¡G/usr/local,Áä¤Jcd©R¥O«á,¥Î¤á·í«e©Ò¦b¥Ø¿ý¬° B .
+A /home B /root C /home/root D /usr/local
+83¡D¦r¤¸³]³Æ¤å¥óÃþ«¬ªº¼Ð»x¬O B .
+A p B c C s D l
+84¡D±N¥úºÐCD-ROM¡]hdc¡^¦w¸Ë¨ì¤å¥ó¨t²Îªº/mnt/cdrom¥Ø¿ý¤Uªº©R¥O¬O C .
+
+A mount /mnt/cdrom B mount /mnt/cdrom /dev/hdc
+C mount /dev/hdc /mnt/cdrom D mount /dev/hdc
+85¡D±N¥úºÐ/dev/hdc¨ø¸üªº©R¥O¬O C .
+A umount /dev/hdc B unmount /dev/hdc
+C umount /mnt/cdrom /dev/hdc D unmount /mnt/cdrom /dev/hdc
+86¡D¦b/home/stud1/wang¥Ø¿ý¤U¦³¤@¤å¥ófile,¨Ï¥Î D ¥i¹ê²{¦b«á¥x°õ¦æ©R¥O,¦¹©R¥O±Nfile¤å¥ó¤¤ªº¤º®e¿é¥X¨ìfile.copy¤å¥ó¤¤.
+A cat file ¡r;file.copy B cat ¡r;file.copy C cat file file.copy & D cat file ¡r;file.copy &
+87¡D¦bDNS°t¸m¤å¥ó¤¤,¥Î©óªí¥Ü¬Y¥D¾÷§O¦Wªº¬O¡G B .
+A NS B CNAME C NAME D CN
+88¡D¥i¥H§¹¦¨¥D¾÷¦W»PIP¦a§}ªº¥¿¦V¸ÑªR©M¤Ï¦V¸ÑªR¥ô°Èªº©R¥O¬O¡G A .
+A nslookup B arp C ifconfig D dnslook
+89¡D¤U¦CÅÜ¼Æ¦W¤¤¦³®ÄªºshellÅÜ¼Æ¦W¬O¡G C .
+A -2-time B _2$3 C trust_no_1 D 2004file
+90¡Dqmail¬O B .
+A ¦¬¨ú¶l¥óªº¨ó©w B ¶l¥ó¦øªA¾¹ªº¤@ºØ C µo°e¶l¥óªº¨ó©w D ¶l¥ó¶¤¦C
+92¡D¤wª¾¬Y¥Î¤ástud1,¨ä¥Î¤á¥Ø¿ý¬°/home/stud1.¤À­¶Åã¥Ü·í«e¥Ø¿ý¤Uªº©Ò¦³¤å¥óªº¤å¥ó©Î¥Ø¿ý¦W¡B¥Î¤á²Õ¡B¥Î¤á¡B¤å¥ó¤j¤p¡B¤å¥ó©Î¥Ø¿ý³\¥iÅv¡B¤å¥ó³Ð«Ø®É¶¡µ¥¸ê°Tªº©R¥O¬O D .
+A more ls ¡Val B more ¡Val ls C more ¡q ls ¡Val D ls ¡Val | more 
+93¡DÃö©ó¶iµ{½Õ«×©R¥O, B ¬O¤£¥¿½Tªº.at--©w´Á°õ¦æµ{¦¡ªº½Õ«×©R¥O
+A ·í¤é±ß11ÂI°õ¦æclear©R¥O,¨Ï¥Îat©R¥O¡Gat 23:00 today clearB ¨C¦~1¤ë1¤é¦­¤W6ÂI°õ¦ædate©R¥O,¨Ï¥Îat©R¥O¡Gat 6am Jan 1 date
+C ¨C¤é±ß11ÂI°õ¦ædate©R¥O,crontab¤å¥ó¤¤À³¬°¡G0 23 * * * date
+D ¨C¤p®É°õ¦æ¤@¦¸clear©R¥O,crontab¤å¥ó¤¤À³¬°¡G0 */1 * * * clear
+94¡D¨t²Î¤¤¦³¥Î¤áuser1©Muser2,¦PÄÝ©óusers²Õ.¦buser1¥Î¤á¥Ø¿ý¤U¦³¤@¤å¥ófile1,¥¦¾Ö¦³644ªº³\¥iÅv,¦pªGuser2¥Î¤á·Q­×§ïuser1¥Î¤á¥Ø¿ý¤Uªºfile1¤å¥ó,À³¾Ö¦³ B ³\¥iÅv.
+
+A 744 B 664 C 646 D 746
+??95¡D¦pªG·Q°t¸m¤@¥x°Î¦Wftp¦øªA¾¹,À³­×§ï C ¤å¥ó.
+A /etc/gateway B /etc/ftpservers C /etc/ftpusers D /etc/inetd.conf
+96¡DSamba¦øªA¾¹ªº¶iµ{¥ÑB ¨â³¡¤À²Õ¦¨ .
+A named©Msendmail B smbd©Mnmbd C bootp©Mdhcpd D httpd©Msquid
+97¡D­n°t¸mNFS¦øªA¾¹,¦b¦øªA¾¹ºÝ¥D­n°t¸m C ¤å¥ó.
+A /etc/rc.d/rc.inet1 B /etc/rc.d/rc.M C /etc/exports D /etc/rc.d/rc.S
+98¡D¬°«OÃÒ¦b±Ò°Ê¦øªA¾¹®É¦Û°Ê±Ò°ÊDHCP¶iµ{,À³¹ï B ¤å¥ó¶i¦æ½s¿è.
+A /etc/rc.d/rc.inet2 B /etc/rc.d/rc.inet1 C /etc/dhcpd.conf D /etc/rc.d/rc.S
+99¡D¦b°t¸m¥N²z¦øªA¾¹®É,­Y³]¸m¥N²z¦øªA¾¹ªº¤u§@½w¦s¬°64MB,°t¸m¦æÀ³¬° D .
+A cache 64MB B cache_dir ufs /usr/local/squid/cache 10000 16 256
+C cache_ mgr 64MB D cache_ mem 64MB
+100¡D¦w¥þºÞ²z¯A¤Îªº°ÝÃD¥]¬A«OÃÒºô¸ôºÞ²z¤u§@¥i¾a¶i¦æªº¦w¥þ°ÝÃD©M«OÅ@ºô¸ô¥Î¤á¤Îºô¸ôºÞ²z¹ï¹³°ÝÃD. C ÄÝ©ó¦w¥þºÞ²zªº¤º®e.
+A °t¸m³]³Æªº¤u§@°Ñ¼Æ B ¦¬¶°»Pºô¸ô©Ê¯à¦³Ãöªº¼Æ¾Ú 
+C ±±¨î©MºûÅ@³X°Ý³\¥iÅv D ºÊ´ú¬G»Ù
+101¡D¥H¤U©R¥O¹ï¤¤,¥¿½Tªº¬O¡G B .
+A ls©Msl B cat©Mtac C more©Merom D exit©Mtixecat¬OÅã¥Ü¤å¥ó§¨ªº©R¥O,³o­Ó¤j®a³£ª¾¹D,tac¬Ocatªº­Ë¼g,·N«ä¤]©M¥¦¬O¬Û¤Ïªº.cat¬O±q²Ä¤@¦æÅã¥Ü¨ì¤@¦æ,¦Ótac¬O±q¤@¦æÅã¥Ü¨ì²Ä¤@¦æ,¦Órev «h¬O±q¤@­Ó¦r¤¸Åã¥Ü¨ì²Ä¤@­Ó¦r¤¸
+102¡D B ©R¥O¬O¦bvi½s¿è¾¹¤¤°õ¦æ¦sÀÉ°h¥X.
+A :q B ZZ C :q! D :WQ
+103¡D¤U¦CÃö©ó/etc/fstab¤å¥ó´y­z,¥¿½Tªº¬O D .
+A fstab¤å¥ó¥u¯à´y­zÄÝ©ólinuxªº¤å¥ó¨t²Î B CD_ROM©M³nºÐ¬O¦Û°Ê¸ü¤Jªº
+C fstab¤å¥ó¤¤´y­zªº¤å¥ó¨t²Î¤£¯à³Q¨ø¸ü D ±Ò°Ê®É«öfstab¤å¥ó´y­z¤º®e¸ü¤J¤å¥ó¨t²Î
+104¡D³q¹L¤å¥ó¦W¦s¨ú¤å¥ó®É,¤å¥ó¨t²Î¤º³¡ªº¾Þ§@¹Lµ{¬O³q¹L C .
+
+A ¤å¥ó¦b¥Ø¿ý¤¤¬d§ä¤å¥ó¼Æ¾Ú¦s¨ú¦ì¸m.B ¤å¥ó¦Wª½±µ§ä¨ì¤å¥óªº¼Æ¾Ú,¶i¦æ¦s¨ú¾Þ§@.
+C ¤å¥ó¦W¦b¥Ø¿ý¤¤¬d§ä¹ïÀ³ªºI¸`ÂI,³q¹LI¸`ÂI¦s¨ú¤å¥ó¼Æ¾Ú.
+D ¤å¥ó¦W¦b¤¤¬d§ä¹ïÀ³ªº¶W¯Å¶ô,¦b¶W¯Å¶ô¬d§ä¹ïÀ³i¸`ÂI,³q¹Li¸`ÂI¦s¨ú¤å¥ó¼Æ¾Ú
+105¡DLinux±N¦sÀx³]³Æ©M¿é¤J/¿é¥X³]³Æ§¡¬Ý°µ¤å¥ó¨Ó¾Þ§@, C ¤£¬O¥H¤å¥óªº§Î¦¡¥X²{.
+A ¥Ø¿ý B ³nÃì±µ C i¸`ÂIªí D ºô¸ô¾A°t¾¹
+106¡DÃö©ói¸`ÂI©M¶W¯Å¶ô,¤U¦C½×­z¤£¥¿½Tªº¬O B .
+A i¸`ÂI¬O¤@­Óªø«×©T©wªºªí B ¶W¯Å¶ô¦b¤å¥ó¨t²Îªº­Ó¼Æ¬O°ß¤@ªº
+C i¸`ÂI¥]§t¤F´y­z¤@­Ó¤å¥ó©Ò¥²»Ýªº¥þ³¡¸ê°T
+D ¶W¯Å¶ô°O¿ý¤Fi¸`ÂIªí©MªÅ¶~¶ôªí¸ê°T¦bºÏºÐ¤¤¦s©ñªº¦ì¸m
+107¡D D ³]³Æ¬O¦r¤¸³]³Æ.
+A hdc B fd0 C hda1 D tty1(A,B,C¬°¶ô³]³Æ)
+108¡D B ¥Ø¿ý¦s©ñµÛLinuxªº·½¥N½X.
+A /etc B /usr/src C /usr D /home
+109¡DÃö©ó¤å¥ó¨t²Îªº¦w¸Ë©M¨ø¸ü,¤U­±´y­z¥¿½Tªº¬O A .
+A ¦pªG¥úºÐ¥¼¸g¨ø¸ü,¥úºÐ¾÷¬O¥´¤£¶}ªº B ¦w¸Ë¤å¥ó¨t²Îªº¦w¸ËÂI¥u¯à¬O/mnt¤U
+C ¤£ºÞ¥úºÐ¾÷¤¤¬O§_¦³¥úºÐ,¨t²Î³£¥i¥H¦w¸ËCD-ROM³]³Æ
+D mount /dev/fd0 /floppy ¦¹©R¥O¤¤¥Ø¿ý/floppy¬O¦Û°Ê¥Í¦¨ªº
+110¡D B ¤£¬O¶iµ{©Mµ{¦¡ªº°Ï§O.
+A µ{¦¡¬O¤@²Õ¦³§ÇªºÀRºA«ü¥O,¶iµ{¬O¤@¦¸µ{¦¡ªº°õ¦æ¹Lµ{
+B µ{¦¡¥u¯à¦b«e¥x¹B¦æ,¦Ó¶iµ{¥i¥H¦b«e¥x©Î«á¥x¹B¦æ
+C µ{¦¡¥i¥Hªø´Á«O¦s,¶iµ{¬O¼È®Éªº
+D µ{¦¡¨S¦³ª¬ºA,¦Ó¶iµ{¬O¦³ª¬ºAªº
+111¡D¤å¥óexer1ªº³X°Ý³\¥iÅv¬°rw-r--r--,²{­n¼W¥[©Ò¦³¥Î¤áªº°õ¦æ³\¥iÅv©M¦P²Õ¥Î¤áªº¼g³\¥iÅv,¤U¦C©R¥O¥¿½Tªº¬O A .
+A chmod a x g w exer1 B chmod 765 exer1
+C chmod o x exer1 D chmod g w exer1
+112¡D¦³ÃöÂkÀÉ©MÀ£ÁY©R¥O,¤U­±´y­z¥¿½Tªº¬O C .
+
+A ¥Îuncompress©R¥O¸ÑÀ£ÁY¥Ñcompress©R¥O¥Í¦¨ªº«áºó¬°.zipªºÀ£ÁY¤å¥ó
+B unzip©R¥O©Mgzip©R¥O¥i¥H¸ÑÀ£ÁY¬Û¦PÃþ«¬ªº¤å¥ó
+C tarÂkÀÉ¥BÀ£ÁYªº¤å¥ó¥i¥H¥Ñgzip©R¥O¸ÑÀ£ÁY
+D tar©R¥OÂkÀÉ«áªº¤å¥ó¤]¬O¤@ºØÀ£ÁY¤å¥ó
+113¡D¤£¬Oshell¨ã¦³ªº¥\¯à©M¯SÂIªº¬O C .
+A ºÞ¹D B ¿é¤J¿é¥X­«©w¦V C °õ¦æ«á¥x¶iµ{ D ³B²zµ{¦¡©R¥O
+114¡D¤U¦C¹ïshellÅÜ¼ÆFRUIT¾Þ§@,¥¿½Tªº¬O¡G C .
+A ¬°ÅÜ¼Æ½á­È¡G$FRUIT=apple B Åã¥ÜÅÜ¼Æªº­È¡Gfruit=apple
+C Åã¥ÜÅÜ¼Æªº­È¡Gecho $FRUIT D §PÂ_ÅÜ¼Æ¬O§_¦³­È¡G[ -f "$FRUIT" ]
+¤T¡DÂ²µªÃD¡G
+1¡DÂ²­zLinux¤å¥ó¨t²Î³q¹Li¸`ÂI§â¤å¥óªºÅÞ¿èµ²ºc©Mª«²zµ²ºcÂà´«ªº¤u§@¹Lµ{.
+°Ñ¦Òµª®×¡G
+Linux³q¹Li¸`ÂIªí±N¤å¥óªºÅÞ¿èµ²ºc©Mª«²zµ²ºc¶i¦æÂà´«.
+i ¸`ÂI¬O¤@­Ó64¦ì¤¸²Õªøªºªí,ªí¤¤¥]§t¤F¤å¥óªº¬ÛÃö¸ê°T,¨ä¤¤¦³¤å¥óªº¤j¤p¡B¤å¥ó©Ò¦³ªÌ¡B¤å¥óªº¦s¨ú³\¥i¤è¦¡¥H¤Î¤å¥óªºÃþ«¬µ¥­«­n¸ê°T.¦bi¸`ÂIªí¤¤³Ì­«­n ªº¤º®e¬OºÏºÐ¦a§}ªí.¦bºÏºÐ¦a§}ªí¤¤¦³13­Ó¶ô¸¹,¤å¥ó±N¥H¶ô¸¹¦bºÏºÐ¦a§}ªí¤¤¥X²{ªº¶¶§Ç¨Ì¦¸Åª¨ú¬ÛÀ³ªº¶ô.Linux¤å¥ó¨t²Î³q¹L§âi¸`ÂI©M¤å¥ó¦W¶i¦æ ³s±µ,·í»Ý­nÅª¨ú¸Ó¤å¥ó®É,¤å¥ó¨t²Î¦b·í«e¥Ø¿ýªí¤¤¬d§ä¸Ó¤å¥ó¦W¹ïÀ³ªº¶µ,¥Ñ¦¹±o¨ì¸Ó¤å¥ó¬Û¹ïÀ³ªºi¸`ÂI¸¹,³q¹L¸Ói¸`ÂIªººÏºÐ¦a§}ªí§â¤À´²¦s©ñªº¤å¥óª« ²z¶ô³s±µ¦¨¤å¥óªºÅÞ¿èµ²ºc.2¡DÂ²­z¶iµ{ªº±Ò°Ê¡B²×¤îªº¤è¦¡¥H¤Î¦p¦ó¶i¦æ¶iµ{ªº¬d¬Ý.
+°Ñ¦Òµª®×¡G
+¦bLinux¤¤±Ò°Ê¤@­Ó¶iµ{¦³¤â¤u±Ò°Ê©M½Õ«×±Ò°Ê¨âºØ¤è¦¡¡G
+¡]1¡^¤â¤u±Ò°Ê
+¥Î¤á¦b¿é¤JºÝµo¥X©R¥O,ª½±µ±Ò°Ê¤@­Ó¶iµ{ªº±Ò°Ê¤è¦¡.¥i¥H¤À¬°¡G
+
+¢°«e¥x±Ò°Ê¡Gª½±µ¦bSHELL¤¤¿é¤J©R¥O¶i¦æ±Ò°Ê.
+¢±«á¥x±Ò°Ê¡G±Ò°Ê¤@­Ó¥Ø«e¨Ã¤£ºò«æªº¶iµ{,¦p¦C¦L¶iµ{.
+¡]2¡^½Õ«×±Ò°Ê
+¨t²ÎºÞ²z­û®Ú¾Ú¨t²Î¸ê·½©M¶iµ{¦û¥Î¸ê·½ªº±¡ªp,¨Æ¥ý¶i¦æ½Õ«×¦w±Æ,«ü©w¥ô°È¹B¦æªº®É¶¡©M³õ¦X,¨ì®É­Ô¨t²Î·|¦Û°Ê§¹¦¨¸Ó¥ô°È.
+¸g±`¨Ï¥Îªº¶iµ{½Õ«×©R¥O¬°¡Gat¡Bbatch¡Bcrontab.
+3. Â²­zDNS¶i¦æ°ì¦W¸ÑªRªº¹Lµ{.
+°Ñ¦Òµª®×¡G
+,¥Î¤áºÝµo¥XDNS½Ð¨DÂ½Ä¶IP¦a§}©Î¥D¾÷¦W.DNS¦øªA¾¹¦b¦¬¨ì«È¤á¾÷ªº½Ð¨D«á¡G
+¡]1¡^ÀË¬dDNS¦øªA¾¹ªº½w¦s,­Y¬d¨ì½Ð¨Dªº¦a§}©Î¦W¦r,§Y¦V«È¤á¾÷µo¥XÀ³µª¸ê°T¡F
+¡]2¡^­Y¨S¦³¬d¨ì,«h¦b¸ê®Æ®w¤¤¬d§ä,­Y¬d¨ì½Ð¨Dªº¦a§}©Î¦W¦r,§Y¦V«È¤á¾÷µo¥XÀ³µª¸ê°T¡F
+¡]3¡^­Y¨S¦³¬d¨ì,«h±N½Ð¨Dµoµ¹®Ú°ìDNS¦øªA¾¹,¨Ã¨Ì§Ç±q®Ú°ì¬d§ä³»¯Å°ì,¥Ñ³»¯Å¬d§ä¤G¯Å°ì,¤G¯Å°ì¬d§ä¤T¯Å,ª½¦Ü§ä¨ì­n¸ÑªRªº¦a§}©Î¦W¦r,§Y¦V«È¤á¾÷©Ò¦bºô¸ôªºDNS¦øªA¾¹µo¥XÀ³µª¸ê°T,DNS¦øªA¾¹¦¬¨ìÀ³µª«á²{¦b½w¦s¤¤¦sÀx,µM«á,±N¸ÑªRµ²ªGµoµ¹«È¤á¾÷.
+¡]4¡^­Y¨S¦³§ä¨ì,«hªð¦^¿ù»~¸ê°T.4¡D¨t²ÎºÞ²z­ûªºÂ¾³d¥]¬A¨º¨Ç¡HºÞ²zªº¹ï¶H¬O¤°»ò¡H
+°Ñ¦Òµª®×¡G
+¨t²ÎºÞ²z­ûªºÂ¾³d¬O¶i¦æ¨t²Î¸ê·½ºÞ²z¡B³]³ÆºÞ²z¡B¨t²Î©Ê¯àºÞ²z¡B¦w¥þºÞ²z©M¨t²Î©Ê¯àºÊ´ú.ºÞ²zªº¹ï¶H¬O¦øªA¾¹¡B¥Î¤á¡B¦øªA¾¹ªº¶iµ{¤Î¨t²Îªº¦UºØ¸ê·½µ¥.
+5¡DÂ²­z¦w¸ËSlackware Linux¨t²Îªº¹Lµ{.
+°Ñ¦Òµª®×¡G 
+¡]1¡^¹ïµwºÐ­«·s¤À°Ï. ¡]2¡^±Ò°ÊLinux¨t²Î¡]¥Î¥úºÐ¡B³nºÐµ¥¡^.
+¡]3¡^«Ø¥ßLinux¥D¤À°Ï©M¥æ´«¤À°Ï.¡]4¡^¥Îsetup©R¥O¦w¸ËLinux¨t²Î.
+¡]5¡^®æ¦¡¤ÆLinux¥D¤À°Ï©M¥æ´«¤À°Ï¡]6¡^¦w¸ËLinux³nÅé¥]
+¡]7¡^¦w¸Ë§¹²¦,«Ø¥ß±qµwºÐ±Ò°ÊLinux¨t²ÎªºLILO±Ò°Êµ{¦¡,©ÎªÌ»s§@¤@±i±Ò°ÊLinux¨t²Îªº³nºÐ.­«·s±Ò°ÊLinux¨t²Î.
+
+6¡D¤°»ò¬OÀRºA¸ô¥Ñ,¨ä¯SÂI¬O¤°»ò¡H¤°»ò¬O°ÊºA¸ô¥Ñ,¨ä¯SÂI¬O¤°»ò¡H
+°Ñ¦Òµª®×¡G
+ÀRºA¸ô¥Ñ¬O¥Ñ¨t²ÎºÞ²z­û³]­p»Pºc«Øªº¸ô¥Ñªí³W©wªº¸ô¥Ñ.¾A¥Î©óºôÃö¼Æ¶q¦³­­ªº³õ¦X,¥Bºô¸ô©Ý¾ëµ²ºc¤£¸g±`ÅÜ¤Æªººô¸ô.¨ä¯ÊÂI¬O¤£¯à°ÊºA¦a¾A¥Îºô¸ôª¬ªpªºÅÜ¤Æ,·íºô¸ôª¬ªpÅÜ¤Æ«á¥Ñºô¸ôºÞ²z­û­×§ï¸ô¥Ñªí.
+°ÊºA¸ô¥Ñ¬O¥Ñ¸ô¥Ñ¿ï¾Ü¨ó©w¦Ó°ÊºAºc«Øªº,¸ô¥Ñ¨ó©w¤§¶¡³q¹L¥æ´«¦U¦Û©Ò¾Ö¦³ªº¸ô¥Ñ¸ê°T¹ê®É§ó·s¸ô¥Ñªíªº¤º®e.°ÊºA¸ô¥Ñ¥i¥H¦Û°Ê¾Ç²ßºô¸ôªº©Ý¾ëµ²ºc,¨Ã§ó·s¸ô¥Ñªí.¨ä¯ÊÂI¬O¸ô¥Ñ¼s¼½§ó·s¸ê°T±N¦û¾Ú¤j¶qªººô¸ô±a¼e.
+87¡D¶iµ{ªº¬d¬Ý©M½Õ«×¤À§O¨Ï¥Î¤°»ò©R¥O¡H
+°Ñ¦Òµª®×¡G
+¶iµ{¬d¬Ýªº©R¥O¬Ops©Mtop.
+¶iµ{½Õ«×ªº©R¥O¦³at,crontab,batch,kill.
+8¡D·í¤å¥ó¨t²Î¨ü¨ì¯}Ãa®É,¦p¦óÀË¬d©M­×´_¨t²Î¡H
+°Ñ¦Òµª®×¡G
+¦¨¥\­×ÂÐ¤å¥ó¨t²Îªº«e´£¬O­n¦³¨â­Ó¥H¤Wªº¥D¤å¥ó¨t²Î,¨Ã«OÃÒ¦b­×´_¤§«e¨ø¸ü±N³Q­×´_ªº¤å¥ó¨t²Î.
+¨Ï¥Î©R¥Ofsck¹ï¨ü¨ì¯}Ãaªº¤å¥ó¨t²Î¶i¦æ­×´_.fsckÀË¬d¤å¥ó¨t²Î¤À¬°5¨B,¨C¤@¨BÀË¬d¨t²Î¤£¦P³¡¤Àªº³s±µ¯S©Ê¨Ã¹ï¤W¤@¨B¶i¦æÅçÃÒ©M­×§ï.¦b°õ¦æ fsck©R¥O®É,ÀË¬d±q¶W¯Å¶ô¶}©l,µM«á¬O¤À°tªººÏºÐ¶ô¡B¸ô®|¦W¡B¥Ø¿ýªº³s±µ©Ê¡BÃì±µ¼Æ¥Ø¥H¤ÎªÅ¶~¶ôÃìªí¡Bi-node.
+9¡D¸ÑÄÀi¸`ÂI¦b¤å¥ó¨t²Î¤¤ªº§@¥Î.
+°Ñ¦Òµª®×¡G
+¦blinux¤å¥ó¨t²Î¤¤,¬O¥H¶ô¬°³æ¦ì¦sÀx¸ê°Tªº,¬°¤F§ä¨ì¬Y¤@­Ó¤å¥ó¦b¦sÀxªÅ¶¡¤¤¦s©ñªº¦ì¸m,¥Îi¸`ÂI¹ï¤@­Ó¤å¥ó¶i¦æ¯Á¤Þ.I¸`ÂI¥]§t¤F´y­z¤@­Ó¤å¥ó©Òªº¥þ³¡¸ê°T.i¸`ÂI¬O¤å¥ó¨t²ÎºÞ²zªº¤@­Ó¼Æ¾Úµ²ºc.
+10¡D¤°»ò¬O²Å¸¹Ãì±µ,¤°»ò¬OµwÃì±µ¡H²Å¸¹Ãì±µ»PµwÃì±µªº°Ï§O¬O¤°»ò¡H
+
+°Ñ¦Òµª®×¡G
+Ãì±µ¤ÀµwÃì±µ©M²Å¸¹Ãì±µ.
+²Å¸¹Ãì±µ¥i¥H«Ø¥ß¹ï©ó¤å¥ó©M¥Ø¿ýªºÃì±µ.²Å¸¹Ãì±µ¥i¥H¸ó¤å¥ó¨t²Î,§Y¥i¥H¸óºÏºÐ¤À°Ï.²Å¸¹Ãì±µªº¤å¥óÃþ«¬¦ì¬Ol,Ãì±µ¤å¥ó¨ã¦³·sªºi¸`ÂI.
+µwÃì±µ¤£¥i¥H¸ó¤å¥ó¨t²Î.¥¦¥u¯à«Ø¥ß¹ï¤å¥óªºÃì±µ,µwÃì±µªº¤å¥óÃþ«¬¦ì¬O¡Ð,¥BµwÃì±µ¤å¥óªºi¸`ÂI¦P³QÃì±µ¤å¥óªºi¸`ÂI¬Û¦P.
+11¡D¦b¹ïlinux¨t²Î¤À°Ï¶i¦æ®æ¦¡¤Æ®É»Ý­n¹ïºÏºÐÁL¡]©Îi¸`ÂI±K«×¡^ªº¤j¤p¶i¦æ¿ï¾Ü,½Ð»¡©ú¿ï¾Üªº­ì«h.
+°Ñ¦Òµª®×¡G
+ºÏºÐÁL¡]©Îi¸`ÂI±K«×¡^¬O¤å¥ó¨t²Î½Õ«×¤å¥óªº°ò¥»³æ¤¸.ºÏºÐÁLªº¤j¤p,ª½±µ¼vÅT¨t²Î½Õ«×ºÏºÐªÅ¶¡®Ä²v.·íºÏºÐ¤À°Ï¸û¤j®É,ºÏºÐÁL¤]À³¿ï±o¤j¨Ç¡F·í¤À°Ï¸û¤p®É,ºÏºÐÁLÀ³¿ï±o¤p¨Ç.³q±`¨Ï¥Î¸gÅç­È.
+12¡DÂ²­zºô¸ô¤å¥ó¨t²ÎNFS,¨Ã»¡©ú¨ä§@¥Î.
+°Ñ¦Òµª®×¡G
+ºô¸ô¤å¥ó¨t²Î¬OÀ³¥Î¼hªº¤@ºØÀ³¥ÎªA°È,¥¦¥D­nÀ³¥Î©óLinux©MLinux¨t²Î¡BLinux©MUnix¨t²Î¤§¶¡ªº¤å¥ó©Î¥Ø¿ýªº¦@¨É.¹ï©ó¥Î¤á¦Ó¨¥¥i¥H³q¹L NFS¤è«Kªº³X°Ý»·¦aªº¤å¥ó¨t²Î,¨Ï¤§¦¨¬°¥»¦a¤å¥ó¨t²Îªº¤@³¡¤À.±Ä¥ÎNFS¤§«á¬Ù¥h¤Fµn¿ýªº¹Lµ{,¤è«K¤F¥Î¤á³X°Ý¨t²Î¸ê·½.13¡D¬Y/etc /fstab¤å¥ó¤¤ªº¬Y¦æ¦p¤U¡G
+/dev/had5 /mnt/dosdata msdos defaults,usrquota 1 2
+½Ð¸ÑÄÀ¨ä§t¸q.
+°Ñ¦Òµª®×:
+¡]1¡^²Ä¤@¦C¡G±N³Q¸ü¤Jªº¤å¥ó¨t²Î¦W¡F¡]2¡^²Ä¤G¦C¡G¸Ó¤å¥ó¨t²Îªº¦w¸ËÂI¡F
+¡]3¡^²Ä¤T¦C¡G¤å¥ó¨t²ÎªºÃþ«¬¡F¡]4¡^²Ä¥|¦C¡G³]¸m°Ñ¼Æ¡F
+¡]5¡^²Ä¤­¦C¡G¨Ñ³Æ¥÷µ{¦¡½T©w¤W¦¸³Æ¥÷¶Z²{¦bªº¤Ñ¼Æ¡F
+¡]6¡^²Ä¤»¦C¡G¦b¨t²Î¤Þ¾É®ÉÀË´ú¤å¥ó¨t²Îªº¶¶§Ç.
+14¡DApache¦øªA¾¹ªº°t¸m¤å¥óhttpd.conf¤¤¦³«Ü¦h¤º®e,½Ð¸ÑÄÀ¦p¤U°t¸m¶µ¡G
+¡]1¡^MaxKeepAliveRequests 200 ¡]2¡^UserDir public_html
+
+¡]3¡^DefaultType text/plain ¡]4¡^AddLanguare en.en
+¡]5¡^DocumentRoot"/usr/local/httpd/htdocs"
+¡]6¡^AddType application/x-httpd-php.php.php.php4
+°Ñ¦Òµª®×:
+¡]1¡^¤¹³\¨C¦¸³s±µªº³Ì¤j½Ð¨D¼Æ¥Ø,¦¹¬°200¡F¡]2¡^³]©w¥Î¤á©ñ¸mºô­¶ªº¥Ø¿ý¡F
+¡]3¡^³]¸m¦øªA¾¹¹ï©ó¤£»{ÃÑªº¤å¥óÃþ«¬ªº¹w³]®æ¦¡¡F
+¡]4¡^³]¸m¥i¶Ç°e»y¨¥ªº¤å¥óµ¹ÂsÄý¾¹¡F¡]5¡^¸Ó¥Ø¿ý¬°Apache©ñ¸mºô­¶ªº¦a¤è¡F
+¡]6¡^¦øªA¾¹¿ï¾Ü¨Ï¥Îphp4.
+15¡D¬YLinux¥D¾÷ªº/etc/rc.d/rc.inet1¤å¥ó¤¤¦³¦p¤U»y¥y,½Ð­×¥¿¿ù»~,¨Ã¸ÑÄÀ¨ä¤º®e.
+/etc/rc.d/rc.inet1¡G
+¡K¡K
+ROUTE add ¡Vnet default gw 192.168.0.101 netmask 255.255.0.0 metric 1
+ROUTE add ¡Vnet 192.168.1.0 gw 192.168.0.250 netmask 255.255.0.0 metric 1
+°Ñ¦Òµª®×:
+­×¥¿¿ù»~:
+¡]1¡^ROUTEÀ³§ï¬°¤p¼g¡Groute¡F¡]2¡^netmask 255.255.0.0À³§ï¬°:netmask 255.255.255.0¡F
+¡]3¡^¹w³]¸ô¥Ñªº¤lºô±»½XÀ³§ï¬°:netmask 0.0.0.0¡F
+¡]4¡^¹w³]¸ô¥Ñ¦b³]©w,§_«h¨ä«áªº¸ô¥Ñ±NµL®Ä.
+¸ÑÄÀ¤º®e:
+¡]1¡^route¡G«Ø¥ßÀRºA¸ô¥Ñªíªº©R¥O¡F¡]2¡^add¡G¼W¥[¤@±ø·s¸ô¥Ñ¡F
+¡]3¡^-net 192.168.1.0¡G¨ì¹F¤@­Ó¥Ø¼Ðºô¸ôªººô¸ô¦a§}¡F
+¡]4¡^default¡G«Ø¥ß¤@±ø¹w³]¸ô¥Ñ¡F¡]5¡^gw 192.168.0.101¡GºôÃö¦a§}¡F
+¡]6¡^metric 1¡G¨ì¹F¥Ø¼Ðºô¸ô¸g¹Lªº¸ô¥Ñ¾¹¼Æ¡]¸õ¼Æ¡^.16¡D¸Õ¸ÑÄÀapache¦øªA¾¹¥H¤U°t¸mªº§t¸q¡G 
+¡]1¡^port 1080 ¡]2¡^UserDir userdoc
+¡]3¡^DocumentRoot "/home/htdocs"
+¡]4¡^¡qDirectory /home/htdocs/inside¡r;
+Options Indexes FollowSymLinks
+AllowOverride None
+Order deny,allow
+deny from all
+allow from 192.168.1.5
+¡q/Directory¡r;
+¡]5¡^Server Type Standlone
+°Ñ¦Òµª®×¡G
+
+Apache¦øªA¾¹°t¸m¦æ§t¸q¦p¤U¡G 
+¡]1¡^±Napache¦øªA¾¹ªº°ð¸¹³]©w¬°1080¡F
+¡]2¡^³]©w¥Î¤áºô­¶¥Ø¿ý¬°userdoc¡F
+¡]3¡^³]©wapache¦øªA¾¹ªººô­¶®Ú¥Ø¿ý:/home/htdocs¡F
+¡]4¡^¦b¦¹apache¦øªA¾¹¤W³]©w¤@­Ó¥Ø¿ý/home/htdocs/inside,¥B¦¹¥Ø¿ý¥u¤¹³\IP¦a§}¬°192.168.1.5ªº¥D¾÷³X°Ý¡F
+¡]5¡^©w¸qapache¦øªA¾¹¥H¿W¥ß¶iµ{ªº¤è¦¡¹B¦æ.
+17¡DÂ²­z¨Ï¥Îftp¶i¦æ¤å¥ó¶Ç¿é®Éªº¨âºØµn¿ý¤è¦¡¡H¥¦­Ìªº°Ï§O¬O¤°»ò¡H±`¥Îªºftp¤å¥ó¶Ç¿é©R¥O¬O¤°»ò¡H 
+°Ñ¦Òµª®×¡G
+¡]1¡^ftp¦³¨âºØµn¿ý¤è¦¡¡G°Î¦Wµn¿ý©M±ÂÅvµn¿ý.¨Ï¥Î°Î¦Wµn¿ý®É,¥Î¤á¦W¬°¡Ganonymous,±K½X¬°¡G¥ô¦ó¦Xªkemail¦a§}¡F¨Ï¥Î±ÂÅvµn¿ý®É,¥Î¤á¦W¬°¥Î¤á¦b»·ºÝ¨t²Î¤¤ªº¥Î¤á±b¸¹,±K½X¬°¥Î¤á¦b»·ºÝ¨t²Î¤¤ªº¥Î¤á±K½X.
+°Ï§O¡G¨Ï¥Î°Î¦Wµn¿ý¥u¯à³X°Ýftp¥Ø¿ý¤Uªº¸ê·½,Àq»{°t¸m¤U¥u¯à¤U¸ü¡F¦Ó±ÂÅvµn¿ý³X°Ýªº³\¥iÅv¤j©ó°Î¦Wµn¿ý,¥B¤W¸ü¡B¤U¸ü§¡¥i.
+¡]2¡^ftp¤å¥ó¶Ç¿é¦³¨âºØ¤å¥ó¶Ç¿é¼Ò¦¡¡GASCII¼Ò¦¡©Mbinary¼Ò¦¡.ASCII¼Ò¦¡¥Î¨Ó¶Ç¿é¤å¥»¤å¥ó,¨ä¥L¤å¥óªº¶Ç¿é¨Ï¥Îbinary¼Ò¦¡.
+¡]3¡^±`¥Îªºftp¤å¥ó¶Ç¿é©R¥O¬°¡Gbin¡Basc¡Bput¡Bget¡Bmput¡Bmget¡Bprompt¡Bbye
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
