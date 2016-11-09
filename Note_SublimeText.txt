@@ -1,0 +1,250 @@
+快捷鍵功能
+ctrl+shift+n    打開新Sublime    
+ctrl+shift+w    關閉Sublime，關閉所有打開文件    
+ctrl+shift+t    重新打開最近關閉文件    
+ctrl+n    		新建文件    
+ctrl+s    		保存    
+ctrl+shift+s    另存為    
+ctrl+f4    		關閉文件    
+ctrl+w    		關閉    
+ctrl+k, ctrl+b  切換側邊欄顯示狀態    
+f11    			切換全屏狀態    
+shift+f11    	免打擾模式狀態切換    
+backspace    	刪除左側    
+shift+backspace 		   左側刪除    
+ctrl+shift+backspace    	左側全部刪除    
+delete    				右側刪除    
+enter    		插入    
+shift+enter 	插入    
+ctrl+z    		撤消    
+ctrl+shift+z    重做    
+ctrl+y   		重做或重複    
+ctrl+u  		軟撤消    
+ctrl+shift+u    軟重做    
+ctrl+shift+v    粘貼並格式化    
+shift+delete    剪切    
+ctrl+insert     拷貝    
+shift+insert    粘貼    
+ctrl+x    	剪切    
+ctrl+c    拷貝    
+ctrl+v    粘貼    
+left    移動    
+right    移動    
+up    移動    
+down    移動    
+shift+left    移動並選擇    
+shift+right    移動並選擇    
+shift+up    移動並選擇    
+shift+down    移動並選擇    
+ctrl+left    按\w規則移動（跳躍）    
+ctrl+right    按\w規則移動（跳躍）    
+ctrl+shift+left    按\w規則移動並選擇（跳躍）    
+ctrl+shift+right    按\w規則移動並選擇（跳躍）    
+alt+left    按單詞移動    
+alt+right    按單詞移動    
+alt+shift+left    按單詞移動並選擇    
+alt+shift+right    按單詞移動並選擇    
+ctrl+alt+up    選擇多行進行編輯    
+ctrl+alt+down    選擇多行進行編輯    
+pageup    移動    
+pagedown    移動    
+shift+pageup    移動+選擇    
+shift+pagedown    移動+選擇    
+home    移動到行首    
+end    移動到行尾    
+shift+home    選擇到行首    
+shift+end    選擇到行尾    
+ctrl+home    移動到頁首行頭    
+ctrl+end    移動到頁尾行尾    
+ctrl+shift+home    選擇到頁首行頭    
+ctrl+shift+end    選擇到頁尾行尾    
+ctrl+up    滾動行    
+ctrl+down    滾動行    
+ctrl+pagedown    下一視圖（視覺位置）    
+ctrl+pageup    前一視圖    
+ctrl+tab    棧中下一視圖（打開順序）    
+ctrl+shift+tab    棧中前一視圖    
+ctrl+a    全選    
+ctrl+shift+l    選擇多行編輯    
+escape    單個選擇    
+escape    清除字段    
+escape    清除字段    
+escape    隱藏面板    
+escape    hide overlay    
+escape    hide auto complete    
+tab    insert best completion    
+tab    insert best completion    
+tab    replace completion with next completion    
+tab    reindent    
+tab    indent    
+tab    next field    
+tab    commit completion    
+shift+tab    insert    
+shift+tab    unindent    
+shift+tab    unindent    
+shift+tab    unindent    
+shift+tab    prev field    
+ctrl+]    縮進    
+ctrl+[    不縮進    
+insert    toggle overwrite    
+ctrl+l    選擇行，重複可依次增加選擇下一行    
+ctrl+d    選擇單詞，重複可增加選擇下一個相同的單詞    
+ctrl+k, ctrl+d    find under expand skip    
+ctrl+shift+space    expand selection    
+ctrl+shift+m    expand selection    
+ctrl+m    跳轉到對應括號    
+ctrl+shift+j    expand selection    
+ctrl+shift+a    expand selection    
+alt+.    close tag    
+ctrl+q    toggle record macro    
+ctrl+shift+q    run macro    
+ctrl+enter    run macro file    
+ctrl+shift+enter    在當前行前插入新行    
+enter    commit completion    
+ctrl+p    搜索項目中的文件    
+ctrl+shift+p    打開命令面板    
+ctrl+alt+p    prompt select project    
+ctrl+r    前往Method    
+ctrl+g    跳轉到第幾行    
+ctrl+;    show overlay    
+ctrl+i    show panel    
+ctrl+shift+i    show panel    
+ctrl+f    查找    
+ctrl+h    查找替換    
+ctrl+shift+h    查找替換下一個    
+f3    下一個匹配項    
+shift+f3    上一個匹配項    
+ctrl+f3    下一個匹配項    
+ctrl+shift+f3    find under prev    
+alt+f3    find all under    
+ctrl+e    slurp find string    
+ctrl+shift+e    slurp replace string    
+ctrl+shift+f    show panel    
+f4    next result    
+shift+f4    prev result    
+f6    toggle setting    
+ctrl+f6    next misspelling    
+ctrl+shift+f6    prev misspelling    
+ctrl+shift+up    swap line up    
+ctrl+shift+down    swap line down    
+ctrl+backspace    delete word    
+ctrl+shift+backspace    run macro file    
+ctrl+delete    delete word    
+ctrl+shift+delete    run macro file    
+ctrl+/    當前行註釋狀態切換    
+ctrl+shift+/    當前位置註釋狀態切換    
+ctrl+j    選擇標籤內容，將後繼行附加到行尾    
+ctrl+shift+d    duplicate line    
+ctrl+`    show panel    
+ctrl+space    auto complete    
+ctrl+space    replace completion with auto complete    
+ctrl+alt+shift+p    show scope name    
+f7    build    
+ctrl+b    build    
+ctrl+shift+b    build    
+ctrl+break    exec    
+ctrl+t    transpose    
+f9    行排序    
+ctrl+f9    行排序    
+// Auto-pair quotes    
+\    insert snippet    
+\    insert snippet    
+\    move    
+backspace    run macro file    
+// Auto-pair single quotes    
+'    insert snippet    
+'    insert snippet    
+'    move    
+backspace    run macro file    
+// Auto-pair brackets    
+(    insert snippet    
+(    insert snippet    
+)    move    
+backspace    run macro file    
+// Auto-pair square brackets    
+[    insert snippet    
+[    insert snippet    
+]    move    
+backspace    run macro file    
+// Auto-pair curly brackets    
+{    insert snippet    
+{    insert snippet    
+}    move    
+backspace    run macro file    
+enter    run macro file    
+shift+enter    run macro file    
+ctrl+1    focus group    
+ctrl+2    focus group    
+ctrl+3    focus group    
+ctrl+4    focus group    
+ctrl+shift+1    move to group    
+ctrl+shift+2    move to group    
+ctrl+shift+3    move to group    
+ctrl+shift+4    move to group    
+ctrl+0    focus side bar    
+alt+1    select by index    
+alt+2    select by index    
+alt+3    select by index    
+alt+4    select by index    
+alt+5    select by index    
+alt+6    select by index    
+alt+7    select by index    
+alt+8    select by index    
+alt+9    select by index    
+alt+0    select by index    
+f2    next bookmark    
+shift+f2    prev bookmark    
+ctrl+f2    標記狀態切換    
+ctrl+shift+f2    clear bookmarks    
+alt+f2    select all bookmarks    
+ctrl+shift+k    run macro file    
+alt+q    wrap lines    
+ctrl+k, ctrl+u    upper case    
+ctrl+k, ctrl+l    lower case    
+ctrl+k, ctrl+space    set mark    
+ctrl+k, ctrl+a    select to mark    
+ctrl+k, ctrl+w    delete to mark    
+ctrl+k, ctrl+x    swap with mark    
+ctrl+k, ctrl+y    yank    
+ctrl+k, ctrl+k    run macro file    
+ctrl+k, ctrl+backspace    run macro file    
+ctrl+k, ctrl+g    clear bookmarks    
+ctrl+k, ctrl+c    show at center    
+ctrl++    increase font size    
+ctrl+=    increase font size    
+ctrl+keypad plus    increase font size    
+ctrl+-    decrease font size    
+ctrl+keypad minus    decrease font size    
+alt+shift+w    insert snippet    
+ctrl+shift+[    折疊(代碼)    
+ctrl+shift+]    不折疊    
+ctrl+k, ctrl+1    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+2    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+3    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+4    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+5    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+6    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+7    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+8    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+9    按層級折疊(代碼），數字是層級數    
+ctrl+k, ctrl+0    unfold all    
+ctrl+k, ctrl+j    unfold all    
+ctrl+k, ctrl+t    fold tag attributes    
+context menu    context menu    
+alt+c    toggle case sensitive    
+alt+r    toggle regex    
+alt+w    toggle whole word    
+alt+a    toggle preserve case    
+// 查找面板的按鍵綁定    
+enter    向後查找    
+shift+enter    向前查找    
+alt+enter    查找全部    
+// 替換面板的按鍵綁定    
+enter    查找下一個    
+shift+enter    查找前一個    
+alt+enter    查找全部    
+ctrl+alt+enter    替換全部    
+// Incremental find panel key bindings    
+enter    hide panel    
+shift+enter    find prev    
+alt+enter    find all

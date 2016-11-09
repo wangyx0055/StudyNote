@@ -105,7 +105,6 @@ http://article.bridgat.com/big5/index.html
 肉丸　　　　　Rice-meat dumplings
 豆幹　　　　　Dried tofu
 
-
 其 他
 當歸鴨　　　　Angelica duck
 檳榔　　　　　Betel nut
@@ -116,7 +115,6 @@ http://article.bridgat.com/big5/index.html
 酒吧英語辭彙匯總：器具、飲料、咖啡、酒  ref: http://article.bridgat.com/big5/language/200803/language46.html
 /******************************************************************************/
 器具類
-
 bar 酒吧
 counter 吧台
 bar chair 酒吧椅
@@ -831,7 +829,6 @@ As requested in your letter ~根據您來信要求~
 In response to your letter~回覆您的來信~
 As regards to ~事關~事件
 In connection with ~這是有關於~事件
-
 
 「客套結束語」
 1. 期待語句，例如「be looking forward to ~」靜待得到~：
@@ -1959,6 +1956,7 @@ Are you free right now? I really need to talk about it with you.
 
 
 /******************************************************************************/
+
 /******************************************************************************/
 Allspice  香辣椒， 多香果，牙買加胡椒 
 Anise (star anise) 大茴香，八角，大料 
@@ -2465,15 +2463,15 @@ from : http://englishwizard.mysinablog.com/index.php?op=ViewArticle&articleId=23
 The following is a list of abbreviations commonly used in business contexts.  
 Remember that if you use abbreviations, the person you write to may not understand the shortened form.（
 下面是一些工作用的簡寫，但要考慮有些可能會太簡單明瞭，簡單明瞭得對方不明白。）
-1.          @             at
-2.          A.W.B.      air waybill（空運單）
-3.          a/c           account
-4.          AGM        annual general meeting （週年股東大會；週年大會）
-5.          AOB.        any other business（任何其他事務）
-6.          approx.   approximately
-7.          B/E.         bill of exchange（匯票）
-8.          B/L.          bill of lading（提單；提貨單）
-9.          c              cents
+1. 		@			at
+2.       A.W.B.      air waybill（空運單）
+3.       a/c           account
+4.       AGM        annual general meeting （週年股東大會；週年大會）
+5.       AOB.        any other business（任何其他事務）
+6.       approx.   approximately
+7.       B/E.         bill of exchange（匯票）
+8.       B/L.          bill of lading（提單；提貨單）
+9.       c              cents
 10.      c.c.           copies to（抄送；副本送）
 11.      c/o           care of（轉交）
 12.      CAD         Canadian Dollar（加元）
@@ -2483,11 +2481,11 @@ Remember that if you use abbreviations, the person you write to may not understa
 16.      CFO         chief financial officer （首席財務官（大陸）；財務總監（香港）；財務長（台灣））
 17.      cge          carriage（運輸；馬車）
 18.      Chin         Chinese
-19.      CIRC                China Insurance Regulatory Commission（中國保監會；中國保險監督管理委員會）
+19.      CIRC         China Insurance Regulatory Commission（中國保監會；中國保險監督管理委員會）
 20.      CN           Chinese
 21.      Co.          company
 22.      COD         cash on delivery（交貨付現；貨到付款）
-23.      COO                chief operating officer （首席營運官（大陸）；營運總監（香港）；營運長（台灣）；常務總經理（台灣））
+23.      COO         chief operating officer （首席營運官（大陸）；營運總監（香港）；營運長（台灣）；常務總經理（台灣））
 24.      CSRC        China Securities Regulatory Commission（中國證監會；中國證券監督管理委員會）
 25.      CWO        cash with order（訂貨付現；訂購即付）
 26.      D/A          documents against acceptance（承兌交單）
@@ -2544,11 +2542,10 @@ Remember that if you use abbreviations, the person you write to may not understa
 77.      VIP           very important person 
 78.      viz.           namely
 79.      w, w/out  with, without 
-
 These abbreviations are common in telexes and short messages.（以下的給短訊用）
 80.      asap         as soon as possible
 81.      attn          (for the) attention (of)（收件人）ˍ
-82.     btw         by the way （順便說）
+82.      btw         by the way （順便說）
 82.      cfm          confirm
 83.      eta           estimated time of arrival       
 84.      LoL           laughing out lound

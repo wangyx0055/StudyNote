@@ -1495,6 +1495,70 @@ HomeKit 它屬於蘋果自家的軟體平臺，定位在物聯網架構的應用層，它所選擇的角色完全不
 因此理論上，在實際應用時它們是可以彼此相容而不會相互干擾，因此目前的物聯網標準之爭，預期將會持續下去，只是並不致於像以往的Beta v.s. VHS或Blu Ray v.s. HD DVD之爭一樣，最終只能有一種標準能夠勝出。
 有一句話說的好，「物聯網（The Internet of Things；IOT）真正的大餅不在那數百億顆感測器、也不在單純的連結服務！
 真正的獲利泉源是來自於分析解讀、使用感測器而創造出的龐大數據。」，目前各大聯盟競逐物並押寶各種聯網的標準，其最終目的並不在於標準技術的規範，而是在於更能方便利用自己的標準來掌控使用者數據的流向與最終的數據。
+
+
+/***************************************************************************/
+Installing Sync On Linux
+/***************************************************************************/
+To install Sync from BitTorrent repository, you need to complete 3 steps:
+
+Add repository
+Add PGP public key for package verification
+Install the package
+
+For Debian-based Linux
+Create file /etc/apt/sources.list.d/btsync.list with the following content to register BT repository:
+deb http://linux-packages.getsync.com/btsync/deb btsync non-free
+
+Add public key with the following command:
+wget -qO - http://linux-packages.getsync.com/btsync/key.asc | sudo apt-key add -
+
+Install Sync
+sudo apt-get update
+sudo apt-get install btsync
+
+For RPM-based Linux
+Create file /etc/yum.repos.d/btsync.repo with the following content to register BT repository:
+
+[btsync]
+name=BitTorrent Sync $basearch
+baseurl=http://linux-packages.getsync.com/btsync/rpm/$basearch
+enabled=1
+gpgcheck=1
+
+Add public key:
+sudo rpm --import http://linux-packages.getsync.com/btsync/key.asc
+
+Install Sync:
+sudo yum install btsync
+
+Managing Sync
+systemd
+Enable sync service automatic startup as user btsync:
+
+sudo systemctl enable btsync
+
+Enable sync service as current user:
+systemctl --user enable btsync
+
+Systemctl can be also run with the following arguments: start, stop, enable, disable, status
+
+sysvinit, upstart
+Run as btsync user:
+sudo service btsync start
+Service can also be run with the following arguments: start, stop, restart
+
+You can access it by
+127.0.0.1:8888     # This will redirect to the 2nd link
+OR
+http://127.0.0.1:8888/gui/
+OR
+localhost:8888
+Username = admin , Password = ( Use have set during installation )
+
+
+
+/***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/
 /***************************************************************************/

@@ -1,0 +1,785 @@
+
+/******************************************************************************/
+OpenWrt 建置 – 安裝
+/******************************************************************************/
+https://wiki.openwrt.org/zh-tw/doc/howto/buildroot.exigence
+OpenWrt Buildroot 偏好使用 toolchain 來建置OpenWrt。建議你使用一個 GNU/Linux Distribution，不論是獨立安裝的， 或是執行於虛擬環境的 (VMware 或 Qemu)上。
+
+Cygwin 無法正常的運作，也不保證可以成功的建置於 ~BSD 或 MacOSX 系統上。 你可以試試，並回報你的結果。不要忘了先閱讀 問題排除.
+
+先前準備
+350 MB 的硬碟空間供下載原始碼
+3-4 GB 的硬碟空間供OpenWrt的建置
+
+程序
+1. 不要使用 root帳號
+2. 所有的命令必須在 <buildroot dir> 目錄底下執行, 如 ~/openwrt/trunk/ 3. 不要在完整路徑名中有空白的資料夾下建置
+安裝 subversion (short: svn), 來下載OpenWrt的原始碼較為便利，且安裝 build tools 來幫助編彙程序:
+sudo apt-get update
+sudo apt-get install subversion build-essential
+subversion請參見 svn 和 subversion documentation (multiple languages)
+建置工具請參見 make 和 build-essential
+使用svn下載OpenWrt的原始碼
+mkdir ~/openwrt
+cd ~/openwrt
+svn co svn://svn.openwrt.org/openwrt/trunk/
+cd trunk
+這會產生 'trunk'資料夾，為OpenWrt原始碼主要的資料夾。
+以版本 R27988來說，全部有14,382個檔案，總大小約 150 MiB
+包含OpenWrt Buildroot system.
+請參照Downloading Sources.
+使用feeds script下載並安裝 feeds。(選擇性)
+./scripts/feeds update -a
+./scripts/feeds install -a
+版本 7367之後，trunk資料夾已包含 26,650 個檔案，總大小約 302 MiB (如需安裝個別套件: ./scripts/feeds install PACKAGENAME)
+使用以下其中一個命令，可以檢查是否你的建置OpenWrt的環境中有遺漏的套件:
+make defconfig
+make prereq
+make menuconfig
+這會列出需要建置OpenWrt的系統中遺漏的套件。
+使用 package management commands安裝遺漏的套件。參照以下的範例表。
+執行 build 或 在Mac OS X 10.7 Lion建置OpenWrt
+:!: 在設定並執行編譯後 (如 這裡所描述), trunk資料夾包含 244,451 個檔案，總大小為 3.2GiB!
+
+
+/******************************************************************************/
+OpenWrt 建置 – 使用方法
+/******************************************************************************/
+from : https://wiki.openwrt.org/zh-tw/doc/howto/build
+
+先前準備
+Install OpenWrt Buildroot and its prerequisites on your OS.
+程序
+1. 不要使用 root帳號
+2. 所有的命令必須在 <buildroot dir> 目錄底下執行, 如 ~/openwrt/trunk/
+更新OpenWrt原始碼
+更新並安裝套件
+設定套件
+開始編譯。這會自動編譯toolchain，編譯原始碼，封裝套件，最後產生可以刷新的映像擋。
+開始進行 安裝OpenWrt
+更新原始碼
+
+更新原始碼:
+svn update
+OpenWrt的原始碼很常更新。建議使用最新的原始碼。
+
+更新 Feeds
+更新feeds:
+./scripts/feeds update -a
+安裝下載的套件:
+注意: 在 ./scripts/feeds中顯示的installing 表示 "讓這個套件可以在 make menuconfig中選擇"。而不是真的編譯和安裝套件。
+安裝單一套件:
+./scripts/feeds install <PACKAGENAME>
+或安裝全部的套件:
+./scripts/feeds install -a
+
+Image Configuration
+開始OpenWrt Buildroot的 ncurses text-based 設定界面:
+make menuconfig
+就像Linux kernel 設定，每一個選項大致有三種，y, m, n 分別表示:
+按 y 設定成 <*> 標籤 
+這個套件將包含在映像檔裡
+按 m 設定成 <M> 標籤 
+這個套件會被編譯 (to be installed with opkg after Flashing OpenWrt) but the package will not be included in the firmware-image
+按 n 設定成 < > 標籤 
+這個套件不會被編譯
+儲存設定後， ~/openwrt/trunk/.config 會依據你所選的設定產生。
+編譯環境會提供OpenWrt的 'Backfire' 10.03.1 設定檔，如 for ar71xx.
+上面這個選單可以讓你選擇目標的平台，你想使用的toolchain以及你想要包進映像檔的套件。
+更新原始碼和feeds後再執行這個設定界面，以確保是最新的套件設定。
+
+Defconfig
+選定好target後再執行defconfig
+make defconfig
+這會產生標準的設定，包含檢查相依性和建置的環境等。 會檢查相依性，是否有安裝遺漏的並再執行一次。
+
+整體設定
+Menuconfig 提供一個文字的選單介面，可以選擇要編譯成韌體的目標、套件和一些核心選項。
+make menuconfig
+會自動更新現存的設定和相依性來建置更新後的映像檔。
+為了簡化強大的編譯環境來產生個別的OpenWrt映像檔，發展了'menuconfig'。透過menuconfig的幫助，可以解決客製化的設定需求。依照特定的目標平台，套件需求和核心模組。標準的設定流程修改的部分包含:
+
+目標系統(Target system)
+套件選擇(Package selection)
+建置系統設定(Build system settings)
+核心模組(Kernel modules)
+目標系統的選擇可以依照你手上的設備選擇支援的平台，可以是通用或特定的設置。 選擇套件可以選'selecting all package'來選定所有的套件，但這或許在特定狀況下才可被實現。預設的套件已經足夠，或可以再選定個別的套件。要注意的是，某些套件的組合會導致建置中斷，所以要做些測試來達到預期的結果。也因此OpenWrt的開發者們只有維護最小的預設套件組合。不過feeds-script可以讓建置過程中的套件整合和維護簡單化。
+
+最常用的三個選項:
+< > 這個原始碼不會被處理
+<M> 這個套件的原始碼會被編譯成二進制檔和一個opkg套件檔。這個套件檔會放在 /buildsystem/bla/bla/bla，但是ImageGenerator並不會把這個套件放到韌體的映像檔中!
+<*> 這個套件會被放入韌體中 (在SqashFS 分割區)
+在開始編譯前的最後一步，離開 'menuconfig' – 這包含儲存設定或載入已存在的版本和設定。
+離開文字選單並選擇 save 來儲存設定。
+
+核心設定
+如果不想要標準的核心設定，你可以用:
+make kernel_menuconfig
+注意: make kernel_menuconfig 會修改核心設定的模版，清空 build_dir 並不會回復。 
+修改的部分可以參考 svn diff target/linux/ 並可以下 svn revert -R target/linux/ 來回復。
+參照: Customizing the kernel options
+
+原始碼鏡射位置
+'Build system settings' 包含會影響套件位置的選項，以便於操控本地端的套件組:
+套件原始碼的本地端鏡射位置
+下載資料夾
+第一個選項，你只需要輸入那個套件原始碼的完整的ftp或web伺服器位址。下載資料夾會一樣的放在你本地端的路徑資料夾。如果是ftp或web伺服器提供TAR封裝檔，OpenWrt的建置系統會先嘗試下載在Makefile裡描述的位址。也可以指定在建置系統上的下載資料夾。
+如果你需要特定或非標準的驅動程式，必須到'Kernel modules'選定。這通常是需要USB模組或是特定的網路介面的驅動程式等。
+
+客製化檔案
+在許多狀況，可能需要一個已被預先設定好的客製化映像檔。可以放置你的客製化檔案到
+<buildroot dir>/files/
+例如，你想要先設定好/etc/config/firewall，那就把修改好的firewall設定檔放到:
+<buildroot dir>/files/etc/config/
+例如，你的<buildroot dir> 是 /openwrt/trunk。如果你想把某些檔案放到映像檔中的/etc/config資料夾，就把這些檔案放到 /openwrt/trunk/files/etc/config.
+
+建置映像檔
+當全部都準備好可以建置映像檔了，只要下這麼一個命令:
+make
+這個命令會開始一連串的活動，如你所知的
+編譯 toolchain
+用toolchain做跨平台編譯原始碼
+產生opkg套件
+產生可以flashed的韌體映像檔
+Make 選項
+多核心CPU建置
+建置的程序可以透過多個非同步的程序來加速，使用 -j選項:
+make -j 3
+使用標準的公式 <CPU核心數目 + 1>
+如果會發生不固定建置錯誤，請試著拿掉 -j選項後再編譯一次。
+背景建置
+如果你希望建置的過程中還可以使用你的系統，你可以讓建置的程序只使用閒置的 I/O 和 CPU 資源 (雙核心 CPU):
+ionice -c 3 nice -n 20 make -j 2
+建置單一套件
+在開發OpenWrt套件的時候，僅編譯套件是來得方便多的 (例如建置套件 cups):
+make package/cups/compile V=s
+如套件 mc (midnight commander)包含feed packages 的套件:
+make package/feeds/packages/mc/compile V=s
+注意:啟始路徑為package 目錄和 package/feeds 的或許不會和feeds的結構相同。 如套件 ~/openwrt/trunk/feeds/packages/net/snort 要用 make ~/openwrt/trunk/package/feeds/packages/snort/compile V=s來編譯。
+建置錯誤
+如果因為某些原因建置錯誤了，最簡單的方式就是使用:
+make V=s 2>&1 | tee build.log | grep -i error
+這個命令會記錄全部的建置輸出到 /openwrt/trunk/build.log 並顯示error的部分到螢幕上。
+另一個範例:
+ionice -c 3 nice -n 20 make -j 2 V=s CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee build.log | egrep -i '(warn|error)'
+這個命令在雙核心CPU環境用背景建置並記錄全部的建置輸出到 build.log 且顯示warnings和error的部分到螢幕上。
+使用beep聲提示
+依照你的使用的CPU，建置程序需要一些時間或更久。你可以使用 echo -e '\a'來做聲音的提示:
+make V=s ; echo -e '\a'
+
+映像檔位置
+建置成功後，最新的映像檔會放在 <buildroot dir>/bin 資料夾。編譯過的檔案會依照目的平台來放置，如韌體是給ar71xx裝置的，就會被放在 <buildroot dir>/bin/ar71xx 資料夾裡。
+例:假設你的 <buildroot dir> 是 /openwrt/trunk 這個二進制檔就在 /openwrt/trunk/bin/ar71xx.
+清除編譯
+如果需要清除建置環境的時候，以下的make參數可以使用:
+清除
+make clean
+刪除 bin 和 build_dir 目錄內容。
+清除目錄
+make dirclean
+除了刪除 /bin 和 /build_dir 的內容，並包含 /staging_dir 和 /toolchain (跨平台編譯的工具). 'Dirclean' 是基本的清除指令。
+清除編譯
+make distclean
+消滅所有的已編譯的部分或設定，並刪除以下載的套件和原始碼。
+注意: 請小心使用，這個命令會 移除你的建置設定(.config)，toolchain和其他所有的原始碼!
+在OpenWrt的建置環境中還有很多的功能，以上已包含部分的概念。
+建置範例
+https://forum.openwrt.org/viewtopic.php?pid=129319#p129319
+https://forum.openwrt.org/viewtopic.php?id=28267
+問題排除
+首先使用"make V=s"選項來取得更多資訊。
+Missing source code file, due to download problems
+先檢查Makefile裡的URL路徑的結尾是否包含斜線，試著將它移除。 或是手動下載原始碼，並放到 "dl" 資料夾。
+Compilation errors
+試著更新原始碼和所有的feeds (注意! 可能會導致其他問題)。 檢查是否有相關的臭蟲 (TRAC), 可以使用filter來搜尋。 或是直接在那裏回報問題，請提供套件名稱，目的CPU和映像檔等以及原始碼和套件版本。 使用 make -j … 有時會發生不固定的錯誤。回報前請先不使用-j選項編譯。
+Bad environment variables
+GREP_OPTIONS 不應該有 –initial-tab 或是其他會影響輸出的選項。
+SED 不應該被設定。如果已存在編譯前請執行 `unset SED` 。 (參照 Ticket 10612.)
+I can't find my <package> in menuconfig
+請先試過這個命令 See this.
+./scripts/feeds install <package>
+也許你找錯子目錄了。請參考套件的 Makefile 。
+cat package/feeds/packages/<package>/Makefile
+找到如下:
+define Package/<package>/Default
+  SUBMENU:=Firewall
+  SECTION:=net
+  CATEGORY:=Network
+Error: No rule to make target...
+請確認路徑是以 package 資料夾開始，並確認資料夾存在。feeds 和 package/feeds 資料夾的結構是不一樣的。 
+See this.
+錯誤: make feeds/packages/utils/screen/compile V=s
+正確: make package/feeds/packages/screen/compile V=s
+WARNING: skipping <package> -- package not selected
+執行 make menuconfig 並開啟這個套件。 把它標記為 <*> 或 <M> 讓編譯正常. See this.
+
+
+/******************************************************************************/
+openwrt學習：make menuconfig的一些筆記
+/******************************************************************************/
+本文記錄openwrt編譯配置的一些筆記，這些配置只是筆者的一個實踐例子，當然，還有更多的配置選擇，那是諸君之事了。
+一、介紹
+make menuconfig不僅僅配置內核，還有rootfs(實際為busybox)、app(系統庫、界面工具。內核配置位於：chaos_calmer\package\kernel\linux。不同的驅動配置在不同的文件，具體根據文件名稱可識別出。
+ls chaos_calmer/package/kernel/linux/modules/
+001-depends.mk  crypto.mk    hwmon.mk  leds.mk        netfilter.mk   other.mk   spi.mk    virtual.mk   wpan.mk
+block.mk        firewire.mk  i2c.mk    lib.mk         netsupport.mk  pcmcia.mk  usb.mk    w1.mk
+can.mk          fs.mk        input.mk  netdevices.mk  nls.mk         sound.mk   video.mk  wireless.mk
+二、配置
+下面簡單列出筆記的配置的一部分內容。
+1、平台類型
+Target System (x86)  --->
+這裡只選擇x86。根據平台類型的不同，後面的選項也有不同。
+2、目標板鏡像文件
+生成的鏡像文件的相關配置。
+Target Images  --->
+[*] tar.gz  # 壓縮包格式
+[*] ext4  ---> # 可選ext4的最大節點數以及block大小
+[*] Build GRUB images (Linux x86 or x86_64 host only)
+[*]   Use Console Terminal (in addition to Serial)   # 開啟串口調試終端
+(ttyS0) Serial port device # 串口設備名，一般為ttyS0
+(115200) Serial port baud rate # 波特率，選擇的與串口工具設置的波特率必須一致
+(3)   Seconds to wait before booting the default entry # grub倒計時，單位為秒
+(4) Kernel partition size (in MB)  # 內核的大小，單位為MB，一般3、4MB足夠
+(64) Root filesystem partition size (in MB) # 根文件系統大小，這個值越大，鏡像體積越大，一般路由系統幾十MB足夠
+3、鏡像配置(系統腳本及IP配置)
+[*] Image configuration  --->
+--- Preinit configuration options
+  [*]   Suppress stderr messages during preinit
+  (2)   Failsafe wait timeout
+  [ ]   Show all preinit network messages
+  [ ]   Suppress network message indicating failsafe
+  ()    Preinit network interface  # 默認IP地址
+  (192.168.1.1) IP address for preinit network messages
+  (255.255.255.0) Netmask for preinit network messages
+  (192.168.1.255) Broadcast address for preinit network messages
+4、基礎系統
+本配置項為構建基本的文件系統，基本工具，庫，等。默認即可。
+Base system  --->     
+<*> base-files................................... Base filesystem for OpenWrt # 基本文件系統
+<*> dropbear........................................ Small SSH2 client/server #ssh伺服器
+-*- libc........................................................... C library # C庫
+-*- libgcc............................................... GCC support library # gcc支援庫
+-*- libpthread.......................................... POSIX thread library # 線程庫
+-*- librt................................ POSIX.1b RealTime extension library# 運行時庫
+5、root權限命令
+如sudo等命令
+Administration  --->  
+6、Boot Loader
+此項無內容
+Boot Loaders  ---->    
+7、開發相關
+開發專用，會安裝如gcc、gdb、ar、patch、binutils等工具，普通用戶無須關注。
+Development  --->    
+8、固件
+個別模組的固件，如是，則要加入內核。X86平台，無須理會。
+Firmware  --->        
+9、內核模組
+真正的內核配置在此處。本模組較重要，內容較多。但本文使用的X86平台上需要配置的東西不多。
+Kernel modules  --->  
+9.1、塊設備
+Block Devices  --->
+-*- kmod-scsi-core....................................... SCSI device support
+9.2、文件系統
+本次移植使用的文件系統為EXT4。其它不需要。
+Filesystems  --->
+<*> kmod-fs-ext4..................................... EXT4 filesystem support
+-*- kmod-fs-nfs....................................... NFS filesystem support
+-*- kmod-fs-nfs-common......................... Common NFS filesystem modules
+9.3、硬體監控模組
+如LM75，不使用。
+Hardware Monitoring Support  --->   
+9.4、I2C支援
+該X86平台使用IGB網路驅動，需要I2C的支援，故選擇。
+I2C support  --->
+<*> kmod-i2c-core................................................ I2C support
+9.5、輸入模組
+如USB滑鼠、鍵盤，等。
+Input modules  --->    
+-*- kmod-hid..................................................... HID Devices
+<*> kmod-hid-generic.............................. Generic HID device support
+-*- kmod-input-core........................................ Input device core
+-*- kmod-input-evdev...................................... Input event device   
+9.6、本地語言支援
+Native Language Support  --->
+-*- kmod-nls-base.................................... Native Language Support
+9.7、netfilter擴展
+iptables的選項需要內核的支援，在此進行選擇。文本使用預設值。
+Netfilter Extensions  --->
+9.8、網路設備
+該X86平台使用的網路設備驅動為IGB，其它不選。
+Network Devices  --->  
+-*- kmod-ifb........................... Intermediate Functional Block support
+<*> kmod-igb....... Intel(R) 82575/82576 PCI-Express Gigabit Ethernet support # IGB驅動
+-*- kmod-libphy.................................................. PHY library # PHY庫，必須
+-*- kmod-mii..................................................... MII library
+9.9、網路支援
+對網路的支援，比如8021q、DNS、ipv6。
+Network Support  --->
+<*> kmod-8021q........................................... 802.1Q VLAN support
+-*- kmod-dnsresolver.................................. In-kernel DNS Resolver
+-*- kmod-ipv6................................................... IPv6 support
+9.10、其它模組
+openwrt的menuconfig涉及大量其它東西，而內核只是其中一部分，故不像真正的kernel的menuconfig那樣分類詳細。很多字元類設備都在此選項。比如MMC、EEPROM、RTC、串口。
+Other modules  --->
+<*> kmod-serial-8250.............................................. 8250 UARTs   # 串口設備
+9.11、SPI支援
+SPI驅動，不使用。
+SPI Support  --->
+9.12、音頻支援
+不使用音頻驅動。
+Sound Support  --->
+9.13、USB支援
+USB介面輸入設備，U盤支援，在此處選擇。
+USB Support  --->    
+-*- kmod-usb-core............................................ Support for USB
+<*> kmod-usb-ohci............................... Support for OHCI controllers
+<*> kmod-usb-storage..................................... USB Storage support
+9.14、視頻支援
+不使用視頻功能。
+Video Support  --->
+9.15、無線驅動
+不使用無線驅動。
+Wireless Drivers  --->
+10、編程語言
+如Java、Lua、PHP、Perl、Python、Ruby。由於openwrt使用Lua，建議選上。
+Languages  --->       
+11、庫
+常用庫。如壓縮為libbz2、SSL庫、libexif，等，使用默認選項。SSL建議選擇。
+Libraries  --->       
+12、界面選項配置
+openwrt的界面使用LuCI，功能項、工具在此配置。內容較龐大、較重要。
+LuCI  --->
+1. Collections  ---> 
+2. Modules  --->     
+3. Applications  --->
+4. Themes  --->      
+5. Protocols  --->   
+6. Libraries  --->   
+9. Freifunk  --->
+12.1、綜合
+1. Collections  --->     
+-*- luci   
+<*> luci-ssl......................... Standard OpenWrt set with HTTPS support
+12.2、模組
+LuCI基本模組在此配置。包含各種語言支援。
+2. Modules  --->
+-*- luci-base............................................ LuCI core libraries
+Translations  --->
+<*> Chinese (zh-cn)        # 中文支援
+-*- luci-mod-admin-full. LuCI Administration - full-featured for full control
+12.3、應用程式
+界面上的應用程式在此配置。如防火牆、QOS、NTP同步，等。
+3. Applications  --->    
+-*- luci-app-firewall................ Firewall and Portforwarding application
+<*> luci-app-ntpc.............. NTP time synchronisation configuration module
+<*> luci-app-qos..................... Quality of Service configuration module
+<*> luci-app-vnstat.................................. LuCI Support for VnStat
+12.4、主題
+默認主題為luci-theme-bootstrap。
+4. Themes  --->      
+-*- luci-theme-bootstrap........................... Bootstrap Theme (default)
+<*> luci-theme-freifunk-bno.................... Freifunk Berlin Nordost Theme
+<*> luci-theme-freifunk-generic....................... Freifunk Generic Theme
+<*> luci-theme-openwrt................................ LuCI OpenWrt.org theme
+12.5、協定
+如3G、ipv6、PPP。
+5. Protocols  --->   
+<*> luci-proto-3g............................................. Support for 3G
+-*- luci-proto-ipv6........... Support for DHCPv6/6in4/6to4/6rd/DS-Lite/aiccu
+-*- luci-proto-ppp.......................... Support for PPP/PPPoE/PPPoA/PPtP
+12.6、庫
+6. Libraries  --->   
+-*- luci-lib-ip....... Lua library for IP calculation and routing information
+-*- luci-lib-nixio....................................... NIXIO POSIX library  
+13、郵件
+郵件服務。不使用。
+Mail  --->            
+14、多媒體
+多媒體配置，如ffmpeg、流媒體播放工具。不使用。
+Multimedia  --->      
+15、網路
+本項為網路相關工具、模組的配置。內容較多，也較重要。
+Network  --->
+SSH  --->
+-*- openssh-client............................................ OpenSSH client
+-*- openssh-keygen............................................ OpenSSH keygen
+<*> openssh-server............................................ OpenSSH server
+Time Synchronization  ---> # 時間同步
+-*- ntpclient............................. NTP (Network Time Protocol) client
+<*> ntpdate..................................................... ISC ntp date
+VPN  ---> # VPN，不使用
+Web Servers/Proxies  --->
+-*- uhttpd........................ uHTTPd - tiny, single threaded HTTP server # 小型web伺服器
+<*> ethtool......................... Display or change ethernet card settings
+<*> iperf
+<*> tcpdump..................... Network monitoring and data acquisition tool
+16、音頻
+不使用音頻相關工具、庫，不用配置。
+Sound  --->           
+17、其它工具
+一些其它小工具在此。內容較雜。有的是boot loader，有的是壓縮庫，有的是編輯器(vim)。還有其它工具，如minicom、grep、tar、bash、file，等。根據實際選擇。
+Utilities  --->    
+Editors  --->  # 編輯器
+<*> vim.............................. Vi IMproved - enhanced vi editor (Tiny)
+Terminal  --->  # 終端工具
+<*> minicom....................................... Terminal emulation program
+database  --->  # 數據庫，如mysql、sqlite
+zoneinfo  --->  # 時區資訊
+<*> bash.......................................... The GNU Bourne Again Shell
+<*> grep.................................. grep search utility - full version
+<*> hwclock.................................. query or set the hardware clock
+<*> tar.............................................................. GNU tar
+
+
+/******************************************************************************/
+AllJoyn在OpenWrt上的實踐  (待測)
+/******************************************************************************/
+from : https://read01.com/yO3mzP.html
+
+依項目需求，需要將alljoyn移植到openwrt開發板上，其實談不上複雜，只是這東西有點新，參考教程不多，需要足夠地摸索。可參考的官方教程寫得太不詳細，也只能跟著它試試看了。基本步驟如下：
+
+1、下載openwrt源碼編譯
+貌似版本很多，也不是所有版本都適合我的板子，所以這點得弄清楚。我下得是barrier_break，支援mt7620a開發板。按照上面的教程，把該準備的給準備著，具體總結如下：
+1.1 目前有三種,v12.09,attitude adjustment,barrier_breaker，貌似中間第二種不支援mt7620
+1.2 將下面某一行添加進對應版本的feeds.conf
+src-git alljoyn https://git.allseenalliance.org/gerrit/core/openwrt_feed;openwrt_12.09
+src-git alljoyn https://git.allseenalliance.org/gerrit/core/openwrt_feed;barrier_breaker
+1.3 更新和安裝
+./scripts/feeds update -a
+./scripts/feeds install -a -p alljoyn
+1.4 make menuconfig時按照下圖選擇
+當然如果選擇模組，則生成ipk文件，如果集成到內核中，則直接刷固件就有了
+我們可以在build_dir/target-mipsel-24kec**/下找到alljoyn的相關目錄，裡面的build目錄下有生成好的庫和二進位文件
+
+2、編寫alljoyn程式
+編譯方法和helloworld類似了，我前篇博文有講述，這裡就不說了，我主要列出src文件夾的Makefile
+CXXFLAGS = -Wall -pipe -std=c++11 -fno-rtti -fno-exceptions -Wno-long-long -Wno-deprecated -DQCC_OS_GROUP_POSIX LIBS = -lstdc++ -lalljoyn -lcrypto -lpthread -lrt aj_test: common.o main.o mybuslistener.o mybusobject.o servicebusattachment.o $(CXX) -o $@ $^ -L../alljoyn-lib $(LIBS) common.o: common.cc $(CXX) -c $(CXXFLAGS) -I../alljoyn-inc -o $@ common.cc main.o: main.cc $(CXX) -c $(CXXFLAGS) -I../alljoyn-inc -o $@ $< mybuslistener.o: mybuslistener.cc $(CXX) -c $(CXXFLAGS) -I../alljoyn-inc -o $@ $< mybusobject.o: mybusobject.cc $(CXX) -c $(CXXFLAGS) -I../alljoyn-inc -o $@ $< servicebusattachment.o: servicebusattachment.cc $(CXX) -c $(CXXFLAGS) -I../alljoyn-inc -o $@ $< clean: rm -rf *.o3、交叉編譯
+在SDK頂層下編譯程式，成功後在build_dir/target**/ajtest/下有執行程式，scp到板子上運行。這裡截取一下交叉編譯器的編譯和連結過程，注意觀察用到了哪些目錄下的頭文件目錄和庫目錄
+
+【編譯】
+mipsel-openwrt-linux-uclibc-g++-Os -pipe -mno-branch-likely -mips32r2 -mtune=24kec -mdsp -fno-caller-saves -fhonour-copts -Wno-error=unused-but-set-variable -msoft-float -I/home/cshi/download/openwrt/barrier_breaker/bin/ramips/OpenWrt-SDK-ramips-for-linux-i686-gcc-4.8-linaro_uClibc-0.9.33.2/staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/usr/include-I/home/cshi/download/openwrt/barrier_breaker/bin/ramips/OpenWrt-SDK-ramips-for-linux-i686-gcc-4.8-linaro_uClibc-0.9.33.2/staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/include/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/usr/include/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/include -c hello.cpp
+
+【連結】
+mipsel-openwrt-linux-uclibc-g++-L/home/cshi/download/openwrt/barrier_breaker/bin/ramips/OpenWrt-SDK-ramips-for-linux-i686-gcc-4.8-linaro_uClibc-0.9.33.2/staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/usr/lib-L/home/cshi/download/openwrt/barrier_breaker/bin/ramips/OpenWrt-SDK-ramips-for-linux-i686-gcc-4.8-linaro_uClibc-0.9.33.2/staging_dir/target-mipsel_24kec+dsp_uClibc-0.9.33.2/lib/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/usr/lib/staging_dir/toolchain-mipsel_24kec+dsp_gcc-4.8-linaro_uClibc-0.9.33.2/lib hello.o -o hello
+
+4、保證板中已經有了liballjoyn,pthread,librt,ssl等庫，且正確設置了動態庫路徑，執行即可
+用ldd檢查可發現加載了哪些動態庫
+原文網址：https://read01.com/yO3mzP.html
+
+
+/******************************************************************************/
+openWRT的ipk編譯方法 _一九八網路科技V客學院-IT技術博客
+/******************************************************************************/
+from : http://blog.inet198.cn/?dai_xiangjun/article/details/40213403
+
+編譯時要配置內核，make menuconfig
+配置Build the OpenWrt SDK ，前提條件是openwrt編譯成功
+1.在編譯好的文件中會有/bin/ramips/OpenWrt-SDK-ramips-for-linux-x86_64-gcc-4.6-linaro_uClibc-0.9.33.2.tar.bz2文件
+2.然後解壓這個文件
+tar xvf OpenWrt-SDK-ramips-for-linux-x86_64-gcc-4.6-linaro_uClibc-0.9.33.2.tar.bz2
+進入這個sdk，會看見一個package，在下新建mkdir -p helloworld/src 兩個目錄
+在目錄src下新建helloworld.c
+#include<stdio.h>
+#include <unistd.h>
+int main(void)
+{
+    printf("Hell! O' world, why won't my code compile?\n\n");
+    return 0;
+}
+
+然後在此目錄下創建Makefile(注意Makefile的語法要用tab)
+# build helloworld executable when user executes "make"
+helloworld: helloworld.o
+        $(CC) $(LDFLAGS) helloworld.o -o helloworld
+helloworld.o: helloworld.c
+        $(CC) $(CFLAGS) -c helloworld.c
+# remove object files and executable when user executes "make clean"
+clean:
+        rm *.o helloworld
+然後返回上層目錄，即helloworld目錄，在此目錄下創建一個Makefile
+##############################################
+# OpenWrt Makefile for helloworld program
+#
+#
+# Most of the variables used here are defined in
+# the include directives below. We just need to
+# specify a basic description of the package,
+# where to build our program, where to find
+# the source files, and where to install the
+# compiled program on the router.
+#
+# Be very careful of spacing in this file.
+# Indents should be tabs, not spaces, and
+# there should be no trailing whitespace in
+# lines that are not commented.
+#
+##############################################
+include $(TOPDIR)/rules.mk
+# Name and release number of this package
+PKG_NAME:=helloworld
+PKG_RELEASE:=1
+
+# This specifies the directory where we're going to build the program. 
+# The root build directory, $(BUILD_DIR), is by default the build_mipsel
+# directory in your OpenWrt SDK directory
+PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+
+include $(INCLUDE_DIR)/package.mk
+
+# Specify package information for this program.
+# The variables defined here should be self explanatory.
+# If you are running Kamikaze, delete the DESCRIPTION
+# variable below and uncomment the Kamikaze define
+# directive for the description below
+define Package/helloworld
+        SECTION:=utils
+        CATEGORY:=Utilities
+        TITLE:=Helloworld -- prints a snarky message
+endef
+# Uncomment portion below for Kamikaze and delete DESCRIPTION variable above
+define Package/helloworld/description
+        If you can't figure out what this program does, you're probably
+        brain-dead and need immediate medical attention.
+endef
+# Specify what needs to be done to prepare for building the package.
+# In our case, we need to copy the source files to the build directory.
+# This is NOT the default.  The default uses the PKG_SOURCE_URL and the
+# PKG_SOURCE which is not defined here to download the source from the web.
+# In order to just build a simple program that we have just written, it is
+# much easier to do it this way.
+define Build/Prepare
+        mkdir -p $(PKG_BUILD_DIR)
+        $(CP) ./src/* $(PKG_BUILD_DIR)/
+endef
+# We do not need to define Build/Configure or Build/Compile directives
+# The defaults are appropriate for compiling a simple program such as this one
+# Specify where and how to install the program. Since we only have one file,
+# the helloworld executable, install it by copying it to the /bin directory on
+# the router. The $(1) variable represents the root directory on the router running
+# OpenWrt. The $(INSTALL_DIR) variable contains a command to prepare the install
+# directory if it does not already exist.  Likewise $(INSTALL_BIN) contains the
+# command to copy the binary file from its current location (in our case the build
+# directory) to the install directory.
+define Package/helloworld/install
+        $(INSTALL_DIR) $(1)/bin
+        $(INSTALL_BIN) $(PKG_BUILD_DIR)/helloworld $(1)/bin/
+endef
+# This line executes the necessary commands to compile our program.
+# The above define directives specify all the information needed, but this
+# line calls BuildPackage which in turn actually uses this information to
+# build a package.
+$(eval $(call BuildPackage,helloworld))
+這裡的Makefile文件要注意tab（如果是複製過去的話）
+然後回到OpenWrt-SDK-ramips-for-linux-x86_64-gcc-4.6-linaro_uClibc-0.9.33.2目錄執行make
+編譯過程會在build_dir目錄下完成
+make[1] world
+make[2] package/compile
+make[3] -C package/helloworld compile
+make[2] package/index
+說明編譯成功
+編譯好的文件放置在bin/[yourtarget]/package目錄下
+
+
+/******************************************************************************/
+新版OpenWrt編譯教程
+/******************************************************************************/
+Openwrt 官方正式的發行版是已編譯好了的映像文件（後綴名bin或trx、trx2），此映像文件可從Openwrt官方網站的下載頁面中輕鬆獲取到為了參與測試或參與開發OpenWrt的工作；我們需要重新移植或者重新編譯個一個openwrt,若想實現上述目的，其實很簡單，按下述文字即可成功編譯出一個您的Openwrt來。 
+準備工作 
+在開始編譯Openwrt之前需要您做些準備工作；與其他編譯過程一樣，類似的編譯工具和編譯環境是必不可少的： 一個構建並編譯OpenWrt映像的系統，簡單說就是準備一個Linux或者類Unix作業系統（比如Ubuntu、Debian,MAC OS,FreeBSD等）；確保安裝了所需的依賴關係庫， （在debian系統中就是安裝各種需要的套裝軟體） 
+獲取到OpenWrt源代碼副本 
+首先， 開機登陸到開發機的作業系統（廢話了）。不管是獨立安裝的或者是運行在虛擬機上的(Vmware 或者 Qemu)，推薦使用Linux系統。  
+在 *BSD 或者是 Max OSX 系統上編譯Openwrt也可行，但並不能保證可以成功編譯。下文假定您使用的是Ubuntu作業系統可以到 http://www.ubuntu.com/download/ubuntu/download 下載最新版。 
+
+1，安裝Ubuntu，安裝過程就不說了，圖形化安裝，而且是中文版，連安裝都搞不定的，可以關閉本頁面了。可以安裝在虛擬機裡，也可以安裝在物理機了，官方建議有條件的最好安裝在物理機上，畢竟在虛擬機中編譯Openwrt會產生無法預料的問題，所以建議您還是使用物理主機來編譯以減少不必要的麻煩。 
+2，安裝好後，在左面左邊找到「系統設置」「螢幕」選項把「定時關閉」改成「從不」把鎖定「關閉」在左上角「主面板」功能表的「搜索」中輸入「te」找到「終端」拖至桌面，省去以後再找的過程，這個窗口是沒有「應用」或「確定」之類的，直接關閉它就會保存。用慣WINDOWS的用戶注意了。為什麼要做這步呢? 因為整個編譯過程中有些步驟要等一段時間的，老是自動啟用螢幕保護程式，然後還要重新輸密碼才能退出，也是麻煩事。 
+3，打開桌面上的「終端」進入命令模式然後輸入sudo –sH，注意大小寫，然後輸入裝系統時設置的用戶密碼，就能切換到root(提示：輸入密碼的時候不會有*之類的顯示的，是完全不顯示，部分人不必驚慌)。切換到root是為了安裝或升級部分必要的元件，有些元件需要root權限。 
+   註：如果你使用此方法切換root權限失敗（提示sudo：-sh command no found）你使用一下命令 
+sudo passwd root 
+******（輸入原先的root口令） 
+******（輸入新的root口令，可以保持原樣。我就保持的原樣） 
+******（再次輸入新的root口令） 
+su root 
+就切換到root權限了 
+4、切到root後，順序輸入： 
+apt-get install g++ 
+apt-get install libncurses5-dev 
+apt-get install zlib1g-dev 
+apt-get install bison 
+apt-get install flex 
+apt-get install unzip 
+apt-get install autoconf 
+apt-get install gawk 
+apt-get install make 
+apt-get install gettext 
+apt-get install gcc 
+apt-get install binutils 
+apt-get install patch 
+apt-get install bzip2 
+apt-get install libz-dev 
+apt-get install asciidoc 
+apt-get install subversion 
+每一行回車後都會馬上檢測安裝或升級那個元件，官方WIKI用的是單一條命令，我分開了，因為這樣更容易查看每一個元件的安裝是否成功。一行命令的話，一大堆東西連續出來，懶得拖滾動條回頭看了。一個個分開執行方便看一些。個人喜好了。當中最後面的asciidoc元件是需要下載400多MB東西的，慢慢等了。下載東西之前會有提示本次要下載多少M的東西，問是否的，按y然後回車讓它下載就行了。 提示：假如它提示找不到套裝軟體的話，那麻煩你再看清楚命令中的軟體名 名稱，因為有時是字母中間冒個數字1出來之類的，很容易錯看成字母L。 
+5、上述安裝完成後，這一步很重要，就是執行exit（小寫）命令退出root。如果不退出root的話，那後面會出現暈人的情況，下一步是下載源碼，以root身份下載源碼後，在後續操作中有些會提示不能以root身份操作，但源碼已經以root身份下載了，所有文件的「所有者」都是root，退出root後再操作，又會提示沒有權限，因為文件是root的，普通用戶無法訪問，結果只能用命令修改文件所有者，比較麻煩。所以這裡就要退出root，以普通用戶身份執行下面的下載源碼命令。其實一開始安裝元件的時候可以在命令前加上sudo來達到臨時用root身份，執行完後又回到普通權限的目的，但對於新手來說，不必過於追求這些了，有個可行的方法就湊合著先用吧。 
+6 ，關於Openwrt的源代碼下載，途徑有二，一是通過 subversion ，一是通過 git，建議使用 subversion(SVN) ，因為Openwrt主要以 svn 來維護Openwrt系統的版本。另外，請注意Openwrt中不同的分支版本，一種是最新版但不是最穩定，也就是trunk版，一種是相對穩定版，backfire版。 
+下述代碼即舉例說明了通過svn從brandkfire獲得backfire源代碼（此版本意思是從trunk分支的補丁也在backfire版本中了，即包含修復補丁）： 
+mkdir OpenWrt/ 
+cd OpenWrt/ 
+svn co svn://svn.openwrt.org/openwrt/branches/backfire（回車後等待下載） 
+註解: 上述svn命令將在當前目錄創建一個 OpenWrt/backfire/ 子目錄，此目錄包含此命令獲取到的源代碼。您也可以通過下述命令，下載不含修復補丁的backfire的原版源碼： 
+svn co svn://svn.openwrt.org/openwrt/tags/backfire_10.03 
+使用開發版源代碼 
+當前的開發版本分支(trunk)已包含最新的實驗補丁。此分支或許還突破了Openwrt原來所不支援的硬體設備的限制哦，驚喜的同時也有風險存在。因此，編譯trunk版，慎之～ 
+mkdir OpenWrt/ 
+cd OpenWrt/ 
+svn co svn://svn.openwrt.org/openwrt/trunk/（回車後等待下載） 
+7，開始準備編譯 
+首先跟進並更新源代碼 
+因Openwrt的源代碼隨時都會變動，故此命令將確保您所獲取得到的源碼的最新性。 
+如果你用的是backfire版本的源碼： 
+cd OpenWrt/backfire/ 
+svn up 
+./scripts/feeds update -a 
+./scripts/feeds install -a 
+如果你用的是trunk版本的源碼： 
+cd OpenWrt/trunk/ 
+svn up 
+./scripts/feeds update -a 
+./scripts/feeds install -a 
+下一步是檢查編譯環境，若可進行編譯則生成默認配置： 
+make defconfig 
+若defconfig回顯提示缺少套裝軟體或編譯庫等依賴，則按提示安裝所缺套裝軟體或庫等即可，不難的，細心點就行。 
+Menuconfig 
+Menuconfig is a text-based tool which handles the selection of target, packages to include in the build, kernel options  
+etc. 
+make menuconfig
+8，編譯固件
+萬事具備，只欠東風,通過下面簡單的make命令來編譯:
+make
+在多核電腦中編譯
+具有多核CPU處理器的電腦進行編譯，使用下述參數可令編譯過程加速。 常規用法為 <您cpu處理器的數目 + 1> – 例如使用3進程來編譯 (即雙核CPU), 命令及參數如下:
+make -j 3
+後台編譯
+If you intend to use your system while building, you can have the build process only use idle I/O and CPU capacity like this (dualcore CPU):
+ionice -c 3 nice -n 20 make -j 2
+
+編譯簡單的基本的套裝軟體
+When developing or packaging software for OpenWrt, it is convenient to be able to build only the package in question (e.g. with package cups):
+make package/cups/compile V=99
+
+For a package in the feeds it looks like this:
+make package/feeds/packages/ndyndns/compile V=99
+
+編譯錯誤
+如果因某種不知道的原因而編譯失敗,下面有種簡單的方法來得知編譯到底錯在哪裡了:
+make V=99 2>&1 |tee build.log |grep -i error
+The above saves a full verbose copy of the build output (with stdout piped to stderr) in build.log and only shows errors on the screen.
+舉例說明:
+ionice -c 3 nice -n 20 make -j 2 V=99 CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 \
+  |tee build.log |egrep -i '(warn|error)'
+The above saves a full verbose copy of the build output (with stdout piped to stderr) in build.log and outputs only warnings and errors while building using only background resources on a dual core CPU.
+一鍵編譯
+即使用腳本來編譯Openwrt固件。許多朋友編譯Openwrt是用的腳本來編譯的，詳見:https://forum.openwrt.org/viewtopic.php?id=28267
+生成的固件在哪
+編譯成功後所生成的固件文件位於bin目錄下，可用如下命令查看：
+cd bin/
+ls */
+
+Cleaning Up
+You might need to clean your build environment every now and then. The following make targets are useful for that job:
+Clean
+Cleaning the trunk/ directory after the build process is simple and only requires 'make clean'. It deletes contents of 'bin' and 'build_dir' directories.
+See CAUTION below
+make clean
+CAUTION: Make sure to move your compiled OpenWrt images to another location before issuing this command since it erases the contents of the "bin" directory (where the compiled OpenWrt images live).
+
+Dirclean
+If you want to clean in addition to the build directories also the cross-compile tools (in toolchain directory), use the 'dirclean' make, which does the same as 'clean' and also deletes 'staging_dir' and 'toolchain' contents. 'Dirclean' is your basic "Full clean" operation.
+See CAUTION below
+make dirclean
+CAUTION: Make sure to move your compiled OpenWrt images to another location before issuing this command.
+
+Distclean
+If complete cleaning of the build environment is required, then all it takes is 'make distclean'. It practically nukes everything you have compiled or configured and also deletes all downloaded feeds contents and package sources. Making distclean means quite a lot downloading afterwards, so it should not be used lightly. 'Dirclean' is enough for most cases.
+See CAUTION below
+make distclean
+CAUTION: In addition to all else, this will erase your build configuration (.config), your toolchain and all other sources. 
+Use with care!
+There are numerous other functionalities in the OpenWrt build system, but the above should have covered some of the fundamentals.
+Installing OpenWrt
+In comparison to the actual building of the desired image(s), the installation of the OpenWrt image can sometimes be a little, or more, of a challenge. It can be as simple as using the tools supplied by the manufacturer of the hardware (web interface or recovery tools), over manually uploading a new firmware via tftp and rebooting, to doing extensive hardware modifications with the intent of enabling JTAG access. Though, generally installation is made possible via the bootloader (Redboot, Uboot etc.) or simple copying onto a CompactFlash-card – all depending on the specific device.
+
+-------------------------------------------------
+make 命令簡單說明
+make V=99
+V=99表示輸出詳細的debug資訊
+
+make world
+表示編譯所有
+
+make j=2 V=99
+如是多核CPU，加j=2 選項理論上能加快編譯速度
+make -j 2 V=99可加快編譯速度（不推薦使用）
+
+只清除某個模組
+make package/qos/clean
+
+只編譯某個模組
+make package/qos/clean
+make package/qos/compile
+make package/qos/install
+
+make V=99 | tee compile_v1.0.0.log
+混合 tee 命令將編譯資訊放到compile_v1.0.0.log文件中方便查看。
+
+x86的編譯要點
+　考慮到x86平台使用的特點，以及 OpenWrt 本身，可參考以下要點
+　1. 編譯所有文件系統支援，包括ext2/ext3/ext4，還有NTFS，甚至是LVM；
+　2. 加入一個文本編輯器，例如vim或者nano，因為日常使用中需要用文本編輯器修改各種配置文件；
+　3. 加入所有關於無線網卡的驅動，模組，各種支援程式，
+　4. 一些其他常見應用--藍牙、加密、PGP、SSL、SSH、VPN、USB支援、3G上網卡、
+　5. 編譯時要到網上下載相關源碼，所以可以日後下載的包盡量不選擇編譯；
+　6. 編譯好的文件在當前目錄的bin文件夾下，如果是brcm-2.4，則 ls bin/brcm-2.4/ 就可以看到很多熟悉的文件了。
+
+參考資料
+　　如何給 Openwrt 提交補丁
+　　https://dev.openwrt.org/wiki/SubmittingPatches
+
+　　Openwrt 源代碼的下載方式
+　　https://dev.openwrt.org/wiki/GetSource
+
+　　構造編譯環境
+　　http://wiki.openwrt.org/doc/howto/buildroot
+
+　　構造編譯環境－老的文檔
+　　http://downloads.openwrt.org/docs/buildroot-documentation.html
+
+　　本文賴以生存的基礎－官方wiki中的編譯教程，我翻譯了編譯一文中的小部分。
+　　http://wiki.openwrt.org/doc/howto/build
+
+　　下文有詳細的編譯方面說明
+　　http://downloads.openwrt.org/kamikaze/docs/openwrt.html 
+
+
+
+/******************************************************************************/
+// build error
+/******************************************************************************/
+make[3]: Leaving directory '/home/dexter/RPi/openwrt/feeds/packages/libs/classpath'
+package/Makefile:191: recipe for target 'package/feeds/packages/classpath/compile' failed
+make[2]: *** [package/feeds/packages/classpath/compile] Error 2
+make[2]: Leaving directory '/home/dexter/RPi/openwrt'
+package/Makefile:188: recipe for target '/home/dexter/RPi/openwrt/staging_dir/target-arm_cortex-a7+vfp_uClibc-0.9.33.2_eabi/stamp/.package_compile' failed
+make[1]: *** [/home/dexter/RPi/openwrt/staging_dir/target-arm_cortex-a7+vfp_uClibc-0.9.33.2_eabi/stamp/.package_compile] Error 2
+make[1]: Leaving directory '/home/dexter/RPi/openwrt'
+/home/dexter/RPi/openwrt/include/toplevel.mk:181: recipe for target 'world' failed
+make: *** [world] Error 2
+
+
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
